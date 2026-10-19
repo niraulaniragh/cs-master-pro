@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS Master Pro - Edexcel IGCSE Computer Science (4CP0)</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Highlight.js for code syntax highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    
+    <!-- KaTeX for math rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    
+    <!-- Our Styles (SCSS compiled) -->
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Navigation -->
+        <nav class="main-nav" id="main-nav">
+            <div class="nav-brand">
+                <span class="brand-icon">🎓</span>
+                <span class="brand-text">CS Master Pro</span>
+                <span class="brand-badge">Edexcel 4CP0</span>
+            </div>
+            <div class="nav-links">
+                <a href="#" class="nav-link active" data-route="home">
+                    <i class="fas fa-home"></i> Home
+                </a>
+                <a href="#" class="nav-link" data-route="learn">
+                    <i class="fas fa-book-open"></i> Learn
+                </a>
+                <a href="#" class="nav-link" data-route="practice">
+                    <i class="fas fa-gamepad"></i> Practice
+                </a>
+                <a href="#" class="nav-link" data-route="tools">
+                    <i class="fas fa-tools"></i> Tools
+                </a>
+                <a href="#" class="nav-link" data-route="playground">
+                    <i class="fas fa-code"></i> Playground
+                </a>
+            </div>
+            <div class="nav-stats">
+                <div class="stat-item" title="Experience Points">
+                    <i class="fas fa-star"></i>
+                    <span id="nav-xp">0</span> XP
+                </div>
+                <div class="stat-item" title="Level">
+                    <i class="fas fa-trophy"></i>
+                    Lvl <span id="nav-level">1</span>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content" id="main-content">
+            <!-- Dynamic content loaded here by router -->
+        </main>
+
+        <!-- Footer -->
+        <footer class="main-footer">
+            <p>Edexcel IGCSE Computer Science (4CP0) - Paper 1: Principles of Computer Science</p>
+        </footer>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Modal Container -->
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal-content" id="modal-content"></div>
+    </div>
+
+    <!-- Scripts - Order matters! -->
+    <!-- Data files -->
+    <script src="js/data/topics.js"></script>
+    <script src="js/data/questions.js"></script>
+    <script src="js/data/notes.js"></script>
+    
+    <!-- Utilities -->
+    <script src="js/utils/helpers.js"></script>
+    <script src="js/utils/storage.js"></script>
+    
+    <!-- Components -->
+    <script src="js/components/Toast.js"></script>
+    <script src="js/components/Modal.js"></script>
+    
+    <!-- Views -->
+    <script src="js/views/HomeView.js"></script>
+    <script src="js/views/LearnView.js"></script>
+    <script src="js/views/PracticeView.js"></script>
+    <script src="js/views/ToolsView.js"></script>
+    <script src="js/views/PlaygroundView.js"></script>
+    
+    <!-- Core (must be last) -->
+    <script src="js/core/State.js"></script>
+    <script src="js/core/Router.js"></script>
+    <script src="js/core/App.js"></script>
+</body>
+</html>
