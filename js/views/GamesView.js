@@ -253,7 +253,15 @@ const GamesView = {
             { id: 'flawless', name: 'Flawless Victory', icon: '⭐', desc: 'Defeat boss with full HP' }
         ];
         
-        const unlocked = AppState.getState('achievements') || [];
+        let unlocked = [];
+        try {
+            const user = AppState.getState('user');
+            if (user && user.achievements) {
+                unlocked = user.achievements;
+            }
+        } catch (e) {
+            unlocked = [];
+        }
         
         return `
             <div class="game-ach-grid">
