@@ -1,6 +1,6 @@
 /**
  * HomeView.js - Enhanced Home/Dashboard View
- * Features: Better stats, visual progress charts, study streaks, topic progress
+ * Features: Daily Challenge, Study Timer, Leaderboard, Progress Charts
  */
 
 const HomeView = {
@@ -11,23 +11,42 @@ const HomeView = {
         const progress = Math.min(100, ((user.xp - currentLevelXP) / (xpForNext - currentLevelXP)) * 100);
         const accuracy = user.totalAnswered > 0 ? Math.round((user.totalCorrect / user.totalAnswered) * 100) : 0;
         const rank = HomeView.getRank(user.level);
+        const isLoggedIn = typeof Auth !== 'undefined' && Auth.isLoggedIn();
+        const username = isLoggedIn ? Auth.getSession()?.username : 'Student';
 
         return `
             <div class="home-view">
+                <!-- Welcome Hero -->
                 <section class="hero">
                     <div class="hero-content">
-                        <h1>🎓 CS Master Pro</h1>
-                        <p class="hero-subtitle">Master IGCSE Computer Science • Edexcel 4CP0</p>
-                        <div class="hero-badges">
-                            <span class="badge badge-purple">Paper 1 & 2 Complete</span>
-                            <span class="badge badge-green">155+ Questions</span>
-                            <span class="badge badge-cyan">Interactive Tools</span>
+                        <div class="hero-welcome">
+                            <h1>Welcome back, ${username}! 👋</h1>
+                            <p class="hero-subtitle">Ready to master IGCSE Computer Science?</p>
                         </div>
+                        <div class="hero-badges">
+                            <span class="badge badge-purple">Edexcel 4CP0</span>
+                            <span class="badge badge-green">155+ Questions</span>
+                            <span class="badge badge-cyan">Interactive Learning</span>
+                        </div>
+                    </div>
+                    <div class="hero-search">
+                        <button class="search-btn" onclick="SearchNotes.open()">
+                            <i class="fas fa-search"></i>
+                            <span>Search notes...</span>
+                            <kbd>Ctrl+K</kbd>
+                        </button>
                     </div>
                 </section>
 
+                <!-- Daily Challenge & Timer Row -->
+                <section class="feature-row">
+                    ${DailyChallenge.renderCard()}
+                    ${StudyTimer.render()}
+                </section>
+
+                <!-- Main Dashboard -->
                 <section class="dashboard-grid">
-                    <!-- Main Stats Panel -->
+                    <!-- Progress Panel -->
                     <div class="dashboard-panel user-panel">
                         <div class="panel-header">
                             <h3>📊 Your Progress</h3>
@@ -59,55 +78,27 @@ const HomeView = {
                                 <p class="xp-needed">${(xpForNext - user.xp).toLocaleString()} XP to Level ${user.level + 1}</p>
                             </div>
                         </div>
+                        
+                        <!-- Mini Stats -->
+                        <div class="mini-stats">
+                            <div class="mini-stat">
+                                <span class="mini-stat-value">${user.totalCorrect}</span>
+                                <span class="mini-stat-label">Correct</span>
+                            </div>
+                            <div class="mini-stat">
+                                <span class="mini-stat-value">${accuracy}%</span>
+                                <span class="mini-stat-label">Accuracy</span>
+                            </div>
+                            <div class="mini-stat">
+                                <span class="mini-stat-value">${user.achievements.length}</span>
+                                <span class="mini-stat-label">Achievements</span>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Stats Cards -->
-                    <div class="dashboard-panel stats-panel">
-                        <div class="panel-header">
-                            <h3>📈 Statistics</h3>
-                        </div>
-                        <div class="stats-grid">
-                            <div class="stat-item">
-                                <div class="stat-icon-box purple">✅</div>
-                                <div class="stat-details">
-                                    <span class="stat-value">${user.totalCorrect}</span>
-                                    <span class="stat-label">Correct Answers</span>
-                                </div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-icon-box blue">📝</div>
-                                <div class="stat-details">
-                                    <span class="stat-value">${user.totalAnswered}</span>
-                                    <span class="stat-label">Questions Answered</span>
-                                </div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-icon-box green">🎯</div>
-                                <div class="stat-details">
-                                    <span class="stat-value">${accuracy}%</span>
-                                    <span class="stat-label">Accuracy Rate</span>
-                                </div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-icon-box orange">🏆</div>
-                                <div class="stat-details">
-                                    <span class="stat-value">${user.achievements.length}/${ACHIEVEMENTS.length}</span>
-                                    <span class="stat-label">Achievements</span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Accuracy Visual -->
-                        <div class="accuracy-visual">
-                            <div class="accuracy-bar-container">
-                                <div class="accuracy-bar" style="width: ${accuracy}%"></div>
-                            </div>
-                            <div class="accuracy-labels">
-                                <span>0%</span>
-                                <span class="accuracy-current">${accuracy}% Accuracy</span>
-                                <span>100%</span>
-                            </div>
-                        </div>
+                    <!-- Leaderboard -->
+                    <div class="dashboard-panel leaderboard-panel">
+                        ${Leaderboard.renderMini()}
                     </div>
                 </section>
 
@@ -118,32 +109,40 @@ const HomeView = {
                         <button class="action-card" onclick="Router.navigate('learn')">
                             <span class="action-icon">📚</span>
                             <span class="action-title">Learn</span>
-                            <span class="action-desc">Study revision notes with ${TOPICS.reduce((acc, t) => acc + t.subtopics.length, 0)}+ subtopics</span>
+                            <span class="action-desc">Study revision notes</span>
+                            <kbd>L</kbd>
                         </button>
                         <button class="action-card highlight" onclick="Router.navigate('practice')">
                             <span class="action-icon">🎯</span>
                             <span class="action-title">Practice</span>
-                            <span class="action-desc">Quiz mode & Flashcards with 155+ questions</span>
+                            <span class="action-desc">Quiz & Flashcards</span>
+                            <kbd>P</kbd>
                         </button>
                         <button class="action-card" onclick="Router.navigate('tools')">
                             <span class="action-icon">🔧</span>
                             <span class="action-title">Tools</span>
-                            <span class="action-desc">Binary converter, Logic gates & more</span>
+                            <span class="action-desc">Interactive tools</span>
+                            <kbd>T</kbd>
                         </button>
                         <button class="action-card" onclick="Router.navigate('playground')">
                             <span class="action-icon">💻</span>
                             <span class="action-title">Code</span>
-                            <span class="action-desc">Write & trace code with trace tables</span>
+                            <span class="action-desc">Write & trace code</span>
+                            <kbd>C</kbd>
                         </button>
                     </div>
                 </section>
 
-                <!-- Topic Progress -->
+                <!-- Topics Overview -->
                 <section class="topic-progress-section">
-                    <h3>📖 Topics Overview</h3>
-                    <p class="section-subtitle">Click any topic to start learning</p>
+                    <div class="section-header-row">
+                        <h3>📖 Topics Overview</h3>
+                        <button class="btn btn-small btn-secondary" onclick="Router.navigate('learn')">
+                            View All →
+                        </button>
+                    </div>
                     <div class="topics-progress-grid">
-                        ${TOPICS.map(topic => {
+                        ${TOPICS.slice(0, 6).map(topic => {
                             const questionCount = QUESTIONS.filter(q => q.topic === topic.id).length;
                             return `
                                 <div class="topic-progress-card" onclick="Router.navigate('learn'); setTimeout(() => LearnView.selectTopic('${topic.id}'), 100)">
@@ -154,72 +153,35 @@ const HomeView = {
                                             <span class="topic-meta">${topic.subtopics.length} subtopics • ${questionCount} questions</span>
                                         </div>
                                     </div>
-                                    <div class="topic-subtopics">
-                                        ${topic.subtopics.slice(0, 3).map(sub => `<span class="subtopic-tag">${sub}</span>`).join('')}
-                                        ${topic.subtopics.length > 3 ? `<span class="subtopic-more">+${topic.subtopics.length - 3} more</span>` : ''}
-                                    </div>
                                 </div>
                             `;
                         }).join('')}
                     </div>
                 </section>
 
-                <!-- Achievements -->
+                <!-- Achievements Preview -->
                 <section class="achievements-section">
-                    <div class="section-header">
+                    <div class="section-header-row">
                         <h3>🏆 Achievements</h3>
                         <span class="achievement-count">${user.achievements.length}/${ACHIEVEMENTS.length} Unlocked</span>
                     </div>
-                    <div class="achievements-grid">
-                        ${ACHIEVEMENTS.map(ach => {
+                    <div class="achievements-scroll">
+                        ${ACHIEVEMENTS.slice(0, 8).map(ach => {
                             const unlocked = user.achievements.includes(ach.id);
                             return `
                                 <div class="achievement-card ${unlocked ? 'unlocked' : 'locked'}" title="${ach.description}">
                                     <span class="ach-icon">${unlocked ? ach.icon : '🔒'}</span>
-                                    <div class="ach-info">
-                                        <span class="ach-name">${ach.name}</span>
-                                        <span class="ach-desc">${ach.description}</span>
-                                    </div>
+                                    <span class="ach-name">${ach.name}</span>
                                 </div>
                             `;
                         }).join('')}
                     </div>
                 </section>
 
-                <!-- Study Tips -->
-                <section class="study-tips-section">
-                    <h3>💡 Study Tips</h3>
-                    <div class="tips-grid">
-                        <div class="tip-card">
-                            <span class="tip-icon">📖</span>
-                            <div class="tip-content">
-                                <h4>Read First, Quiz Later</h4>
-                                <p>Study the revision notes for each topic before testing yourself with quizzes.</p>
-                            </div>
-                        </div>
-                        <div class="tip-card">
-                            <span class="tip-icon">🔄</span>
-                            <div class="tip-content">
-                                <h4>Spaced Repetition</h4>
-                                <p>Use flashcards regularly. Mark cards for review and revisit them daily.</p>
-                            </div>
-                        </div>
-                        <div class="tip-card">
-                            <span class="tip-icon">🎯</span>
-                            <div class="tip-content">
-                                <h4>Focus on Weak Areas</h4>
-                                <p>After each quiz, review the questions you got wrong and read the explanations.</p>
-                            </div>
-                        </div>
-                        <div class="tip-card">
-                            <span class="tip-icon">🔧</span>
-                            <div class="tip-content">
-                                <h4>Practice with Tools</h4>
-                                <p>Use interactive tools to understand binary, logic gates, and algorithms visually.</p>
-                            </div>
-                        </div>
-                    </div>
-                </section>
+                <!-- Keyboard Shortcut Hint -->
+                <div class="keyboard-hint">
+                    <p>💡 Press <kbd>?</kbd> for keyboard shortcuts</p>
+                </div>
             </div>
         `;
     },
