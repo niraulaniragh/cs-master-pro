@@ -3957,5 +3957,545 @@ ENDIF</code></pre>
 </div>
             `
         }
+    },
+
+    'exam-tips': {
+        'Command Words': {
+            content: `
+<h2>📝 Command Words</h2>
+<p>Understanding command words is <strong>essential</strong> for exam success. They tell you exactly what the examiner expects in your answer.</p>
+
+<div class="definition-box">
+    <strong>Definition:</strong> Command words are the words in a question that tell you what type of response is required and how much detail to provide.
+</div>
+
+<h3>Low-Mark Commands (1-2 marks)</h3>
+
+<div class="info-box">
+    <h4>State / Give / Name / Identify</h4>
+    <p><strong>Meaning:</strong> Write a brief answer without explanation.</p>
+    <p><strong>Format:</strong> Single word, phrase, or short sentence.</p>
+    <div class="example-box">
+        <strong>Example Q:</strong> State what ASCII stands for. (1 mark)<br>
+        <strong>Answer:</strong> American Standard Code for Information Interchange
+    </div>
+</div>
+
+<div class="info-box">
+    <h4>Define</h4>
+    <p><strong>Meaning:</strong> Give the precise meaning of a term.</p>
+    <p><strong>Format:</strong> One or two sentences with technical accuracy.</p>
+    <div class="example-box">
+        <strong>Example Q:</strong> Define the term 'algorithm'. (2 marks)<br>
+        <strong>Answer:</strong> An algorithm is a step-by-step set of instructions to solve a problem or complete a task. It must be finite, unambiguous, and produce an output.
+    </div>
+</div>
+
+<h3>Medium-Mark Commands (2-4 marks)</h3>
+
+<div class="info-box">
+    <h4>Describe</h4>
+    <p><strong>Meaning:</strong> Give a detailed account of features or characteristics.</p>
+    <p><strong>Format:</strong> Multiple sentences describing what something is or does. No reasons needed.</p>
+    <div class="example-box">
+        <strong>Example Q:</strong> Describe the purpose of RAM. (2 marks)<br>
+        <strong>Answer:</strong> RAM (Random Access Memory) is a type of primary storage that holds data and programs currently in use. It is volatile, meaning data is lost when the power is turned off. The CPU can read from and write to RAM very quickly.
+    </div>
+</div>
+
+<div class="info-box">
+    <h4>Explain</h4>
+    <p><strong>Meaning:</strong> Give reasons or causes. Say WHY or HOW something happens.</p>
+    <p><strong>Format:</strong> Points + reasons. Use connectives like "because", "this means", "therefore", "as a result".</p>
+    <div class="example-box">
+        <strong>Example Q:</strong> Explain why binary search is faster than linear search. (3 marks)<br>
+        <strong>Answer:</strong> Binary search eliminates half of the remaining items with each comparison <strong>because</strong> it compares the target with the middle element and discards the half that cannot contain the target. <strong>This means</strong> it only needs log₂(n) comparisons in the worst case, <strong>whereas</strong> linear search may need to check every item (n comparisons).
+    </div>
+</div>
+
+<h3>High-Mark Commands (4-8 marks)</h3>
+
+<div class="info-box">
+    <h4>Discuss</h4>
+    <p><strong>Meaning:</strong> Consider different aspects, viewpoints, or arguments. Explore pros AND cons.</p>
+    <p><strong>Format:</strong> Balanced response with multiple paragraphs covering different perspectives.</p>
+    <div class="example-box">
+        <strong>Example Q:</strong> Discuss the impact of automation on employment. (6 marks)<br>
+        <strong>Answer should include:</strong><br>
+        • Positive impacts (new jobs, increased productivity)<br>
+        • Negative impacts (job losses, skills gaps)<br>
+        • A concluding statement weighing up the impacts
+    </div>
+</div>
+
+<div class="info-box">
+    <h4>Compare</h4>
+    <p><strong>Meaning:</strong> Identify similarities AND differences between items.</p>
+    <p><strong>Format:</strong> Structured comparison using "Both...", "However...", "Unlike..."</p>
+    <div class="example-box">
+        <strong>Example Q:</strong> Compare a compiler and an interpreter. (4 marks)<br>
+        <strong>Answer:</strong><br>
+        <strong>Similarities:</strong> Both translate high-level source code into machine code.<br>
+        <strong>Differences:</strong> A compiler translates the entire program at once before execution, creating an executable file. An interpreter translates and executes one line at a time, without creating an executable.
+    </div>
+</div>
+
+<div class="info-box">
+    <h4>Evaluate</h4>
+    <p><strong>Meaning:</strong> Make a judgment based on criteria. Weigh up evidence and reach a conclusion.</p>
+    <p><strong>Format:</strong> Present evidence, analyze it, and give a justified conclusion.</p>
+    <div class="example-box">
+        <strong>Example Q:</strong> Evaluate the use of cloud storage versus local storage. (6 marks)<br>
+        <strong>Answer should:</strong><br>
+        • List advantages of cloud storage (accessibility, automatic backup)<br>
+        • List disadvantages of cloud storage (requires internet, privacy concerns)<br>
+        • List advantages of local storage (fast access, no internet needed)<br>
+        • Make a justified conclusion about which is better for a specific scenario
+    </div>
+</div>
+
+<h3>🔑 Key Command Word Summary</h3>
+
+<table class="data-table">
+    <tr>
+        <th>Command</th>
+        <th>What to Do</th>
+        <th>Typical Marks</th>
+    </tr>
+    <tr>
+        <td><strong>State</strong></td>
+        <td>Brief answer, no explanation</td>
+        <td>1</td>
+    </tr>
+    <tr>
+        <td><strong>Define</strong></td>
+        <td>Give precise meaning</td>
+        <td>1-2</td>
+    </tr>
+    <tr>
+        <td><strong>Describe</strong></td>
+        <td>What it is/does (no reasons)</td>
+        <td>2-4</td>
+    </tr>
+    <tr>
+        <td><strong>Explain</strong></td>
+        <td>Give reasons (why/how)</td>
+        <td>2-4</td>
+    </tr>
+    <tr>
+        <td><strong>Compare</strong></td>
+        <td>Similarities + Differences</td>
+        <td>3-4</td>
+    </tr>
+    <tr>
+        <td><strong>Discuss</strong></td>
+        <td>Multiple viewpoints/aspects</td>
+        <td>4-6</td>
+    </tr>
+    <tr>
+        <td><strong>Evaluate</strong></td>
+        <td>Judge + Conclude</td>
+        <td>5-8</td>
+    </tr>
+</table>
+
+<div class="warning">
+    <strong>⚠️ Common Mistake:</strong> Describing when asked to explain! If the question says "Explain", you MUST give reasons. "Describe" only requires you to say what something is, not why.
+</div>
+            `
+        },
+        'Exam Technique': {
+            content: `
+<h2>📝 Exam Technique</h2>
+<p>Good exam technique can gain you extra marks even when you're not sure of the content.</p>
+
+<h3>Before the Exam</h3>
+
+<div class="info-box">
+    <h4>📖 Preparation</h4>
+    <ul>
+        <li>Know the exam format (Paper 1: Theory 2 hours, Paper 2: Practical 3 hours)</li>
+        <li>Practice past papers under timed conditions</li>
+        <li>Review mark schemes to understand what examiners want</li>
+        <li>Create flashcards for definitions and key facts</li>
+        <li>Practice writing pseudocode and trace tables</li>
+    </ul>
+</div>
+
+<h3>During the Exam</h3>
+
+<div class="tip-box">
+    <strong>📊 Time Management</strong>
+    <ul>
+        <li><strong>Paper 1 (2 hours, 100 marks):</strong> ~1.2 minutes per mark</li>
+        <li><strong>Paper 2 (3 hours, 100 marks):</strong> ~1.8 minutes per mark</li>
+        <li>Don't spend too long on any one question</li>
+        <li>Leave time at the end to check your answers</li>
+    </ul>
+</div>
+
+<div class="info-box">
+    <h4>✅ Reading Questions</h4>
+    <ul>
+        <li><strong>Highlight command words</strong> - What are you being asked to do?</li>
+        <li><strong>Note the marks</strong> - 4 marks usually needs 4 distinct points</li>
+        <li><strong>Look for context</strong> - Many questions relate to a scenario</li>
+        <li><strong>Answer what's asked</strong> - Don't write about what you know if it's not relevant</li>
+    </ul>
+</div>
+
+<div class="info-box">
+    <h4>📝 Writing Answers</h4>
+    <ul>
+        <li><strong>One mark = one point</strong> - Make sure you have enough points</li>
+        <li><strong>Use technical terminology</strong> - Shows your knowledge</li>
+        <li><strong>Be specific, not vague</strong> - "RAM stores data" is weaker than "RAM stores data and programs currently being executed"</li>
+        <li><strong>For "Explain" questions:</strong> Point → Because → Therefore</li>
+    </ul>
+</div>
+
+<h3>Paper 1 Specific Tips</h3>
+
+<div class="example-box">
+    <h4>Theory Questions</h4>
+    <ul>
+        <li>Draw diagrams if they help (flowcharts, logic gates)</li>
+        <li>For binary/hex conversions, show your working</li>
+        <li>In discussion questions, structure your answer with clear paragraphs</li>
+        <li>Always relate answers back to the scenario if one is given</li>
+    </ul>
+</div>
+
+<h3>Paper 2 Specific Tips</h3>
+
+<div class="example-box">
+    <h4>Programming Questions</h4>
+    <ul>
+        <li><strong>Read all of the code</strong> before answering</li>
+        <li><strong>Trace through carefully</strong> - use trace tables</li>
+        <li><strong>Check your syntax</strong> - but examiners usually accept minor errors</li>
+        <li><strong>Test your logic</strong> with boundary values</li>
+        <li><strong>Comment your code</strong> when asked to write programs</li>
+    </ul>
+</div>
+
+<div class="tip-box">
+    <h4>Trace Table Tips</h4>
+    <ul>
+        <li>Create columns for ALL variables and outputs</li>
+        <li>Work through line by line - don't skip</li>
+        <li>Show values change with each iteration</li>
+        <li>Check loop conditions carefully</li>
+    </ul>
+</div>
+
+<h3>If You're Stuck</h3>
+
+<div class="warning">
+    <h4>🆘 Don't Panic!</h4>
+    <ul>
+        <li><strong>Skip and return</strong> - Don't waste time, move on and come back</li>
+        <li><strong>Write something</strong> - Partial marks are better than no marks</li>
+        <li><strong>Use common sense</strong> - Even if you can't remember, think logically</li>
+        <li><strong>Check the question</strong> - Sometimes hints are in the wording</li>
+    </ul>
+</div>
+            `
+        },
+        'Mark Scheme Advice': {
+            content: `
+<h2>📋 Mark Scheme Advice</h2>
+<p>Understanding how examiners mark will help you write better answers.</p>
+
+<h3>How Marking Works</h3>
+
+<div class="definition-box">
+    <p>Examiners use <strong>mark schemes</strong> with specific points that earn marks. They look for these exact points in your answer.</p>
+</div>
+
+<div class="info-box">
+    <h4>Point-Based Marking</h4>
+    <p>Most questions use <strong>point-based marking</strong>:</p>
+    <ul>
+        <li>Each valid point = 1 mark</li>
+        <li>Alternative acceptable answers are included</li>
+        <li>You can't get more than max marks even with extra points</li>
+    </ul>
+</div>
+
+<div class="example-box">
+    <h4>Example: "Describe two features of a star network topology" (2 marks)</h4>
+    <p><strong>Mark scheme points:</strong></p>
+    <ul>
+        <li>All devices connect to a central switch/hub (1)</li>
+        <li>If one device fails, others continue working (1)</li>
+        <li>Easy to add new devices (1)</li>
+        <li>More cable is needed than bus topology (1)</li>
+    </ul>
+    <p><em>Any 2 points from the list = 2 marks</em></p>
+</div>
+
+<h3>Levels-Based Marking (Extended Questions)</h3>
+
+<div class="info-box">
+    <h4>For 6+ Mark Questions</h4>
+    <p>Longer questions often use <strong>levels-based marking</strong>:</p>
+    <table class="data-table">
+        <tr>
+            <th>Level</th>
+            <th>Marks</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>Level 3</td>
+            <td>5-6</td>
+            <td>Comprehensive, detailed, well-structured</td>
+        </tr>
+        <tr>
+            <td>Level 2</td>
+            <td>3-4</td>
+            <td>Good understanding, some gaps</td>
+        </tr>
+        <tr>
+            <td>Level 1</td>
+            <td>1-2</td>
+            <td>Basic points, limited detail</td>
+        </tr>
+        <tr>
+            <td>Level 0</td>
+            <td>0</td>
+            <td>No relevant content</td>
+        </tr>
+    </table>
+</div>
+
+<h3>Common Marking Notes</h3>
+
+<div class="tip-box">
+    <h4>What Examiners Accept</h4>
+    <ul>
+        <li><strong>Abbreviations:</strong> CPU, RAM, ROM, etc. are accepted</li>
+        <li><strong>Minor spelling errors:</strong> If the meaning is clear</li>
+        <li><strong>Alternative terms:</strong> "Random Access Memory" or "RAM"</li>
+        <li><strong>Diagrams:</strong> Can earn marks if they answer the question</li>
+    </ul>
+</div>
+
+<div class="warning">
+    <h4>What Loses Marks</h4>
+    <ul>
+        <li><strong>Vague answers:</strong> "It makes things faster" without saying what/why</li>
+        <li><strong>Contradictions:</strong> Writing two opposite statements</li>
+        <li><strong>Irrelevant information:</strong> Writing about things not asked</li>
+        <li><strong>Listing when asked to explain:</strong> No marks without reasons</li>
+    </ul>
+</div>
+
+<h3>Example Analysis</h3>
+
+<div class="example-box">
+    <h4>Question: Explain why hexadecimal is used instead of binary by programmers. (3 marks)</h4>
+    
+    <p><strong>Poor Answer (1 mark):</strong><br>
+    "Hexadecimal is easier to use than binary."</p>
+    <p><em>Only gets 1 mark - doesn't explain WHY it's easier</em></p>
+    
+    <p><strong>Good Answer (3 marks):</strong><br>
+    "Hexadecimal is used because binary numbers can be very long and difficult to read (1). Hexadecimal is more compact as each hex digit represents 4 bits (1). This makes it easier to spot errors and remember values like memory addresses (1)."</p>
+    <p><em>Gets 3 marks - explains with reasons</em></p>
+</div>
+
+<h3>Pro Tips from Mark Schemes</h3>
+
+<div class="info-box">
+    <ul>
+        <li><strong>Match points to marks:</strong> 4-mark question = aim for 4 distinct points</li>
+        <li><strong>Quality over quantity:</strong> 3 good points beats 6 weak ones</li>
+        <li><strong>Answer the question asked:</strong> Don't write everything you know</li>
+        <li><strong>Use examples:</strong> Concrete examples often earn marks</li>
+        <li><strong>Show your working:</strong> Especially for calculations</li>
+    </ul>
+</div>
+            `
+        },
+        'Common Mistakes': {
+            content: `
+<h2>⚠️ Common Mistakes to Avoid</h2>
+<p>Learn from the most common errors students make in IGCSE Computer Science exams.</p>
+
+<h3>Theory Mistakes</h3>
+
+<div class="warning">
+    <h4>❌ RAM vs ROM Confusion</h4>
+    <p><strong>Mistake:</strong> Saying RAM stores permanent data or ROM is volatile.</p>
+    <p><strong>Remember:</strong></p>
+    <ul>
+        <li><strong>RAM:</strong> Volatile (loses data when power off), read/write, stores running programs</li>
+        <li><strong>ROM:</strong> Non-volatile (keeps data), read-only, stores boot instructions</li>
+    </ul>
+</div>
+
+<div class="warning">
+    <h4>❌ Compiler vs Interpreter</h4>
+    <p><strong>Mistake:</strong> Mixing up which one creates executable files.</p>
+    <p><strong>Remember:</strong></p>
+    <ul>
+        <li><strong>Compiler:</strong> Translates entire program at once → Creates executable → Faster to run</li>
+        <li><strong>Interpreter:</strong> Translates line by line → No executable → Easier to debug</li>
+    </ul>
+</div>
+
+<div class="warning">
+    <h4>❌ Lossy vs Lossless Compression</h4>
+    <p><strong>Mistake:</strong> Not knowing when to use each type.</p>
+    <p><strong>Remember:</strong></p>
+    <ul>
+        <li><strong>Lossy:</strong> Permanently removes data, smaller files, for images/audio (JPEG, MP3)</li>
+        <li><strong>Lossless:</strong> No data lost, can restore original, for text/important files (PNG, ZIP)</li>
+    </ul>
+</div>
+
+<h3>Binary & Hex Mistakes</h3>
+
+<div class="warning">
+    <h4>❌ Left Shift vs Right Shift</h4>
+    <p><strong>Mistake:</strong> Forgetting which shift multiplies and which divides.</p>
+    <p><strong>Remember:</strong></p>
+    <ul>
+        <li><strong>Left shift:</strong> ×2 (bits move left, adds zero on right)</li>
+        <li><strong>Right shift:</strong> ÷2 (bits move right, loses rightmost bit)</li>
+    </ul>
+</div>
+
+<div class="warning">
+    <h4>❌ Binary Overflow</h4>
+    <p><strong>Mistake:</strong> Not recognizing when a result is too large.</p>
+    <p><strong>Remember:</strong> 8 bits can only store 0-255. If your answer exceeds this, overflow has occurred!</p>
+</div>
+
+<div class="warning">
+    <h4>❌ Hex Conversion Errors</h4>
+    <p><strong>Mistake:</strong> Forgetting that A=10, B=11... F=15</p>
+    <p><strong>Remember:</strong></p>
+    <ul>
+        <li>Split binary into groups of 4 from the right</li>
+        <li>A=10, B=11, C=12, D=13, E=14, F=15</li>
+    </ul>
+</div>
+
+<h3>Programming Mistakes</h3>
+
+<div class="warning">
+    <h4>❌ Arrays Start at 0</h4>
+    <p><strong>Mistake:</strong> Thinking the first element is at index 1.</p>
+    <p><strong>Remember:</strong></p>
+    <ul>
+        <li>First element = index 0</li>
+        <li>Array of 5 elements has indices 0, 1, 2, 3, 4</li>
+    </ul>
+</div>
+
+<div class="warning">
+    <h4>❌ MOD vs DIV</h4>
+    <p><strong>Mistake:</strong> Confusing remainder with quotient.</p>
+    <p><strong>Remember:</strong></p>
+    <ul>
+        <li><strong>DIV:</strong> Integer division (whole number only) → 7 DIV 3 = 2</li>
+        <li><strong>MOD:</strong> Remainder after division → 7 MOD 3 = 1</li>
+    </ul>
+</div>
+
+<div class="warning">
+    <h4>❌ WHILE vs REPEAT-UNTIL</h4>
+    <p><strong>Mistake:</strong> Forgetting which runs at least once.</p>
+    <p><strong>Remember:</strong></p>
+    <ul>
+        <li><strong>WHILE:</strong> Checks condition BEFORE → might never run</li>
+        <li><strong>REPEAT-UNTIL:</strong> Checks condition AFTER → always runs at least once</li>
+    </ul>
+</div>
+
+<h3>Algorithm Mistakes</h3>
+
+<div class="warning">
+    <h4>❌ Binary Search Requirements</h4>
+    <p><strong>Mistake:</strong> Forgetting that binary search needs sorted data.</p>
+    <p><strong>Remember:</strong> Binary search ONLY works on sorted data. Always check if data is sorted first!</p>
+</div>
+
+<div class="warning">
+    <h4>❌ Sorting Algorithm Confusion</h4>
+    <p><strong>Mistake:</strong> Mixing up bubble sort and merge sort processes.</p>
+    <table class="data-table">
+        <tr>
+            <th>Bubble Sort</th>
+            <th>Merge Sort</th>
+        </tr>
+        <tr>
+            <td>Compares adjacent pairs</td>
+            <td>Divides list in half</td>
+        </tr>
+        <tr>
+            <td>Swaps if wrong order</td>
+            <td>Merges sorted sublists</td>
+        </tr>
+        <tr>
+            <td>O(n²) - slower</td>
+            <td>O(n log n) - faster</td>
+        </tr>
+    </table>
+</div>
+
+<h3>Network Mistakes</h3>
+
+<div class="warning">
+    <h4>❌ LAN vs WAN</h4>
+    <p><strong>Mistake:</strong> Not knowing the key differences.</p>
+    <p><strong>Remember:</strong></p>
+    <ul>
+        <li><strong>LAN:</strong> Small area (building), fast, private, own hardware</li>
+        <li><strong>WAN:</strong> Large area (countries), slower, often uses public infrastructure</li>
+    </ul>
+</div>
+
+<div class="warning">
+    <h4>❌ Switch vs Router</h4>
+    <p><strong>Mistake:</strong> Treating them as the same device.</p>
+    <p><strong>Remember:</strong></p>
+    <ul>
+        <li><strong>Switch:</strong> Connects devices within a LAN, uses MAC addresses</li>
+        <li><strong>Router:</strong> Connects different networks, uses IP addresses</li>
+    </ul>
+</div>
+
+<h3>Exam Technique Mistakes</h3>
+
+<div class="warning">
+    <h4>❌ Not Reading the Question</h4>
+    <p>Always check:</p>
+    <ul>
+        <li>Command word (describe, explain, compare...)</li>
+        <li>Number of marks (how many points needed?)</li>
+        <li>Context (relate to the scenario given)</li>
+    </ul>
+</div>
+
+<div class="warning">
+    <h4>❌ Writing Too Little</h4>
+    <p>For a 4-mark question, you need approximately 4 valid points. One-word answers rarely get full marks!</p>
+</div>
+
+<div class="tip-box">
+    <h4>✅ Quick Checklist Before Moving On</h4>
+    <ul>
+        <li>Did I answer what was asked?</li>
+        <li>Did I give enough points for the marks?</li>
+        <li>Did I explain (give reasons) if required?</li>
+        <li>Did I use technical vocabulary?</li>
+        <li>Did I relate to the scenario if given?</li>
+    </ul>
+</div>
+            `
+        }
     }
 };

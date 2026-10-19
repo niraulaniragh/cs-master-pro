@@ -150,6 +150,20 @@ const TOPICS = [
             'Automation & Robotics',
             'Digital Currency'
         ]
+    },
+    {
+        id: 'exam-tips',
+        name: 'Exam Tips',
+        icon: '📝',
+        color: '#fbbf24',
+        paper: 'Paper 1 & 2',
+        description: 'Command words, exam technique, mark schemes, common mistakes',
+        subtopics: [
+            'Command Words',
+            'Exam Technique',
+            'Mark Scheme Advice',
+            'Common Mistakes'
+        ]
     }
 ];
 
