@@ -14,6 +14,7 @@ const App = (() => {
         // Check authentication
         if (Auth.isLoggedIn()) {
             // User is logged in - load their profile
+            const user = Auth.getCurrentUser();
             const profile = Auth.getProfile();
             if (profile) {
                 AppState.initWithProfile(profile);
@@ -24,7 +25,7 @@ const App = (() => {
             // Update last active
             Auth.updateProfile({ lastActive: new Date().toISOString() });
             
-            console.log(`👤 Logged in as: ${Auth.getSession().username}`);
+            console.log(`👤 Logged in as: ${user?.username || Auth.getSession()?.email}`);
         } else {
             // Not logged in - show auth modal
             AppState.init();
