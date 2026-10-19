@@ -61,7 +61,7 @@ const DailyChallenge = {
         
         // Generate new challenge questions for today
         // Use date as seed for consistent questions throughout the day
-        const seed = today.split('-').join('');
+        let seed = parseInt(today.split('-').join(''));
         const shuffled = [...QUESTIONS].sort(() => {
             const x = Math.sin(seed++) * 10000;
             return x - Math.floor(x) - 0.5;
