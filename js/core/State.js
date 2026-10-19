@@ -1,6 +1,6 @@
 /**
  * State.js - Reactive State Management System
- * A simple but powerful state management inspired by Redux/Zustand
+ * A simple but powerful state management with auth integration
  */
 
 const AppState = (() => {
@@ -76,9 +76,19 @@ const AppState = (() => {
         // Notify subscribers
         notifySubscribers(path, value);
         
-        // Persist user state
+        // Persist user state (to localStorage for guests, to Auth for logged in users)
         if (path.startsWith('user')) {
-            Storage.save('user', state.user);
+            saveUserProgress();
+        }
+    };
+
+    // Save user progress - syncs with Auth if logged in
+    const saveUserProgress = () => {
+        Storage.save('user', state.user);
+        
+        // If logged in, also save to user profile
+        if (typeof Auth !== 'undefined' && Auth.isLoggedIn()) {
+            Auth.saveProgress(state.user);
         }
     };
 
@@ -124,14 +134,102 @@ const AppState = (() => {
         }
     };
 
-    // Initialize state from storage
+    // Initialize state from storage (for guests)
     const init = () => {
         const savedUser = Storage.load('user');
         if (savedUser) {
             state.user = { ...state.user, ...savedUser };
         }
         console.log('🔄 State initialized:', state.user.xp, 'XP, Level', state.user.level);
+        updateNavUser();
     };
+
+    // Initialize state from a user profile (for logged in users)
+    const initWithProfile = (profile) => {
+        state.user = {
+            xp: profile.xp || 0,
+            level: profile.level || 1,
+            streak: profile.streak || 0,
+            totalCorrect: profile.totalCorrect || 0,
+            totalAnswered: profile.totalAnswered || 0,
+            achievements: profile.achievements || [],
+            topicProgress: profile.topicProgress || {},
+            settings: profile.settings || {
+                sound: true,
+                animations: true,
+                darkMode: true
+            }
+        };
+        Storage.save('user', state.user);
+        console.log('🔄 State loaded from profile:', state.user.xp, 'XP, Level', state.user.level);
+        updateNavUser();
+    };
+
+    // Reset state (for logout)
+    const resetState = () => {
+        state.user = {
+            xp: 0,
+            level: 1,
+            streak: 0,
+            totalCorrect: 0,
+            totalAnswered: 0,
+            achievements: [],
+            topicProgress: {},
+            settings: { sound: true, animations: true, darkMode: true }
+        };
+        Storage.remove('user');
+    };
+
+    // Update nav with user info
+    const updateNavUser = () => {
+        const navUser = document.getElementById('nav-user');
+        if (!navUser) return;
+
+        if (typeof Auth !== 'undefined' && Auth.isLoggedIn()) {
+            const session = Auth.getSession();
+            navUser.innerHTML = `
+                <div class="user-menu">
+                    <button class="user-menu-btn" onclick="AppState.toggleUserMenu()">
+                        <span class="user-avatar">${session.username.charAt(0).toUpperCase()}</span>
+                        <span class="user-name">${session.username}</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="user-dropdown" id="user-dropdown">
+                        <a href="#" onclick="App.showProfile(); return false;">
+                            <i class="fas fa-user"></i> Profile
+                        </a>
+                        <a href="#" onclick="App.logout(); return false;">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </div>
+                </div>
+            `;
+        } else {
+            navUser.innerHTML = `
+                <button class="btn btn-primary btn-small" onclick="AuthModal.show('login')">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+            `;
+        }
+    };
+
+    // Toggle user dropdown menu
+    const toggleUserMenu = () => {
+        const dropdown = document.getElementById('user-dropdown');
+        if (dropdown) {
+            dropdown.classList.toggle('show');
+        }
+    };
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.user-menu')) {
+            const dropdown = document.getElementById('user-dropdown');
+            if (dropdown) {
+                dropdown.classList.remove('show');
+            }
+        }
+    });
 
     // XP and Level System
     const addXP = (amount) => {
@@ -143,6 +241,10 @@ const AppState = (() => {
         if (newLevel > state.user.level) {
             setState('user.level', newLevel);
             Toast.show(`🎉 Level Up! You're now Level ${newLevel}!`, 'success');
+            
+            // Check level achievements
+            if (newLevel >= 5) unlockAchievement('level_5');
+            if (newLevel >= 10) unlockAchievement('level_10');
         }
         
         updateNavStats();
@@ -201,25 +303,30 @@ const AppState = (() => {
         updateState,
         subscribe,
         init,
+        initWithProfile,
+        resetState,
         addXP,
         calculateLevel,
         unlockAchievement,
         hasAchievement,
         updateNavStats,
+        updateNavUser,
+        toggleUserMenu,
         reset
     };
 })();
 
 // Achievements Data
 const ACHIEVEMENTS = [
-    { id: 'first_quiz', name: 'First Steps', icon: '🎯', desc: 'Complete your first quiz' },
-    { id: 'streak_5', name: 'On Fire!', icon: '🔥', desc: 'Get a 5 answer streak' },
-    { id: 'streak_10', name: 'Unstoppable', icon: '⚡', desc: 'Get a 10 answer streak' },
-    { id: 'perfect', name: 'Perfectionist', icon: '💯', desc: 'Get 100% on a quiz' },
-    { id: 'level_5', name: 'Rising Star', icon: '⭐', desc: 'Reach Level 5' },
-    { id: 'level_10', name: 'Expert', icon: '🏆', desc: 'Reach Level 10' },
-    { id: 'all_topics', name: 'Well Rounded', icon: '🎓', desc: 'Study all 6 topics' },
-    { id: 'note_reader', name: 'Bookworm', icon: '📚', desc: 'Read notes from all topics' },
-    { id: 'tool_master', name: 'Tool Master', icon: '🔧', desc: 'Use all learning tools' },
-    { id: 'century', name: 'Century', icon: '💎', desc: 'Answer 100 questions correctly' }
+    { id: 'first_quiz', name: 'First Steps', icon: '🎯', description: 'Complete your first quiz' },
+    { id: 'streak_5', name: 'On Fire!', icon: '🔥', description: 'Get a 5 answer streak' },
+    { id: 'streak_10', name: 'Unstoppable', icon: '⚡', description: 'Get a 10 answer streak' },
+    { id: 'perfect', name: 'Perfectionist', icon: '💯', description: 'Get 100% on a quiz' },
+    { id: 'level_5', name: 'Rising Star', icon: '⭐', description: 'Reach Level 5' },
+    { id: 'level_10', name: 'Expert', icon: '🏆', description: 'Reach Level 10' },
+    { id: 'all_topics', name: 'Well Rounded', icon: '🎓', description: 'Study all topics' },
+    { id: 'note_reader', name: 'Bookworm', icon: '📚', description: 'Read notes from all topics' },
+    { id: 'tool_master', name: 'Tool Master', icon: '🔧', description: 'Use all learning tools' },
+    { id: 'century', name: 'Century', icon: '💎', description: 'Answer 100 questions correctly' },
+    { id: 'flashcard_master', name: 'Memory Master', icon: '🧠', description: 'Complete flashcards with 100% known' }
 ];

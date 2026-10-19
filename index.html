@@ -21,7 +21,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
     <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
     
-    <!-- Our Styles (SCSS compiled) -->
+    <!-- Our Styles -->
     <link rel="stylesheet" href="styles/main.css">
 </head>
 <body>
@@ -60,6 +60,9 @@
                     Lvl <span id="nav-level">1</span>
                 </div>
             </div>
+            <div class="nav-user" id="nav-user">
+                <!-- Populated by JS when logged in -->
+            </div>
         </nav>
 
         <!-- Main Content Area -->
@@ -94,6 +97,7 @@
     <!-- Components -->
     <script src="js/components/Toast.js"></script>
     <script src="js/components/Modal.js"></script>
+    <script src="js/components/AuthModal.js"></script>
     
     <!-- Views -->
     <script src="js/views/HomeView.js"></script>
@@ -103,6 +107,7 @@
     <script src="js/views/PlaygroundView.js"></script>
     
     <!-- Core (must be last) -->
+    <script src="js/core/Auth.js"></script>
     <script src="js/core/State.js"></script>
     <script src="js/core/Router.js"></script>
     <script src="js/core/App.js"></script>

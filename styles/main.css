@@ -3526,6 +3526,489 @@ label {
 }
 
 /* ==========================================
+   Auth Modal
+========================================== */
+.auth-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: var(--space-4);
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.auth-modal {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    width: 100%;
+    max-width: 420px;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.auth-header {
+    text-align: center;
+    padding: var(--space-8) var(--space-6) var(--space-4);
+}
+
+.auth-logo {
+    font-size: 3rem;
+    margin-bottom: var(--space-3);
+}
+
+.auth-header h2 {
+    color: var(--text-primary);
+    margin-bottom: var(--space-2);
+}
+
+.auth-subtitle {
+    color: var(--text-muted);
+    font-size: 0.9375rem;
+}
+
+.auth-tabs {
+    display: flex;
+    margin: 0 var(--space-6);
+    background: var(--bg-elevated);
+    border-radius: var(--radius-md);
+    padding: var(--space-1);
+}
+
+.auth-tab {
+    flex: 1;
+    padding: var(--space-3);
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.auth-tab:hover {
+    color: var(--text-secondary);
+}
+
+.auth-tab.active {
+    background: var(--purple);
+    color: white;
+}
+
+.auth-form {
+    padding: var(--space-6);
+}
+
+.auth-field {
+    margin-bottom: var(--space-5);
+}
+
+.auth-field label {
+    display: block;
+    margin-bottom: var(--space-2);
+    color: var(--text-secondary);
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
+.auth-field input {
+    width: 100%;
+    padding: var(--space-3) var(--space-4);
+    background: var(--bg-elevated);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: border-color 0.2s ease;
+}
+
+.auth-field input:focus {
+    outline: none;
+    border-color: var(--purple);
+}
+
+.auth-field input::placeholder {
+    color: var(--text-dim);
+}
+
+.field-hint {
+    display: block;
+    margin-top: var(--space-1);
+    font-size: 0.75rem;
+    color: var(--text-dim);
+}
+
+.password-input-wrapper {
+    position: relative;
+}
+
+.password-input-wrapper input {
+    padding-right: 50px;
+}
+
+.toggle-password {
+    position: absolute;
+    right: var(--space-3);
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.25rem;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+}
+
+.toggle-password:hover {
+    opacity: 1;
+}
+
+.auth-error {
+    padding: var(--space-3);
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid var(--red);
+    border-radius: var(--radius-md);
+    color: var(--red);
+    font-size: 0.875rem;
+    margin-bottom: var(--space-4);
+    text-align: center;
+}
+
+.auth-submit-btn {
+    width: 100%;
+    padding: var(--space-4);
+    background: var(--purple);
+    border: none;
+    border-radius: var(--radius-md);
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.auth-submit-btn:hover {
+    background: var(--purple-dark);
+    transform: translateY(-2px);
+}
+
+.auth-footer {
+    text-align: center;
+    padding: var(--space-4);
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.875rem;
+}
+
+.auth-footer a {
+    color: var(--purple-light);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.auth-footer a:hover {
+    text-decoration: underline;
+}
+
+.auth-features {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-6);
+    padding: var(--space-4) var(--space-6) var(--space-6);
+}
+
+.auth-features .feature {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: 0.75rem;
+    color: var(--text-dim);
+}
+
+.auth-features .feature span:first-child {
+    font-size: 1.25rem;
+}
+
+/* User Menu in Nav */
+.nav-user {
+    margin-left: var(--space-4);
+}
+
+.user-menu {
+    position: relative;
+}
+
+.user-menu-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.user-menu-btn:hover {
+    border-color: var(--purple);
+}
+
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    background: var(--purple);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.875rem;
+}
+
+.user-name {
+    font-weight: 500;
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.user-menu-btn i {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    transition: transform 0.2s;
+}
+
+.user-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: var(--space-2);
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    min-width: 160px;
+    box-shadow: var(--shadow-lg);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.2s ease;
+    z-index: 100;
+}
+
+.user-dropdown.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.user-dropdown a {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.user-dropdown a:hover {
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+}
+
+.user-dropdown a i {
+    width: 16px;
+    text-align: center;
+    color: var(--text-muted);
+}
+
+/* Profile Modal */
+.profile-modal {
+    text-align: center;
+}
+
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding-bottom: var(--space-6);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: var(--space-6);
+}
+
+.profile-avatar {
+    width: 64px;
+    height: 64px;
+    background: var(--purple);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white;
+}
+
+.profile-info {
+    text-align: left;
+}
+
+.profile-info h3 {
+    color: var(--text-primary);
+    margin-bottom: var(--space-1);
+}
+
+.profile-info p {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+}
+
+.profile-stats {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-6);
+    margin-bottom: var(--space-6);
+}
+
+.profile-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.profile-stat .stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--purple);
+}
+
+.profile-stat .stat-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.profile-details {
+    text-align: left;
+    background: var(--bg-elevated);
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-6);
+}
+
+.profile-details p {
+    color: var(--text-secondary);
+    margin: var(--space-2) 0;
+    font-size: 0.875rem;
+}
+
+.profile-actions {
+    display: flex;
+    gap: var(--space-3);
+    justify-content: center;
+}
+
+/* Form styles for profile modals */
+.form-field {
+    margin-bottom: var(--space-4);
+    text-align: left;
+}
+
+.form-field label {
+    display: block;
+    margin-bottom: var(--space-2);
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.form-field input {
+    width: 100%;
+    padding: var(--space-3);
+    background: var(--bg-elevated);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+}
+
+.form-field input:focus {
+    outline: none;
+    border-color: var(--purple);
+}
+
+.form-error {
+    padding: var(--space-3);
+    background: rgba(239, 68, 68, 0.15);
+    border-radius: var(--radius-md);
+    color: var(--red);
+    font-size: 0.875rem;
+    margin-bottom: var(--space-4);
+}
+
+.delete-account-warning {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid var(--red);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    margin-bottom: var(--space-6);
+}
+
+.delete-account-warning p {
+    color: var(--text-secondary);
+    margin: var(--space-2) 0;
+}
+
+.btn-danger {
+    background: var(--red);
+    color: white;
+    border: none;
+    padding: var(--space-3) var(--space-5);
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-danger:hover {
+    background: #dc2626;
+}
+
+.btn-small {
+    padding: var(--space-2) var(--space-4);
+    font-size: 0.875rem;
+}
+
+body.modal-open {
+    overflow: hidden;
+}
+
+/* ==========================================
    Responsive Design
 ========================================== */
 @media (max-width: 1024px) {
