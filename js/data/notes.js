@@ -3335,6 +3335,627 @@ After defrag:  [A1][A2][A3][B1][B2][C1][--][--]
     <strong>Key point:</strong> AI augments human capabilities but raises important ethical questions about control and responsibility.
 </div>
             `
+        },
+        'Automation & Robotics': {
+            content: `
+<h2>Automation & Robotics</h2>
+<div class="definition-box">
+    <strong>Automation:</strong> Using technology to perform tasks with minimal human intervention.
+</div>
+
+<h3>Types of Automation</h3>
+<table class="notes-table">
+    <tr><th>Type</th><th>Description</th><th>Example</th></tr>
+    <tr><td><strong>Fixed</strong></td><td>Repetitive, unchanging tasks</td><td>Assembly line welding</td></tr>
+    <tr><td><strong>Programmable</strong></td><td>Can be reprogrammed for different tasks</td><td>CNC machines</td></tr>
+    <tr><td><strong>Flexible</strong></td><td>Adapts in real-time</td><td>Warehouse robots</td></tr>
+</table>
+
+<h3>Robots in Society</h3>
+<ul>
+    <li><strong>Manufacturing:</strong> Assembly, welding, painting cars</li>
+    <li><strong>Healthcare:</strong> Surgical robots, patient care</li>
+    <li><strong>Domestic:</strong> Vacuum cleaners, lawn mowers</li>
+    <li><strong>Exploration:</strong> Space rovers, deep sea drones</li>
+    <li><strong>Military:</strong> Bomb disposal, drones</li>
+</ul>
+
+<h3>Advantages of Automation</h3>
+<ul>
+    <li>Faster and more efficient</li>
+    <li>Consistent quality (no human error)</li>
+    <li>Can work 24/7 without breaks</li>
+    <li>Can work in dangerous environments</li>
+    <li>Reduces long-term costs</li>
+</ul>
+
+<h3>Disadvantages of Automation</h3>
+<ul>
+    <li>Job losses - unemployment</li>
+    <li>High initial cost</li>
+    <li>Requires skilled maintenance</li>
+    <li>Lacks human judgment/creativity</li>
+    <li>Technical failures can halt production</li>
+</ul>
+
+<div class="tip-box">
+    <strong>Key Issue:</strong> Balance between efficiency gains and social impact on employment.
+</div>
+            `
+        },
+        'Digital Currency': {
+            content: `
+<h2>Digital Currency & Blockchain</h2>
+<div class="definition-box">
+    <strong>Digital Currency:</strong> Electronic money that exists only digitally, with no physical form like coins or notes.
+</div>
+
+<h3>Types of Digital Currency</h3>
+<table class="notes-table">
+    <tr><th>Type</th><th>Description</th><th>Example</th></tr>
+    <tr><td><strong>Cryptocurrency</strong></td><td>Decentralized, uses blockchain</td><td>Bitcoin, Ethereum</td></tr>
+    <tr><td><strong>Central Bank Digital</strong></td><td>Government-issued digital money</td><td>Digital Yuan</td></tr>
+    <tr><td><strong>Virtual Currency</strong></td><td>Used in specific platforms</td><td>Game credits</td></tr>
+</table>
+
+<h3>Blockchain Technology</h3>
+<div class="definition-box">
+    <strong>Blockchain:</strong> A distributed ledger that records transactions across many computers, making it nearly impossible to alter.
+</div>
+
+<h4>How Blockchain Works:</h4>
+<ol>
+    <li>Transaction is requested</li>
+    <li>Transaction broadcast to network of computers</li>
+    <li>Network validates the transaction</li>
+    <li>Transaction added to a "block"</li>
+    <li>Block added to the chain (permanent record)</li>
+</ol>
+
+<h3>Advantages</h3>
+<ul>
+    <li>Decentralized - no single point of control</li>
+    <li>Transparent - all transactions visible</li>
+    <li>Secure - cryptographically protected</li>
+    <li>Fast international transfers</li>
+    <li>Lower transaction fees</li>
+</ul>
+
+<h3>Disadvantages</h3>
+<ul>
+    <li>Volatile value (prices fluctuate wildly)</li>
+    <li>Used for illegal transactions</li>
+    <li>Environmental impact (energy for mining)</li>
+    <li>Not widely accepted</li>
+    <li>No consumer protection</li>
+</ul>
+
+<div class="tip-box">
+    <strong>Key Point:</strong> Blockchain has uses beyond currency - supply chain tracking, voting systems, digital identity.
+</div>
+            `
+        }
+    },
+
+    'databases': {
+        'Database Concepts': {
+            content: `
+<h2>Database Concepts</h2>
+<div class="definition-box">
+    <strong>Database:</strong> An organized collection of structured data, stored electronically. Databases allow efficient storage, retrieval, and management of large amounts of data.
+</div>
+
+<h3>Why Use Databases?</h3>
+<ul>
+    <li>Store large amounts of data efficiently</li>
+    <li>Multiple users can access simultaneously</li>
+    <li>Easy to search and filter data</li>
+    <li>Reduce data redundancy (duplication)</li>
+    <li>Maintain data integrity and consistency</li>
+</ul>
+
+<h3>Database vs Spreadsheet</h3>
+<table class="notes-table">
+    <tr><th>Feature</th><th>Database</th><th>Spreadsheet</th></tr>
+    <tr><td><strong>Data volume</strong></td><td>Millions of records</td><td>Thousands of rows</td></tr>
+    <tr><td><strong>Multiple users</strong></td><td>Yes, simultaneously</td><td>Limited</td></tr>
+    <tr><td><strong>Data relationships</strong></td><td>Links between tables</td><td>Limited</td></tr>
+    <tr><td><strong>Data integrity</strong></td><td>Strong validation</td><td>Basic</td></tr>
+    <tr><td><strong>Complexity</strong></td><td>Requires training</td><td>Easy to use</td></tr>
+</table>
+
+<h3>Key Database Terms</h3>
+<table class="notes-table">
+    <tr><th>Term</th><th>Definition</th><th>Example</th></tr>
+    <tr><td><strong>Table</strong></td><td>Collection of related data in rows/columns</td><td>Students table</td></tr>
+    <tr><td><strong>Record (Row)</strong></td><td>Single entry in a table</td><td>One student's data</td></tr>
+    <tr><td><strong>Field (Column)</strong></td><td>Single piece of data</td><td>StudentName, Age</td></tr>
+    <tr><td><strong>Primary Key</strong></td><td>Unique identifier for each record</td><td>StudentID</td></tr>
+    <tr><td><strong>Foreign Key</strong></td><td>Links to primary key in another table</td><td>ClassID in Students</td></tr>
+</table>
+
+<h3>Example Database Structure</h3>
+<div class="example-box">
+    <h4>Students Table</h4>
+<pre><code>| StudentID | FirstName | LastName | ClassID | Age |
+|-----------|-----------|----------|---------|-----|
+| S001      | John      | Smith    | C1      | 15  |
+| S002      | Emma      | Jones    | C2      | 16  |
+| S003      | Ali       | Khan     | C1      | 15  |
+
+Primary Key: StudentID (unique for each student)
+Foreign Key: ClassID (links to Classes table)</code></pre>
+</div>
+
+<div class="tip-box">
+    <strong>Exam Tip:</strong> Primary keys must be UNIQUE and NOT NULL. They identify each record distinctly.
+</div>
+            `
+        },
+        'Primary & Foreign Keys': {
+            content: `
+<h2>Primary & Foreign Keys</h2>
+
+<h3>Primary Key</h3>
+<div class="definition-box">
+    <strong>Primary Key:</strong> A field (or combination of fields) that uniquely identifies each record in a table. No two records can have the same primary key value.
+</div>
+
+<h4>Rules for Primary Keys:</h4>
+<ul>
+    <li><strong>Unique:</strong> No duplicates allowed</li>
+    <li><strong>Not Null:</strong> Must have a value (cannot be empty)</li>
+    <li><strong>Unchanging:</strong> Should not change over time</li>
+    <li><strong>Simple:</strong> Preferably a single field</li>
+</ul>
+
+<h4>Good vs Bad Primary Keys:</h4>
+<table class="notes-table">
+    <tr><th>Good ✓</th><th>Bad ✗</th><th>Why?</th></tr>
+    <tr><td>StudentID</td><td>Name</td><td>Names can be duplicated</td></tr>
+    <tr><td>ISBN</td><td>BookTitle</td><td>Titles can repeat</td></tr>
+    <tr><td>OrderNumber</td><td>OrderDate</td><td>Many orders same day</td></tr>
+    <tr><td>NationalInsuranceNo</td><td>PhoneNumber</td><td>Phone numbers change</td></tr>
+</table>
+
+<h3>Foreign Key</h3>
+<div class="definition-box">
+    <strong>Foreign Key:</strong> A field in one table that links to the primary key of another table. It creates a relationship between two tables.
+</div>
+
+<h3>Example: School Database</h3>
+<div class="example-box">
+<pre><code>CLASSES Table                    STUDENTS Table
++---------+------------+         +-----------+-----------+---------+
+| ClassID | ClassName  |         | StudentID | Name      | ClassID |
++---------+------------+         +-----------+-----------+---------+
+| C1      | 10A        |         | S001      | John      | C1      |
+| C2      | 10B        |    ←──  | S002      | Emma      | C2      |
+| C3      | 11A        |    Link | S003      | Ali       | C1      |
++---------+------------+         +-----------+-----------+---------+
+Primary Key: ClassID             Primary Key: StudentID
+                                 Foreign Key: ClassID
+
+The ClassID in STUDENTS links to ClassID in CLASSES
+This tells us which class each student is in.</code></pre>
+</div>
+
+<h3>Why Use Foreign Keys?</h3>
+<ul>
+    <li><strong>Links tables:</strong> Creates relationships between data</li>
+    <li><strong>Reduces redundancy:</strong> Store class info once, reference it many times</li>
+    <li><strong>Data integrity:</strong> Can't add student to non-existent class</li>
+    <li><strong>Easier updates:</strong> Change class name in one place</li>
+</ul>
+
+<div class="tip-box">
+    <strong>Remember:</strong> Foreign key in one table → Primary key in another table. This creates the link!
+</div>
+            `
+        },
+        'SQL Queries': {
+            content: `
+<h2>SQL Queries</h2>
+<div class="definition-box">
+    <strong>SQL (Structured Query Language):</strong> The standard language for interacting with databases. Used to create, read, update, and delete data.
+</div>
+
+<h3>SELECT - Retrieving Data</h3>
+<p>The most common SQL command - gets data from tables.</p>
+
+<pre><code class="language-sql">-- Get all columns from all students
+SELECT * FROM Students
+
+-- Get specific columns
+SELECT FirstName, LastName FROM Students
+
+-- Get students with condition
+SELECT * FROM Students WHERE Age > 15
+
+-- Get students in order
+SELECT * FROM Students ORDER BY LastName ASC</code></pre>
+
+<h3>SQL Keywords</h3>
+<table class="notes-table">
+    <tr><th>Keyword</th><th>Purpose</th><th>Example</th></tr>
+    <tr><td><strong>SELECT</strong></td><td>Choose columns</td><td>SELECT Name, Age</td></tr>
+    <tr><td><strong>FROM</strong></td><td>Choose table</td><td>FROM Students</td></tr>
+    <tr><td><strong>WHERE</strong></td><td>Filter rows</td><td>WHERE Age > 16</td></tr>
+    <tr><td><strong>AND / OR</strong></td><td>Multiple conditions</td><td>WHERE Age > 16 AND Class = "10A"</td></tr>
+    <tr><td><strong>ORDER BY</strong></td><td>Sort results</td><td>ORDER BY Name ASC</td></tr>
+    <tr><td><strong>ASC / DESC</strong></td><td>Sort direction</td><td>ORDER BY Age DESC</td></tr>
+</table>
+
+<h3>Comparison Operators</h3>
+<table class="notes-table">
+    <tr><th>Operator</th><th>Meaning</th><th>Example</th></tr>
+    <tr><td>=</td><td>Equal to</td><td>WHERE Class = "10A"</td></tr>
+    <tr><td><> or !=</td><td>Not equal to</td><td>WHERE Status <> "Absent"</td></tr>
+    <tr><td>></td><td>Greater than</td><td>WHERE Age > 15</td></tr>
+    <tr><td><</td><td>Less than</td><td>WHERE Score < 50</td></tr>
+    <tr><td>>=</td><td>Greater or equal</td><td>WHERE Age >= 18</td></tr>
+    <tr><td><=</td><td>Less or equal</td><td>WHERE Price <= 100</td></tr>
+    <tr><td>LIKE</td><td>Pattern matching</td><td>WHERE Name LIKE "J%"</td></tr>
+</table>
+
+<h3>Example Queries</h3>
+<div class="example-box">
+<pre><code class="language-sql">-- Find all students aged 16 or over
+SELECT * FROM Students WHERE Age >= 16
+
+-- Find students named John or Emma
+SELECT * FROM Students 
+WHERE FirstName = "John" OR FirstName = "Emma"
+
+-- Find students in class 10A, sorted by name
+SELECT FirstName, LastName FROM Students
+WHERE Class = "10A"
+ORDER BY LastName ASC
+
+-- Find students whose name starts with 'A'
+SELECT * FROM Students WHERE FirstName LIKE "A%"</code></pre>
+</div>
+
+<h3>Wildcards with LIKE</h3>
+<ul>
+    <li><strong>%</strong> - matches any number of characters</li>
+    <li><strong>_</strong> - matches exactly one character</li>
+</ul>
+<pre><code class="language-sql">LIKE "J%"     -- Starts with J (John, Jane, James)
+LIKE "%son"   -- Ends with son (Johnson, Wilson)
+LIKE "%an%"   -- Contains 'an' (Daniel, Fran, Andrew)
+LIKE "J___"   -- J followed by exactly 3 characters</code></pre>
+
+<div class="tip-box">
+    <strong>Exam Tips:</strong>
+    <ul>
+        <li>SQL keywords are usually written in UPPERCASE</li>
+        <li>Text values need quotes: "John"</li>
+        <li>Numbers don't need quotes: 16</li>
+        <li>* means "all columns"</li>
+    </ul>
+</div>
+            `
+        },
+        'Data Validation in Databases': {
+            content: `
+<h2>Data Validation in Databases</h2>
+<div class="definition-box">
+    <strong>Validation:</strong> Rules applied to database fields to ensure data entered is reasonable and appropriate.
+</div>
+
+<h3>Validation Types in Databases</h3>
+<table class="notes-table">
+    <tr><th>Type</th><th>Description</th><th>Example</th></tr>
+    <tr><td><strong>Presence Check</strong></td><td>Field cannot be left empty</td><td>CustomerName required</td></tr>
+    <tr><td><strong>Range Check</strong></td><td>Value must be within limits</td><td>Age between 0-120</td></tr>
+    <tr><td><strong>Type Check</strong></td><td>Data must be correct type</td><td>Age must be integer</td></tr>
+    <tr><td><strong>Length Check</strong></td><td>Text must be certain length</td><td>Postcode max 8 chars</td></tr>
+    <tr><td><strong>Format Check</strong></td><td>Must match pattern</td><td>Email contains @</td></tr>
+    <tr><td><strong>Lookup Check</strong></td><td>Must exist in another table</td><td>ClassID must exist</td></tr>
+</table>
+
+<h3>Field Properties</h3>
+<table class="notes-table">
+    <tr><th>Property</th><th>Purpose</th></tr>
+    <tr><td><strong>Data Type</strong></td><td>Integer, Text, Date, Boolean, etc.</td></tr>
+    <tr><td><strong>Field Size</strong></td><td>Maximum characters allowed</td></tr>
+    <tr><td><strong>Required</strong></td><td>Yes/No - presence check</td></tr>
+    <tr><td><strong>Default Value</strong></td><td>Automatic value if none entered</td></tr>
+    <tr><td><strong>Validation Rule</strong></td><td>Custom rule (e.g., >0 AND <100)</td></tr>
+    <tr><td><strong>Input Mask</strong></td><td>Format template</td></tr>
+</table>
+
+<h3>Referential Integrity</h3>
+<div class="definition-box">
+    <strong>Referential Integrity:</strong> Ensures relationships between tables remain valid. You cannot add a foreign key value that doesn't exist as a primary key in the related table.
+</div>
+
+<div class="example-box">
+    <p><strong>Example:</strong> If ClassID "C5" doesn't exist in the Classes table, you cannot add a student with ClassID = "C5" in the Students table.</p>
+</div>
+
+<div class="tip-box">
+    <strong>Key Point:</strong> Validation ensures data QUALITY. Without it, databases fill with errors that cause problems later.
+</div>
+            `
+        }
+    },
+
+    'web-development': {
+        'HTML Basics': {
+            content: `
+<h2>HTML Basics</h2>
+<div class="definition-box">
+    <strong>HTML (HyperText Markup Language):</strong> The standard language for creating web pages. HTML defines the structure and content of a webpage using tags.
+</div>
+
+<h3>HTML Document Structure</h3>
+<pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;Page Title&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;h1&gt;Main Heading&lt;/h1&gt;
+    &lt;p&gt;This is a paragraph.&lt;/p&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+<h3>Common HTML Tags</h3>
+<table class="notes-table">
+    <tr><th>Tag</th><th>Purpose</th><th>Example</th></tr>
+    <tr><td><strong>&lt;h1&gt; - &lt;h6&gt;</strong></td><td>Headings (h1 largest)</td><td>&lt;h1&gt;Title&lt;/h1&gt;</td></tr>
+    <tr><td><strong>&lt;p&gt;</strong></td><td>Paragraph</td><td>&lt;p&gt;Text here&lt;/p&gt;</td></tr>
+    <tr><td><strong>&lt;a&gt;</strong></td><td>Hyperlink</td><td>&lt;a href="url"&gt;Click&lt;/a&gt;</td></tr>
+    <tr><td><strong>&lt;img&gt;</strong></td><td>Image</td><td>&lt;img src="pic.jpg"&gt;</td></tr>
+    <tr><td><strong>&lt;ul&gt; / &lt;ol&gt;</strong></td><td>Lists (unordered/ordered)</td><td>&lt;ul&gt;&lt;li&gt;Item&lt;/li&gt;&lt;/ul&gt;</td></tr>
+    <tr><td><strong>&lt;table&gt;</strong></td><td>Table</td><td>&lt;table&gt;&lt;tr&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</td></tr>
+    <tr><td><strong>&lt;div&gt;</strong></td><td>Division/container</td><td>&lt;div&gt;Content&lt;/div&gt;</td></tr>
+    <tr><td><strong>&lt;br&gt;</strong></td><td>Line break</td><td>Line 1&lt;br&gt;Line 2</td></tr>
+</table>
+
+<h3>Attributes</h3>
+<p>Tags can have attributes that provide additional information:</p>
+<pre><code class="language-html">&lt;!-- Link with href attribute --&gt;
+&lt;a href="https://google.com"&gt;Visit Google&lt;/a&gt;
+
+&lt;!-- Image with src and alt attributes --&gt;
+&lt;img src="photo.jpg" alt="Description of image"&gt;
+
+&lt;!-- Element with id and class --&gt;
+&lt;div id="header" class="container"&gt;Content&lt;/div&gt;</code></pre>
+
+<h3>HTML Form Elements</h3>
+<pre><code class="language-html">&lt;form action="submit.php" method="POST"&gt;
+  &lt;label&gt;Name:&lt;/label&gt;
+  &lt;input type="text" name="username"&gt;
+  
+  &lt;label&gt;Password:&lt;/label&gt;
+  &lt;input type="password" name="pass"&gt;
+  
+  &lt;label&gt;Age:&lt;/label&gt;
+  &lt;input type="number" name="age"&gt;
+  
+  &lt;button type="submit"&gt;Submit&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+
+<div class="tip-box">
+    <strong>Remember:</strong>
+    <ul>
+        <li>Tags usually come in pairs: &lt;p&gt;...&lt;/p&gt;</li>
+        <li>Some tags are self-closing: &lt;img&gt;, &lt;br&gt;</li>
+        <li>HTML defines STRUCTURE, CSS defines STYLE</li>
+    </ul>
+</div>
+            `
+        },
+        'CSS Basics': {
+            content: `
+<h2>CSS Basics</h2>
+<div class="definition-box">
+    <strong>CSS (Cascading Style Sheets):</strong> A language used to describe the presentation and styling of HTML documents. CSS controls colors, fonts, layout, and more.
+</div>
+
+<h3>Ways to Add CSS</h3>
+<table class="notes-table">
+    <tr><th>Method</th><th>Example</th><th>Best For</th></tr>
+    <tr><td><strong>Inline</strong></td><td>&lt;p style="color:red"&gt;</td><td>Single element</td></tr>
+    <tr><td><strong>Internal</strong></td><td>&lt;style&gt; in &lt;head&gt;</td><td>Single page</td></tr>
+    <tr><td><strong>External</strong></td><td>&lt;link rel="stylesheet"&gt;</td><td>Whole website</td></tr>
+</table>
+
+<h3>CSS Syntax</h3>
+<pre><code class="language-css">selector {
+    property: value;
+    property: value;
+}
+
+/* Example */
+h1 {
+    color: blue;
+    font-size: 24px;
+    text-align: center;
+}</code></pre>
+
+<h3>CSS Selectors</h3>
+<table class="notes-table">
+    <tr><th>Selector</th><th>Example</th><th>Selects</th></tr>
+    <tr><td><strong>Element</strong></td><td>p { }</td><td>All &lt;p&gt; elements</td></tr>
+    <tr><td><strong>Class</strong></td><td>.intro { }</td><td>Elements with class="intro"</td></tr>
+    <tr><td><strong>ID</strong></td><td>#header { }</td><td>Element with id="header"</td></tr>
+    <tr><td><strong>Multiple</strong></td><td>h1, h2, p { }</td><td>All h1, h2, and p</td></tr>
+</table>
+
+<h3>Common CSS Properties</h3>
+<pre><code class="language-css">/* Text styling */
+color: red;              /* Text color */
+font-size: 16px;         /* Text size */
+font-family: Arial;      /* Font */
+text-align: center;      /* Alignment */
+
+/* Box styling */
+background-color: yellow;
+border: 1px solid black;
+padding: 10px;           /* Inside spacing */
+margin: 20px;            /* Outside spacing */
+
+/* Size */
+width: 200px;
+height: 100px;</code></pre>
+
+<h3>Colors in CSS</h3>
+<pre><code class="language-css">/* Named colors */
+color: red;
+color: blue;
+
+/* Hexadecimal */
+color: #FF0000;     /* Red */
+color: #00FF00;     /* Green */
+
+/* RGB */
+color: rgb(255, 0, 0);   /* Red */</code></pre>
+
+<div class="tip-box">
+    <strong>Exam Tips:</strong>
+    <ul>
+        <li>Classes use . (dot): .myclass</li>
+        <li>IDs use # (hash): #myid</li>
+        <li>IDs should be unique, classes can be reused</li>
+        <li>External CSS is best for larger websites</li>
+    </ul>
+</div>
+            `
+        }
+    },
+
+    'boolean-logic': {
+        'Boolean Expressions': {
+            content: `
+<h2>Boolean Expressions</h2>
+<div class="definition-box">
+    <strong>Boolean Expression:</strong> An expression that evaluates to either TRUE (1) or FALSE (0). Used in programming conditions and logic circuits.
+</div>
+
+<h3>Boolean Operators</h3>
+<table class="notes-table">
+    <tr><th>Operator</th><th>Symbol</th><th>Description</th></tr>
+    <tr><td><strong>AND</strong></td><td>∧ or ·</td><td>True only if BOTH inputs are true</td></tr>
+    <tr><td><strong>OR</strong></td><td>∨ or +</td><td>True if AT LEAST ONE input is true</td></tr>
+    <tr><td><strong>NOT</strong></td><td>¬ or !</td><td>Inverts the value (true→false)</td></tr>
+    <tr><td><strong>XOR</strong></td><td>⊕</td><td>True if inputs are DIFFERENT</td></tr>
+</table>
+
+<h3>Writing Boolean Expressions</h3>
+<div class="example-box">
+    <h4>Examples:</h4>
+    <ul>
+        <li><strong>A AND B</strong> written as: A ∧ B or A · B</li>
+        <li><strong>A OR B</strong> written as: A ∨ B or A + B</li>
+        <li><strong>NOT A</strong> written as: ¬A or Ā or !A</li>
+        <li><strong>A AND (NOT B)</strong> written as: A ∧ ¬B</li>
+    </ul>
+</div>
+
+<h3>Order of Operations</h3>
+<ol>
+    <li><strong>Brackets</strong> (highest priority)</li>
+    <li><strong>NOT</strong></li>
+    <li><strong>AND</strong></li>
+    <li><strong>OR</strong> (lowest priority)</li>
+</ol>
+
+<div class="example-box">
+    <h4>Evaluate: A OR B AND NOT C, where A=1, B=1, C=1</h4>
+<pre><code>Step 1: NOT C = NOT 1 = 0
+Step 2: B AND 0 = 1 AND 0 = 0
+Step 3: A OR 0 = 1 OR 0 = 1
+
+Answer: 1 (True)</code></pre>
+</div>
+
+<h3>Boolean in Programming</h3>
+<pre><code class="language-python">age = 18
+hasLicense = True
+
+# Boolean expression in IF statement
+IF age >= 17 AND hasLicense = True THEN
+    OUTPUT "Can drive"
+ENDIF
+
+# Combining conditions
+IF (score >= 50 AND attendance >= 80) OR hasExemption THEN
+    OUTPUT "Passed"
+ENDIF</code></pre>
+
+<div class="tip-box">
+    <strong>Key Point:</strong> Boolean algebra is the mathematics behind all digital logic - every computer operation ultimately reduces to combinations of AND, OR, and NOT.
+</div>
+            `
+        },
+        'Truth Tables': {
+            content: `
+<h2>Truth Tables</h2>
+<div class="definition-box">
+    <strong>Truth Table:</strong> A table showing all possible input combinations and their corresponding outputs for a Boolean expression or logic circuit.
+</div>
+
+<h3>How to Create a Truth Table</h3>
+<ol>
+    <li>List all input variables</li>
+    <li>Calculate number of rows: 2ⁿ (where n = number of inputs)</li>
+    <li>List all possible combinations (count in binary)</li>
+    <li>Calculate output for each combination</li>
+</ol>
+
+<h3>Basic Truth Tables</h3>
+
+<h4>NOT (1 input = 2 rows)</h4>
+<table class="notes-table">
+    <tr><th>A</th><th>NOT A</th></tr>
+    <tr><td>0</td><td>1</td></tr>
+    <tr><td>1</td><td>0</td></tr>
+</table>
+
+<h4>AND (2 inputs = 4 rows)</h4>
+<table class="notes-table">
+    <tr><th>A</th><th>B</th><th>A AND B</th></tr>
+    <tr><td>0</td><td>0</td><td>0</td></tr>
+    <tr><td>0</td><td>1</td><td>0</td></tr>
+    <tr><td>1</td><td>0</td><td>0</td></tr>
+    <tr><td>1</td><td>1</td><td>1</td></tr>
+</table>
+
+<h4>OR (2 inputs = 4 rows)</h4>
+<table class="notes-table">
+    <tr><th>A</th><th>B</th><th>A OR B</th></tr>
+    <tr><td>0</td><td>0</td><td>0</td></tr>
+    <tr><td>0</td><td>1</td><td>1</td></tr>
+    <tr><td>1</td><td>0</td><td>1</td></tr>
+    <tr><td>1</td><td>1</td><td>1</td></tr>
+</table>
+
+<h3>Complex Expression Example</h3>
+<div class="example-box">
+    <h4>Truth table for: (A AND B) OR (NOT C)</h4>
+    <table class="notes-table">
+        <tr><th>A</th><th>B</th><th>C</th><th>A AND B</th><th>NOT C</th><th>Output</th></tr>
+        <tr><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+        <tr><td>0</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td></tr>
+        <tr><td>0</td><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+        <tr><td>0</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td></tr>
+        <tr><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td></tr>
+        <tr><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td></tr>
+        <tr><td>1</td><td>1</td><td>0</td><td>1</td><td>1</td><td>1</td></tr>
+        <tr><td>1</td><td>1</td><td>1</td><td>1</td><td>0</td><td>1</td></tr>
+    </table>
+    <p>3 inputs = 2³ = 8 rows</p>
+</div>
+
+<div class="tip-box">
+    <strong>Exam Tip:</strong> When filling in input columns, use binary counting: 000, 001, 010, 011, 100, 101, 110, 111
+</div>
+            `
         }
     }
 };

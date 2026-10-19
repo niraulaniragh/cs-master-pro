@@ -98,17 +98,57 @@ const TOPICS = [
         ]
     },
     {
+        id: 'databases',
+        name: 'Databases',
+        icon: '🗄️',
+        color: '#ef4444',
+        paper: 'Paper 1 & 2',
+        description: 'Database concepts, tables, keys, SQL queries, validation',
+        subtopics: [
+            'Database Concepts',
+            'Primary & Foreign Keys',
+            'SQL Queries',
+            'Data Validation in Databases'
+        ]
+    },
+    {
+        id: 'web-development',
+        name: 'Web Development',
+        icon: '🌍',
+        color: '#14b8a6',
+        paper: 'Paper 1',
+        description: 'HTML structure, tags, CSS styling, web page creation',
+        subtopics: [
+            'HTML Basics',
+            'CSS Basics'
+        ]
+    },
+    {
+        id: 'boolean-logic',
+        name: 'Boolean Logic',
+        icon: '🔣',
+        color: '#f97316',
+        paper: 'Paper 1',
+        description: 'Boolean expressions, truth tables, logic operators',
+        subtopics: [
+            'Boolean Expressions',
+            'Truth Tables'
+        ]
+    },
+    {
         id: 'bigger-picture',
         name: 'The Bigger Picture',
         icon: '🌍',
         color: '#06b6d4',
         paper: 'Paper 1',
-        description: 'Environmental impact, ethics, AI, copyright, emerging technologies',
+        description: 'Environmental impact, ethics, AI, copyright, automation, digital currency',
         subtopics: [
             'Environmental Impact',
             'Ethical Issues',
             'Copyright & Licensing',
-            'Artificial Intelligence'
+            'Artificial Intelligence',
+            'Automation & Robotics',
+            'Digital Currency'
         ]
     }
 ];
