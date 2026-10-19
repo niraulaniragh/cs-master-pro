@@ -197,7 +197,7 @@ const GamesView = {
         const gameAchievements = ['speed_demon', 'speed_master', 'battle_veteran', 'undefeated', 
                                    'speed_typist', 'perfect_accuracy', 'millionaire', 'quiz_master',
                                    'boss_slayer', 'champion', 'flawless'];
-        const unlocked = AppState.getState('achievements') || [];
+        const unlocked = AppState.getState('user.achievements') || [];
         return gameAchievements.filter(a => unlocked.includes(a)).length;
     },
 
