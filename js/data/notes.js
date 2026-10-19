@@ -1320,6 +1320,258 @@ UNTIL age >= 0 AND age <= 120</code></pre>
     <strong>Exam Tip:</strong> Validation can check if data is SENSIBLE but not if it's CORRECT. Age=25 passes validation but might not be the true age.
 </div>
             `
+        },
+        'String Handling': {
+            content: `
+<h2>String Handling (Paper 2)</h2>
+<div class="definition-box">
+    <strong>String:</strong> A sequence of characters (text). String handling involves manipulating, searching, and modifying text data - essential for Paper 2 programming.
+</div>
+
+<h3>Key String Operations</h3>
+<table class="notes-table">
+    <tr><th>Operation</th><th>Description</th><th>Example</th><th>Result</th></tr>
+    <tr><td><strong>LENGTH</strong></td><td>Number of characters</td><td>LENGTH("Hello")</td><td>5</td></tr>
+    <tr><td><strong>SUBSTRING</strong></td><td>Extract part of string</td><td>SUBSTRING("Hello", 0, 2)</td><td>"He"</td></tr>
+    <tr><td><strong>UPPER</strong></td><td>Convert to uppercase</td><td>UPPER("Hello")</td><td>"HELLO"</td></tr>
+    <tr><td><strong>LOWER</strong></td><td>Convert to lowercase</td><td>LOWER("Hello")</td><td>"hello"</td></tr>
+    <tr><td><strong>CONCATENATE</strong></td><td>Join strings together</td><td>"Hello" + " World"</td><td>"Hello World"</td></tr>
+    <tr><td><strong>ASC</strong></td><td>Get ASCII code</td><td>ASC("A")</td><td>65</td></tr>
+    <tr><td><strong>CHR</strong></td><td>Get character from code</td><td>CHR(65)</td><td>"A"</td></tr>
+</table>
+
+<h3>Accessing Individual Characters</h3>
+<p>Strings are like arrays - each character has an index (starting from 0):</p>
+<pre><code class="language-python">text = "Hello"
+# Index:  01234
+
+text[0]    # "H" (first character)
+text[1]    # "e" (second character)
+text[4]    # "o" (last character)
+text[-1]   # "o" (last character - Python)
+</code></pre>
+
+<h3>Common String Tasks</h3>
+
+<h4>1. Count occurrences of a character</h4>
+<pre><code class="language-python">text = "Hello World"
+count = 0
+FOR i = 0 TO LENGTH(text) - 1
+    IF text[i] = "l" THEN
+        count = count + 1
+    ENDIF
+NEXT i
+OUTPUT count    // Outputs: 3</code></pre>
+
+<h4>2. Reverse a string</h4>
+<pre><code class="language-python">text = "Hello"
+reversed = ""
+FOR i = LENGTH(text) - 1 TO 0 STEP -1
+    reversed = reversed + text[i]
+NEXT i
+OUTPUT reversed    // Outputs: "olleH"</code></pre>
+
+<h4>3. Check if palindrome</h4>
+<pre><code class="language-python">text = "radar"
+reversed = ""
+FOR i = LENGTH(text) - 1 TO 0 STEP -1
+    reversed = reversed + text[i]
+NEXT i
+IF text = reversed THEN
+    OUTPUT "Palindrome!"
+ELSE
+    OUTPUT "Not a palindrome"
+ENDIF</code></pre>
+
+<h4>4. Extract first name from full name</h4>
+<pre><code class="language-python">fullName = "John Smith"
+firstName = ""
+FOR i = 0 TO LENGTH(fullName) - 1
+    IF fullName[i] = " " THEN
+        BREAK    // Stop at space
+    ENDIF
+    firstName = firstName + fullName[i]
+NEXT i
+OUTPUT firstName    // Outputs: "John"</code></pre>
+
+<div class="tip-box">
+    <strong>Paper 2 Tips:</strong>
+    <ul>
+        <li>Remember strings are 0-indexed (first character is position 0)</li>
+        <li>LENGTH gives total characters, so last index is LENGTH - 1</li>
+        <li>Build new strings by concatenating characters one at a time</li>
+        <li>Practice reversing, searching, and extracting substrings</li>
+    </ul>
+</div>
+            `
+        },
+        'File Handling': {
+            content: `
+<h2>File Handling (Paper 2)</h2>
+<div class="definition-box">
+    <strong>File Handling:</strong> Reading data from files and writing data to files. This allows programs to store data permanently (data persists after program ends).
+</div>
+
+<h3>Why Use Files?</h3>
+<ul>
+    <li><strong>Persistence:</strong> Data survives after program closes</li>
+    <li><strong>Large data:</strong> Store more data than fits in memory</li>
+    <li><strong>Sharing:</strong> Data can be used by other programs</li>
+    <li><strong>Input:</strong> Read data prepared in advance</li>
+</ul>
+
+<h3>File Operations</h3>
+<table class="notes-table">
+    <tr><th>Operation</th><th>Purpose</th></tr>
+    <tr><td><strong>OPEN</strong></td><td>Open a file for reading or writing</td></tr>
+    <tr><td><strong>READ</strong></td><td>Get data from a file</td></tr>
+    <tr><td><strong>WRITE</strong></td><td>Put data into a file</td></tr>
+    <tr><td><strong>CLOSE</strong></td><td>Finish using the file</td></tr>
+    <tr><td><strong>EOF</strong></td><td>Check for End Of File</td></tr>
+</table>
+
+<h3>File Modes</h3>
+<table class="notes-table">
+    <tr><th>Mode</th><th>Description</th></tr>
+    <tr><td><strong>Read ("r")</strong></td><td>Open for reading only</td></tr>
+    <tr><td><strong>Write ("w")</strong></td><td>Open for writing (overwrites existing)</td></tr>
+    <tr><td><strong>Append ("a")</strong></td><td>Open for writing (adds to end)</td></tr>
+</table>
+
+<h3>Reading from a File</h3>
+<pre><code class="language-python"># Pseudocode
+OPEN "data.txt" FOR READ AS file
+WHILE NOT EOF(file)
+    line = READLINE(file)
+    OUTPUT line
+ENDWHILE
+CLOSE file
+
+# Python
+file = open("data.txt", "r")
+for line in file:
+    print(line)
+file.close()</code></pre>
+
+<h3>Writing to a File</h3>
+<pre><code class="language-python"># Pseudocode
+OPEN "output.txt" FOR WRITE AS file
+WRITELINE(file, "Hello World")
+WRITELINE(file, "This is line 2")
+CLOSE file
+
+# Python
+file = open("output.txt", "w")
+file.write("Hello World\\n")
+file.write("This is line 2\\n")
+file.close()</code></pre>
+
+<h3>Appending to a File</h3>
+<pre><code class="language-python"># Add to existing file without overwriting
+OPEN "log.txt" FOR APPEND AS file
+WRITELINE(file, "New entry added")
+CLOSE file</code></pre>
+
+<h3>Example: Read numbers and calculate average</h3>
+<pre><code class="language-python">OPEN "numbers.txt" FOR READ AS file
+total = 0
+count = 0
+WHILE NOT EOF(file)
+    number = READLINE(file)
+    total = total + number
+    count = count + 1
+ENDWHILE
+CLOSE file
+
+average = total / count
+OUTPUT "Average: ", average</code></pre>
+
+<h3>Example: Save high scores</h3>
+<pre><code class="language-python">// Writing scores
+OPEN "scores.txt" FOR WRITE AS file
+WRITELINE(file, playerName + "," + score)
+CLOSE file
+
+// Reading scores
+OPEN "scores.txt" FOR READ AS file
+WHILE NOT EOF(file)
+    line = READLINE(file)
+    // Split line by comma to get name and score
+    OUTPUT line
+ENDWHILE
+CLOSE file</code></pre>
+
+<div class="tip-box">
+    <strong>Paper 2 Tips:</strong>
+    <ul>
+        <li>Always CLOSE files when finished</li>
+        <li>Use READ mode for input, WRITE for output</li>
+        <li>APPEND adds to end, WRITE overwrites everything</li>
+        <li>Check for EOF (End Of File) when reading</li>
+        <li>Each WRITELINE creates a new line in the file</li>
+    </ul>
+</div>
+            `
+        },
+        'Testing': {
+            content: `
+<h2>Testing (Paper 2)</h2>
+<div class="definition-box">
+    <strong>Testing:</strong> The process of checking that a program works correctly, handles errors gracefully, and meets its requirements.
+</div>
+
+<h3>Types of Test Data</h3>
+<table class="notes-table">
+    <tr><th>Type</th><th>Description</th><th>Example (Age 0-120)</th></tr>
+    <tr><td><strong>Normal</strong></td><td>Typical, expected valid data</td><td>25, 45, 67</td></tr>
+    <tr><td><strong>Boundary</strong></td><td>At the edges of valid range</td><td>0, 1, 119, 120</td></tr>
+    <tr><td><strong>Erroneous</strong></td><td>Invalid data that should be rejected</td><td>-5, 150, "abc"</td></tr>
+</table>
+
+<h3>Why Each Type Matters</h3>
+<ul>
+    <li><strong>Normal:</strong> Confirms program works for typical use</li>
+    <li><strong>Boundary:</strong> Checks edges work correctly (common source of bugs)</li>
+    <li><strong>Erroneous:</strong> Ensures program handles bad input gracefully</li>
+</ul>
+
+<h3>Test Table Example</h3>
+<p>For a program that accepts ages 18-65:</p>
+<table class="notes-table">
+    <tr><th>Test #</th><th>Type</th><th>Input</th><th>Expected Output</th></tr>
+    <tr><td>1</td><td>Normal</td><td>25</td><td>Accepted</td></tr>
+    <tr><td>2</td><td>Normal</td><td>40</td><td>Accepted</td></tr>
+    <tr><td>3</td><td>Boundary</td><td>18</td><td>Accepted (minimum)</td></tr>
+    <tr><td>4</td><td>Boundary</td><td>65</td><td>Accepted (maximum)</td></tr>
+    <tr><td>5</td><td>Boundary</td><td>17</td><td>Rejected (below min)</td></tr>
+    <tr><td>6</td><td>Boundary</td><td>66</td><td>Rejected (above max)</td></tr>
+    <tr><td>7</td><td>Erroneous</td><td>-5</td><td>Rejected (negative)</td></tr>
+    <tr><td>8</td><td>Erroneous</td><td>"abc"</td><td>Rejected (not number)</td></tr>
+</table>
+
+<h3>Trace Tables</h3>
+<p>Used to track variable values through program execution:</p>
+<div class="example-box">
+    <h4>Trace table for: total = 0; FOR i = 1 TO 3: total = total + i</h4>
+    <table class="notes-table">
+        <tr><th>Step</th><th>i</th><th>total</th></tr>
+        <tr><td>Start</td><td>-</td><td>0</td></tr>
+        <tr><td>1</td><td>1</td><td>1</td></tr>
+        <tr><td>2</td><td>2</td><td>3</td></tr>
+        <tr><td>3</td><td>3</td><td>6</td></tr>
+    </table>
+</div>
+
+<div class="tip-box">
+    <strong>Paper 2 Tips:</strong>
+    <ul>
+        <li>Always include ALL THREE types of test data</li>
+        <li>Boundary tests should include values just inside AND just outside the range</li>
+        <li>Document expected vs actual results</li>
+        <li>Use trace tables to find logic errors</li>
+    </ul>
+</div>
+            `
         }
     },
 
@@ -1520,6 +1772,220 @@ This color is mostly red, a bit of green, little blue = Orange!</code></pre>
         <li>Memorize hex A=10, B=11, C=12, D=13, E=14, F=15</li>
         <li>When converting binary to hex, pad with zeros to make groups of 4</li>
         <li>Each hex digit is exactly 4 bits - this makes conversion easy</li>
+    </ul>
+</div>
+            `
+        },
+        'Binary Addition': {
+            content: `
+<h2>Binary Addition</h2>
+<div class="definition-box">
+    <strong>Binary Addition:</strong> Adding binary numbers using the same column method as denary, but with only 0 and 1. When the sum exceeds 1, we carry to the next column.
+</div>
+
+<h3>Binary Addition Rules</h3>
+<table class="notes-table">
+    <tr><th>A</th><th>B</th><th>Sum</th><th>Carry</th></tr>
+    <tr><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+    <tr><td>0</td><td>1</td><td>1</td><td>0</td></tr>
+    <tr><td>1</td><td>0</td><td>1</td><td>0</td></tr>
+    <tr><td>1</td><td>1</td><td>0</td><td>1</td></tr>
+</table>
+
+<p><strong>Key rule:</strong> 1 + 1 = 10 (which is 0, carry 1)</p>
+
+<h3>Example 1: Simple Addition</h3>
+<div class="example-box">
+    <h4>Add 0101 (5) + 0011 (3)</h4>
+<pre><code>    0 1 0 1   (5)
+  + 0 0 1 1   (3)
+  ---------
+Carry: 1 1
+  ---------
+    1 0 0 0   (8)
+
+Check: 5 + 3 = 8 ✓</code></pre>
+</div>
+
+<h3>Example 2: With Multiple Carries</h3>
+<div class="example-box">
+    <h4>Add 01101 (13) + 01011 (11)</h4>
+<pre><code>      0 1 1 0 1   (13)
+    + 0 1 0 1 1   (11)
+    -----------
+Carry:1 1 1 1
+    -----------
+      1 1 0 0 0   (24)
+
+Check: 13 + 11 = 24 ✓</code></pre>
+</div>
+
+<h3>Overflow Error</h3>
+<p class="warning">⚠️ <strong>Overflow</strong> occurs when the result is too large to fit in the available bits. For 8-bit: max value is 255. If result > 255, overflow occurs!</p>
+
+<div class="example-box">
+    <h4>Overflow Example (8-bit)</h4>
+<pre><code>    1111 1111   (255)
+  + 0000 0001   (1)
+  -----------
+  1 0000 0000   (256 - but needs 9 bits!)
+
+Result would be 0000 0000 with overflow flag set.
+The 9th bit is lost!</code></pre>
+</div>
+
+<div class="tip-box">
+    <strong>Exam Tips:</strong>
+    <ul>
+        <li>Work right to left, just like denary addition</li>
+        <li>1 + 1 = 0 carry 1</li>
+        <li>1 + 1 + 1 (with carry) = 1 carry 1</li>
+        <li>Check your answer by converting both to denary</li>
+    </ul>
+</div>
+            `
+        },
+        'Binary Shifts': {
+            content: `
+<h2>Binary Shifts</h2>
+<div class="definition-box">
+    <strong>Binary Shift:</strong> Moving all bits left or right by a certain number of positions. This is a very fast way to multiply or divide by powers of 2.
+</div>
+
+<h3>Left Shift (Multiply)</h3>
+<p>Shifting left by n positions <strong>multiplies</strong> by 2ⁿ</p>
+
+<div class="example-box">
+    <h4>Left shift 00001010 (10) by 1 position</h4>
+<pre><code>Before: 0 0 0 0 1 0 1 0  = 10
+             ← ← ← ← ← ← ← ←  (shift left)
+After:  0 0 0 1 0 1 0 0  = 20
+
+10 × 2 = 20 ✓</code></pre>
+</div>
+
+<div class="example-box">
+    <h4>Left shift 00000101 (5) by 2 positions</h4>
+<pre><code>Before: 0 0 0 0 0 1 0 1  = 5
+After:  0 0 0 1 0 1 0 0  = 20
+
+5 × 2² = 5 × 4 = 20 ✓</code></pre>
+</div>
+
+<h3>Right Shift (Divide)</h3>
+<p>Shifting right by n positions <strong>divides</strong> by 2ⁿ (integer division)</p>
+
+<div class="example-box">
+    <h4>Right shift 00010100 (20) by 1 position</h4>
+<pre><code>Before: 0 0 0 1 0 1 0 0  = 20
+             → → → → → → → →  (shift right)
+After:  0 0 0 0 1 0 1 0  = 10
+
+20 ÷ 2 = 10 ✓</code></pre>
+</div>
+
+<div class="example-box">
+    <h4>Right shift 00011000 (24) by 3 positions</h4>
+<pre><code>Before: 0 0 0 1 1 0 0 0  = 24
+After:  0 0 0 0 0 0 1 1  = 3
+
+24 ÷ 2³ = 24 ÷ 8 = 3 ✓</code></pre>
+</div>
+
+<h3>Summary Table</h3>
+<table class="notes-table">
+    <tr><th>Shift</th><th>Direction</th><th>Effect</th><th>Example</th></tr>
+    <tr><td>Left by 1</td><td>←</td><td>× 2</td><td>5 → 10</td></tr>
+    <tr><td>Left by 2</td><td>← ←</td><td>× 4</td><td>5 → 20</td></tr>
+    <tr><td>Left by 3</td><td>← ← ←</td><td>× 8</td><td>5 → 40</td></tr>
+    <tr><td>Right by 1</td><td>→</td><td>÷ 2</td><td>20 → 10</td></tr>
+    <tr><td>Right by 2</td><td>→ →</td><td>÷ 4</td><td>20 → 5</td></tr>
+</table>
+
+<p class="warning">⚠️ Right shift performs INTEGER division - remainders are lost. 7 >> 1 = 3 (not 3.5)</p>
+
+<div class="tip-box">
+    <strong>Why Use Shifts?</strong>
+    <ul>
+        <li>Much faster than multiplication/division</li>
+        <li>Used in graphics, games, and low-level programming</li>
+        <li>Left shift: bits that "fall off" the left are lost</li>
+        <li>Right shift: bits that "fall off" the right are lost</li>
+    </ul>
+</div>
+            `
+        },
+        'Encryption': {
+            content: `
+<h2>Encryption</h2>
+<div class="definition-box">
+    <strong>Encryption:</strong> The process of converting readable data (plaintext) into unreadable scrambled data (ciphertext) to protect it from unauthorized access.
+</div>
+
+<h3>Key Terms</h3>
+<table class="notes-table">
+    <tr><th>Term</th><th>Definition</th></tr>
+    <tr><td><strong>Plaintext</strong></td><td>Original readable message</td></tr>
+    <tr><td><strong>Ciphertext</strong></td><td>Encrypted (scrambled) message</td></tr>
+    <tr><td><strong>Key</strong></td><td>Secret value used to encrypt/decrypt</td></tr>
+    <tr><td><strong>Encryption</strong></td><td>Plaintext → Ciphertext</td></tr>
+    <tr><td><strong>Decryption</strong></td><td>Ciphertext → Plaintext</td></tr>
+</table>
+
+<h3>Caesar Cipher</h3>
+<p>A simple substitution cipher that shifts each letter by a fixed number of positions.</p>
+
+<div class="example-box">
+    <h4>Caesar Cipher with shift of 3</h4>
+<pre><code>Plaintext:   H E L L O
+Shift +3:    ↓ ↓ ↓ ↓ ↓
+Ciphertext:  K H O O R
+
+A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓
+D E F G H I J K L M N O P Q R S T U V W X Y Z A B C</code></pre>
+</div>
+
+<h3>Caesar Cipher Algorithm</h3>
+<pre><code class="language-python">FUNCTION encrypt(text, shift)
+    result = ""
+    FOR each character IN text
+        IF character is a letter THEN
+            code = ASC(character)
+            code = code + shift
+            // Wrap around if past Z
+            IF code > ASC('Z') THEN
+                code = code - 26
+            ENDIF
+            result = result + CHR(code)
+        ELSE
+            result = result + character
+        ENDIF
+    NEXT
+    RETURN result
+ENDFUNCTION</code></pre>
+
+<h3>Why Caesar Cipher is Weak</h3>
+<ul>
+    <li>Only 25 possible keys (shifts 1-25)</li>
+    <li>Easy to crack by trying all keys (brute force)</li>
+    <li>Letter frequency analysis can break it</li>
+</ul>
+
+<h3>Modern Encryption Concepts</h3>
+<table class="notes-table">
+    <tr><th>Type</th><th>Description</th><th>Example Use</th></tr>
+    <tr><td><strong>Symmetric</strong></td><td>Same key for encrypt & decrypt</td><td>AES - file encryption</td></tr>
+    <tr><td><strong>Asymmetric</strong></td><td>Public key + Private key pair</td><td>HTTPS websites</td></tr>
+</table>
+
+<div class="tip-box">
+    <strong>Exam Tips:</strong>
+    <ul>
+        <li>Know how Caesar cipher works with shifts</li>
+        <li>Be able to encrypt AND decrypt messages</li>
+        <li>Remember: decryption uses the OPPOSITE shift</li>
+        <li>Understand why simple ciphers are insecure</li>
     </ul>
 </div>
             `
@@ -2025,6 +2491,206 @@ EXECUTE:
 </div>
             `
         },
+        'Primary Storage': {
+            content: `
+<h2>Primary Storage (Main Memory)</h2>
+<div class="definition-box">
+    <strong>Primary Storage:</strong> Memory that is directly accessible by the CPU. It holds data and instructions currently being used. Fast but limited in size.
+</div>
+
+<h3>Types of Primary Storage</h3>
+
+<h4>RAM (Random Access Memory)</h4>
+<ul>
+    <li><strong>Volatile:</strong> Loses data when power is turned off</li>
+    <li><strong>Read/Write:</strong> Can read and write data</li>
+    <li><strong>Fast access:</strong> CPU can access any location directly</li>
+    <li><strong>Purpose:</strong> Stores running programs and data in use</li>
+</ul>
+
+<h4>ROM (Read Only Memory)</h4>
+<ul>
+    <li><strong>Non-volatile:</strong> Keeps data when power is off</li>
+    <li><strong>Read only:</strong> Cannot be easily modified</li>
+    <li><strong>Purpose:</strong> Stores boot instructions (BIOS/UEFI)</li>
+    <li><strong>Permanent:</strong> Written during manufacturing</li>
+</ul>
+
+<h3>Comparison Table</h3>
+<table class="notes-table">
+    <tr><th>Feature</th><th>RAM</th><th>ROM</th></tr>
+    <tr><td><strong>Volatile?</strong></td><td>Yes - loses data</td><td>No - keeps data</td></tr>
+    <tr><td><strong>Speed</strong></td><td>Fast</td><td>Fast</td></tr>
+    <tr><td><strong>Read/Write</strong></td><td>Both</td><td>Read only</td></tr>
+    <tr><td><strong>Contents</strong></td><td>Programs, user data</td><td>Boot instructions</td></tr>
+    <tr><td><strong>Size</strong></td><td>4GB - 64GB typical</td><td>Small (few MB)</td></tr>
+</table>
+
+<h3>Virtual Memory</h3>
+<div class="definition-box">
+    <strong>Virtual Memory:</strong> Uses part of the hard drive as if it were RAM when physical RAM is full.
+</div>
+<ul>
+    <li>Allows running more programs than RAM can hold</li>
+    <li>Much slower than real RAM (hard drive speed)</li>
+    <li>Swaps data between RAM and disk</li>
+</ul>
+
+<div class="tip-box">
+    <strong>Key Point:</strong> RAM is volatile (temporary), ROM is non-volatile (permanent). Both are primary storage with fast CPU access.
+</div>
+            `
+        },
+        'Secondary Storage': {
+            content: `
+<h2>Secondary Storage</h2>
+<div class="definition-box">
+    <strong>Secondary Storage:</strong> Non-volatile storage that keeps data permanently, even when powered off. Larger capacity but slower than primary storage.
+</div>
+
+<h3>Types of Secondary Storage</h3>
+
+<h4>1. Magnetic Storage</h4>
+<p><strong>Hard Disk Drive (HDD)</strong></p>
+<ul>
+    <li>Spinning magnetic platters with read/write heads</li>
+    <li>High capacity (1TB - 20TB)</li>
+    <li>Relatively cheap per GB</li>
+    <li>Slower than SSD, mechanical parts can fail</li>
+</ul>
+
+<h4>2. Solid State Storage</h4>
+<p><strong>Solid State Drive (SSD)</strong></p>
+<ul>
+    <li>No moving parts - uses flash memory chips</li>
+    <li>Much faster than HDD</li>
+    <li>More expensive per GB</li>
+    <li>More durable, silent, lower power</li>
+</ul>
+
+<p><strong>USB Flash Drive</strong></p>
+<ul>
+    <li>Portable solid state storage</li>
+    <li>Small capacity (8GB - 256GB typical)</li>
+    <li>Good for transferring files</li>
+</ul>
+
+<h4>3. Optical Storage</h4>
+<p><strong>CD, DVD, Blu-ray</strong></p>
+<ul>
+    <li>Data stored using laser marks on disc</li>
+    <li>CD: ~700MB, DVD: ~4.7GB, Blu-ray: ~25GB</li>
+    <li>Good for distributing software, movies</li>
+    <li>Becoming less common</li>
+</ul>
+
+<h3>Comparison Table</h3>
+<table class="notes-table">
+    <tr><th>Type</th><th>Speed</th><th>Capacity</th><th>Cost/GB</th><th>Durability</th></tr>
+    <tr><td><strong>HDD</strong></td><td>Slow</td><td>Very High</td><td>Low</td><td>Medium</td></tr>
+    <tr><td><strong>SSD</strong></td><td>Fast</td><td>High</td><td>Medium</td><td>High</td></tr>
+    <tr><td><strong>USB</strong></td><td>Medium</td><td>Low</td><td>Medium</td><td>High</td></tr>
+    <tr><td><strong>Optical</strong></td><td>Slow</td><td>Low</td><td>Very Low</td><td>Medium</td></tr>
+</table>
+
+<h3>Cloud Storage</h3>
+<ul>
+    <li>Data stored on remote servers via internet</li>
+    <li>Accessible from anywhere with internet</li>
+    <li>Examples: Google Drive, Dropbox, iCloud</li>
+    <li>Requires internet connection</li>
+</ul>
+
+<div class="tip-box">
+    <strong>Exam Tip:</strong> Know the differences between storage types, their speeds, capacities, and appropriate uses.
+</div>
+            `
+        },
+        'System Software': {
+            content: `
+<h2>System Software</h2>
+<div class="definition-box">
+    <strong>System Software:</strong> Software that manages and controls computer hardware, providing a platform for application software to run. The most important is the Operating System.
+</div>
+
+<h3>Operating System (OS)</h3>
+<p>The main system software that manages all computer resources.</p>
+
+<h4>Key Functions of an OS:</h4>
+<table class="notes-table">
+    <tr><th>Function</th><th>Description</th></tr>
+    <tr><td><strong>Memory Management</strong></td><td>Allocates RAM to programs, manages virtual memory</td></tr>
+    <tr><td><strong>Processor Management</strong></td><td>Schedules which programs use the CPU and when</td></tr>
+    <tr><td><strong>File Management</strong></td><td>Organizes files and folders, controls read/write access</td></tr>
+    <tr><td><strong>I/O Management</strong></td><td>Handles input/output devices (keyboard, printer)</td></tr>
+    <tr><td><strong>Security</strong></td><td>User accounts, passwords, access permissions</td></tr>
+    <tr><td><strong>User Interface</strong></td><td>GUI (graphical) or CLI (command line) for user interaction</td></tr>
+</table>
+
+<h3>Types of User Interface</h3>
+<table class="notes-table">
+    <tr><th>Type</th><th>Description</th><th>Example</th></tr>
+    <tr><td><strong>GUI</strong></td><td>Graphical - windows, icons, menus</td><td>Windows, macOS</td></tr>
+    <tr><td><strong>CLI</strong></td><td>Command Line - text commands</td><td>Terminal, Command Prompt</td></tr>
+    <tr><td><strong>Menu</strong></td><td>List of options to select</td><td>ATM machines</td></tr>
+</table>
+
+<h3>Examples of Operating Systems</h3>
+<ul>
+    <li><strong>Desktop:</strong> Windows, macOS, Linux</li>
+    <li><strong>Mobile:</strong> Android, iOS</li>
+    <li><strong>Server:</strong> Windows Server, Linux</li>
+</ul>
+
+<div class="tip-box">
+    <strong>Key Point:</strong> The OS acts as an intermediary between the user, applications, and hardware. Without it, you couldn't use the computer!
+</div>
+            `
+        },
+        'Utility Software': {
+            content: `
+<h2>Utility Software</h2>
+<div class="definition-box">
+    <strong>Utility Software:</strong> Programs designed to help maintain, optimize, and secure a computer system. They perform specific tasks to keep the system running smoothly.
+</div>
+
+<h3>Common Utility Programs</h3>
+<table class="notes-table">
+    <tr><th>Utility</th><th>Purpose</th></tr>
+    <tr><td><strong>Antivirus</strong></td><td>Detects and removes malware, viruses, trojans</td></tr>
+    <tr><td><strong>Firewall</strong></td><td>Monitors and filters network traffic</td></tr>
+    <tr><td><strong>Disk Defragmenter</strong></td><td>Reorganizes fragmented files on HDD for faster access</td></tr>
+    <tr><td><strong>Backup Software</strong></td><td>Creates copies of files for recovery</td></tr>
+    <tr><td><strong>File Compression</strong></td><td>Reduces file size (ZIP, RAR)</td></tr>
+    <tr><td><strong>Disk Cleanup</strong></td><td>Removes temporary and unnecessary files</td></tr>
+    <tr><td><strong>Encryption</strong></td><td>Scrambles data to protect it</td></tr>
+</table>
+
+<h3>Defragmentation Explained</h3>
+<div class="example-box">
+    <p>When files are saved and deleted, fragments get scattered across the disk:</p>
+<pre><code>Before defrag: [A1][B1][--][A2][C1][B2][A3][--]
+                (file A is in 3 separate pieces!)
+
+After defrag:  [A1][A2][A3][B1][B2][C1][--][--]
+                (file A is now together - faster to read!)</code></pre>
+</div>
+
+<p><strong>Note:</strong> SSDs don't need defragmentation - it can actually reduce their lifespan!</p>
+
+<h3>Backup Types</h3>
+<table class="notes-table">
+    <tr><th>Type</th><th>Description</th></tr>
+    <tr><td><strong>Full Backup</strong></td><td>Copies ALL files (takes longest, uses most space)</td></tr>
+    <tr><td><strong>Incremental</strong></td><td>Only files changed since last backup</td></tr>
+    <tr><td><strong>Differential</strong></td><td>Files changed since last FULL backup</td></tr>
+</table>
+
+<div class="tip-box">
+    <strong>Exam Tip:</strong> Know the difference between system software (OS, utilities) and application software (Word, games, browsers). System software manages the computer; applications are used by users to do tasks.
+</div>
+            `
+        },
         'Logic Gates': {
             content: `
 <h2>Logic Gates</h2>
@@ -2310,6 +2976,100 @@ EXECUTE:
 
 <div class="tip-box">
     <strong>Most Common:</strong> Star topology is used in most modern LANs because it balances cost, reliability, and ease of management.
+</div>
+            `
+        },
+        'Network Hardware': {
+            content: `
+<h2>Network Hardware</h2>
+<div class="definition-box">
+    <strong>Network Hardware:</strong> Physical devices required to create, connect, and manage computer networks.
+</div>
+
+<h3>Key Network Devices</h3>
+<table class="notes-table">
+    <tr><th>Device</th><th>Purpose</th><th>Layer</th></tr>
+    <tr><td><strong>NIC</strong></td><td>Network Interface Card - connects device to network</td><td>Physical</td></tr>
+    <tr><td><strong>Switch</strong></td><td>Connects devices in a LAN, sends data to specific device</td><td>Data Link</td></tr>
+    <tr><td><strong>Router</strong></td><td>Connects different networks, directs traffic between them</td><td>Network</td></tr>
+    <tr><td><strong>Hub</strong></td><td>Connects devices, broadcasts to all (outdated)</td><td>Physical</td></tr>
+    <tr><td><strong>WAP</strong></td><td>Wireless Access Point - provides Wi-Fi</td><td>Data Link</td></tr>
+    <tr><td><strong>Modem</strong></td><td>Converts digital ↔ analog signals for internet</td><td>Physical</td></tr>
+</table>
+
+<h3>Switch vs Hub vs Router</h3>
+<table class="notes-table">
+    <tr><th>Device</th><th>Intelligence</th><th>Traffic</th></tr>
+    <tr><td><strong>Hub</strong></td><td>None - "dumb" device</td><td>Broadcasts to ALL ports</td></tr>
+    <tr><td><strong>Switch</strong></td><td>Learns MAC addresses</td><td>Sends to SPECIFIC port</td></tr>
+    <tr><td><strong>Router</strong></td><td>Uses IP addresses</td><td>Routes between NETWORKS</td></tr>
+</table>
+
+<h3>Transmission Media</h3>
+<ul>
+    <li><strong>Ethernet Cable (Cat5/6):</strong> Copper wires, up to 1 Gbps</li>
+    <li><strong>Fiber Optic:</strong> Light pulses, very fast, long distance</li>
+    <li><strong>Wireless (Wi-Fi):</strong> Radio waves, convenient but slower</li>
+</ul>
+
+<div class="tip-box">
+    <strong>Remember:</strong> Switches work within a LAN, Routers connect different networks (like your home to the internet).
+</div>
+            `
+        },
+        'Protocols': {
+            content: `
+<h2>Network Protocols</h2>
+<div class="definition-box">
+    <strong>Protocol:</strong> A set of rules that govern how data is transmitted and received over a network. Protocols ensure devices can communicate even if made by different manufacturers.
+</div>
+
+<h3>Why Protocols Are Needed</h3>
+<ul>
+    <li>Devices from different manufacturers need common rules</li>
+    <li>Data must be formatted consistently</li>
+    <li>Errors need to be detected and handled</li>
+    <li>Devices must agree on speed and timing</li>
+</ul>
+
+<h3>Common Protocols</h3>
+<table class="notes-table">
+    <tr><th>Protocol</th><th>Full Name</th><th>Purpose</th></tr>
+    <tr><td><strong>HTTP</strong></td><td>HyperText Transfer Protocol</td><td>Web page requests (unsecured)</td></tr>
+    <tr><td><strong>HTTPS</strong></td><td>HTTP Secure</td><td>Encrypted web traffic</td></tr>
+    <tr><td><strong>FTP</strong></td><td>File Transfer Protocol</td><td>Uploading/downloading files</td></tr>
+    <tr><td><strong>SMTP</strong></td><td>Simple Mail Transfer Protocol</td><td>Sending emails</td></tr>
+    <tr><td><strong>POP/IMAP</strong></td><td>Post Office Protocol / Internet Message Access</td><td>Receiving emails</td></tr>
+    <tr><td><strong>TCP</strong></td><td>Transmission Control Protocol</td><td>Reliable data delivery</td></tr>
+    <tr><td><strong>IP</strong></td><td>Internet Protocol</td><td>Addressing and routing</td></tr>
+</table>
+
+<h3>TCP/IP Model</h3>
+<p>The TCP/IP model has 4 layers that work together:</p>
+<table class="notes-table">
+    <tr><th>Layer</th><th>Purpose</th><th>Protocols</th></tr>
+    <tr><td><strong>4. Application</strong></td><td>User-facing services</td><td>HTTP, FTP, SMTP</td></tr>
+    <tr><td><strong>3. Transport</strong></td><td>Reliable delivery</td><td>TCP, UDP</td></tr>
+    <tr><td><strong>2. Internet</strong></td><td>Addressing & routing</td><td>IP</td></tr>
+    <tr><td><strong>1. Network Access</strong></td><td>Physical connection</td><td>Ethernet, Wi-Fi</td></tr>
+</table>
+
+<h3>IP Addresses</h3>
+<ul>
+    <li><strong>IPv4:</strong> 32-bit address (e.g., 192.168.1.1)</li>
+    <li><strong>IPv6:</strong> 128-bit address (more addresses available)</li>
+    <li>Every device on a network needs a unique IP</li>
+</ul>
+
+<h3>MAC Address</h3>
+<ul>
+    <li>Physical address burned into network card</li>
+    <li>48-bit, written in hex (e.g., 00:1A:2B:3C:4D:5E)</li>
+    <li>Unique to each device worldwide</li>
+</ul>
+
+<div class="tip-box">
+    <strong>HTTP vs HTTPS:</strong> HTTPS encrypts data between browser and website. Always look for HTTPS when entering sensitive information (passwords, payments).
 </div>
             `
         },

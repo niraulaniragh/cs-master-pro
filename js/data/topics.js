@@ -1,6 +1,6 @@
 /**
  * topics.js - Topic Definitions for Edexcel IGCSE 4CP0
- * Contains all 6 main topics with metadata
+ * Complete Paper 1 & Paper 2 Syllabus
  */
 
 const TOPICS = [
@@ -9,6 +9,7 @@ const TOPICS = [
         name: 'Problem Solving',
         icon: '🧩',
         color: '#3b82f6',
+        paper: 'Paper 1 & 2',
         description: 'Algorithms, flowcharts, searching & sorting, decomposition, abstraction',
         subtopics: [
             'Algorithms & Flowcharts',
@@ -26,7 +27,8 @@ const TOPICS = [
         name: 'Programming',
         icon: '💻',
         color: '#10b981',
-        description: 'Constructs, data types, arrays, loops, functions, validation, file handling',
+        paper: 'Paper 2 (Practical)',
+        description: 'Data types, variables, selection, iteration, arrays, functions, file handling, string manipulation',
         subtopics: [
             'Data Types',
             'Variables & Constants',
@@ -36,8 +38,9 @@ const TOPICS = [
             'Arrays',
             'Functions & Procedures',
             'String Handling',
+            'File Handling',
             'Validation',
-            'File Handling'
+            'Testing'
         ]
     },
     {
@@ -45,6 +48,7 @@ const TOPICS = [
         name: 'Data Representation',
         icon: '📊',
         color: '#f59e0b',
+        paper: 'Paper 1',
         description: 'Binary, hex, ASCII, Unicode, images, sound, compression, encryption',
         subtopics: [
             'Binary Numbers',
@@ -63,16 +67,17 @@ const TOPICS = [
         name: 'Computer Systems',
         icon: '🖥️',
         color: '#8b5cf6',
-        description: 'Von Neumann, CPU components, logic gates, software types, translators',
+        paper: 'Paper 1',
+        description: 'Architecture, CPU, memory, storage, logic gates, software, translators',
         subtopics: [
             'Von Neumann Architecture',
             'CPU Components',
             'Fetch-Decode-Execute Cycle',
             'Primary Storage',
             'Secondary Storage',
-            'Logic Gates',
             'System Software',
             'Utility Software',
+            'Logic Gates',
             'Translators'
         ]
     },
@@ -81,17 +86,15 @@ const TOPICS = [
         name: 'Networks & Internet',
         icon: '🌐',
         color: '#ec4899',
-        description: 'LAN/WAN, topologies, protocols, TCP/IP, security threats, prevention',
+        paper: 'Paper 1',
+        description: 'LAN/WAN, topologies, hardware, protocols, TCP/IP, security threats, prevention',
         subtopics: [
             'Network Types (LAN/WAN)',
             'Network Topologies',
             'Network Hardware',
             'Protocols',
-            'TCP/IP Model',
-            'Internet & WWW',
             'Security Threats',
-            'Security Prevention',
-            'HTML & CSS Basics'
+            'Security Prevention'
         ]
     },
     {
@@ -99,16 +102,13 @@ const TOPICS = [
         name: 'The Bigger Picture',
         icon: '🌍',
         color: '#06b6d4',
+        paper: 'Paper 1',
         description: 'Environmental impact, ethics, AI, copyright, emerging technologies',
         subtopics: [
             'Environmental Impact',
-            'E-Waste',
             'Ethical Issues',
-            'Legal Issues',
             'Copyright & Licensing',
-            'Artificial Intelligence',
-            'Privacy & Surveillance',
-            'Emerging Technologies'
+            'Artificial Intelligence'
         ]
     }
 ];
