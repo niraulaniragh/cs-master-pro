@@ -318,6 +318,7 @@ const AppState = (() => {
 
 // Achievements Data
 const ACHIEVEMENTS = [
+    // Learning Achievements
     { id: 'first_quiz', name: 'First Steps', icon: '🎯', description: 'Complete your first quiz' },
     { id: 'streak_5', name: 'On Fire!', icon: '🔥', description: 'Get a 5 answer streak' },
     { id: 'streak_10', name: 'Unstoppable', icon: '⚡', description: 'Get a 10 answer streak' },
@@ -328,5 +329,22 @@ const ACHIEVEMENTS = [
     { id: 'note_reader', name: 'Bookworm', icon: '📚', description: 'Read notes from all topics' },
     { id: 'tool_master', name: 'Tool Master', icon: '🔧', description: 'Use all learning tools' },
     { id: 'century', name: 'Century', icon: '💎', description: 'Answer 100 questions correctly' },
-    { id: 'flashcard_master', name: 'Memory Master', icon: '🧠', description: 'Complete flashcards with 100% known' }
+    { id: 'flashcard_master', name: 'Memory Master', icon: '🧠', description: 'Complete flashcards with 100% known' },
+    
+    // Game Achievements
+    { id: 'speed_demon', name: 'Speed Demon', icon: '⚡', description: 'Get 10x combo in Speed Run' },
+    { id: 'speed_master', name: 'Speed Master', icon: '🏎️', description: 'Score 2000+ in Speed Run' },
+    { id: 'battle_veteran', name: 'Battle Veteran', icon: '⚔️', description: 'Win 10 battles' },
+    { id: 'undefeated', name: 'Undefeated', icon: '🛡️', description: 'Get a 5 win streak in Battle Mode' },
+    { id: 'speed_typist', name: 'Speed Typist', icon: '⌨️', description: 'Type at 60+ WPM' },
+    { id: 'perfect_accuracy', name: 'Perfect Accuracy', icon: '🎯', description: '100% accuracy in Type Racer' },
+    { id: 'millionaire', name: 'CS Millionaire', icon: '💰', description: 'Win 1,000,000 XP in Millionaire' },
+    { id: 'quiz_master', name: 'Quiz Master', icon: '🧠', description: 'Reach question 10 in Millionaire' },
+    { id: 'boss_slayer', name: 'Boss Slayer', icon: '🗡️', description: 'Defeat any boss' },
+    { id: 'champion', name: 'Champion', icon: '👑', description: 'Defeat The Examinator' },
+    { id: 'flawless', name: 'Flawless Victory', icon: '⭐', description: 'Defeat a boss with full HP' },
+    
+    // Daily Challenge Achievements  
+    { id: 'daily_streak_7', name: 'Weekly Warrior', icon: '📅', description: '7-day streak on daily challenges' },
+    { id: 'daily_streak_30', name: 'Monthly Master', icon: '🗓️', description: '30-day streak on daily challenges' }
 ];
