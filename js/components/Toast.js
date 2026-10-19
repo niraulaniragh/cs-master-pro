@@ -33,6 +33,15 @@ const Toast = (() => {
         `;
 
         container.appendChild(toast);
+        
+        // Play sound based on type
+        if (typeof SoundFX !== 'undefined') {
+            if (type === 'success') SoundFX.play('success');
+            else if (type === 'error') SoundFX.play('error');
+            else if (message.includes('XP')) SoundFX.play('xp');
+            else if (message.includes('Level Up')) SoundFX.play('levelup');
+            else if (message.includes('Achievement')) SoundFX.play('success');
+        }
 
         // Trigger animation
         requestAnimationFrame(() => {

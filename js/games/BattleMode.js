@@ -137,6 +137,8 @@ const BattleMode = {
         BattleMode.powerUps = { doublePoints: 1, skipQuestion: 1, timeFreeze: 1 };
         BattleMode.isPlaying = true;
         
+        SoundFX.play('start');
+        
         const container = document.querySelector('.battle-container');
         container.innerHTML = BattleMode.renderGame();
         
@@ -319,9 +321,11 @@ const BattleMode = {
             }
             BattleMode.playerScore += points;
             BattleMode.opponentHP -= 15;
+            SoundFX.play('correct');
             BattleMode.showFeedback(true, points);
         } else {
             BattleMode.playerHP -= 10;
+            SoundFX.play('damage');
             BattleMode.showFeedback(false, 0);
         }
         
@@ -444,6 +448,13 @@ const BattleMode = {
         const playerWon = BattleMode.playerHP > BattleMode.opponentHP || 
                           (BattleMode.playerHP === BattleMode.opponentHP && BattleMode.playerScore > BattleMode.opponentScore);
         const isDraw = BattleMode.playerHP === BattleMode.opponentHP && BattleMode.playerScore === BattleMode.opponentScore;
+        
+        // Play sound
+        if (playerWon) {
+            SoundFX.play('victory');
+        } else if (!isDraw) {
+            SoundFX.play('defeat');
+        }
         
         // Save stats
         BattleMode.saveStats(playerWon, isDraw);

@@ -115,6 +115,8 @@ const SpeedRun = {
         SpeedRun.isPlaying = true;
         SpeedRun.startTime = Date.now();
         
+        SoundFX.play('start');
+        
         const container = document.querySelector('.speed-run-container');
         container.innerHTML = SpeedRun.renderGame();
         
@@ -218,6 +220,13 @@ const SpeedRun = {
             SpeedRun.combo++;
             SpeedRun.maxCombo = Math.max(SpeedRun.maxCombo, SpeedRun.combo);
             
+            // Play sound
+            if (SpeedRun.combo > 1) {
+                SoundFX.play('combo');
+            } else {
+                SoundFX.play('correct');
+            }
+            
             if (answerTime < SpeedRun.fastestAnswer) {
                 SpeedRun.fastestAnswer = answerTime;
             }
@@ -245,6 +254,7 @@ const SpeedRun = {
         } else {
             SpeedRun.wrongAnswers++;
             SpeedRun.combo = 0;
+            SoundFX.play('wrong');
             SpeedRun.showFeedback(false, 0, '', answerTime);
         }
         

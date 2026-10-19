@@ -251,7 +251,27 @@ pre code {
 
 .nav-stats {
     display: flex;
-    gap: var(--space-6);
+    align-items: center;
+    gap: var(--space-4);
+}
+
+.sound-toggle {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.2s;
+}
+
+.sound-toggle:hover {
+    border-color: var(--purple);
+    transform: scale(1.1);
 }
 
 .stat-item {
