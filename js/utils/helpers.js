@@ -13,14 +13,12 @@ function shuffleArray(array) {
     return arr;
 }
 
-// Global getTopicById function (used by various views)
-function getTopicById(id) {
-    return TOPICS.find(t => t.id === id) || null;
-}
-
 const Helpers = {
     // Shuffle array (Fisher-Yates)
     shuffle: shuffleArray,
+    
+    // Alias for backwards compatibility
+    shuffleArray: shuffleArray,
 
     // Generate random ID
     generateId: () => Math.random().toString(36).substr(2, 9),
