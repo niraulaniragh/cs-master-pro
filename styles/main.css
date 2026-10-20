@@ -532,48 +532,47 @@ label {
     border: 1px solid var(--border);
     border-radius: var(--radius-xl);
     padding: var(--space-6);
-    overflow: hidden;
+    overflow: visible;
 }
 
 .panel-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: var(--space-6);
-    gap: var(--space-3);
-    flex-wrap: wrap;
+    margin-bottom: var(--space-5);
 }
 
 .panel-header h3 {
     color: var(--text-primary);
-    font-size: 1.125rem;
+    font-size: 1.1rem;
     margin: 0;
-    white-space: nowrap;
+    font-weight: 600;
 }
 
 .rank-badge {
-    padding: var(--space-2) var(--space-4);
+    padding: 6px 14px;
     background: var(--bg-elevated);
+    border: 1px solid var(--border);
     border-radius: var(--radius-full);
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     font-weight: 600;
     color: var(--text-secondary);
-    white-space: nowrap;
-    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
 }
 
 /* Level Display */
 .level-display {
     display: flex;
     align-items: center;
-    gap: var(--space-6);
-    flex-wrap: wrap;
+    gap: var(--space-5);
 }
 
 .level-circle {
     position: relative;
-    width: 120px;
-    height: 120px;
+    width: 110px;
+    height: 110px;
     flex-shrink: 0;
 }
 
@@ -604,6 +603,7 @@ label {
     left: 50%;
     transform: translate(-50%, -50%);
     text-align: center;
+    width: 100%;
 }
 
 .level-value {
@@ -623,13 +623,17 @@ label {
 
 .level-info {
     flex: 1;
-    min-width: 180px;
+    min-width: 0;
 }
 
 .xp-display {
-    font-size: 1.25rem;
+    font-size: 1.1rem;
     font-weight: 700;
-    margin-bottom: var(--space-3);
+    margin-bottom: var(--space-2);
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 2px;
 }
 
 .xp-current {
@@ -638,20 +642,20 @@ label {
 
 .xp-divider {
     color: var(--text-dim);
-    margin: 0 var(--space-1);
+    margin: 0 2px;
 }
 
 .xp-target {
     color: var(--text-muted);
-    font-size: 0.9em;
+    font-size: 0.85em;
 }
 
 .xp-bar {
-    height: 10px;
+    height: 8px;
     background: var(--bg-elevated);
     border-radius: var(--radius-full);
     overflow: hidden;
-    margin-bottom: var(--space-3);
+    margin-bottom: var(--space-2);
 }
 
 .xp-fill {
@@ -661,36 +665,8 @@ label {
 }
 
 .xp-needed {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     color: var(--text-muted);
-}
-
-/* Responsive level display */
-@media (max-width: 480px) {
-    .level-display {
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-    }
-    
-    .level-circle {
-        width: 100px;
-        height: 100px;
-    }
-    
-    .level-value {
-        font-size: 1.75rem;
-    }
-    
-    .level-info {
-        width: 100%;
-    }
-    
-    .panel-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: var(--space-2);
-    }
 }
 
 /* Stats Panel */
