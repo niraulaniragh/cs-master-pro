@@ -51,7 +51,7 @@ const BossBattle = {
             description: 'Shadow of the Web',
             hp: 110,
             attack: 20,
-            color: '#ef4444',
+            color: '#10b981',
             reward: 550,
             attacks: ['Packet Punch', 'Protocol Slash', 'Firewall Fury']
         },
@@ -75,7 +75,7 @@ const BossBattle = {
             description: 'Phantom of Encryption',
             hp: 100,
             attack: 25,
-            color: '#ef4444',
+            color: '#10b981',
             reward: 650,
             attacks: ['Malware Maelstrom', 'Phishing Phantasm', 'Encryption Eclipse']
         },

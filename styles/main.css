@@ -1,57 +1,57 @@
 /* ==========================================
    CS Master Pro - Complete Redesign
-   Focus: Aggressive, Cool, High Energy
+   Focus: Calm, Professional, Modern
 ========================================== */
 
 /* ==========================================
    CSS Variables (Design Tokens)
 ========================================== */
 :root {
-    /* Colors - Aggressive Dark Theme */
-    --bg-primary: #0c0c0c;
-    --bg-secondary: #151515;
-    --bg-card: #1a1a1a;
-    --bg-elevated: #242424;
-    --bg-hover: #2d2d2d;
-    --bg-input: #1a1a1a;
+    /* Colors - Calm Dark Theme */
+    --bg-primary: #0d1117;
+    --bg-secondary: #161b22;
+    --bg-card: #1c2128;
+    --bg-elevated: #262c36;
+    --bg-hover: #313843;
+    --bg-input: #161b22;
     
-    /* Brand Colors - Aggressive Red/Orange */
-    --primary: #ef4444;
-    --primary-light: #f87171;
-    --primary-dark: #dc2626;
-    --accent: #f97316;
-    --accent-light: #fb923c;
+    /* Brand Colors - Calm Emerald/Teal */
+    --primary: #10b981;
+    --primary-light: #34d399;
+    --primary-dark: #059669;
+    --accent: #06b6d4;
+    --accent-light: #22d3ee;
     
     /* Secondary Colors */
     --cyan: #06b6d4;
     --blue: #3b82f6;
-    --green: #22c55e;
-    --yellow: #eab308;
+    --green: #10b981;
+    --yellow: #fbbf24;
     --orange: #f97316;
-    --red: #ef4444;
+    --red: #10b981;
     
-    /* Text - High contrast */
-    --text-primary: #ffffff;
-    --text-secondary: #e5e5e5;
-    --text-muted: #a3a3a3;
-    --text-dim: #737373;
+    /* Text - Clean and readable */
+    --text-primary: #f0f6fc;
+    --text-secondary: #c9d1d9;
+    --text-muted: #8b949e;
+    --text-dim: #6e7681;
     
     /* Borders */
-    --border: #2d2d2d;
-    --border-light: #404040;
-    --border-focus: #ef4444;
+    --border: #30363d;
+    --border-light: #484f58;
+    --border-focus: #10b981;
     
-    /* Topic Colors - Aggressive palette */
+    /* Topic Colors */
     --topic-problem-solving: #3b82f6;
-    --topic-programming: #22c55e;
-    --topic-data: #f97316;
-    --topic-computers: #ef4444;
-    --topic-networks: #06b6d4;
-    --topic-bigger-picture: #eab308;
+    --topic-programming: #10b981;
+    --topic-data: #fbbf24;
+    --topic-computers: #06b6d4;
+    --topic-networks: #8b5cf6;
+    --topic-bigger-picture: #f97316;
     
-    /* Typography */
-    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    --font-mono: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+    /* Typography - Modern Professional */
+    --font-sans: 'Plus Jakarta Sans', 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', monospace;
     
     /* Spacing */
     --space-1: 0.25rem;
@@ -71,11 +71,11 @@
     --radius-xl: 16px;
     --radius-full: 9999px;
     
-    /* Shadows - Red glow */
-    --shadow-sm: 0 1px 3px rgba(0,0,0,0.4);
-    --shadow-md: 0 4px 12px rgba(0,0,0,0.5);
-    --shadow-lg: 0 8px 30px rgba(0,0,0,0.6);
-    --shadow-glow: 0 0 40px rgba(239, 68, 68, 0.3);
+    /* Shadows - Subtle emerald glow */
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+    --shadow-lg: 0 8px 30px rgba(0,0,0,0.5);
+    --shadow-glow: 0 0 40px rgba(16, 185, 129, 0.15);
 }
 
 /* ==========================================
@@ -144,7 +144,7 @@ body::before {
     position: fixed;
     inset: 0;
     background: 
-        radial-gradient(ellipse at 0% 0%, rgba(239, 68, 68, 0.08) 0%, transparent 50%),
+        radial-gradient(ellipse at 0% 0%, rgba(16, 185, 129, 0.08) 0%, transparent 50%),
         radial-gradient(ellipse at 100% 100%, rgba(249, 115, 22, 0.08) 0%, transparent 50%);
     pointer-events: none;
     z-index: -1;
@@ -281,7 +281,7 @@ pre code {
 .nav-link.active {
     background: linear-gradient(135deg, var(--primary), var(--accent));
     color: white;
-    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
 }
 
 .nav-link i {
@@ -370,7 +370,7 @@ pre code {
 
 .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
 }
 
 .btn-secondary {
@@ -411,7 +411,7 @@ select, input[type="text"], input[type="number"], textarea {
 select:focus, input:focus, textarea:focus {
     outline: none;
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
 }
 
 select {
@@ -479,7 +479,7 @@ label {
 }
 
 .badge-primary {
-    background: rgba(239, 68, 68, 0.2);
+    background: rgba(16, 185, 129, 0.2);
     color: var(--primary-light);
     border: 1px solid var(--primary);
 }
@@ -663,7 +663,7 @@ label {
     font-size: 1.25rem;
 }
 
-.stat-icon-box.red { background: rgba(239, 68, 68, 0.2); }
+.stat-icon-box.red { background: rgba(16, 185, 129, 0.2); }
 .stat-icon-box.blue { background: rgba(59, 130, 246, 0.2); }
 .stat-icon-box.green { background: rgba(34, 197, 94, 0.2); }
 .stat-icon-box.orange { background: rgba(249, 115, 22, 0.2); }
@@ -750,7 +750,7 @@ label {
 
 .action-card.highlight {
     border-color: var(--primary);
-    background: linear-gradient(180deg, rgba(239, 68, 68, 0.1) 0%, var(--bg-card) 100%);
+    background: linear-gradient(180deg, rgba(16, 185, 129, 0.1) 0%, var(--bg-card) 100%);
 }
 
 .action-icon {
@@ -1332,7 +1332,7 @@ label {
 
 /* Definition Box - Key terms */
 .definition-box {
-    background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(249, 115, 22, 0.1));
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(249, 115, 22, 0.1));
     border: 1px solid var(--primary);
     border-left: 4px solid var(--primary);
     border-radius: var(--radius-md);
@@ -1385,7 +1385,7 @@ label {
 
 /* Warning Box */
 .warning, p.warning {
-    background: rgba(239, 68, 68, 0.1);
+    background: rgba(16, 185, 129, 0.1);
     border: 1px solid var(--red);
     border-left: 4px solid var(--red);
     border-radius: var(--radius-md);
@@ -1588,7 +1588,7 @@ label {
 
 .option-btn.incorrect {
     border-color: var(--red);
-    background: rgba(239, 68, 68, 0.15);
+    background: rgba(16, 185, 129, 0.15);
 }
 
 .option-letter {
@@ -1626,7 +1626,7 @@ label {
 
 .explanation.incorrect {
     border-left-color: var(--red);
-    background: rgba(239, 68, 68, 0.1);
+    background: rgba(16, 185, 129, 0.1);
 }
 
 .explanation p {
@@ -1718,7 +1718,7 @@ label {
 }
 
 .result-item.incorrect {
-    background: rgba(239, 68, 68, 0.1);
+    background: rgba(16, 185, 129, 0.1);
 }
 
 .result-icon {
@@ -3373,7 +3373,7 @@ label {
 }
 
 #code-output.error {
-    color: #f87171;
+    color: #34d399;
 }
 
 .trace-controls {
@@ -3748,7 +3748,7 @@ label {
 
 .auth-error {
     padding: var(--space-3);
-    background: rgba(239, 68, 68, 0.15);
+    background: rgba(16, 185, 129, 0.15);
     border: 1px solid var(--red);
     border-radius: var(--radius-md);
     color: var(--red);
@@ -4023,7 +4023,7 @@ label {
 
 .form-error {
     padding: var(--space-3);
-    background: rgba(239, 68, 68, 0.15);
+    background: rgba(16, 185, 129, 0.15);
     border-radius: var(--radius-md);
     color: var(--red);
     font-size: 0.875rem;
@@ -4031,7 +4031,7 @@ label {
 }
 
 .delete-account-warning {
-    background: rgba(239, 68, 68, 0.1);
+    background: rgba(16, 185, 129, 0.1);
     border: 1px solid var(--red);
     border-radius: var(--radius-md);
     padding: var(--space-4);
@@ -4055,7 +4055,7 @@ label {
 }
 
 .btn-danger:hover {
-    background: #dc2626;
+    background: #059669;
 }
 
 .btn-small {
@@ -4280,7 +4280,7 @@ body.modal-open {
 
 .dc-option.incorrect {
     border-color: var(--red);
-    background: rgba(239, 68, 68, 0.15);
+    background: rgba(16, 185, 129, 0.15);
 }
 
 .dc-option-letter {
@@ -4951,7 +4951,7 @@ body.modal-open {
 }
 
 .result-snippet mark {
-    background: rgba(239, 68, 68, 0.3);
+    background: rgba(16, 185, 129, 0.3);
     color: var(--primary-light);
     padding: 0 2px;
     border-radius: 2px;
@@ -5200,7 +5200,7 @@ body.modal-open {
 input:focus,
 select:focus,
 textarea:focus {
-    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
 }
 
 /* Toast slide in */
@@ -5258,8 +5258,8 @@ textarea:focus {
 }
 
 @keyframes subtlePulse {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
-    50% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+    0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+    50% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
 }
 
 /* Loading skeleton */
@@ -5795,7 +5795,7 @@ textarea:focus {
 
 .challenge-item.active {
     border-color: var(--primary);
-    background: rgba(239, 68, 68, 0.1);
+    background: rgba(16, 185, 129, 0.1);
 }
 
 .challenge-item.completed {
@@ -5892,7 +5892,7 @@ textarea:focus {
 
 .ch-difficulty.easy { background: rgba(16, 185, 129, 0.2); color: var(--green); }
 .ch-difficulty.medium { background: rgba(251, 191, 36, 0.2); color: var(--yellow); }
-.ch-difficulty.hard { background: rgba(239, 68, 68, 0.2); color: var(--red); }
+.ch-difficulty.hard { background: rgba(16, 185, 129, 0.2); color: var(--red); }
 
 .ch-xp {
     color: var(--primary);
@@ -6462,11 +6462,11 @@ textarea:focus {
 
 .ch-difficulty.easy { background: rgba(34, 197, 94, 0.2); color: var(--green); }
 .ch-difficulty.medium { background: rgba(234, 179, 8, 0.2); color: var(--yellow); }
-.ch-difficulty.hard { background: rgba(239, 68, 68, 0.2); color: var(--red); }
+.ch-difficulty.hard { background: rgba(16, 185, 129, 0.2); color: var(--red); }
 
 .ch-xp {
     padding: var(--space-1) var(--space-3);
-    background: rgba(239, 68, 68, 0.2);
+    background: rgba(16, 185, 129, 0.2);
     color: var(--primary-light);
     border-radius: var(--radius-full);
     font-size: 0.75rem;
@@ -8012,7 +8012,7 @@ textarea:focus {
 
 .account-type-btn.active {
     border-color: var(--primary);
-    background: rgba(239, 68, 68, 0.1);
+    background: rgba(16, 185, 129, 0.1);
 }
 
 .account-type-btn .type-icon {
@@ -8289,7 +8289,7 @@ textarea:focus {
 }
 
 .btn-danger:hover {
-    background: #dc2626;
+    background: #059669;
 }
 
 .classroom-settings h4 {
@@ -8332,7 +8332,7 @@ textarea:focus {
 .game-type-btn:hover,
 .game-type-btn.active {
     border-color: var(--primary);
-    background: rgba(239, 68, 68, 0.1);
+    background: rgba(16, 185, 129, 0.1);
 }
 
 .game-type-btn .type-icon {
@@ -8730,7 +8730,7 @@ textarea:focus {
 
 .race-option:hover {
     border-color: var(--primary);
-    background: rgba(239, 68, 68, 0.1);
+    background: rgba(16, 185, 129, 0.1);
 }
 
 .option-letter {
@@ -8843,7 +8843,7 @@ textarea:focus {
 .active-powerup {
     margin-top: var(--space-3);
     padding: var(--space-2);
-    background: rgba(239, 68, 68, 0.2);
+    background: rgba(16, 185, 129, 0.2);
     border-radius: var(--radius-md);
     color: var(--primary) !important;
     text-align: center;
@@ -8878,7 +8878,7 @@ textarea:focus {
 }
 
 .lb-row.current-user {
-    background: rgba(239, 68, 68, 0.2);
+    background: rgba(16, 185, 129, 0.2);
     border: 1px solid var(--primary);
 }
 
@@ -9364,7 +9364,7 @@ textarea:focus {
 }
 
 .score-badge.failed {
-    background: rgba(239, 68, 68, 0.2);
+    background: rgba(16, 185, 129, 0.2);
     color: var(--error) !important;
 }
 
@@ -9588,7 +9588,7 @@ textarea:focus {
 }
 
 .timer.warning {
-    background: rgba(239, 68, 68, 0.2);
+    background: rgba(16, 185, 129, 0.2);
     color: var(--error) !important;
     animation: pulse 1s infinite;
 }
@@ -9685,8 +9685,8 @@ textarea:focus {
 }
 
 .results-header.failed {
-    background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.05));
-    border: 1px solid rgba(239, 68, 68, 0.3);
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.05));
+    border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
 .result-icon {
@@ -9912,7 +9912,7 @@ textarea:focus {
 
 .profile-avatar-wrapper .profile-avatar:hover {
     transform: scale(1.05);
-    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
 }
 
 .avatar-edit-btn {
@@ -9951,7 +9951,7 @@ textarea:focus {
 }
 
 .account-type-badge.student {
-    background: linear-gradient(135deg, #ef4444, #dc2626);
+    background: linear-gradient(135deg, #10b981, #059669);
     color: white;
 }
 
@@ -10077,8 +10077,8 @@ textarea:focus {
 
 .emoji-btn.selected {
     border-color: var(--primary);
-    background: rgba(239, 68, 68, 0.1);
-    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.3);
+    background: rgba(16, 185, 129, 0.1);
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.3);
 }
 
 /* Switch Account Dialog */
@@ -10105,7 +10105,7 @@ textarea:focus {
 .switch-note {
     font-size: 0.85rem;
     color: var(--primary);
-    background: rgba(239, 68, 68, 0.1);
+    background: rgba(16, 185, 129, 0.1);
     padding: 10px;
     border-radius: 8px;
     margin-top: 15px;
@@ -10113,15 +10113,15 @@ textarea:focus {
 
 /* Delete Account Warning */
 .delete-account-warning {
-    background: rgba(239, 68, 68, 0.1);
-    border: 1px solid rgba(239, 68, 68, 0.3);
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.3);
     border-radius: 8px;
     padding: 15px;
     margin-bottom: 20px;
 }
 
 .delete-account-warning p {
-    color: #ef4444;
+    color: #10b981;
     margin-bottom: 5px;
 }
 
@@ -10183,8 +10183,8 @@ textarea:focus {
 }
 
 .join-classroom-btn:hover {
-    border-color: #ef4444;
-    background: rgba(239, 68, 68, 0.05);
+    border-color: #10b981;
+    background: rgba(16, 185, 129, 0.05);
 }
 
 .join-game-btn:hover {
@@ -10316,7 +10316,7 @@ textarea:focus {
     font-weight: 900;
     letter-spacing: 0.3em;
     color: var(--text);
-    text-shadow: 0 4px 20px rgba(239, 68, 68, 0.3);
+    text-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
     animation: pulse-code 2s ease-in-out infinite;
 }
 
@@ -10416,12 +10416,12 @@ textarea:focus {
 
 .game-type-btn:hover {
     border-color: var(--primary);
-    background: rgba(239, 68, 68, 0.05);
+    background: rgba(16, 185, 129, 0.05);
 }
 
 .game-type-btn.active {
     border-color: var(--primary);
-    background: rgba(239, 68, 68, 0.1);
+    background: rgba(16, 185, 129, 0.1);
 }
 
 .game-type-btn .type-icon {
@@ -10511,7 +10511,7 @@ textarea:focus {
 }
 
 .shield-badge {
-    background: linear-gradient(135deg, #3b82f6, #ef4444);
+    background: linear-gradient(135deg, #3b82f6, #10b981);
     padding: 5px 15px;
     border-radius: 20px;
     color: white;
@@ -10589,8 +10589,8 @@ textarea:focus {
 }
 
 .crypto-option.wrong {
-    background: rgba(239, 68, 68, 0.2);
-    border-color: #ef4444;
+    background: rgba(16, 185, 129, 0.2);
+    border-color: #10b981;
 }
 
 .option-letter {
@@ -10679,7 +10679,7 @@ textarea:focus {
 }
 
 .crypto-change.negative {
-    color: #ef4444;
+    color: #10b981;
 }
 
 .crypto-change.neutral {
@@ -10898,7 +10898,7 @@ textarea:focus {
 }
 
 .leaderboard-item.is-you {
-    background: rgba(239, 68, 68, 0.2);
+    background: rgba(16, 185, 129, 0.2);
 }
 
 .leaderboard-item .lb-rank {
@@ -11019,7 +11019,7 @@ textarea:focus {
     display: flex;
     align-items: center;
     gap: 8px;
-    background: rgba(239, 68, 68, 0.1);
+    background: rgba(16, 185, 129, 0.1);
     padding: 6px 12px;
     border-radius: 8px;
     margin-top: 8px;
@@ -11065,7 +11065,7 @@ textarea:focus {
 .join-note {
     margin-top: 20px;
     padding: 12px;
-    background: rgba(239, 68, 68, 0.1);
+    background: rgba(16, 185, 129, 0.1);
     border-radius: 8px;
     font-size: 0.85rem;
     color: var(--text-secondary);

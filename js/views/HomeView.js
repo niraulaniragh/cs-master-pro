@@ -208,7 +208,7 @@ const HomeView = {
 
     getRank: (level) => {
         if (level >= 10) return { name: 'Master', icon: '👑', color: '#fbbf24' };
-        if (level >= 8) return { name: 'Expert', icon: '💎', color: '#ef4444' };
+        if (level >= 8) return { name: 'Expert', icon: '💎', color: '#10b981' };
         if (level >= 6) return { name: 'Advanced', icon: '🌟', color: '#3b82f6' };
         if (level >= 4) return { name: 'Intermediate', icon: '📈', color: '#22c55e' };
         if (level >= 2) return { name: 'Learner', icon: '📚', color: '#22d3ee' };

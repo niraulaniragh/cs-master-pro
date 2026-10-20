@@ -685,7 +685,7 @@
     font-size: 2rem;
     font-weight: 700;
     color: var(--red);
-    text-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+    text-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
 }
 
 .round-display {
@@ -764,7 +764,7 @@
 
 .bq-option.wrong {
     border-color: var(--red);
-    background: rgba(239, 68, 68, 0.2);
+    background: rgba(16, 185, 129, 0.2);
 }
 
 .bq-option-key {
@@ -1208,7 +1208,7 @@
 
 .tr-text-display span.incorrect {
     color: var(--red);
-    background: rgba(239, 68, 68, 0.2);
+    background: rgba(16, 185, 129, 0.2);
 }
 
 .tr-text-display span.current {
@@ -1439,7 +1439,7 @@
 
 .mill-answer.wrong {
     border-color: var(--red);
-    background: linear-gradient(90deg, rgba(239, 68, 68, 0.3), transparent);
+    background: linear-gradient(90deg, rgba(16, 185, 129, 0.3), transparent);
 }
 
 .mill-answer.eliminated {
@@ -1669,7 +1669,7 @@
 
 .fc-diff-badge.easy { background: rgba(16, 185, 129, 0.2); color: var(--green); }
 .fc-diff-badge.medium { background: rgba(251, 191, 36, 0.2); color: var(--yellow); }
-.fc-diff-badge.hard { background: rgba(239, 68, 68, 0.2); color: var(--red); }
+.fc-diff-badge.hard { background: rgba(16, 185, 129, 0.2); color: var(--red); }
 
 .fc-code-block {
     background: var(--bg-primary);
@@ -1720,7 +1720,7 @@
 
 .fc-blank.wrong {
     border-color: var(--red);
-    background: rgba(239, 68, 68, 0.2);
+    background: rgba(16, 185, 129, 0.2);
     color: var(--red);
 }
 
@@ -2013,7 +2013,7 @@
 }
 
 .boss-option.correct { border-color: var(--green); background: rgba(16, 185, 129, 0.2); }
-.boss-option.wrong { border-color: var(--red); background: rgba(239, 68, 68, 0.2); }
+.boss-option.wrong { border-color: var(--red); background: rgba(16, 185, 129, 0.2); }
 
 .boss-opt-key {
     width: 32px;
@@ -2242,7 +2242,7 @@
 
 .game-difficulty.easy { background: rgba(16, 185, 129, 0.2); color: var(--green); }
 .game-difficulty.medium { background: rgba(251, 191, 36, 0.2); color: var(--yellow); }
-.game-difficulty.hard { background: rgba(239, 68, 68, 0.2); color: var(--red); }
+.game-difficulty.hard { background: rgba(16, 185, 129, 0.2); color: var(--red); }
 .game-difficulty.variable { background: rgba(59, 130, 246, 0.2); color: var(--blue); }
 .game-difficulty.easyhard { background: rgba(168, 85, 247, 0.2); color: var(--primary); }
 
