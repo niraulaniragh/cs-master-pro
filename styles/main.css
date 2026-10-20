@@ -239,8 +239,19 @@ pre code {
     gap: var(--space-3);
 }
 
-.brand-icon {
-    font-size: 2rem;
+.brand-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.brand-logo svg {
+    filter: drop-shadow(0 2px 8px rgba(16, 185, 129, 0.3));
+    transition: transform 0.2s ease;
+}
+
+.nav-brand:hover .brand-logo svg {
+    transform: scale(1.05);
 }
 
 .brand-text {
