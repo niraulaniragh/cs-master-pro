@@ -1924,7 +1924,7 @@ label {
 
 .btn-review {
     background: var(--yellow);
-    color: #000;
+    color: var(--bg-primary);
     border: none;
     padding: var(--space-3) var(--space-6);
     border-radius: var(--radius-md);
@@ -6318,7 +6318,7 @@ textarea:focus {
 }
 
 .diff-btn.easy.active { background: var(--green); border-color: var(--green); }
-.diff-btn.medium.active { background: var(--yellow); border-color: var(--yellow); color: #000; }
+.diff-btn.medium.active { background: var(--yellow); border-color: var(--yellow); color: var(--bg-primary); }
 .diff-btn.hard.active { background: var(--red); border-color: var(--red); }
 
 .challenge-meta {
