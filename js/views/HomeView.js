@@ -206,12 +206,12 @@ const HomeView = {
     },
     
     renderLeaderboard: () => {
-        const leaders = Leaderboard.getTop(5);
+        const leaders = Leaderboard.getRankings().slice(0, 5);
         if (leaders.length === 0) {
             return '<p class="empty-text">No players yet</p>';
         }
         return leaders.map((p, i) => `
-            <div class="lb-row-new">
+            <div class="lb-row-new ${p.isCurrentUser ? 'is-you' : ''}">
                 <span class="lb-rank-new ${i < 3 ? 'top' + (i+1) : ''}">${i + 1}</span>
                 <span class="lb-name-new">${p.username}</span>
                 <span class="lb-xp-new">${p.xp.toLocaleString()} XP</span>
