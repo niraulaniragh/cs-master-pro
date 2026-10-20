@@ -99,19 +99,40 @@ body {
     min-height: 100vh;
 }
 
-/* Ensure all elements inherit proper colors */
-*, *::before, *::after {
-    color: inherit;
+/* Ensure all text is WHITE/LIGHT - never black */
+* {
+    color: var(--text-primary);
 }
 
-/* Reset specific elements that might have browser defaults */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--text-primary) !important;
+}
+
+p, span, label, li, td, th {
+    color: var(--text-secondary);
+}
+
+a {
+    color: var(--purple-light);
+}
+
 input, textarea, select, button {
-    color: var(--text-primary);
+    color: var(--text-primary) !important;
+    background-color: var(--bg-elevated);
 }
 
 option {
-    color: var(--text-primary);
+    color: var(--text-primary) !important;
     background: var(--bg-card);
+}
+
+code {
+    color: var(--purple-light) !important;
+}
+
+/* Muted text classes */
+.text-muted, .text-dim {
+    color: var(--text-muted) !important;
 }
 
 /* Subtle background gradient */
@@ -6187,45 +6208,35 @@ textarea:focus {
    ENHANCED PLAYGROUND STYLES
 ========================================== */
 
-/* Force all text to be visible */
-.playground-view,
+/* Force all playground text to be visible - WHITE */
 .playground-view * {
-    color: inherit;
-}
-
-.playground-view {
     color: var(--text-primary);
 }
 
-.playground-view h2,
-.playground-view h3,
-.playground-view h4 {
-    color: var(--text-primary);
-}
-
-.playground-view p,
-.playground-view span,
-.playground-view label {
-    color: var(--text-secondary);
+.playground-view p {
+    color: var(--text-secondary) !important;
 }
 
 .playground-view code {
-    color: var(--purple-light);
+    color: var(--purple-light) !important;
 }
 
-.playground-view pre {
-    color: var(--text-secondary);
+.playground-view textarea {
+    color: var(--text-primary) !important;
+    background: var(--bg-primary) !important;
 }
 
-.playground-view input,
-.playground-view textarea,
 .playground-view select {
-    color: var(--text-primary);
-    background: var(--bg-primary);
+    color: var(--text-primary) !important;
 }
 
-.playground-view button {
-    color: var(--text-primary);
+.playground-view option {
+    color: var(--text-primary) !important;
+    background: var(--bg-card) !important;
+}
+
+.playground-view .placeholder-text {
+    color: var(--text-muted) !important;
 }
 
 /* Execution Controls */
