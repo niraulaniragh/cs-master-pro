@@ -308,6 +308,7 @@ const HomeView = {
                                maxlength="6"
                                style="text-transform: uppercase; font-family: var(--font-mono); font-size: 1.5rem; text-align: center; letter-spacing: 0.3em;">
                     </div>
+                    <p class="join-note">💡 For testing: Create a classroom as a teacher first, then switch to student mode to join it.</p>
                 </div>
             `,
             footer: `

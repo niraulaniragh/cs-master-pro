@@ -90,7 +90,11 @@ const TeacherView = {
                     <div class="classroom-card">
                         <div class="classroom-header">
                             <h3>${classroom.name}</h3>
-                            <span class="classroom-code" title="Share this code with students">${classroom.code}</span>
+                            <div class="classroom-code-box">
+                                <span class="code-label">Code:</span>
+                                <span class="classroom-code" title="Share this code with students">${classroom.code}</span>
+                                <button class="btn btn-tiny" onclick="event.stopPropagation(); navigator.clipboard.writeText('${classroom.code}'); Toast.show('Copied!', 'success')">📋</button>
+                            </div>
                         </div>
                         <p class="classroom-desc">${classroom.description || 'No description'}</p>
                         <div class="classroom-stats">
@@ -137,20 +141,29 @@ const TeacherView = {
                         <div class="game-info">
                             <h4>${TeacherView.getGameTitle(game.gameType)}</h4>
                             <p>Classroom: ${game.classroomName}</p>
+                            <div class="game-join-code">
+                                <span class="code-label">Join Code:</span>
+                                <span class="code-value">${game.joinCode}</span>
+                                <button class="btn btn-tiny" onclick="navigator.clipboard.writeText('${game.joinCode}'); Toast.show('Copied!', 'success')">📋</button>
+                            </div>
                             <span class="game-status status-${game.status}">${game.status}</span>
                         </div>
                         <div class="game-players">
                             <span>${game.players.length} player${game.players.length !== 1 ? 's' : ''}</span>
                         </div>
                         <div class="game-actions">
+                            <button class="btn btn-small btn-secondary" onclick="TeacherView.showGameJoinCode(Classroom.getGame('${game.id}'))">
+                                📺 Show Code
+                            </button>
                             ${game.status === 'waiting' ? `
-                                <button class="btn btn-small btn-primary" onclick="TeacherView.startHostedGame('${game.id}')">
+                                <button class="btn btn-small btn-primary" onclick="TeacherView.launchGame('${game.id}')">
                                     Start Game
                                 </button>
-                            ` : ''}
-                            <button class="btn btn-small btn-secondary" onclick="TeacherView.viewGame('${game.id}')">
-                                View
-                            </button>
+                            ` : `
+                                <button class="btn btn-small btn-secondary" onclick="TeacherView.viewGame('${game.id}')">
+                                    View
+                                </button>
+                            `}
                         </div>
                     </div>
                 `).join('')}

@@ -11006,3 +11006,97 @@ textarea:focus {
         border-radius: 12px;
     }
 }
+
+
+/* =====================================================
+   CLASSROOM CODE DISPLAY & JOIN FIXES
+   ===================================================== */
+
+.classroom-code-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(99, 102, 241, 0.1);
+    padding: 6px 12px;
+    border-radius: 8px;
+    margin-top: 8px;
+}
+
+.classroom-code-box .code-label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.classroom-code-box .classroom-code {
+    font-family: var(--font-mono);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--primary);
+    letter-spacing: 0.1em;
+}
+
+.game-join-code {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 8px 0;
+    padding: 8px 12px;
+    background: rgba(34, 197, 94, 0.1);
+    border-radius: 8px;
+    border: 1px dashed rgba(34, 197, 94, 0.3);
+}
+
+.game-join-code .code-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.game-join-code .code-value {
+    font-family: var(--font-mono);
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #22c55e;
+    letter-spacing: 0.15em;
+}
+
+.join-note {
+    margin-top: 20px;
+    padding: 12px;
+    background: rgba(99, 102, 241, 0.1);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    border-left: 3px solid var(--primary);
+}
+
+/* Game item improvements */
+.game-item {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    background: var(--card-bg);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    margin-bottom: 15px;
+}
+
+.game-item .game-info {
+    flex: 1;
+}
+
+.game-item .game-info h4 {
+    margin-bottom: 5px;
+    color: var(--text);
+}
+
+.game-item .game-info p {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+.game-item .game-actions {
+    display: flex;
+    gap: 10px;
+}
