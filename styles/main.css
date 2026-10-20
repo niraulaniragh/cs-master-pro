@@ -99,6 +99,21 @@ body {
     min-height: 100vh;
 }
 
+/* Ensure all elements inherit proper colors */
+*, *::before, *::after {
+    color: inherit;
+}
+
+/* Reset specific elements that might have browser defaults */
+input, textarea, select, button {
+    color: var(--text-primary);
+}
+
+option {
+    color: var(--text-primary);
+    background: var(--bg-card);
+}
+
 /* Subtle background gradient */
 body::before {
     content: '';
@@ -6172,6 +6187,47 @@ textarea:focus {
    ENHANCED PLAYGROUND STYLES
 ========================================== */
 
+/* Force all text to be visible */
+.playground-view,
+.playground-view * {
+    color: inherit;
+}
+
+.playground-view {
+    color: var(--text-primary);
+}
+
+.playground-view h2,
+.playground-view h3,
+.playground-view h4 {
+    color: var(--text-primary);
+}
+
+.playground-view p,
+.playground-view span,
+.playground-view label {
+    color: var(--text-secondary);
+}
+
+.playground-view code {
+    color: var(--purple-light);
+}
+
+.playground-view pre {
+    color: var(--text-secondary);
+}
+
+.playground-view input,
+.playground-view textarea,
+.playground-view select {
+    color: var(--text-primary);
+    background: var(--bg-primary);
+}
+
+.playground-view button {
+    color: var(--text-primary);
+}
+
 /* Execution Controls */
 .execution-controls {
     display: flex;
@@ -6464,6 +6520,19 @@ textarea:focus {
 #challenge-editor:focus {
     outline: none;
     border-color: var(--purple);
+}
+
+#challenge-editor::placeholder {
+    color: var(--text-dim);
+}
+
+#code-editor {
+    color: var(--text-primary);
+    background: var(--bg-primary);
+}
+
+#code-editor::placeholder {
+    color: var(--text-dim);
 }
 
 .challenge-output-section h4 {
