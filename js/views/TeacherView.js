@@ -512,6 +512,9 @@ const TeacherView = {
         const game = Classroom.getGame(gameId);
         if (!game) return;
         
+        // Close the modal first
+        Modal.close();
+        
         // Update game status
         game.status = 'playing';
         game.startedAt = new Date().toISOString();
@@ -521,26 +524,29 @@ const TeacherView = {
         
         Toast.show('Game started!', 'success');
         
-        // Launch appropriate game
-        switch(game.gameType) {
-            case 'race':
-                CarRace.startAsHost(game);
-                break;
-            case 'crypto':
-                CryptoHack.startAsHost(game);
-                break;
-            case 'tower':
-                TowerDefense.startAsHost(game);
-                break;
-            case 'factory':
-                Factory.startAsHost(game);
-                break;
-            case 'gold':
-                GoldQuest.startAsHost(game);
-                break;
-            default:
-                Toast.show('Game type not implemented yet', 'warning');
-        }
+        // Small delay to ensure modal is fully closed
+        setTimeout(() => {
+            // Launch appropriate game
+            switch(game.gameType) {
+                case 'race':
+                    CarRace.startAsHost(game);
+                    break;
+                case 'crypto':
+                    CryptoHack.startAsHost(game);
+                    break;
+                case 'tower':
+                    TowerDefense.startAsHost(game);
+                    break;
+                case 'factory':
+                    Factory.startAsHost(game);
+                    break;
+                case 'gold':
+                    GoldQuest.startAsHost(game);
+                    break;
+                default:
+                    Toast.show('Game type not implemented yet', 'warning');
+            }
+        }, 100);
     },
     
     lobbyGameId: null,

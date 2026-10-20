@@ -70,7 +70,11 @@ const CarRace = {
      * Render the game
      */
     render: () => {
-        const container = document.getElementById('app-main');
+        const container = document.getElementById('app-main') || document.getElementById('app');
+        if (!container) {
+            console.error('No container found for CarRace');
+            return;
+        }
         container.innerHTML = CarRace.renderGame();
         
         // Start update loop
