@@ -532,6 +532,7 @@ label {
     border: 1px solid var(--border);
     border-radius: var(--radius-xl);
     padding: var(--space-6);
+    overflow: hidden;
 }
 
 .panel-header {
@@ -539,20 +540,26 @@ label {
     justify-content: space-between;
     align-items: center;
     margin-bottom: var(--space-6);
+    gap: var(--space-3);
+    flex-wrap: wrap;
 }
 
 .panel-header h3 {
     color: var(--text-primary);
     font-size: 1.125rem;
+    margin: 0;
+    white-space: nowrap;
 }
 
 .rank-badge {
     padding: var(--space-2) var(--space-4);
     background: var(--bg-elevated);
     border-radius: var(--radius-full);
-    font-size: 0.875rem;
+    font-size: 0.8rem;
     font-weight: 600;
     color: var(--text-secondary);
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 /* Level Display */
@@ -560,12 +567,13 @@ label {
     display: flex;
     align-items: center;
     gap: var(--space-6);
+    flex-wrap: wrap;
 }
 
 .level-circle {
     position: relative;
-    width: 140px;
-    height: 140px;
+    width: 120px;
+    height: 120px;
     flex-shrink: 0;
 }
 
@@ -573,6 +581,7 @@ label {
     transform: rotate(-90deg);
     width: 100%;
     height: 100%;
+    display: block;
 }
 
 .level-circle-bg {
@@ -599,7 +608,7 @@ label {
 
 .level-value {
     display: block;
-    font-size: 2.5rem;
+    font-size: 2rem;
     font-weight: 800;
     color: var(--text-primary);
     line-height: 1;
@@ -614,10 +623,11 @@ label {
 
 .level-info {
     flex: 1;
+    min-width: 180px;
 }
 
 .xp-display {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     font-weight: 700;
     margin-bottom: var(--space-3);
 }
@@ -628,15 +638,16 @@ label {
 
 .xp-divider {
     color: var(--text-dim);
-    margin: 0 var(--space-2);
+    margin: 0 var(--space-1);
 }
 
 .xp-target {
     color: var(--text-muted);
+    font-size: 0.9em;
 }
 
 .xp-bar {
-    height: 12px;
+    height: 10px;
     background: var(--bg-elevated);
     border-radius: var(--radius-full);
     overflow: hidden;
@@ -650,8 +661,36 @@ label {
 }
 
 .xp-needed {
-    font-size: 0.875rem;
+    font-size: 0.8rem;
     color: var(--text-muted);
+}
+
+/* Responsive level display */
+@media (max-width: 480px) {
+    .level-display {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .level-circle {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .level-value {
+        font-size: 1.75rem;
+    }
+    
+    .level-info {
+        width: 100%;
+    }
+    
+    .panel-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-2);
+    }
 }
 
 /* Stats Panel */
