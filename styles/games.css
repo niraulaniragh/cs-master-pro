@@ -2372,11 +2372,61 @@
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* Responsive */
+/* ==========================================
+   GAMES RESPONSIVE STYLES
+========================================== */
+
+/* TABLET (max 1024px) */
+@media (max-width: 1024px) {
+    .game-container {
+        margin: var(--space-3);
+        padding: var(--space-4);
+    }
+    
+    .game-content {
+        padding: var(--space-4);
+    }
+    
+    .mill-ladder {
+        max-width: 180px;
+    }
+    
+    .boss-options,
+    .mill-answers {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* TABLET SMALL (max 768px) */
 @media (max-width: 768px) {
     .game-container {
         margin: var(--space-2);
+        padding: var(--space-3);
         max-height: 95vh;
+        border-radius: var(--radius-lg);
+    }
+    
+    .game-header {
+        padding: var(--space-3);
+        flex-wrap: wrap;
+        gap: var(--space-2);
+    }
+    
+    .game-header h1 {
+        font-size: 1.25rem;
+        flex: 1 1 100%;
+        text-align: center;
+    }
+    
+    .game-content {
+        padding: var(--space-3);
+    }
+    
+    /* SpeedRun */
+    .sr-score-display,
+    .tr-stats {
+        flex-wrap: wrap;
+        gap: var(--space-2);
     }
     
     .sr-options,
@@ -2384,11 +2434,112 @@
     .boss-options,
     .mill-answers {
         grid-template-columns: 1fr;
+        gap: var(--space-2);
     }
     
+    .sr-option,
+    .bq-option,
+    .boss-option,
+    .mill-answer {
+        padding: var(--space-3);
+        font-size: 0.9rem;
+    }
+    
+    .sr-question-text,
+    .bq-question-text,
+    .boss-question-text {
+        font-size: 1.1rem;
+    }
+    
+    /* Battle Mode */
     .battle-arena {
         flex-direction: column;
         gap: var(--space-4);
+    }
+    
+    .battle-player {
+        padding: var(--space-3);
+    }
+    
+    .player-avatar {
+        width: 60px;
+        height: 60px;
+        font-size: 1.75rem;
+    }
+    
+    .player-hp-bar {
+        height: 16px;
+    }
+    
+    /* Memory Match */
+    .mm-grid {
+        --grid-cols: 3 !important;
+        gap: var(--space-2);
+    }
+    
+    .mm-card {
+        height: 70px;
+        font-size: 0.8rem;
+    }
+    
+    /* Type Racer */
+    .tr-target-text {
+        font-size: 1.1rem;
+        padding: var(--space-3);
+    }
+    
+    .tr-input {
+        font-size: 1rem;
+        padding: var(--space-3);
+    }
+    
+    /* Millionaire */
+    .mill-layout {
+        flex-direction: column;
+    }
+    
+    .mill-ladder {
+        max-width: 100%;
+        order: -1;
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-1);
+        justify-content: center;
+        padding: var(--space-2);
+    }
+    
+    .mill-step {
+        padding: var(--space-1) var(--space-2);
+        font-size: 0.7rem;
+    }
+    
+    .mill-main {
+        padding: var(--space-3);
+    }
+    
+    .mill-question-text {
+        font-size: 1.1rem;
+    }
+    
+    .mill-bottom-bar {
+        flex-direction: column;
+        gap: var(--space-2);
+    }
+    
+    .mill-lifelines {
+        justify-content: center;
+    }
+    
+    .mill-lifeline {
+        width: 40px;
+        height: 40px;
+        font-size: 1rem;
+    }
+    
+    /* Boss Battle */
+    .boss-stats {
+        flex-wrap: wrap;
+        gap: var(--space-2);
     }
     
     .boss-grid,
@@ -2396,30 +2547,262 @@
         grid-template-columns: 1fr;
     }
     
-    .mm-grid {
-        --grid-cols: 3 !important;
+    .boss-card {
+        padding: var(--space-4);
     }
     
+    .boss-avatar {
+        width: 80px;
+        height: 80px;
+        font-size: 3rem;
+    }
+    
+    /* Fill Code */
+    .fc-code-container {
+        font-size: 0.85rem;
+    }
+    
+    .fc-blank {
+        padding: var(--space-1) var(--space-2);
+        min-width: 60px;
+    }
+    
+    .fc-options {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    /* Quick Stats */
     .games-quick-stats {
         flex-direction: column;
         gap: var(--space-4);
     }
+    
+    .gqs-value {
+        font-size: 1.25rem;
+    }
+    
+    /* Game Summary */
+    .game-summary-stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-3);
+    }
+    
+    .summary-actions {
+        flex-direction: column;
+        gap: var(--space-2);
+    }
+    
+    .summary-actions .btn {
+        width: 100%;
+    }
 }
 
+/* PHONE (max 480px) */
 @media (max-width: 480px) {
+    .game-container {
+        margin: 0;
+        padding: var(--space-2);
+        border-radius: 0;
+        min-height: 100vh;
+        max-height: 100vh;
+    }
+    
+    .game-header {
+        padding: var(--space-2);
+    }
+    
+    .game-header h1 {
+        font-size: 1.1rem;
+    }
+    
+    .game-close {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .game-content {
+        padding: var(--space-2);
+    }
+    
+    /* Memory Match */
     .mm-grid {
         --grid-cols: 2 !important;
+        gap: 6px;
     }
     
+    .mm-card {
+        height: 60px;
+        font-size: 0.7rem;
+    }
+    
+    /* Difficulty Selection */
     .difficulty-options {
         grid-template-columns: 1fr;
+        gap: var(--space-2);
     }
     
-    .mill-bottom-bar {
-        flex-direction: column;
+    .diff-card {
+        padding: var(--space-3);
     }
     
-    .mill-lifelines {
-        justify-content: center;
+    .diff-icon {
+        font-size: 1.75rem;
+    }
+    
+    /* Questions */
+    .sr-question-text,
+    .bq-question-text,
+    .boss-question-text,
+    .mill-question-text {
+        font-size: 1rem;
+    }
+    
+    /* Options */
+    .sr-option,
+    .bq-option,
+    .boss-option,
+    .mill-answer {
+        padding: var(--space-2) var(--space-3);
+        font-size: 0.85rem;
+        min-height: 44px;
+    }
+    
+    /* Battle */
+    .player-avatar {
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+    }
+    
+    .player-name {
+        font-size: 0.9rem;
+    }
+    
+    /* Boss Selection */
+    .boss-avatar {
+        width: 60px;
+        height: 60px;
+        font-size: 2.5rem;
+    }
+    
+    .boss-name {
+        font-size: 1rem;
+    }
+    
+    /* Type Racer */
+    .tr-target-text {
+        font-size: 1rem;
+        padding: var(--space-2);
+    }
+    
+    .tr-input {
+        font-size: 16px; /* Prevents iOS zoom */
+        padding: var(--space-2);
+    }
+    
+    /* Timer/Progress */
+    .game-timer,
+    .game-score {
+        font-size: 0.9rem;
+        padding: var(--space-1) var(--space-2);
+    }
+    
+    /* Summary */
+    .game-summary-stats {
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-2);
+    }
+    
+    .summary-stat-value {
+        font-size: 1.5rem;
+    }
+    
+    .summary-stat-label {
+        font-size: 0.75rem;
+    }
+    
+    /* Millionaire */
+    .mill-ladder {
+        padding: var(--space-1);
+    }
+    
+    .mill-step {
+        font-size: 0.6rem;
+        padding: 2px 6px;
+    }
+    
+    .mill-lifeline {
+        width: 36px;
+        height: 36px;
+        font-size: 0.9rem;
+    }
+    
+    /* Fill Code */
+    .fc-code-container {
+        font-size: 0.75rem;
+        padding: var(--space-2);
+    }
+    
+    .fc-blank {
+        font-size: 0.75rem;
+        min-width: 50px;
+    }
+    
+    .fc-options {
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-2);
+    }
+}
+
+/* VERY SMALL PHONES (max 360px) */
+@media (max-width: 360px) {
+    .game-header h1 {
+        font-size: 1rem;
+    }
+    
+    .mm-card {
+        height: 50px;
+        font-size: 0.65rem;
+    }
+    
+    .sr-question-text,
+    .bq-question-text,
+    .boss-question-text {
+        font-size: 0.9rem;
+    }
+    
+    .mill-ladder {
+        display: none;
+    }
+    
+    .mill-step.current {
+        display: block;
+        position: fixed;
+        top: var(--space-2);
+        right: var(--space-2);
+        z-index: 100;
+    }
+}
+
+/* LANDSCAPE PHONE */
+@media (max-height: 500px) and (orientation: landscape) {
+    .game-container {
+        overflow-y: auto;
+    }
+    
+    .battle-arena {
+        flex-direction: row;
+    }
+    
+    .mm-grid {
+        --grid-cols: 4 !important;
+    }
+    
+    .mm-card {
+        height: 60px;
+    }
+    
+    .mill-ladder {
+        max-width: 120px;
     }
 }
