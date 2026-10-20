@@ -3,16 +3,24 @@
  * Common helper functions used throughout the application
  */
 
+// Global shuffleArray function (used by games)
+function shuffleArray(array) {
+    const arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
+
+// Global getTopicById function (used by various views)
+function getTopicById(id) {
+    return TOPICS.find(t => t.id === id) || null;
+}
+
 const Helpers = {
     // Shuffle array (Fisher-Yates)
-    shuffle: (array) => {
-        const arr = [...array];
-        for (let i = arr.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [arr[i], arr[j]] = [arr[j], arr[i]];
-        }
-        return arr;
-    },
+    shuffle: shuffleArray,
 
     // Generate random ID
     generateId: () => Math.random().toString(36).substr(2, 9),
