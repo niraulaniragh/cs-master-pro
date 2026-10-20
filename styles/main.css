@@ -29,13 +29,13 @@
     
     /* Text - HIGH CONTRAST for readability */
     --text-primary: #ffffff;
-    --text-secondary: #e2e4e9;
-    --text-muted: #b4b8c2;
-    --text-dim: #8c919d;
+    --text-secondary: #e5e7eb;
+    --text-muted: #b8bcc4;
+    --text-dim: #9ca3af;
     
-    /* Borders */
-    --border: #2e2e3a;
-    --border-light: #3f3f4a;
+    /* Borders - Lighter for visibility */
+    --border: #3f3f4a;
+    --border-light: #52525b;
     --border-focus: #a855f7;
     
     /* Topic Colors */
