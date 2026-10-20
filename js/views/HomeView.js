@@ -206,17 +206,22 @@ const HomeView = {
     },
     
     renderLeaderboard: () => {
-        const leaders = Leaderboard.getRankings().slice(0, 5);
-        if (leaders.length === 0) {
-            return '<p class="empty-text">No players yet</p>';
+        try {
+            const leaders = Leaderboard.getRankings().slice(0, 5);
+            if (leaders.length === 0) {
+                return '<p class="empty-text">No players yet</p>';
+            }
+            return leaders.map((p, i) => `
+                <div class="lb-row-new ${p.isCurrentUser ? 'is-you' : ''}">
+                    <span class="lb-rank-new ${i < 3 ? 'top' + (i+1) : ''}">${i + 1}</span>
+                    <span class="lb-name-new">${p.username}</span>
+                    <span class="lb-xp-new">${p.xp.toLocaleString()} XP</span>
+                </div>
+            `).join('');
+        } catch (e) {
+            console.error('Leaderboard error:', e);
+            return '<p class="empty-text">Loading...</p>';
         }
-        return leaders.map((p, i) => `
-            <div class="lb-row-new ${p.isCurrentUser ? 'is-you' : ''}">
-                <span class="lb-rank-new ${i < 3 ? 'top' + (i+1) : ''}">${i + 1}</span>
-                <span class="lb-name-new">${p.username}</span>
-                <span class="lb-xp-new">${p.xp.toLocaleString()} XP</span>
-            </div>
-        `).join('');
     },
 
     init: () => {
