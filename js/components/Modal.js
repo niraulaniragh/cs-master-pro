@@ -6,6 +6,8 @@
 const Modal = (() => {
     let modalElement = null;
     let onCloseCallback = null;
+    let confirmCallback = null;
+    let cancelCallback = null;
 
     const create = () => {
         if (modalElement) return;
@@ -78,25 +80,56 @@ const Modal = (() => {
             onCloseCallback = null;
         }
     };
+    
+    // Handle confirm button click
+    const handleConfirm = () => {
+        close();
+        if (confirmCallback) {
+            confirmCallback();
+            confirmCallback = null;
+        }
+    };
+    
+    // Handle cancel button click  
+    const handleCancel = () => {
+        close();
+        if (cancelCallback) {
+            cancelCallback();
+            cancelCallback = null;
+        }
+    };
 
     // Preset modals
     const confirm = (title, message, onConfirm, onCancel = null) => {
+        confirmCallback = onConfirm;
+        cancelCallback = onCancel;
+        
         show({
             title,
             content: `<p>${message}</p>`,
             footer: `
-                <button class="btn btn-secondary" onclick="Modal.close(); ${onCancel ? 'onCancel()' : ''}">Cancel</button>
-                <button class="btn btn-primary" onclick="Modal.close(); (${onConfirm})();">Confirm</button>
+                <button class="btn btn-secondary" id="modal-cancel-btn">Cancel</button>
+                <button class="btn btn-primary" id="modal-confirm-btn">Confirm</button>
             `
         });
+        
+        // Attach event listeners after DOM update
+        setTimeout(() => {
+            document.getElementById('modal-cancel-btn')?.addEventListener('click', handleCancel);
+            document.getElementById('modal-confirm-btn')?.addEventListener('click', handleConfirm);
+        }, 0);
     };
 
     const alert = (title, message) => {
         show({
             title,
             content: `<p>${message}</p>`,
-            footer: '<button class="btn btn-primary" onclick="Modal.close()">OK</button>'
+            footer: '<button class="btn btn-primary" id="modal-ok-btn">OK</button>'
         });
+        
+        setTimeout(() => {
+            document.getElementById('modal-ok-btn')?.addEventListener('click', close);
+        }, 0);
     };
 
     const quiz = (result) => {
@@ -116,11 +149,22 @@ const Modal = (() => {
                 </div>
             `,
             footer: `
-                <button class="btn btn-secondary" onclick="Modal.close(); Router.navigate('home');">Home</button>
-                <button class="btn btn-primary" onclick="Modal.close(); PracticeView.startQuiz();">Try Again</button>
+                <button class="btn btn-secondary" id="modal-quiz-home">Home</button>
+                <button class="btn btn-primary" id="modal-quiz-retry">Try Again</button>
             `,
             className: 'modal-quiz'
         });
+        
+        setTimeout(() => {
+            document.getElementById('modal-quiz-home')?.addEventListener('click', () => {
+                close();
+                Router.navigate('home');
+            });
+            document.getElementById('modal-quiz-retry')?.addEventListener('click', () => {
+                close();
+                PracticeView.startQuiz();
+            });
+        }, 0);
     };
 
     return { show, close, confirm, alert, quiz };
