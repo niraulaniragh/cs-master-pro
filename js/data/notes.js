@@ -1289,35 +1289,255 @@ OUTPUT "Your grade: ", myGrade    // Outputs: Your grade: A</code></pre>
             content: `
 <h2>Validation</h2>
 <div class="definition-box">
-    <strong>Validation:</strong> Checking that input data is reasonable, sensible, and within acceptable boundaries BEFORE processing.
+    <strong>Validation:</strong> Automatic checking by a computer program that data entered is reasonable, sensible, and within acceptable boundaries BEFORE it is processed. Validation checks if data is acceptable, NOT if it is correct.
 </div>
 
-<h3>Types of Validation</h3>
+<h3>Validation vs Verification - KEY DIFFERENCE!</h3>
 <table class="notes-table">
-    <tr><th>Type</th><th>Description</th><th>Example</th></tr>
+    <tr><th>Validation</th><th>Verification</th></tr>
+    <tr><td>Automatic computer check</td><td>Human check</td></tr>
+    <tr><td>Checks if data is REASONABLE</td><td>Checks if data is ACCURATE/CORRECT</td></tr>
+    <tr><td>Example: Age is a number between 0-120</td><td>Example: User checks their typed email is correct</td></tr>
+    <tr><td>Can be wrong but valid (age=25 when really 26)</td><td>Confirms data matches the truth</td></tr>
+</table>
+
+<div class="tip-box">
+    <strong>Remember:</strong> Validation can check if data is SENSIBLE but NOT if it's CORRECT. An age of 25 passes validation even if the person is actually 26!
+</div>
+
+<h2>Types of Validation - LEARN ALL OF THESE!</h2>
+
+<h3>1. Range Check</h3>
+<div class="definition-box">
+    <strong>Range Check:</strong> Ensures data falls within acceptable minimum and maximum limits.
+</div>
+
+<div class="example-box">
+    <h4>Examples:</h4>
+    <ul>
+        <li>Age must be between 0 and 120</li>
+        <li>Exam mark must be between 0 and 100</li>
+        <li>Month must be between 1 and 12</li>
+        <li>Temperature must be between -50 and 60</li>
+    </ul>
+    
+    <h4>Pseudocode:</h4>
+<pre><code>REPEAT
+    OUTPUT "Enter your age (0-120): "
+    INPUT age
+    IF age < 0 OR age > 120 THEN
+        OUTPUT "Invalid! Age must be between 0 and 120"
+    ENDIF
+UNTIL age >= 0 AND age <= 120</code></pre>
+</div>
+
+<h3>2. Type Check</h3>
+<div class="definition-box">
+    <strong>Type Check:</strong> Ensures data is of the correct data type (integer, string, real, etc.).
+</div>
+
+<div class="example-box">
+    <h4>Examples:</h4>
+    <ul>
+        <li>Age must be an integer (whole number)</li>
+        <li>Price must be a real number (decimal)</li>
+        <li>Name must be a string (text)</li>
+        <li>Answer must be Boolean (True/False)</li>
+    </ul>
+    
+    <h4>Pseudocode:</h4>
+<pre><code>REPEAT
+    OUTPUT "Enter quantity: "
+    INPUT quantity
+    IF NOT isInteger(quantity) THEN
+        OUTPUT "Invalid! Please enter a whole number"
+    ENDIF
+UNTIL isInteger(quantity)</code></pre>
+</div>
+
+<h3>3. Length Check</h3>
+<div class="definition-box">
+    <strong>Length Check:</strong> Ensures data has the correct number of characters - either exact, minimum, maximum, or a range.
+</div>
+
+<div class="example-box">
+    <h4>Examples:</h4>
+    <ul>
+        <li>Password must be at least 8 characters</li>
+        <li>UK postcode must be 6-8 characters</li>
+        <li>Username must be between 3 and 20 characters</li>
+        <li>PIN must be exactly 4 digits</li>
+    </ul>
+    
+    <h4>Pseudocode:</h4>
+<pre><code>REPEAT
+    OUTPUT "Enter password (minimum 8 characters): "
+    INPUT password
+    IF LENGTH(password) < 8 THEN
+        OUTPUT "Password too short! Must be at least 8 characters"
+    ENDIF
+UNTIL LENGTH(password) >= 8</code></pre>
+</div>
+
+<h3>4. Presence Check</h3>
+<div class="definition-box">
+    <strong>Presence Check:</strong> Ensures that data has actually been entered and the field is not left empty.
+</div>
+
+<div class="example-box">
+    <h4>Examples:</h4>
+    <ul>
+        <li>Name field cannot be empty</li>
+        <li>Email address must be provided</li>
+        <li>All required fields marked with * must be filled in</li>
+    </ul>
+    
+    <h4>Pseudocode:</h4>
+<pre><code>REPEAT
+    OUTPUT "Enter your name: "
+    INPUT name
+    IF name = "" THEN
+        OUTPUT "Name cannot be empty! Please enter your name."
+    ENDIF
+UNTIL name ≠ ""</code></pre>
+</div>
+
+<h3>5. Format Check (Pattern Check)</h3>
+<div class="definition-box">
+    <strong>Format Check:</strong> Ensures data matches a specific pattern or format.
+</div>
+
+<div class="example-box">
+    <h4>Examples:</h4>
+    <ul>
+        <li>Email must contain @ and a domain (user@example.com)</li>
+        <li>UK postcode format: LL## #LL (e.g., SW1A 1AA)</li>
+        <li>Date must be DD/MM/YYYY format</li>
+        <li>Phone number must start with 0 and be 11 digits</li>
+        <li>National Insurance: LL######L (e.g., AB123456C)</li>
+    </ul>
+    
+    <h4>Pseudocode:</h4>
+<pre><code>REPEAT
+    OUTPUT "Enter email address: "
+    INPUT email
+    IF NOT contains(email, "@") OR NOT contains(email, ".") THEN
+        OUTPUT "Invalid email format! Must contain @ and a domain"
+    ENDIF
+UNTIL contains(email, "@") AND contains(email, ".")</code></pre>
+</div>
+
+<h3>6. Check Digit</h3>
+<div class="definition-box">
+    <strong>Check Digit:</strong> An extra digit calculated from the other digits and added to the end. Used to detect errors in data entry (especially transposition errors).
+</div>
+
+<div class="example-box">
+    <h4>Examples:</h4>
+    <ul>
+        <li>ISBN numbers (book codes) - last digit is check digit</li>
+        <li>Barcodes (EAN-13) - includes check digit</li>
+        <li>Credit card numbers (Luhn algorithm)</li>
+    </ul>
+    
+    <p><strong>How it works:</strong> When a barcode is scanned, the check digit is recalculated. If it doesn't match the stored check digit, an error has occurred.</p>
+</div>
+
+<h3>7. Lookup Check (Table Lookup)</h3>
+<div class="definition-box">
+    <strong>Lookup Check:</strong> Checks that data exists in a predefined list of acceptable values.
+</div>
+
+<div class="example-box">
+    <h4>Examples:</h4>
+    <ul>
+        <li>Country must be from the list of valid countries</li>
+        <li>Product code must exist in the database</li>
+        <li>Title must be Mr, Mrs, Ms, Miss, or Dr</li>
+        <li>Day must be Monday, Tuesday, Wednesday, etc.</li>
+    </ul>
+    
+    <h4>Pseudocode:</h4>
+<pre><code>validTitles = ["Mr", "Mrs", "Ms", "Miss", "Dr"]
+REPEAT
+    OUTPUT "Enter title (Mr/Mrs/Ms/Miss/Dr): "
+    INPUT title
+    IF title NOT IN validTitles THEN
+        OUTPUT "Invalid title! Please choose from the list."
+    ENDIF
+UNTIL title IN validTitles</code></pre>
+</div>
+
+<h3>Summary Table</h3>
+<table class="notes-table">
+    <tr><th>Validation Type</th><th>What It Checks</th><th>Example</th></tr>
     <tr><td><strong>Range Check</strong></td><td>Value within limits</td><td>Age between 0-120</td></tr>
     <tr><td><strong>Type Check</strong></td><td>Correct data type</td><td>Age must be integer</td></tr>
     <tr><td><strong>Length Check</strong></td><td>Correct number of characters</td><td>Password 8-20 chars</td></tr>
-    <tr><td><strong>Presence Check</strong></td><td>Data has been entered</td><td>Name not empty</td></tr>
-    <tr><td><strong>Format Check</strong></td><td>Correct pattern</td><td>Email contains @</td></tr>
+    <tr><td><strong>Presence Check</strong></td><td>Data has been entered</td><td>Name field not empty</td></tr>
+    <tr><td><strong>Format Check</strong></td><td>Correct pattern/format</td><td>Email contains @</td></tr>
+    <tr><td><strong>Check Digit</strong></td><td>Calculated digit matches</td><td>Barcode check digit</td></tr>
+    <tr><td><strong>Lookup Check</strong></td><td>Value in allowed list</td><td>Country from list</td></tr>
 </table>
 
-<h3>Example: Validating Age</h3>
-<pre><code class="language-plaintext">REPEAT
-    INPUT age
-    IF age < 0 OR age > 120 THEN
-        OUTPUT "Invalid age. Try again."
+<h3>Combining Validation Checks</h3>
+<div class="example-box">
+    <h4>Complete validation for a password</h4>
+<pre><code>FUNCTION validatePassword(password)
+    // Presence check
+    IF password = "" THEN
+        RETURN "Password cannot be empty"
     ENDIF
-UNTIL age >= 0 AND age <= 120</code></pre>
+    
+    // Length check (minimum)
+    IF LENGTH(password) < 8 THEN
+        RETURN "Password must be at least 8 characters"
+    ENDIF
+    
+    // Length check (maximum)
+    IF LENGTH(password) > 20 THEN
+        RETURN "Password cannot exceed 20 characters"
+    ENDIF
+    
+    // Format check (must contain a number)
+    IF NOT containsDigit(password) THEN
+        RETURN "Password must contain at least one number"
+    ENDIF
+    
+    RETURN "Valid"
+ENDFUNCTION</code></pre>
+</div>
 
-<h3>Validation vs Verification</h3>
-<ul>
-    <li><strong>Validation:</strong> Is the data reasonable? (automatic checks)</li>
-    <li><strong>Verification:</strong> Is the data correct? (human checks, double entry)</li>
-</ul>
+<h3>Practice Questions</h3>
+<div class="example-box">
+    <ol>
+        <li>What type of validation would check that a mark is between 0 and 100?</li>
+        <li>Which validation type checks that a phone number starts with 07?</li>
+        <li>What's the difference between validation and verification?</li>
+        <li>Which validation ensures a field isn't left blank?</li>
+        <li>Give an example of a lookup validation check.</li>
+    </ol>
+    <details>
+        <summary>Click for answers</summary>
+        <ol>
+            <li>Range check</li>
+            <li>Format check (pattern check)</li>
+            <li>Validation = automatic computer check if data is reasonable; Verification = human check if data is accurate/correct</li>
+            <li>Presence check</li>
+            <li>Checking a country is from a valid list of countries, or a product code exists in a database</li>
+        </ol>
+    </details>
+</div>
 
 <div class="tip-box">
-    <strong>Exam Tip:</strong> Validation can check if data is SENSIBLE but not if it's CORRECT. Age=25 passes validation but might not be the true age.
+    <strong>Exam Tips:</strong>
+    <ul>
+        <li>Know ALL seven types of validation</li>
+        <li>Be able to write pseudocode for each validation type</li>
+        <li>Remember: Validation checks if data is REASONABLE, not CORRECT</li>
+        <li>Often multiple validation checks are combined for one field</li>
+        <li>Use REPEAT-UNTIL loops to keep asking until valid data is entered</li>
+    </ul>
 </div>
             `
         },
@@ -1586,11 +1806,12 @@ CLOSE file</code></pre>
 <h3>Why Binary?</h3>
 <ul>
     <li><strong>Electronics:</strong> Circuits are either on or off - perfect for 0 and 1</li>
-    <li><strong>Reliability:</strong> Easy to distinguish between two states</li>
-    <li><strong>Simple logic:</strong> All operations can be built from basic gates</li>
+    <li><strong>Reliability:</strong> Easy to distinguish between two states (less error-prone than 10 voltage levels)</li>
+    <li><strong>Simple logic:</strong> All operations can be built from basic AND, OR, NOT gates</li>
+    <li><strong>Noise immunity:</strong> Small voltage fluctuations don't change 0 to 1</li>
 </ul>
 
-<h3>Place Values</h3>
+<h3>Place Values (MEMORIZE THIS!)</h3>
 <p>Each position in binary is worth 2× the position to its right (powers of 2):</p>
 
 <table class="notes-table">
@@ -1598,6 +1819,11 @@ CLOSE file</code></pre>
     <tr><th>Place Value</th><td>128</td><td>64</td><td>32</td><td>16</td><td>8</td><td>4</td><td>2</td><td>1</td></tr>
     <tr><th>Power of 2</th><td>2⁷</td><td>2⁶</td><td>2⁵</td><td>2⁴</td><td>2³</td><td>2²</td><td>2¹</td><td>2⁰</td></tr>
 </table>
+
+<div class="tip-box">
+    <strong>Memory trick:</strong> Learn the sequence: 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024...<br>
+    Each number is double the previous one!
+</div>
 
 <h3>Binary to Denary (Decimal) Conversion</h3>
 <p>Add up the place values where there's a 1:</p>
@@ -1612,8 +1838,18 @@ Binary:         1   0   1   1   0   1   0   1
 Answer: 10110101 in binary = 181 in denary</code></pre>
 </div>
 
+<div class="example-box">
+    <h4>Practice: Convert 01100110 to denary</h4>
+<pre><code>Place values: 128  64  32  16   8   4   2   1
+Binary:         0   1   1   0   0   1   1   0
+                    ↓   ↓           ↓   ↓
+                   64 + 32    +    4 + 2  = 102
+
+Answer: 01100110 = 102</code></pre>
+</div>
+
 <h3>Denary to Binary Conversion</h3>
-<p><strong>Method: Repeated Division by 2</strong></p>
+<p><strong>Method 1: Repeated Division by 2</strong></p>
 
 <div class="example-box">
     <h4>Convert 45 to binary</h4>
@@ -1627,17 +1863,19 @@ Answer: 10110101 in binary = 181 in denary</code></pre>
 Answer: 45 = 101101 in binary</code></pre>
 </div>
 
-<p><strong>Alternative Method: Place Values</strong></p>
+<p><strong>Method 2: Place Values (Subtraction Method - FASTER!)</strong></p>
 <div class="example-box">
     <h4>Convert 45 to binary using place values</h4>
 <pre><code>Place values: 128  64  32  16   8   4   2   1
 
-45 - 32 = 13  ✓ (32 fits)
-13 - 16 = -3  ✗ (16 doesn't fit)
-13 - 8  = 5   ✓ (8 fits)
-5  - 4  = 1   ✓ (4 fits)
-1  - 2  = -1  ✗ (2 doesn't fit)
-1  - 1  = 0   ✓ (1 fits)
+45 - 128 = -83 ✗ (128 doesn't fit, write 0)
+45 - 64  = -19 ✗ (64 doesn't fit, write 0)
+45 - 32  = 13  ✓ (32 fits! write 1, continue with 13)
+13 - 16  = -3  ✗ (16 doesn't fit, write 0)
+13 - 8   = 5   ✓ (8 fits! write 1, continue with 5)
+5  - 4   = 1   ✓ (4 fits! write 1, continue with 1)
+1  - 2   = -1  ✗ (2 doesn't fit, write 0)
+1  - 1   = 0   ✓ (1 fits! write 1, done!)
 
 Binary:       0   0   1   0   1   1   0   1
 Answer: 45 = 00101101 in 8-bit binary</code></pre>
@@ -1646,25 +1884,134 @@ Answer: 45 = 00101101 in 8-bit binary</code></pre>
 <h3>Key Terms</h3>
 <table class="notes-table">
     <tr><th>Term</th><th>Definition</th><th>Example</th></tr>
-    <tr><td><strong>Bit</strong></td><td>Single binary digit (0 or 1)</td><td>1</td></tr>
-    <tr><td><strong>Nibble</strong></td><td>4 bits</td><td>1010</td></tr>
-    <tr><td><strong>Byte</strong></td><td>8 bits</td><td>10101010</td></tr>
-    <tr><td><strong>Kilobyte (KB)</strong></td><td>1,024 bytes</td><td>-</td></tr>
-    <tr><td><strong>Megabyte (MB)</strong></td><td>1,024 KB</td><td>-</td></tr>
-    <tr><td><strong>Gigabyte (GB)</strong></td><td>1,024 MB</td><td>-</td></tr>
+    <tr><td><strong>Bit</strong></td><td>Single binary digit (0 or 1) - smallest unit</td><td>1</td></tr>
+    <tr><td><strong>Nibble</strong></td><td>4 bits (half a byte)</td><td>1010</td></tr>
+    <tr><td><strong>Byte</strong></td><td>8 bits - standard unit for storing a character</td><td>10101010</td></tr>
+    <tr><td><strong>Kilobyte (KB)</strong></td><td>1,024 bytes (2¹⁰)</td><td>A short email</td></tr>
+    <tr><td><strong>Megabyte (MB)</strong></td><td>1,024 KB (2²⁰ bytes)</td><td>An MP3 song</td></tr>
+    <tr><td><strong>Gigabyte (GB)</strong></td><td>1,024 MB (2³⁰ bytes)</td><td>A movie file</td></tr>
+    <tr><td><strong>Terabyte (TB)</strong></td><td>1,024 GB (2⁴⁰ bytes)</td><td>Large hard drive</td></tr>
 </table>
 
-<h3>Maximum Values</h3>
+<h3>Maximum Values - IMPORTANT FOR EXAMS!</h3>
 <table class="notes-table">
-    <tr><th>Bits</th><th>Maximum Value (Unsigned)</th><th>Range</th></tr>
-    <tr><td>4 bits (nibble)</td><td>15</td><td>0 to 15</td></tr>
-    <tr><td>8 bits (byte)</td><td>255</td><td>0 to 255</td></tr>
-    <tr><td>16 bits</td><td>65,535</td><td>0 to 65,535</td></tr>
+    <tr><th>Bits</th><th>Maximum Value (Unsigned)</th><th>Range</th><th>Formula</th></tr>
+    <tr><td>4 bits (nibble)</td><td>15</td><td>0 to 15</td><td>2⁴ - 1</td></tr>
+    <tr><td>8 bits (byte)</td><td>255</td><td>0 to 255</td><td>2⁸ - 1</td></tr>
+    <tr><td>16 bits</td><td>65,535</td><td>0 to 65,535</td><td>2¹⁶ - 1</td></tr>
+    <tr><td>32 bits</td><td>4,294,967,295</td><td>0 to ~4 billion</td><td>2³² - 1</td></tr>
 </table>
 
 <div class="tip-box">
     <strong>Quick Formula:</strong> Maximum value for n bits = 2ⁿ - 1<br>
     Example: 8 bits = 2⁸ - 1 = 256 - 1 = 255
+</div>
+
+<h2>Two's Complement (Signed Binary)</h2>
+<div class="definition-box">
+    <strong>Two's Complement:</strong> A method for representing NEGATIVE numbers in binary. The leftmost bit (MSB - Most Significant Bit) indicates the sign: 0 = positive, 1 = negative.
+</div>
+
+<h3>Why Two's Complement?</h3>
+<ul>
+    <li>Allows representation of negative numbers</li>
+    <li>Only ONE representation of zero (unlike sign-magnitude)</li>
+    <li>Addition and subtraction work the same way as unsigned</li>
+</ul>
+
+<h3>Two's Complement Range</h3>
+<table class="notes-table">
+    <tr><th>Bits</th><th>Range</th><th>Min</th><th>Max</th></tr>
+    <tr><td>4 bits</td><td>-8 to +7</td><td>1000 = -8</td><td>0111 = +7</td></tr>
+    <tr><td>8 bits</td><td>-128 to +127</td><td>10000000 = -128</td><td>01111111 = +127</td></tr>
+</table>
+
+<h3>Converting Positive to Negative (Finding Two's Complement)</h3>
+<p><strong>Method: Flip all bits, then add 1</strong></p>
+
+<div class="example-box">
+    <h4>Convert +5 to -5 in 8-bit two's complement</h4>
+<pre><code>Step 1: Write +5 in binary
+        +5 = 00000101
+
+Step 2: Flip ALL bits (0→1, 1→0)
+        00000101 → 11111010
+
+Step 3: Add 1
+        11111010
+      +        1
+        --------
+        11111011
+
+Answer: -5 = 11111011 in two's complement</code></pre>
+</div>
+
+<div class="example-box">
+    <h4>Convert +35 to -35 in 8-bit two's complement</h4>
+<pre><code>Step 1: +35 = 00100011
+Step 2: Flip:  11011100
+Step 3: Add 1: 11011101
+
+Answer: -35 = 11011101</code></pre>
+</div>
+
+<h3>Reading Two's Complement Numbers</h3>
+<p><strong>If MSB is 0:</strong> Read normally (it's positive)<br>
+<strong>If MSB is 1:</strong> It's negative - flip and add 1 to find the magnitude</p>
+
+<div class="example-box">
+    <h4>What decimal number is 11110011 in two's complement?</h4>
+<pre><code>MSB is 1, so it's NEGATIVE
+
+Step 1: Flip all bits
+        11110011 → 00001100
+
+Step 2: Add 1
+        00001100 + 1 = 00001101
+
+Step 3: Convert to decimal
+        00001101 = 8 + 4 + 1 = 13
+
+Answer: 11110011 = -13</code></pre>
+</div>
+
+<h3>Practice Questions</h3>
+<div class="example-box">
+    <p><strong>Try these yourself:</strong></p>
+    <ol>
+        <li>Convert 156 to binary</li>
+        <li>Convert 10011100 to denary</li>
+        <li>What is -20 in 8-bit two's complement?</li>
+        <li>What decimal is 11101010 in two's complement?</li>
+    </ol>
+    <details>
+        <summary>Click for answers</summary>
+        <ol>
+            <li>156 = 10011100</li>
+            <li>10011100 = 128 + 16 + 8 + 4 = 156</li>
+            <li>+20 = 00010100, flip = 11101011, add 1 = 11101100</li>
+            <li>Flip 11101010 = 00010101, add 1 = 00010110 = 22, so answer is -22</li>
+        </ol>
+    </details>
+</div>
+
+<div class="warning">
+    <strong>⚠️ Common Exam Mistakes:</strong>
+    <ul>
+        <li>Forgetting to add 1 after flipping bits</li>
+        <li>Not checking if the number should be negative (MSB = 1)</li>
+        <li>Mixing up unsigned and two's complement ranges</li>
+    </ul>
+</div>
+
+<div class="tip-box">
+    <strong>Exam Tips:</strong>
+    <ul>
+        <li>Always state if you're using unsigned or two's complement</li>
+        <li>Check your answer by converting back</li>
+        <li>In 8-bit two's complement: range is -128 to +127</li>
+        <li>The most negative number in 8-bit is 10000000 = -128</li>
+    </ul>
 </div>
             `
         },
@@ -1783,64 +2130,198 @@ This color is mostly red, a bit of green, little blue = Orange!</code></pre>
     <strong>Binary Addition:</strong> Adding binary numbers using the same column method as denary, but with only 0 and 1. When the sum exceeds 1, we carry to the next column.
 </div>
 
-<h3>Binary Addition Rules</h3>
+<h3>Binary Addition Rules - MEMORIZE THESE!</h3>
 <table class="notes-table">
-    <tr><th>A</th><th>B</th><th>Sum</th><th>Carry</th></tr>
-    <tr><td>0</td><td>0</td><td>0</td><td>0</td></tr>
-    <tr><td>0</td><td>1</td><td>1</td><td>0</td></tr>
-    <tr><td>1</td><td>0</td><td>1</td><td>0</td></tr>
-    <tr><td>1</td><td>1</td><td>0</td><td>1</td></tr>
+    <tr><th>A</th><th>B</th><th>Carry In</th><th>Sum</th><th>Carry Out</th></tr>
+    <tr><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+    <tr><td>0</td><td>1</td><td>0</td><td>1</td><td>0</td></tr>
+    <tr><td>1</td><td>0</td><td>0</td><td>1</td><td>0</td></tr>
+    <tr><td>1</td><td>1</td><td>0</td><td>0</td><td>1</td></tr>
+    <tr><td>0</td><td>0</td><td>1</td><td>1</td><td>0</td></tr>
+    <tr><td>0</td><td>1</td><td>1</td><td>0</td><td>1</td></tr>
+    <tr><td>1</td><td>0</td><td>1</td><td>0</td><td>1</td></tr>
+    <tr><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
 </table>
 
-<p><strong>Key rule:</strong> 1 + 1 = 10 (which is 0, carry 1)</p>
+<div class="tip-box">
+    <strong>Simple Rules:</strong>
+    <ul>
+        <li>0 + 0 = 0</li>
+        <li>0 + 1 = 1</li>
+        <li>1 + 0 = 1</li>
+        <li>1 + 1 = 10 (write 0, carry 1)</li>
+        <li>1 + 1 + 1 = 11 (write 1, carry 1)</li>
+    </ul>
+</div>
+
+<h3>Step-by-Step Method</h3>
+<ol>
+    <li>Write numbers aligned by the right (ones column)</li>
+    <li>Start from the <strong>rightmost column</strong></li>
+    <li>Add the digits plus any carry from the previous column</li>
+    <li>Write down the sum digit; if sum ≥ 2, carry 1 to the next column</li>
+    <li>Move left and repeat until done</li>
+</ol>
 
 <h3>Example 1: Simple Addition</h3>
 <div class="example-box">
     <h4>Add 0101 (5) + 0011 (3)</h4>
-<pre><code>    0 1 0 1   (5)
-  + 0 0 1 1   (3)
-  ---------
-Carry: 1 1
-  ---------
-    1 0 0 0   (8)
+<pre><code>Column:    4   3   2   1
+           ↓   ↓   ↓   ↓
+           0   1   0   1   (5)
+         + 0   0   1   1   (3)
+         ─────────────────
+Carry:         1   1
+         ─────────────────
+           1   0   0   0   (8)
+
+Working right to left:
+• Column 1: 1 + 1 = 0, carry 1
+• Column 2: 0 + 1 + carry(1) = 0, carry 1
+• Column 3: 1 + 0 + carry(1) = 0, carry 1
+• Column 4: 0 + 0 + carry(1) = 1
 
 Check: 5 + 3 = 8 ✓</code></pre>
 </div>
 
-<h3>Example 2: With Multiple Carries</h3>
+<h3>Example 2: Larger Numbers with Multiple Carries</h3>
 <div class="example-box">
-    <h4>Add 01101 (13) + 01011 (11)</h4>
-<pre><code>      0 1 1 0 1   (13)
-    + 0 1 0 1 1   (11)
-    -----------
-Carry:1 1 1 1
-    -----------
-      1 1 0 0 0   (24)
+    <h4>Add 10110110 (182) + 01101001 (105)</h4>
+<pre><code>         1 0 1 1 0 1 1 0   (182)
+       + 0 1 1 0 1 0 0 1   (105)
+       ─────────────────────
+Carry: 1 1 1 1 1 1 1
+       ─────────────────────
+       1 0 0 0 1 1 1 1 1   (287)
 
-Check: 13 + 11 = 24 ✓</code></pre>
+Wait! This needs 9 bits, but we only have 8!
+This is OVERFLOW - see below.</code></pre>
 </div>
 
-<h3>Overflow Error</h3>
-<p class="warning">⚠️ <strong>Overflow</strong> occurs when the result is too large to fit in the available bits. For 8-bit: max value is 255. If result > 255, overflow occurs!</p>
+<h3>Example 3: 8-bit Addition (No Overflow)</h3>
+<div class="example-box">
+    <h4>Add 01100100 (100) + 00011001 (25)</h4>
+<pre><code>         0 1 1 0 0 1 0 0   (100)
+       + 0 0 0 1 1 0 0 1   (25)
+       ─────────────────────
+Carry:       1 1
+       ─────────────────────
+         0 1 1 1 1 1 0 1   (125)
+
+Check: 100 + 25 = 125 ✓
+This fits in 8 bits (max 255), so no overflow.</code></pre>
+</div>
+
+<h2>Overflow Errors - VERY IMPORTANT!</h2>
+<div class="definition-box">
+    <strong>Overflow:</strong> Occurs when the result of a calculation is too large to be stored in the available number of bits. The extra bit is lost, giving an incorrect result.
+</div>
+
+<h3>When Does Overflow Occur?</h3>
+<table class="notes-table">
+    <tr><th>Number of Bits</th><th>Maximum Unsigned Value</th><th>Overflow If Result Exceeds</th></tr>
+    <tr><td>4 bits</td><td>15</td><td>15</td></tr>
+    <tr><td>8 bits</td><td>255</td><td>255</td></tr>
+    <tr><td>16 bits</td><td>65,535</td><td>65,535</td></tr>
+</table>
 
 <div class="example-box">
-    <h4>Overflow Example (8-bit)</h4>
-<pre><code>    1111 1111   (255)
-  + 0000 0001   (1)
-  -----------
-  1 0000 0000   (256 - but needs 9 bits!)
+    <h4>Overflow Example 1: 4-bit (max 15)</h4>
+<pre><code>Add 1100 (12) + 0110 (6)
 
-Result would be 0000 0000 with overflow flag set.
-The 9th bit is lost!</code></pre>
+      1 1 0 0   (12)
+    + 0 1 1 0   (6)
+    ─────────────
+    1 0 0 1 0   (18 needs 5 bits!)
+
+In 4-bit system: Result is 0010 (2) ← WRONG!
+The leading 1 is lost.
+12 + 6 should equal 18, but we get 2!
+
+OVERFLOW has occurred!</code></pre>
+</div>
+
+<div class="example-box">
+    <h4>Overflow Example 2: 8-bit (max 255)</h4>
+<pre><code>Add 11111111 (255) + 00000001 (1)
+
+      1 1 1 1 1 1 1 1   (255)
+    + 0 0 0 0 0 0 0 1   (1)
+    ───────────────────
+    1 0 0 0 0 0 0 0 0   (256 needs 9 bits!)
+
+In 8-bit system: Result is 00000000 (0) ← WRONG!
+255 + 1 should equal 256, but we get 0!
+
+OVERFLOW has occurred!</code></pre>
+</div>
+
+<div class="example-box">
+    <h4>Overflow Example 3: 8-bit</h4>
+<pre><code>Add 11000000 (192) + 01100000 (96)
+
+      1 1 0 0 0 0 0 0   (192)
+    + 0 1 1 0 0 0 0 0   (96)
+    ───────────────────
+    1 0 0 1 0 0 0 0 0   (288 needs 9 bits!)
+
+In 8-bit: Result is 00100000 (32) ← WRONG!
+192 + 96 = 288, but we get 32.
+
+OVERFLOW - the 9th bit carrying 256 is lost!</code></pre>
+</div>
+
+<h3>How to Detect Overflow</h3>
+<ul>
+    <li><strong>Check the result:</strong> Is it smaller than either input? Overflow!</li>
+    <li><strong>Check the carry:</strong> Is there a carry out of the last bit? Overflow!</li>
+    <li><strong>Do the maths:</strong> Would the decimal result exceed maximum value? Overflow!</li>
+</ul>
+
+<h3>Real-World Consequences of Overflow</h3>
+<div class="example-box">
+    <p><strong>Ariane 5 Rocket (1996):</strong> A 64-bit number was converted to 16-bit, causing overflow. The rocket veered off course and self-destructed 37 seconds after launch. Cost: $370 million!</p>
+    <p><strong>Pac-Man Kill Screen:</strong> Level counter stored in 8 bits. Level 256 causes overflow, corrupting the screen and making the game unplayable.</p>
+</div>
+
+<h3>Practice Questions</h3>
+<div class="example-box">
+    <p><strong>Try these (8-bit):</strong></p>
+    <ol>
+        <li>Add 00110101 + 00101010</li>
+        <li>Add 11001010 + 01010101</li>
+        <li>Add 11110000 + 00010001</li>
+        <li>Which of the above causes overflow?</li>
+    </ol>
+    <details>
+        <summary>Click for answers</summary>
+        <ol>
+            <li>00110101 (53) + 00101010 (42) = 01011111 (95) ✓</li>
+            <li>11001010 (202) + 01010101 (85) = 100011111 → 00011111 (31) OVERFLOW! (should be 287)</li>
+            <li>11110000 (240) + 00010001 (17) = 100000001 → 00000001 (1) OVERFLOW! (should be 257)</li>
+            <li>Questions 2 and 3 cause overflow</li>
+        </ol>
+    </details>
 </div>
 
 <div class="tip-box">
     <strong>Exam Tips:</strong>
     <ul>
-        <li>Work right to left, just like denary addition</li>
-        <li>1 + 1 = 0 carry 1</li>
-        <li>1 + 1 + 1 (with carry) = 1 carry 1</li>
-        <li>Check your answer by converting both to denary</li>
+        <li>Always work right to left</li>
+        <li>Show your carry row clearly</li>
+        <li>Check your answer by converting to decimal</li>
+        <li>State if overflow has occurred and why</li>
+        <li>Remember: overflow = result too big for available bits</li>
+    </ul>
+</div>
+
+<div class="warning">
+    <strong>⚠️ Common Mistakes:</strong>
+    <ul>
+        <li>Forgetting to add the carry</li>
+        <li>Working left to right instead of right to left</li>
+        <li>Not recognizing when overflow has occurred</li>
+        <li>Writing 2 instead of 10 (0 with carry)</li>
     </ul>
 </div>
             `
@@ -2077,81 +2558,180 @@ Space = 32</code></pre>
             content: `
 <h2>Image Representation</h2>
 <div class="definition-box">
-    <strong>Bitmap Image:</strong> A digital image made up of a grid of tiny squares called pixels (picture elements). Each pixel stores color information as binary data.
+    <strong>Bitmap Image:</strong> A digital image made up of a grid of tiny squares called pixels (picture elements). Each pixel stores color information as binary data. The image is essentially a map of bits.
 </div>
 
-<h3>Key Terms</h3>
+<h3>Key Terms - Learn These Definitions!</h3>
 <table class="notes-table">
     <tr><th>Term</th><th>Definition</th><th>Example</th></tr>
-    <tr><td><strong>Pixel</strong></td><td>Smallest single point in an image</td><td>One tiny colored square</td></tr>
-    <tr><td><strong>Resolution</strong></td><td>Width × Height in pixels</td><td>1920 × 1080 (Full HD)</td></tr>
-    <tr><td><strong>Color Depth</strong></td><td>Bits used per pixel</td><td>24-bit = 16.7 million colors</td></tr>
-    <tr><td><strong>Metadata</strong></td><td>Data about the image</td><td>Dimensions, date, camera</td></tr>
+    <tr><td><strong>Pixel</strong></td><td>Smallest single point in an image - one colored square</td><td>A single dot of color</td></tr>
+    <tr><td><strong>Resolution</strong></td><td>Total number of pixels (Width × Height)</td><td>1920 × 1080 = 2,073,600 pixels</td></tr>
+    <tr><td><strong>Color Depth</strong></td><td>Number of bits used to represent each pixel's color</td><td>24-bit = 16.7 million colors</td></tr>
+    <tr><td><strong>Metadata</strong></td><td>Additional information stored about the image</td><td>Date taken, camera model, GPS location</td></tr>
+</table>
+
+<h3>Resolution Explained</h3>
+<p>Resolution determines how much detail an image can show:</p>
+<table class="notes-table">
+    <tr><th>Resolution</th><th>Name</th><th>Total Pixels</th><th>Use</th></tr>
+    <tr><td>640 × 480</td><td>VGA</td><td>307,200</td><td>Old monitors, low quality</td></tr>
+    <tr><td>1280 × 720</td><td>HD (720p)</td><td>921,600</td><td>Web videos</td></tr>
+    <tr><td>1920 × 1080</td><td>Full HD (1080p)</td><td>2,073,600</td><td>TVs, monitors</td></tr>
+    <tr><td>3840 × 2160</td><td>4K UHD</td><td>8,294,400</td><td>High-end TVs</td></tr>
+    <tr><td>4032 × 3024</td><td>12 MP</td><td>12,192,768</td><td>Smartphone cameras</td></tr>
 </table>
 
 <h3>Color Depth Explained</h3>
+<p>More bits per pixel = more possible colors:</p>
 <table class="notes-table">
-    <tr><th>Color Depth</th><th>Colors Available</th><th>Use Case</th></tr>
-    <tr><td>1-bit</td><td>2 (black & white)</td><td>Simple line drawings</td></tr>
-    <tr><td>4-bit</td><td>16</td><td>Early computer graphics</td></tr>
-    <tr><td>8-bit</td><td>256</td><td>GIFs, simple graphics</td></tr>
-    <tr><td>16-bit</td><td>65,536</td><td>Older displays</td></tr>
-    <tr><td>24-bit</td><td>16,777,216</td><td>Photos (True Color)</td></tr>
-    <tr><td>32-bit</td><td>16.7M + transparency</td><td>Graphics with alpha</td></tr>
+    <tr><th>Color Depth</th><th>Colors Available</th><th>Calculation</th><th>Use Case</th></tr>
+    <tr><td>1-bit</td><td>2 (black & white)</td><td>2¹ = 2</td><td>Simple line drawings, fax</td></tr>
+    <tr><td>4-bit</td><td>16</td><td>2⁴ = 16</td><td>Early computer graphics</td></tr>
+    <tr><td>8-bit</td><td>256</td><td>2⁸ = 256</td><td>GIFs, simple graphics</td></tr>
+    <tr><td>16-bit</td><td>65,536</td><td>2¹⁶ = 65,536</td><td>High Color displays</td></tr>
+    <tr><td>24-bit</td><td>16,777,216</td><td>2²⁴ = 16.7M</td><td>True Color - photos</td></tr>
+    <tr><td>32-bit</td><td>16.7M + transparency</td><td>24-bit + 8-bit alpha</td><td>Graphics with transparency</td></tr>
 </table>
 
-<h3>File Size Calculation</h3>
+<h2>FILE SIZE CALCULATIONS - EXAM ESSENTIAL!</h2>
+
 <div class="definition-box">
-    <strong>Formula:</strong> File Size = Width × Height × Color Depth (in bits)
+    <strong>Formula:</strong><br>
+    <strong>File Size (bits) = Width × Height × Color Depth</strong><br><br>
+    <strong>File Size (bytes) = (Width × Height × Color Depth) ÷ 8</strong>
 </div>
 
+<h3>Unit Conversions - MEMORIZE!</h3>
+<table class="notes-table">
+    <tr><th>Conversion</th><th>Value</th></tr>
+    <tr><td>8 bits</td><td>= 1 byte</td></tr>
+    <tr><td>1024 bytes</td><td>= 1 Kilobyte (KB)</td></tr>
+    <tr><td>1024 KB</td><td>= 1 Megabyte (MB)</td></tr>
+    <tr><td>1024 MB</td><td>= 1 Gigabyte (GB)</td></tr>
+</table>
+
+<h3>Worked Example 1 - FULL WORKING</h3>
 <div class="example-box">
-    <h4>Calculate file size of an 800×600 image with 24-bit color</h4>
-<pre><code>File size = Width × Height × Color Depth
-          = 800 × 600 × 24 bits
-          = 11,520,000 bits
+    <h4>Calculate the file size of an 800×600 image with 24-bit color depth</h4>
+<pre><code><strong>Step 1: Calculate total pixels</strong>
+Total pixels = Width × Height
+             = 800 × 600
+             = 480,000 pixels
 
-Convert to bytes: 11,520,000 ÷ 8 = 1,440,000 bytes
-Convert to KB: 1,440,000 ÷ 1024 = 1,406.25 KB
-Convert to MB: 1,406.25 ÷ 1024 ≈ 1.37 MB
+<strong>Step 2: Calculate size in bits</strong>
+Size in bits = Total pixels × Color depth
+             = 480,000 × 24
+             = 11,520,000 bits
 
-Answer: Approximately 1.37 MB (uncompressed)</code></pre>
+<strong>Step 3: Convert bits to bytes</strong>
+Size in bytes = 11,520,000 ÷ 8
+              = 1,440,000 bytes
+
+<strong>Step 4: Convert bytes to KB</strong>
+Size in KB = 1,440,000 ÷ 1024
+           = 1,406.25 KB
+
+<strong>Step 5: Convert KB to MB</strong>
+Size in MB = 1,406.25 ÷ 1024
+           = 1.373 MB (approximately 1.37 MB)
+
+<strong>Answer: The image file size is approximately 1.37 MB (uncompressed)</strong></code></pre>
 </div>
 
-<h3>24-bit Color (True Color)</h3>
-<p>Each pixel uses 24 bits: 8 bits for Red, 8 for Green, 8 for Blue.</p>
+<h3>Worked Example 2</h3>
+<div class="example-box">
+    <h4>Calculate the file size of a 1920×1080 image with 32-bit color</h4>
+<pre><code>Step 1: Total pixels = 1920 × 1080 = 2,073,600 pixels
+
+Step 2: Size in bits = 2,073,600 × 32 = 66,355,200 bits
+
+Step 3: Size in bytes = 66,355,200 ÷ 8 = 8,294,400 bytes
+
+Step 4: Size in KB = 8,294,400 ÷ 1024 = 8,100 KB
+
+Step 5: Size in MB = 8,100 ÷ 1024 = 7.91 MB
+
+<strong>Answer: Approximately 7.91 MB</strong></code></pre>
+</div>
+
+<h3>Worked Example 3 - Small Image</h3>
+<div class="example-box">
+    <h4>Calculate the file size of a 100×100 image with 8-bit color</h4>
+<pre><code>Total pixels = 100 × 100 = 10,000 pixels
+Size in bits = 10,000 × 8 = 80,000 bits
+Size in bytes = 80,000 ÷ 8 = 10,000 bytes
+Size in KB = 10,000 ÷ 1024 = 9.77 KB
+
+<strong>Answer: Approximately 9.77 KB</strong></code></pre>
+</div>
+
+<h3>24-bit True Color Explained</h3>
+<p>Each pixel uses 24 bits: 8 bits for Red, 8 bits for Green, 8 bits for Blue (RGB).</p>
 
 <div class="example-box">
     <h4>How 24-bit color works</h4>
-<pre><code>24 bits = 8 bits Red + 8 bits Green + 8 bits Blue
+<pre><code>24 bits per pixel:
+┌────────────┬────────────┬────────────┐
+│  8 bits    │   8 bits   │   8 bits   │
+│   RED      │   GREEN    │   BLUE     │
+│  0-255     │   0-255    │   0-255    │
+└────────────┴────────────┴────────────┘
 
-Each color channel: 0-255 (2⁸ = 256 values)
-
-Examples:
-Red:   R=255, G=0,   B=0   = Pure Red
-Green: R=0,   G=255, B=0   = Pure Green
-Blue:  R=0,   G=0,   B=255 = Pure Blue
-White: R=255, G=255, B=255 = All colors
-Black: R=0,   G=0,   B=0   = No color
-Yellow: R=255, G=255, B=0  = Red + Green</code></pre>
+Color Examples:
+Pure Red:    R=255, G=0,   B=0   → Hex: #FF0000
+Pure Green:  R=0,   G=255, B=0   → Hex: #00FF00
+Pure Blue:   R=0,   G=0,   B=255 → Hex: #0000FF
+White:       R=255, G=255, B=255 → Hex: #FFFFFF
+Black:       R=0,   G=0,   B=0   → Hex: #000000
+Yellow:      R=255, G=255, B=0   → Hex: #FFFF00
+Orange:      R=255, G=128, B=0   → Hex: #FF8000</code></pre>
 </div>
 
 <h3>Quality vs File Size Trade-off</h3>
 <table class="notes-table">
-    <tr><th>Change</th><th>Effect on Quality</th><th>Effect on Size</th></tr>
-    <tr><td>↑ Resolution</td><td>Better (more detail)</td><td>Larger file</td></tr>
-    <tr><td>↓ Resolution</td><td>Worse (less detail)</td><td>Smaller file</td></tr>
-    <tr><td>↑ Color Depth</td><td>More colors</td><td>Larger file</td></tr>
-    <tr><td>↓ Color Depth</td><td>Fewer colors</td><td>Smaller file</td></tr>
+    <tr><th>Change</th><th>Effect on Quality</th><th>Effect on File Size</th></tr>
+    <tr><td>↑ Resolution</td><td>Better - more detail, sharper</td><td>LARGER file</td></tr>
+    <tr><td>↓ Resolution</td><td>Worse - less detail, pixelated</td><td>Smaller file</td></tr>
+    <tr><td>↑ Color Depth</td><td>Better - more colors, smoother gradients</td><td>LARGER file</td></tr>
+    <tr><td>↓ Color Depth</td><td>Worse - fewer colors, banding</td><td>Smaller file</td></tr>
 </table>
+
+<h3>Practice Questions</h3>
+<div class="example-box">
+    <p><strong>Calculate the file sizes:</strong></p>
+    <ol>
+        <li>400 × 300 pixels, 8-bit color</li>
+        <li>1024 × 768 pixels, 24-bit color</li>
+        <li>3000 × 2000 pixels, 16-bit color</li>
+    </ol>
+    <details>
+        <summary>Click for answers</summary>
+        <ol>
+            <li>400 × 300 × 8 = 960,000 bits = 120,000 bytes = 117.19 KB</li>
+            <li>1024 × 768 × 24 = 18,874,368 bits = 2,359,296 bytes = 2,304 KB = 2.25 MB</li>
+            <li>3000 × 2000 × 16 = 96,000,000 bits = 12,000,000 bytes = 11,718.75 KB = 11.44 MB</li>
+        </ol>
+    </details>
+</div>
 
 <div class="tip-box">
     <strong>Exam Tips:</strong>
     <ul>
-        <li>Show your working when calculating file sizes</li>
-        <li>Remember: 8 bits = 1 byte, 1024 bytes = 1 KB</li>
-        <li>File size formula gives UNCOMPRESSED size - actual files may be smaller</li>
-        <li>More pixels OR more colors = bigger file size</li>
+        <li>ALWAYS show your working step by step</li>
+        <li>Remember: 8 bits = 1 byte, 1024 bytes = 1 KB, 1024 KB = 1 MB</li>
+        <li>File size formula gives UNCOMPRESSED size - actual files may be smaller due to compression</li>
+        <li>Double the resolution = 4× the file size (because both width AND height double)</li>
+        <li>If asked about metadata, mention it adds to file size but is usually small</li>
+    </ul>
+</div>
+
+<div class="warning">
+    <strong>⚠️ Common Mistakes:</strong>
+    <ul>
+        <li>Forgetting to divide by 8 when converting bits to bytes</li>
+        <li>Using 1000 instead of 1024 for KB/MB conversions</li>
+        <li>Not showing working (even if answer is correct)</li>
+        <li>Confusing color depth (bits per pixel) with total colors (2^bits)</li>
     </ul>
 </div>
             `
@@ -2163,90 +2743,199 @@ Yellow: R=255, G=255, B=0  = Red + Green</code></pre>
     <strong>Digital Sound:</strong> Analog sound waves converted to digital data through sampling - measuring the wave's amplitude at regular intervals and storing each measurement as a binary number.
 </div>
 
-<h3>How Sound is Digitized</h3>
+<h3>Analog vs Digital Sound</h3>
+<table class="notes-table">
+    <tr><th>Analog Sound</th><th>Digital Sound</th></tr>
+    <tr><td>Continuous wave</td><td>Discrete samples (snapshots)</td></tr>
+    <tr><td>Natural sound</td><td>Approximation of original</td></tr>
+    <tr><td>Degrades when copied</td><td>Perfect copies possible</td></tr>
+    <tr><td>Vinyl records, cassettes</td><td>CDs, MP3s, streaming</td></tr>
+</table>
+
+<h3>How Sound is Digitized (ADC - Analog to Digital Conversion)</h3>
 <ol>
-    <li><strong>Analog sound wave</strong> enters a microphone</li>
-    <li>Wave is <strong>sampled</strong> at regular intervals</li>
-    <li>Each sample's <strong>amplitude is measured</strong></li>
-    <li>Amplitude is converted to a <strong>binary value</strong></li>
+    <li><strong>Sound wave</strong> enters a microphone (analog signal)</li>
+    <li>Wave is <strong>sampled</strong> at regular intervals (e.g., 44,100 times per second)</li>
+    <li>Each sample's <strong>amplitude is measured</strong> (height of wave)</li>
+    <li>Amplitude is <strong>quantized</strong> (rounded to nearest level based on bit depth)</li>
+    <li>Each value is converted to a <strong>binary number</strong></li>
     <li>Binary values are <strong>stored</strong> in sequence</li>
 </ol>
 
-<h3>Key Terms</h3>
+<h3>Key Terms - MEMORIZE THESE!</h3>
 <table class="notes-table">
-    <tr><th>Term</th><th>Definition</th><th>Typical Values</th></tr>
-    <tr><td><strong>Sample Rate</strong></td><td>Number of samples taken per second (Hz)</td><td>CD: 44,100 Hz</td></tr>
-    <tr><td><strong>Bit Depth</strong></td><td>Bits used for each sample</td><td>CD: 16-bit</td></tr>
-    <tr><td><strong>Bit Rate</strong></td><td>Bits of data per second of audio</td><td>128-320 kbps for MP3</td></tr>
-    <tr><td><strong>Channels</strong></td><td>Separate audio tracks</td><td>1=Mono, 2=Stereo</td></tr>
+    <tr><th>Term</th><th>Definition</th><th>Unit</th><th>Typical Values</th></tr>
+    <tr><td><strong>Sample Rate</strong></td><td>Number of samples taken per second</td><td>Hz (Hertz)</td><td>CD: 44,100 Hz</td></tr>
+    <tr><td><strong>Bit Depth</strong></td><td>Number of bits used for each sample</td><td>bits</td><td>CD: 16-bit</td></tr>
+    <tr><td><strong>Bit Rate</strong></td><td>Amount of data processed per second</td><td>kbps</td><td>MP3: 128-320 kbps</td></tr>
+    <tr><td><strong>Channels</strong></td><td>Number of separate audio tracks</td><td>-</td><td>1=Mono, 2=Stereo</td></tr>
 </table>
 
-<h3>Sample Rate</h3>
-<p>Higher sample rate = more accurate representation of the original sound wave.</p>
+<h3>Sample Rate (Sampling Frequency)</h3>
+<p>How often we take a "snapshot" of the sound wave. Higher = better quality.</p>
 
 <div class="example-box">
     <h4>Common Sample Rates</h4>
-    <ul>
-        <li><strong>8,000 Hz</strong> - Telephone quality</li>
-        <li><strong>22,050 Hz</strong> - FM Radio quality</li>
-        <li><strong>44,100 Hz</strong> - CD quality (44.1 kHz)</li>
-        <li><strong>48,000 Hz</strong> - DVD/Professional video</li>
-        <li><strong>96,000 Hz</strong> - High-resolution audio</li>
-    </ul>
+    <table class="notes-table">
+        <tr><th>Sample Rate</th><th>Quality</th><th>Use</th></tr>
+        <tr><td>8,000 Hz (8 kHz)</td><td>Very low</td><td>Telephone, voice calls</td></tr>
+        <tr><td>22,050 Hz (22 kHz)</td><td>Low-Medium</td><td>AM Radio quality</td></tr>
+        <tr><td>44,100 Hz (44.1 kHz)</td><td>High (CD quality)</td><td>Music CDs, standard audio</td></tr>
+        <tr><td>48,000 Hz (48 kHz)</td><td>High</td><td>DVD, professional video</td></tr>
+        <tr><td>96,000 Hz (96 kHz)</td><td>Very High</td><td>High-resolution audio, studios</td></tr>
+    </table>
 </div>
 
-<h3>Bit Depth</h3>
-<p>Higher bit depth = more accurate amplitude measurements = better quality.</p>
+<div class="tip-box">
+    <strong>Nyquist Theorem:</strong> Sample rate must be at least TWICE the highest frequency you want to capture.<br>
+    Human hearing: up to ~20,000 Hz (20 kHz)<br>
+    Therefore: 44,100 Hz captures everything humans can hear (44,100 > 2 × 20,000)
+</div>
+
+<h3>Bit Depth (Sample Resolution)</h3>
+<p>How precisely each sample measures the amplitude. More bits = more accurate.</p>
 
 <div class="example-box">
-    <h4>Bit Depth Effects</h4>
-    <ul>
-        <li><strong>8-bit:</strong> 256 amplitude levels - lo-fi, retro sound</li>
-        <li><strong>16-bit:</strong> 65,536 levels - CD quality</li>
-        <li><strong>24-bit:</strong> 16.7 million levels - professional studio</li>
-    </ul>
+    <h4>Bit Depth Comparison</h4>
+    <table class="notes-table">
+        <tr><th>Bit Depth</th><th>Amplitude Levels</th><th>Quality</th><th>Use</th></tr>
+        <tr><td>8-bit</td><td>256 (2⁸)</td><td>Lo-fi, noisy</td><td>Retro games, voice</td></tr>
+        <tr><td>16-bit</td><td>65,536 (2¹⁶)</td><td>CD quality</td><td>Standard music</td></tr>
+        <tr><td>24-bit</td><td>16,777,216 (2²⁴)</td><td>Professional</td><td>Studio recording</td></tr>
+        <tr><td>32-bit</td><td>4+ billion (2³²)</td><td>Ultra-high</td><td>Professional mixing</td></tr>
+    </table>
 </div>
 
-<h3>File Size Calculation</h3>
+<h2>SOUND FILE SIZE CALCULATIONS - EXAM ESSENTIAL!</h2>
+
 <div class="definition-box">
-    <strong>Formula:</strong> File Size = Sample Rate × Bit Depth × Channels × Duration (seconds)
+    <strong>Formula:</strong><br>
+    <strong>File Size (bits) = Sample Rate × Bit Depth × Channels × Duration (seconds)</strong><br><br>
+    <strong>File Size (bytes) = (Sample Rate × Bit Depth × Channels × Duration) ÷ 8</strong>
 </div>
 
+<h3>Worked Example 1 - CD Quality Audio</h3>
 <div class="example-box">
     <h4>Calculate file size for 30 seconds of CD-quality stereo audio</h4>
-<pre><code>Given: Sample rate = 44,100 Hz
-       Bit depth = 16 bits
-       Channels = 2 (stereo)
-       Duration = 30 seconds
+<pre><code>Given information:
+• Sample rate = 44,100 Hz (CD quality)
+• Bit depth = 16 bits (CD quality)
+• Channels = 2 (stereo)
+• Duration = 30 seconds
 
-File size = 44,100 × 16 × 2 × 30
-          = 42,336,000 bits
+<strong>Step 1: Apply the formula</strong>
+File size (bits) = Sample Rate × Bit Depth × Channels × Duration
+                 = 44,100 × 16 × 2 × 30
+                 = 42,336,000 bits
 
-Convert to bytes: 42,336,000 ÷ 8 = 5,292,000 bytes
-Convert to MB: 5,292,000 ÷ (1024 × 1024) ≈ 5.05 MB
+<strong>Step 2: Convert bits to bytes</strong>
+File size (bytes) = 42,336,000 ÷ 8
+                  = 5,292,000 bytes
 
-Answer: Approximately 5.05 MB (uncompressed)</code></pre>
+<strong>Step 3: Convert bytes to KB</strong>
+File size (KB) = 5,292,000 ÷ 1024
+               = 5,167.97 KB
+
+<strong>Step 4: Convert KB to MB</strong>
+File size (MB) = 5,167.97 ÷ 1024
+               = 5.05 MB
+
+<strong>Answer: Approximately 5.05 MB (uncompressed)</strong></code></pre>
+</div>
+
+<h3>Worked Example 2 - Phone Call Quality</h3>
+<div class="example-box">
+    <h4>Calculate file size for 60 seconds of telephone quality mono audio</h4>
+<pre><code>Given:
+• Sample rate = 8,000 Hz
+• Bit depth = 8 bits
+• Channels = 1 (mono)
+• Duration = 60 seconds
+
+File size (bits) = 8,000 × 8 × 1 × 60
+                 = 3,840,000 bits
+
+File size (bytes) = 3,840,000 ÷ 8 = 480,000 bytes
+
+File size (KB) = 480,000 ÷ 1024 = 468.75 KB
+
+<strong>Answer: Approximately 469 KB</strong>
+
+Compare: Same 60 seconds in CD quality stereo would be:
+44,100 × 16 × 2 × 60 = 84,672,000 bits = 10.1 MB
+That's over 20 times larger!</code></pre>
+</div>
+
+<h3>Worked Example 3 - Professional Audio</h3>
+<div class="example-box">
+    <h4>Calculate file size for a 3-minute song at 48 kHz, 24-bit, stereo</h4>
+<pre><code>Given:
+• Sample rate = 48,000 Hz
+• Bit depth = 24 bits
+• Channels = 2 (stereo)
+• Duration = 3 minutes = 180 seconds
+
+File size (bits) = 48,000 × 24 × 2 × 180
+                 = 414,720,000 bits
+
+File size (bytes) = 414,720,000 ÷ 8 = 51,840,000 bytes
+
+File size (KB) = 51,840,000 ÷ 1024 = 50,625 KB
+
+File size (MB) = 50,625 ÷ 1024 = 49.44 MB
+
+<strong>Answer: Approximately 49.44 MB (uncompressed)</strong>
+
+Note: This is why MP3 compression exists!
+An MP3 of this song would be around 3-5 MB.</code></pre>
 </div>
 
 <h3>Quality vs File Size Trade-off</h3>
 <table class="notes-table">
-    <tr><th>Increase</th><th>Effect on Quality</th><th>Effect on Size</th></tr>
-    <tr><td>↑ Sample Rate</td><td>Better frequency capture</td><td>Larger file</td></tr>
-    <tr><td>↑ Bit Depth</td><td>More accurate amplitude</td><td>Larger file</td></tr>
-    <tr><td>↑ Channels (stereo)</td><td>Spatial sound</td><td>Double the size</td></tr>
+    <tr><th>Change</th><th>Effect on Quality</th><th>Effect on File Size</th></tr>
+    <tr><td>↑ Sample Rate</td><td>Better - captures higher frequencies</td><td>LARGER file</td></tr>
+    <tr><td>↓ Sample Rate</td><td>Worse - sounds muffled</td><td>Smaller file</td></tr>
+    <tr><td>↑ Bit Depth</td><td>Better - more accurate amplitude</td><td>LARGER file</td></tr>
+    <tr><td>↓ Bit Depth</td><td>Worse - more noise, less dynamic range</td><td>Smaller file</td></tr>
+    <tr><td>Stereo → Mono</td><td>Worse - no spatial sound</td><td>HALF the size</td></tr>
 </table>
 
-<div class="tip-box">
-    <strong>Nyquist Theorem:</strong> Sample rate must be at least TWICE the highest frequency you want to capture. Human hearing goes up to ~20,000 Hz, so 44,100 Hz captures everything we can hear.
+<h3>Practice Questions</h3>
+<div class="example-box">
+    <p><strong>Calculate the file sizes:</strong></p>
+    <ol>
+        <li>20 seconds of audio at 22,050 Hz, 8-bit, mono</li>
+        <li>45 seconds of audio at 44,100 Hz, 16-bit, stereo</li>
+        <li>2 minutes of audio at 48,000 Hz, 16-bit, mono</li>
+    </ol>
+    <details>
+        <summary>Click for answers</summary>
+        <ol>
+            <li>22,050 × 8 × 1 × 20 = 3,528,000 bits = 441,000 bytes = 430.66 KB</li>
+            <li>44,100 × 16 × 2 × 45 = 63,504,000 bits = 7,938,000 bytes = 7,752.93 KB = 7.57 MB</li>
+            <li>48,000 × 16 × 1 × 120 = 92,160,000 bits = 11,520,000 bytes = 11,250 KB = 10.99 MB</li>
+        </ol>
+    </details>
 </div>
 
 <div class="tip-box">
     <strong>Exam Tips:</strong>
     <ul>
-        <li>Show all working in calculations</li>
-        <li>Remember: stereo = ×2 for channels</li>
-        <li>CD quality = 44,100 Hz, 16-bit, stereo</li>
-        <li>Higher sample rate and bit depth = better quality but bigger files</li>
+        <li>ALWAYS show full working - even partial working can get marks</li>
+        <li>Remember: stereo = 2 channels, mono = 1 channel</li>
+        <li>CD quality = 44,100 Hz, 16-bit, stereo (memorize this!)</li>
+        <li>Convert minutes to seconds before calculating</li>
+        <li>These calculations give UNCOMPRESSED sizes - actual MP3s are much smaller</li>
+    </ul>
+</div>
+
+<div class="warning">
+    <strong>⚠️ Common Mistakes:</strong>
+    <ul>
+        <li>Forgetting to multiply by number of channels (stereo = ×2)</li>
+        <li>Forgetting to convert minutes to seconds</li>
+        <li>Dividing by 1000 instead of 1024 for KB/MB</li>
+        <li>Confusing sample rate (Hz) with bit rate (kbps)</li>
     </ul>
 </div>
             `
@@ -2370,43 +3059,200 @@ Saved: 15 characters → 8 characters (47% reduction!)</code></pre>
             content: `
 <h2>CPU Components</h2>
 <div class="definition-box">
-    <strong>CPU (Central Processing Unit):</strong> The "brain" of the computer that fetches, decodes, and executes instructions. It performs all processing and calculations.
+    <strong>CPU (Central Processing Unit):</strong> The "brain" of the computer that fetches, decodes, and executes instructions. All processing and calculations happen here. Also called the processor.
 </div>
 
-<h3>Main Components</h3>
+<h3>Main Components of the CPU</h3>
 <table class="notes-table">
     <tr><th>Component</th><th>Full Name</th><th>Purpose</th></tr>
-    <tr><td><strong>ALU</strong></td><td>Arithmetic Logic Unit</td><td>Performs calculations (+, -, ×, ÷) and logic (AND, OR, NOT)</td></tr>
-    <tr><td><strong>CU</strong></td><td>Control Unit</td><td>Fetches and decodes instructions, controls data flow</td></tr>
-    <tr><td><strong>Registers</strong></td><td>-</td><td>Tiny, ultra-fast storage inside the CPU</td></tr>
-    <tr><td><strong>Cache</strong></td><td>-</td><td>Small fast memory between CPU and RAM</td></tr>
+    <tr><td><strong>ALU</strong></td><td>Arithmetic Logic Unit</td><td>Performs ALL calculations (+, -, ×, ÷) and logic operations (AND, OR, NOT, comparisons)</td></tr>
+    <tr><td><strong>CU</strong></td><td>Control Unit</td><td>Manages the FDE cycle, decodes instructions, coordinates data flow between components</td></tr>
+    <tr><td><strong>Registers</strong></td><td>-</td><td>Tiny, ultra-fast storage locations inside the CPU for immediate use</td></tr>
+    <tr><td><strong>Cache</strong></td><td>-</td><td>Small, very fast memory between CPU and RAM - stores frequently used data</td></tr>
+    <tr><td><strong>Clock</strong></td><td>-</td><td>Generates timing pulses that synchronize all CPU operations</td></tr>
 </table>
 
-<h3>Key Registers</h3>
-<table class="notes-table">
-    <tr><th>Register</th><th>Full Name</th><th>Purpose</th></tr>
-    <tr><td><strong>PC</strong></td><td>Program Counter</td><td>Holds address of NEXT instruction to fetch</td></tr>
-    <tr><td><strong>MAR</strong></td><td>Memory Address Register</td><td>Holds address currently being accessed</td></tr>
-    <tr><td><strong>MDR</strong></td><td>Memory Data Register</td><td>Holds data being read/written to memory</td></tr>
-    <tr><td><strong>CIR</strong></td><td>Current Instruction Register</td><td>Holds instruction being executed</td></tr>
-    <tr><td><strong>ACC</strong></td><td>Accumulator</td><td>Stores results of ALU calculations</td></tr>
-</table>
+<h3>The ALU in Detail</h3>
+<div class="definition-box">
+    <strong>ALU (Arithmetic Logic Unit):</strong> The part of the CPU that performs mathematical and logical operations.
+</div>
 
-<h3>CPU Performance Factors</h3>
+<p><strong>Arithmetic Operations:</strong></p>
+<ul>
+    <li>Addition (+)</li>
+    <li>Subtraction (-)</li>
+    <li>Multiplication (×)</li>
+    <li>Division (÷)</li>
+</ul>
+
+<p><strong>Logical Operations:</strong></p>
+<ul>
+    <li>AND, OR, NOT, XOR</li>
+    <li>Comparisons (equal, greater than, less than)</li>
+    <li>Binary shifts</li>
+</ul>
+
+<h3>The Control Unit in Detail</h3>
+<div class="definition-box">
+    <strong>Control Unit (CU):</strong> The component that manages and coordinates all CPU activities. It doesn't process data itself but tells other parts what to do.
+</div>
+
+<p><strong>Functions of the Control Unit:</strong></p>
+<ul>
+    <li>Fetches instructions from memory</li>
+    <li>Decodes instructions to determine what operation is needed</li>
+    <li>Controls the timing of operations</li>
+    <li>Sends control signals to other components</li>
+    <li>Manages data flow between CPU and memory</li>
+</ul>
+
+<h2>CPU Registers - MUST KNOW FOR EXAMS!</h2>
+
+<div class="definition-box">
+    <strong>Register:</strong> A small, extremely fast storage location inside the CPU. Registers hold data that is being immediately processed. Much faster than RAM!
+</div>
+
+<h3>Key Registers and Their Functions</h3>
 <table class="notes-table">
-    <tr><th>Factor</th><th>What It Is</th><th>Effect</th></tr>
-    <tr><td><strong>Clock Speed</strong></td><td>Cycles per second (GHz)</td><td>Higher = faster processing</td></tr>
-    <tr><td><strong>Cores</strong></td><td>Number of processing units</td><td>More = better multitasking</td></tr>
-    <tr><td><strong>Cache Size</strong></td><td>Fast memory in CPU</td><td>Larger = fewer slow RAM accesses</td></tr>
+    <tr><th>Register</th><th>Full Name</th><th>Purpose</th><th>Memory Aid</th></tr>
+    <tr><td><strong>PC</strong></td><td>Program Counter</td><td>Holds the address of the NEXT instruction to fetch</td><td>"Points" to next instruction</td></tr>
+    <tr><td><strong>MAR</strong></td><td>Memory Address Register</td><td>Holds the address currently being accessed in memory</td><td>"Address" is in the name</td></tr>
+    <tr><td><strong>MDR</strong></td><td>Memory Data Register</td><td>Holds the data being read from OR written to memory</td><td>"Data" is in the name</td></tr>
+    <tr><td><strong>CIR</strong></td><td>Current Instruction Register</td><td>Holds the instruction currently being decoded/executed</td><td>"Current" = right now</td></tr>
+    <tr><td><strong>ACC</strong></td><td>Accumulator</td><td>Stores results from ALU calculations</td><td>"Accumulates" results</td></tr>
 </table>
 
 <div class="example-box">
-    <h4>Understanding Clock Speed</h4>
-    <p>A 3 GHz CPU performs 3 billion cycles per second. Each cycle can do a small part of an instruction.</p>
+    <h4>How Registers Work Together</h4>
+<pre><code>To fetch and execute "ADD 5":
+
+1. PC contains address 100 (next instruction location)
+2. PC value copied to MAR (MAR = 100)
+3. Memory at address 100 is read
+4. Instruction "ADD 5" copied to MDR
+5. MDR contents copied to CIR (CIR = "ADD 5")
+6. PC incremented (PC = 101 for next time)
+7. CU decodes "ADD 5" 
+8. ALU adds 5 to ACC value
+9. Result stored in ACC</code></pre>
+</div>
+
+<h3>Visual Summary of Registers</h3>
+<pre><code>┌─────────────────────────────────────────────────────┐
+│                        CPU                          │
+│  ┌─────────┐    ┌─────────┐    ┌─────────┐         │
+│  │   PC    │    │   MAR   │    │   MDR   │         │
+│  │ Address │───→│ Address │───→│  Data   │←──┐     │
+│  │ of next │    │  to     │    │  to/from│   │     │
+│  │  instr  │    │ access  │    │ memory  │   │     │
+│  └─────────┘    └─────────┘    └─────────┘   │     │
+│       │                              │       │     │
+│       │         ┌─────────┐          │       │     │
+│       │         │   CIR   │←─────────┘       │     │
+│       │         │ Current │                  │     │
+│       │         │ Instr.  │                  │     │
+│       │         └────┬────┘                  │     │
+│       │              │ Decode                │     │
+│       │              ↓                       │     │
+│       │         ┌─────────┐    ┌─────────┐   │     │
+│       │         │   CU    │    │   ALU   │   │     │
+│       │         │ Control │───→│  Math   │   │     │
+│       │         │  Unit   │    │  Logic  │   │     │
+│       │         └─────────┘    └────┬────┘   │     │
+│       │                             │        │     │
+│       │         ┌─────────┐         │        │     │
+│       │         │   ACC   │←────────┘        │     │
+│       │         │ Results │─────────────────→│     │
+│       │         └─────────┘                  │     │
+│       │                                      │     │
+└───────┼──────────────────────────────────────┼─────┘
+        │                                      │
+        ↓                                      ↓
+   ┌────────────────────────────────────────────────┐
+   │                  MEMORY (RAM)                  │
+   └────────────────────────────────────────────────┘</code></pre>
+
+<h2>CPU Performance Factors</h2>
+
+<h3>Three Main Factors Affecting CPU Performance</h3>
+<table class="notes-table">
+    <tr><th>Factor</th><th>What It Is</th><th>Effect on Performance</th></tr>
+    <tr><td><strong>Clock Speed</strong></td><td>Number of cycles per second (measured in GHz)</td><td>Higher = more instructions per second = faster</td></tr>
+    <tr><td><strong>Number of Cores</strong></td><td>Number of independent processing units</td><td>More cores = better multitasking, parallel processing</td></tr>
+    <tr><td><strong>Cache Size</strong></td><td>Amount of fast memory on the CPU chip</td><td>Larger = fewer slow RAM accesses = faster</td></tr>
+</table>
+
+<h3>Clock Speed Explained</h3>
+<div class="definition-box">
+    <strong>Clock Speed:</strong> The number of instruction cycles the CPU can perform per second. Measured in Hertz (Hz), typically GigaHertz (GHz) for modern CPUs.
+</div>
+
+<div class="example-box">
+    <p><strong>A 3.5 GHz CPU:</strong></p>
+    <ul>
+        <li>3.5 GHz = 3,500,000,000 cycles per second</li>
+        <li>3.5 billion "ticks" of the clock every second</li>
+        <li>Each cycle can perform part of an instruction</li>
+    </ul>
+</div>
+
+<h3>Cores Explained</h3>
+<div class="definition-box">
+    <strong>Core:</strong> An independent processing unit within the CPU. Each core can execute instructions separately.
+</div>
+
+<ul>
+    <li><strong>Single-core:</strong> Can only do one thing at a time</li>
+    <li><strong>Dual-core:</strong> 2 cores - can run 2 tasks simultaneously</li>
+    <li><strong>Quad-core:</strong> 4 cores - common in modern computers</li>
+    <li><strong>Octa-core:</strong> 8 cores - found in high-end systems</li>
+</ul>
+
+<div class="tip-box">
+    <strong>Important:</strong> More cores doesn't always mean faster! Software must be designed to use multiple cores (parallel processing). A single-threaded program won't benefit from extra cores.
+</div>
+
+<h3>Cache Explained</h3>
+<div class="definition-box">
+    <strong>Cache:</strong> Very fast memory located on or near the CPU chip. Stores copies of frequently accessed data from RAM.
+</div>
+
+<table class="notes-table">
+    <tr><th>Cache Level</th><th>Size</th><th>Speed</th><th>Location</th></tr>
+    <tr><td><strong>L1 Cache</strong></td><td>Smallest (32-64KB)</td><td>Fastest</td><td>On CPU core</td></tr>
+    <tr><td><strong>L2 Cache</strong></td><td>Medium (256KB-1MB)</td><td>Fast</td><td>On CPU</td></tr>
+    <tr><td><strong>L3 Cache</strong></td><td>Largest (4-50MB)</td><td>Slower than L1/L2</td><td>Shared between cores</td></tr>
+</table>
+
+<h3>Practice Questions</h3>
+<div class="example-box">
+    <ol>
+        <li>What is stored in the Program Counter?</li>
+        <li>Which register holds the instruction currently being executed?</li>
+        <li>What is the purpose of the ALU?</li>
+        <li>Name three factors that affect CPU performance.</li>
+        <li>What's the difference between the MAR and MDR?</li>
+    </ol>
+    <details>
+        <summary>Click for answers</summary>
+        <ol>
+            <li>The address of the NEXT instruction to be fetched</li>
+            <li>The Current Instruction Register (CIR)</li>
+            <li>To perform arithmetic calculations and logic operations</li>
+            <li>Clock speed, number of cores, cache size</li>
+            <li>MAR holds memory ADDRESSES, MDR holds the actual DATA</li>
+        </ol>
+    </details>
 </div>
 
 <div class="tip-box">
-    <strong>Remember:</strong> PC holds the NEXT instruction address. CIR holds the CURRENT instruction being executed.
+    <strong>Exam Tips:</strong>
+    <ul>
+        <li>Know ALL register names and their specific purposes</li>
+        <li>PC holds NEXT instruction address, CIR holds CURRENT instruction</li>
+        <li>MAR = Address, MDR = Data (the clue is in the names!)</li>
+        <li>Be able to explain how clock speed, cores, and cache affect performance</li>
+    </ul>
 </div>
             `
         },
@@ -3021,55 +3867,184 @@ After defrag:  [A1][A2][A3][B1][B2][C1][--][--]
             content: `
 <h2>Network Protocols</h2>
 <div class="definition-box">
-    <strong>Protocol:</strong> A set of rules that govern how data is transmitted and received over a network. Protocols ensure devices can communicate even if made by different manufacturers.
+    <strong>Protocol:</strong> A set of rules that govern how data is transmitted, received, and formatted over a network. Protocols ensure devices from different manufacturers can communicate with each other.
 </div>
 
-<h3>Why Protocols Are Needed</h3>
+<h3>Why Protocols Are Essential</h3>
 <ul>
-    <li>Devices from different manufacturers need common rules</li>
-    <li>Data must be formatted consistently</li>
-    <li>Errors need to be detected and handled</li>
-    <li>Devices must agree on speed and timing</li>
+    <li><strong>Standardization:</strong> Devices from different manufacturers can communicate</li>
+    <li><strong>Data formatting:</strong> Both sender and receiver understand the data structure</li>
+    <li><strong>Error handling:</strong> Errors can be detected and corrected</li>
+    <li><strong>Flow control:</strong> Sender doesn't overwhelm a slower receiver</li>
+    <li><strong>Routing:</strong> Data finds the correct path to its destination</li>
+    <li><strong>Security:</strong> Data can be encrypted and authenticated</li>
 </ul>
 
-<h3>Common Protocols</h3>
+<h2>TCP/IP Model - ESSENTIAL FOR EXAMS!</h2>
+<div class="definition-box">
+    <strong>TCP/IP Model:</strong> A four-layer model that defines how data is transmitted across networks. It's the foundation of the Internet.
+</div>
+
+<h3>The Four TCP/IP Layers</h3>
 <table class="notes-table">
-    <tr><th>Protocol</th><th>Full Name</th><th>Purpose</th></tr>
-    <tr><td><strong>HTTP</strong></td><td>HyperText Transfer Protocol</td><td>Web page requests (unsecured)</td></tr>
-    <tr><td><strong>HTTPS</strong></td><td>HTTP Secure</td><td>Encrypted web traffic</td></tr>
-    <tr><td><strong>FTP</strong></td><td>File Transfer Protocol</td><td>Uploading/downloading files</td></tr>
-    <tr><td><strong>SMTP</strong></td><td>Simple Mail Transfer Protocol</td><td>Sending emails</td></tr>
-    <tr><td><strong>POP/IMAP</strong></td><td>Post Office Protocol / Internet Message Access</td><td>Receiving emails</td></tr>
-    <tr><td><strong>TCP</strong></td><td>Transmission Control Protocol</td><td>Reliable data delivery</td></tr>
-    <tr><td><strong>IP</strong></td><td>Internet Protocol</td><td>Addressing and routing</td></tr>
+    <tr><th>Layer</th><th>Name</th><th>Purpose</th><th>Key Protocols</th><th>Data Unit</th></tr>
+    <tr><td><strong>4</strong></td><td>Application</td><td>User-facing services and applications</td><td>HTTP, HTTPS, FTP, SMTP, POP3, IMAP, DNS</td><td>Data</td></tr>
+    <tr><td><strong>3</strong></td><td>Transport</td><td>End-to-end communication, reliability</td><td>TCP, UDP</td><td>Segment</td></tr>
+    <tr><td><strong>2</strong></td><td>Internet</td><td>Addressing and routing between networks</td><td>IP, ICMP</td><td>Packet</td></tr>
+    <tr><td><strong>1</strong></td><td>Network Access</td><td>Physical transmission of data</td><td>Ethernet, Wi-Fi</td><td>Frame</td></tr>
 </table>
 
-<h3>TCP/IP Model</h3>
-<p>The TCP/IP model has 4 layers that work together:</p>
+<h3>Layer 4: Application Layer</h3>
+<p>The layer closest to the user. Provides services that applications use to communicate.</p>
+
 <table class="notes-table">
-    <tr><th>Layer</th><th>Purpose</th><th>Protocols</th></tr>
-    <tr><td><strong>4. Application</strong></td><td>User-facing services</td><td>HTTP, FTP, SMTP</td></tr>
-    <tr><td><strong>3. Transport</strong></td><td>Reliable delivery</td><td>TCP, UDP</td></tr>
-    <tr><td><strong>2. Internet</strong></td><td>Addressing & routing</td><td>IP</td></tr>
-    <tr><td><strong>1. Network Access</strong></td><td>Physical connection</td><td>Ethernet, Wi-Fi</td></tr>
+    <tr><th>Protocol</th><th>Full Name</th><th>Purpose</th><th>Port</th></tr>
+    <tr><td><strong>HTTP</strong></td><td>HyperText Transfer Protocol</td><td>Web page requests (unencrypted)</td><td>80</td></tr>
+    <tr><td><strong>HTTPS</strong></td><td>HTTP Secure</td><td>Encrypted web traffic (uses SSL/TLS)</td><td>443</td></tr>
+    <tr><td><strong>FTP</strong></td><td>File Transfer Protocol</td><td>Uploading/downloading files</td><td>21</td></tr>
+    <tr><td><strong>SMTP</strong></td><td>Simple Mail Transfer Protocol</td><td>SENDING emails</td><td>25/587</td></tr>
+    <tr><td><strong>POP3</strong></td><td>Post Office Protocol v3</td><td>RECEIVING emails (downloads to device)</td><td>110</td></tr>
+    <tr><td><strong>IMAP</strong></td><td>Internet Message Access Protocol</td><td>RECEIVING emails (keeps on server)</td><td>143</td></tr>
+    <tr><td><strong>DNS</strong></td><td>Domain Name System</td><td>Converts domain names to IP addresses</td><td>53</td></tr>
 </table>
 
-<h3>IP Addresses</h3>
+<div class="example-box">
+    <h4>HTTP vs HTTPS</h4>
+    <table class="notes-table">
+        <tr><th>HTTP</th><th>HTTPS</th></tr>
+        <tr><td>Unencrypted - data sent as plain text</td><td>Encrypted - data scrambled</td></tr>
+        <tr><td>Can be intercepted and read</td><td>Cannot be read even if intercepted</td></tr>
+        <tr><td>http://example.com</td><td>https://example.com (padlock icon)</td></tr>
+        <tr><td>OK for non-sensitive pages</td><td>Essential for logins, payments, personal data</td></tr>
+    </table>
+</div>
+
+<div class="example-box">
+    <h4>Email Protocols: SMTP vs POP3 vs IMAP</h4>
+    <table class="notes-table">
+        <tr><th>Protocol</th><th>Direction</th><th>Where Emails Stored</th><th>Best For</th></tr>
+        <tr><td><strong>SMTP</strong></td><td>Outgoing (sending)</td><td>N/A - just sends</td><td>All email sending</td></tr>
+        <tr><td><strong>POP3</strong></td><td>Incoming (receiving)</td><td>Downloaded to your device, deleted from server</td><td>Single device, offline access</td></tr>
+        <tr><td><strong>IMAP</strong></td><td>Incoming (receiving)</td><td>Stays on server, synced to devices</td><td>Multiple devices, webmail</td></tr>
+    </table>
+    <p><strong>Real example:</strong> When you send an email, SMTP is used. When you read it on your phone and laptop, IMAP keeps them in sync.</p>
+</div>
+
+<h3>Layer 3: Transport Layer</h3>
+<p>Manages end-to-end communication between applications.</p>
+
+<table class="notes-table">
+    <tr><th>Protocol</th><th>Full Name</th><th>Features</th><th>Use Cases</th></tr>
+    <tr><td><strong>TCP</strong></td><td>Transmission Control Protocol</td><td>Reliable, ordered delivery, error checking, slower</td><td>Web pages, email, file transfer</td></tr>
+    <tr><td><strong>UDP</strong></td><td>User Datagram Protocol</td><td>Fast, no reliability guarantee, no ordering</td><td>Video streaming, gaming, VoIP</td></tr>
+</table>
+
+<div class="example-box">
+    <h4>TCP vs UDP</h4>
+    <table class="notes-table">
+        <tr><th>TCP</th><th>UDP</th></tr>
+        <tr><td>Connection-oriented (handshake first)</td><td>Connectionless (just sends)</td></tr>
+        <tr><td>Guarantees delivery</td><td>No delivery guarantee</td></tr>
+        <tr><td>Checks for errors, re-sends lost data</td><td>No error correction</td></tr>
+        <tr><td>Data arrives in order</td><td>Data may arrive out of order</td></tr>
+        <tr><td>Slower but reliable</td><td>Faster but unreliable</td></tr>
+        <tr><td>Web browsing, email, downloads</td><td>Live streaming, online gaming</td></tr>
+    </table>
+    <p><strong>Analogy:</strong> TCP is like sending a signed letter (confirmed delivery). UDP is like shouting across a room (fast but might be missed).</p>
+</div>
+
+<h3>Layer 2: Internet Layer</h3>
+<p>Handles addressing and routing of data packets between networks.</p>
+
+<div class="definition-box">
+    <strong>IP (Internet Protocol):</strong> Responsible for addressing packets with source and destination IP addresses, and routing them across networks.
+</div>
+
+<h4>IP Addresses</h4>
+<table class="notes-table">
+    <tr><th>Version</th><th>Format</th><th>Example</th><th>Addresses Available</th></tr>
+    <tr><td><strong>IPv4</strong></td><td>32-bit, 4 octets</td><td>192.168.1.1</td><td>~4.3 billion</td></tr>
+    <tr><td><strong>IPv6</strong></td><td>128-bit, 8 groups</td><td>2001:0db8:85a3:0000:0000:8a2e:0370:7334</td><td>~340 undecillion</td></tr>
+</table>
+
+<h3>Layer 1: Network Access Layer</h3>
+<p>Deals with the physical transmission of data over the network medium.</p>
+
 <ul>
-    <li><strong>IPv4:</strong> 32-bit address (e.g., 192.168.1.1)</li>
-    <li><strong>IPv6:</strong> 128-bit address (more addresses available)</li>
-    <li>Every device on a network needs a unique IP</li>
+    <li><strong>Ethernet:</strong> Wired network protocol for LANs</li>
+    <li><strong>Wi-Fi (802.11):</strong> Wireless network protocol</li>
+    <li>Uses <strong>MAC addresses</strong> to identify devices on local network</li>
 </ul>
 
 <h3>MAC Address</h3>
+<div class="definition-box">
+    <strong>MAC Address (Media Access Control):</strong> A unique physical address assigned to every network interface card (NIC). Permanent and set during manufacturing.
+</div>
+
 <ul>
-    <li>Physical address burned into network card</li>
-    <li>48-bit, written in hex (e.g., 00:1A:2B:3C:4D:5E)</li>
-    <li>Unique to each device worldwide</li>
+    <li><strong>Format:</strong> 48-bit, written in hexadecimal</li>
+    <li><strong>Example:</strong> 00:1A:2B:3C:4D:5E or 00-1A-2B-3C-4D-5E</li>
+    <li><strong>First 3 pairs:</strong> Manufacturer ID</li>
+    <li><strong>Last 3 pairs:</strong> Unique device ID</li>
+    <li>Used for communication within a LAN</li>
 </ul>
 
+<h3>IP Address vs MAC Address</h3>
+<table class="notes-table">
+    <tr><th>Feature</th><th>IP Address</th><th>MAC Address</th></tr>
+    <tr><td><strong>Layer</strong></td><td>Internet (Layer 2)</td><td>Network Access (Layer 1)</td></tr>
+    <tr><td><strong>Assigned</strong></td><td>By network/DHCP</td><td>By manufacturer (permanent)</td></tr>
+    <tr><td><strong>Can change?</strong></td><td>Yes</td><td>No (hardcoded)</td></tr>
+    <tr><td><strong>Scope</strong></td><td>Global (across internet)</td><td>Local (within LAN)</td></tr>
+    <tr><td><strong>Format</strong></td><td>192.168.1.1</td><td>00:1A:2B:3C:4D:5E</td></tr>
+</table>
+
+<h3>How Data Travels Through the Layers</h3>
+<div class="example-box">
+    <h4>Sending a web page request</h4>
+<pre><code>1. APPLICATION: Browser creates HTTP request for webpage
+                ↓ Add application data
+2. TRANSPORT:   TCP breaks data into segments, adds port numbers
+                ↓ Add segment header
+3. INTERNET:    IP adds source/destination IP addresses
+                ↓ Add packet header  
+4. NETWORK:     Ethernet adds MAC addresses, converts to signals
+                ↓ Add frame header
+5. PHYSICAL:    Electrical signals sent over cable/wireless
+
+At the receiving end, this process is REVERSED.</code></pre>
+</div>
+
+<h3>Practice Questions</h3>
+<div class="example-box">
+    <ol>
+        <li>Which protocol would you use to send an email?</li>
+        <li>What's the difference between POP3 and IMAP?</li>
+        <li>Why might you choose UDP over TCP?</li>
+        <li>What is the purpose of DNS?</li>
+        <li>At which layer does the router operate?</li>
+    </ol>
+    <details>
+        <summary>Click for answers</summary>
+        <ol>
+            <li>SMTP (Simple Mail Transfer Protocol)</li>
+            <li>POP3 downloads emails to device and deletes from server; IMAP keeps emails on server and syncs across devices</li>
+            <li>When speed is more important than reliability, e.g., live streaming or gaming</li>
+            <li>To convert domain names (like google.com) to IP addresses (like 142.250.185.46)</li>
+            <li>Internet layer (Layer 2) - routers use IP addresses</li>
+        </ol>
+    </details>
+</div>
+
 <div class="tip-box">
-    <strong>HTTP vs HTTPS:</strong> HTTPS encrypts data between browser and website. Always look for HTTPS when entering sensitive information (passwords, payments).
+    <strong>Exam Tips:</strong>
+    <ul>
+        <li>Know ALL protocols and their purposes (HTTP, HTTPS, FTP, SMTP, POP3, IMAP)</li>
+        <li>Remember: SMTP = Sending, POP3/IMAP = Receiving</li>
+        <li>HTTPS = HTTP + encryption (SSL/TLS)</li>
+        <li>TCP = reliable but slow, UDP = fast but unreliable</li>
+        <li>MAC addresses are permanent, IP addresses can change</li>
+    </ul>
 </div>
             `
         },
@@ -3557,33 +4532,68 @@ This tells us which class each student is in.</code></pre>
             content: `
 <h2>SQL Queries</h2>
 <div class="definition-box">
-    <strong>SQL (Structured Query Language):</strong> The standard language for interacting with databases. Used to create, read, update, and delete data.
+    <strong>SQL (Structured Query Language):</strong> The standard language for interacting with relational databases. Used to create, read, update, and delete data (CRUD operations).
 </div>
 
-<h3>SELECT - Retrieving Data</h3>
+<h3>The Four Main SQL Commands (CRUD)</h3>
+<table class="notes-table">
+    <tr><th>Operation</th><th>SQL Command</th><th>Purpose</th></tr>
+    <tr><td><strong>Create</strong></td><td>INSERT</td><td>Add new records</td></tr>
+    <tr><td><strong>Read</strong></td><td>SELECT</td><td>Retrieve data</td></tr>
+    <tr><td><strong>Update</strong></td><td>UPDATE</td><td>Modify existing records</td></tr>
+    <tr><td><strong>Delete</strong></td><td>DELETE</td><td>Remove records</td></tr>
+</table>
+
+<h2>SELECT - Retrieving Data</h2>
 <p>The most common SQL command - gets data from tables.</p>
 
-<pre><code class="language-sql">-- Get all columns from all students
+<h3>Basic SELECT Syntax</h3>
+<pre><code class="language-sql">SELECT column1, column2, ...
+FROM TableName
+WHERE condition
+ORDER BY column ASC/DESC;</code></pre>
+
+<h3>SELECT Examples</h3>
+<div class="example-box">
+<pre><code class="language-sql">-- Get ALL columns from ALL students
 SELECT * FROM Students
 
--- Get specific columns
-SELECT FirstName, LastName FROM Students
+-- Get specific columns only
+SELECT FirstName, LastName, Age FROM Students
 
--- Get students with condition
-SELECT * FROM Students WHERE Age > 15
+-- Get students with a condition
+SELECT * FROM Students WHERE Age > 16
 
--- Get students in order
-SELECT * FROM Students ORDER BY LastName ASC</code></pre>
+-- Get students in a specific class
+SELECT * FROM Students WHERE Class = "10A"
 
-<h3>SQL Keywords</h3>
+-- Get students sorted by name (A-Z)
+SELECT * FROM Students ORDER BY LastName ASC
+
+-- Get students sorted by age (highest first)
+SELECT * FROM Students ORDER BY Age DESC
+
+-- Combine conditions with AND
+SELECT * FROM Students 
+WHERE Age >= 16 AND Class = "10A"
+
+-- Combine conditions with OR
+SELECT * FROM Students 
+WHERE Class = "10A" OR Class = "10B"</code></pre>
+</div>
+
+<h3>SQL Keywords for SELECT</h3>
 <table class="notes-table">
     <tr><th>Keyword</th><th>Purpose</th><th>Example</th></tr>
-    <tr><td><strong>SELECT</strong></td><td>Choose columns</td><td>SELECT Name, Age</td></tr>
-    <tr><td><strong>FROM</strong></td><td>Choose table</td><td>FROM Students</td></tr>
-    <tr><td><strong>WHERE</strong></td><td>Filter rows</td><td>WHERE Age > 16</td></tr>
-    <tr><td><strong>AND / OR</strong></td><td>Multiple conditions</td><td>WHERE Age > 16 AND Class = "10A"</td></tr>
+    <tr><td><strong>SELECT</strong></td><td>Choose which columns to display</td><td>SELECT Name, Age</td></tr>
+    <tr><td><strong>FROM</strong></td><td>Choose which table</td><td>FROM Students</td></tr>
+    <tr><td><strong>WHERE</strong></td><td>Filter rows (condition)</td><td>WHERE Age > 16</td></tr>
+    <tr><td><strong>AND</strong></td><td>Both conditions must be true</td><td>WHERE Age > 16 AND Class = "10A"</td></tr>
+    <tr><td><strong>OR</strong></td><td>Either condition can be true</td><td>WHERE Class = "10A" OR Class = "10B"</td></tr>
     <tr><td><strong>ORDER BY</strong></td><td>Sort results</td><td>ORDER BY Name ASC</td></tr>
-    <tr><td><strong>ASC / DESC</strong></td><td>Sort direction</td><td>ORDER BY Age DESC</td></tr>
+    <tr><td><strong>ASC</strong></td><td>Ascending order (A-Z, 0-9)</td><td>ORDER BY Age ASC</td></tr>
+    <tr><td><strong>DESC</strong></td><td>Descending order (Z-A, 9-0)</td><td>ORDER BY Age DESC</td></tr>
+    <tr><td><strong>*</strong></td><td>All columns</td><td>SELECT * FROM Students</td></tr>
 </table>
 
 <h3>Comparison Operators</h3>
@@ -3593,46 +4603,201 @@ SELECT * FROM Students ORDER BY LastName ASC</code></pre>
     <tr><td><> or !=</td><td>Not equal to</td><td>WHERE Status <> "Absent"</td></tr>
     <tr><td>></td><td>Greater than</td><td>WHERE Age > 15</td></tr>
     <tr><td><</td><td>Less than</td><td>WHERE Score < 50</td></tr>
-    <tr><td>>=</td><td>Greater or equal</td><td>WHERE Age >= 18</td></tr>
-    <tr><td><=</td><td>Less or equal</td><td>WHERE Price <= 100</td></tr>
+    <tr><td>>=</td><td>Greater than or equal</td><td>WHERE Age >= 18</td></tr>
+    <tr><td><=</td><td>Less than or equal</td><td>WHERE Price <= 100</td></tr>
     <tr><td>LIKE</td><td>Pattern matching</td><td>WHERE Name LIKE "J%"</td></tr>
+    <tr><td>BETWEEN</td><td>Within a range</td><td>WHERE Age BETWEEN 16 AND 18</td></tr>
+    <tr><td>IN</td><td>Matches any value in list</td><td>WHERE Class IN ("10A", "10B", "10C")</td></tr>
 </table>
 
-<h3>Example Queries</h3>
+<h3>Wildcards with LIKE</h3>
+<table class="notes-table">
+    <tr><th>Wildcard</th><th>Meaning</th><th>Example</th><th>Matches</th></tr>
+    <tr><td>%</td><td>Any number of characters</td><td>LIKE "J%"</td><td>John, Jane, James</td></tr>
+    <tr><td>%</td><td>Any number of characters</td><td>LIKE "%son"</td><td>Johnson, Wilson</td></tr>
+    <tr><td>%</td><td>Any number of characters</td><td>LIKE "%an%"</td><td>Daniel, Fran, Andrew</td></tr>
+    <tr><td>_</td><td>Exactly one character</td><td>LIKE "J___"</td><td>John, Jane (4 letters)</td></tr>
+</table>
+
+<h2>INSERT - Adding New Records</h2>
+<p>Adds new rows to a table.</p>
+
+<h3>INSERT Syntax</h3>
+<pre><code class="language-sql">INSERT INTO TableName (column1, column2, ...)
+VALUES (value1, value2, ...);</code></pre>
+
+<h3>INSERT Examples</h3>
 <div class="example-box">
-<pre><code class="language-sql">-- Find all students aged 16 or over
-SELECT * FROM Students WHERE Age >= 16
+<pre><code class="language-sql">-- Insert a new student (specifying columns)
+INSERT INTO Students (StudentID, FirstName, LastName, Age, Class)
+VALUES ("S100", "Emma", "Watson", 16, "10B");
 
--- Find students named John or Emma
-SELECT * FROM Students 
-WHERE FirstName = "John" OR FirstName = "Emma"
+-- Insert when adding all columns in order
+INSERT INTO Students
+VALUES ("S101", "Tom", "Holland", 17, "11A");
 
--- Find students in class 10A, sorted by name
-SELECT FirstName, LastName FROM Students
-WHERE Class = "10A"
-ORDER BY LastName ASC
-
--- Find students whose name starts with 'A'
-SELECT * FROM Students WHERE FirstName LIKE "A%"</code></pre>
+-- Insert multiple records
+INSERT INTO Students (StudentID, FirstName, LastName, Age, Class)
+VALUES 
+    ("S102", "Chris", "Evans", 16, "10A"),
+    ("S103", "Robert", "Downey", 17, "11B");</code></pre>
 </div>
 
-<h3>Wildcards with LIKE</h3>
-<ul>
-    <li><strong>%</strong> - matches any number of characters</li>
-    <li><strong>_</strong> - matches exactly one character</li>
-</ul>
-<pre><code class="language-sql">LIKE "J%"     -- Starts with J (John, Jane, James)
-LIKE "%son"   -- Ends with son (Johnson, Wilson)
-LIKE "%an%"   -- Contains 'an' (Daniel, Fran, Andrew)
-LIKE "J___"   -- J followed by exactly 3 characters</code></pre>
+<h2>UPDATE - Modifying Existing Records</h2>
+<p>Changes data in existing rows.</p>
+
+<h3>UPDATE Syntax</h3>
+<pre><code class="language-sql">UPDATE TableName
+SET column1 = value1, column2 = value2, ...
+WHERE condition;</code></pre>
+
+<div class="warning">
+    <strong>⚠️ WARNING:</strong> Always use WHERE with UPDATE! Without it, ALL records will be updated!
+</div>
+
+<h3>UPDATE Examples</h3>
+<div class="example-box">
+<pre><code class="language-sql">-- Update a specific student's age
+UPDATE Students
+SET Age = 17
+WHERE StudentID = "S100";
+
+-- Update multiple fields
+UPDATE Students
+SET Age = 18, Class = "12A"
+WHERE StudentID = "S100";
+
+-- Update all students in a class
+UPDATE Students
+SET Class = "11A"
+WHERE Class = "10A";
+
+-- Increase all prices by 10%
+UPDATE Products
+SET Price = Price * 1.10;
+
+-- DANGEROUS - updates ALL records!
+UPDATE Students
+SET Class = "10A";    -- Missing WHERE!</code></pre>
+</div>
+
+<h2>DELETE - Removing Records</h2>
+<p>Removes rows from a table.</p>
+
+<h3>DELETE Syntax</h3>
+<pre><code class="language-sql">DELETE FROM TableName
+WHERE condition;</code></pre>
+
+<div class="warning">
+    <strong>⚠️ WARNING:</strong> Always use WHERE with DELETE! Without it, ALL records will be deleted!
+</div>
+
+<h3>DELETE Examples</h3>
+<div class="example-box">
+<pre><code class="language-sql">-- Delete a specific student
+DELETE FROM Students
+WHERE StudentID = "S100";
+
+-- Delete all students in a class
+DELETE FROM Students
+WHERE Class = "10A";
+
+-- Delete students over 18
+DELETE FROM Students
+WHERE Age > 18;
+
+-- DANGEROUS - deletes ALL records!
+DELETE FROM Students;    -- Missing WHERE!</code></pre>
+</div>
+
+<h2>Putting It All Together - Example Queries</h2>
+
+<div class="example-box">
+    <h4>Given this Students table:</h4>
+<pre><code>| StudentID | FirstName | LastName | Age | Class | Score |
+|-----------|-----------|----------|-----|-------|-------|
+| S001      | John      | Smith    | 15  | 10A   | 78    |
+| S002      | Emma      | Jones    | 16  | 10B   | 92    |
+| S003      | Ali       | Khan     | 15  | 10A   | 65    |
+| S004      | Sarah     | Wilson   | 17  | 11A   | 88    |
+| S005      | James     | Brown    | 16  | 10B   | 71    |</code></pre>
+
+    <h4>Query Examples:</h4>
+<pre><code class="language-sql">-- 1. Find all students in class 10A
+SELECT * FROM Students WHERE Class = "10A";
+-- Returns: John Smith, Ali Khan
+
+-- 2. Find students aged 16 or over, sorted by score
+SELECT FirstName, LastName, Score FROM Students
+WHERE Age >= 16
+ORDER BY Score DESC;
+-- Returns: Emma (92), Sarah (88), James (71)
+
+-- 3. Find students whose name starts with 'J'
+SELECT * FROM Students WHERE FirstName LIKE "J%";
+-- Returns: John Smith, James Brown
+
+-- 4. Add a new student
+INSERT INTO Students (StudentID, FirstName, LastName, Age, Class, Score)
+VALUES ("S006", "Mia", "Taylor", 15, "10A", 85);
+
+-- 5. Update Ali's score to 70
+UPDATE Students SET Score = 70 WHERE StudentID = "S003";
+
+-- 6. Delete students with score below 70
+DELETE FROM Students WHERE Score < 70;</code></pre>
+</div>
+
+<h3>Practice Questions</h3>
+<div class="example-box">
+    <p>Using the Students table above, write SQL queries to:</p>
+    <ol>
+        <li>Find all students aged 15</li>
+        <li>Find students with scores between 70 and 90</li>
+        <li>Find all students sorted by LastName alphabetically</li>
+        <li>Update James Brown's class to "11A"</li>
+        <li>Delete the student with StudentID "S005"</li>
+    </ol>
+    <details>
+        <summary>Click for answers</summary>
+<pre><code class="language-sql">-- 1
+SELECT * FROM Students WHERE Age = 15;
+
+-- 2
+SELECT * FROM Students WHERE Score >= 70 AND Score <= 90;
+-- OR: SELECT * FROM Students WHERE Score BETWEEN 70 AND 90;
+
+-- 3
+SELECT * FROM Students ORDER BY LastName ASC;
+
+-- 4
+UPDATE Students SET Class = "11A" WHERE FirstName = "James" AND LastName = "Brown";
+-- OR: UPDATE Students SET Class = "11A" WHERE StudentID = "S005";
+
+-- 5
+DELETE FROM Students WHERE StudentID = "S005";</code></pre>
+    </details>
+</div>
 
 <div class="tip-box">
     <strong>Exam Tips:</strong>
     <ul>
-        <li>SQL keywords are usually written in UPPERCASE</li>
-        <li>Text values need quotes: "John"</li>
+        <li>SQL keywords are usually written in UPPERCASE (but not required)</li>
+        <li>Text values need quotes: "John" or 'John'</li>
         <li>Numbers don't need quotes: 16</li>
         <li>* means "all columns"</li>
+        <li>Always use WHERE with UPDATE and DELETE to avoid changing all records!</li>
+        <li>End statements with semicolon ; (good practice)</li>
+    </ul>
+</div>
+
+<div class="warning">
+    <strong>⚠️ Common Mistakes:</strong>
+    <ul>
+        <li>Forgetting WHERE in UPDATE/DELETE (changes ALL records!)</li>
+        <li>Using = instead of LIKE for pattern matching</li>
+        <li>Forgetting quotes around text values</li>
+        <li>Wrong order of keywords (SELECT...FROM...WHERE...ORDER BY)</li>
     </ul>
 </div>
             `
@@ -3834,62 +4999,229 @@ color: rgb(255, 0, 0);   /* Red */</code></pre>
             content: `
 <h2>Boolean Expressions</h2>
 <div class="definition-box">
-    <strong>Boolean Expression:</strong> An expression that evaluates to either TRUE (1) or FALSE (0). Used in programming conditions and logic circuits.
+    <strong>Boolean Expression:</strong> An expression that evaluates to either TRUE (1) or FALSE (0). Used in programming conditions, logic circuits, and digital systems. Named after mathematician George Boole.
 </div>
 
 <h3>Boolean Operators</h3>
 <table class="notes-table">
-    <tr><th>Operator</th><th>Symbol</th><th>Description</th></tr>
-    <tr><td><strong>AND</strong></td><td>∧ or ·</td><td>True only if BOTH inputs are true</td></tr>
-    <tr><td><strong>OR</strong></td><td>∨ or +</td><td>True if AT LEAST ONE input is true</td></tr>
-    <tr><td><strong>NOT</strong></td><td>¬ or !</td><td>Inverts the value (true→false)</td></tr>
-    <tr><td><strong>XOR</strong></td><td>⊕</td><td>True if inputs are DIFFERENT</td></tr>
+    <tr><th>Operator</th><th>Symbols</th><th>Description</th><th>Result is TRUE when...</th></tr>
+    <tr><td><strong>AND</strong></td><td>∧ or · or &&</td><td>Logical conjunction</td><td>BOTH inputs are TRUE</td></tr>
+    <tr><td><strong>OR</strong></td><td>∨ or + or ||</td><td>Logical disjunction</td><td>AT LEAST ONE input is TRUE</td></tr>
+    <tr><td><strong>NOT</strong></td><td>¬ or ! or ‾ (overline)</td><td>Logical negation</td><td>Input is FALSE</td></tr>
+    <tr><td><strong>XOR</strong></td><td>⊕</td><td>Exclusive OR</td><td>Inputs are DIFFERENT</td></tr>
+    <tr><td><strong>NAND</strong></td><td>NOT AND</td><td>Negated AND</td><td>NOT both TRUE</td></tr>
+    <tr><td><strong>NOR</strong></td><td>NOT OR</td><td>Negated OR</td><td>BOTH inputs are FALSE</td></tr>
 </table>
 
 <h3>Writing Boolean Expressions</h3>
 <div class="example-box">
-    <h4>Examples:</h4>
-    <ul>
-        <li><strong>A AND B</strong> written as: A ∧ B or A · B</li>
-        <li><strong>A OR B</strong> written as: A ∨ B or A + B</li>
-        <li><strong>NOT A</strong> written as: ¬A or Ā or !A</li>
-        <li><strong>A AND (NOT B)</strong> written as: A ∧ ¬B</li>
-    </ul>
+    <h4>Different notations:</h4>
+    <table class="notes-table">
+        <tr><th>Expression</th><th>Mathematical</th><th>Programming</th></tr>
+        <tr><td>A AND B</td><td>A ∧ B or A · B</td><td>A && B</td></tr>
+        <tr><td>A OR B</td><td>A ∨ B or A + B</td><td>A || B</td></tr>
+        <tr><td>NOT A</td><td>¬A or Ā</td><td>!A or NOT A</td></tr>
+        <tr><td>A XOR B</td><td>A ⊕ B</td><td>A ^ B</td></tr>
+    </table>
 </div>
 
-<h3>Order of Operations</h3>
+<h3>Order of Operations (Precedence)</h3>
+<p>When evaluating Boolean expressions without brackets, follow this order:</p>
 <ol>
-    <li><strong>Brackets</strong> (highest priority)</li>
+    <li><strong>Brackets ()</strong> - highest priority, evaluate first</li>
     <li><strong>NOT</strong></li>
     <li><strong>AND</strong></li>
-    <li><strong>OR</strong> (lowest priority)</li>
+    <li><strong>XOR</strong></li>
+    <li><strong>OR</strong> - lowest priority, evaluate last</li>
 </ol>
 
 <div class="example-box">
     <h4>Evaluate: A OR B AND NOT C, where A=1, B=1, C=1</h4>
-<pre><code>Step 1: NOT C = NOT 1 = 0
-Step 2: B AND 0 = 1 AND 0 = 0
-Step 3: A OR 0 = 1 OR 0 = 1
+<pre><code>Step 1: NOT C = NOT 1 = 0         (NOT first)
+Step 2: B AND 0 = 1 AND 0 = 0     (AND second)
+Step 3: A OR 0 = 1 OR 0 = 1       (OR last)
 
-Answer: 1 (True)</code></pre>
+Answer: 1 (TRUE)</code></pre>
+</div>
+
+<div class="example-box">
+    <h4>Evaluate: (A OR B) AND NOT C, where A=0, B=1, C=0</h4>
+<pre><code>Step 1: (A OR B) = (0 OR 1) = 1   (Brackets first)
+Step 2: NOT C = NOT 0 = 1         (NOT second)
+Step 3: 1 AND 1 = 1               (AND last)
+
+Answer: 1 (TRUE)</code></pre>
+</div>
+
+<h2>Boolean Laws and Identities</h2>
+
+<h3>Basic Laws</h3>
+<table class="notes-table">
+    <tr><th>Law</th><th>AND Form</th><th>OR Form</th></tr>
+    <tr><td><strong>Identity</strong></td><td>A AND 1 = A</td><td>A OR 0 = A</td></tr>
+    <tr><td><strong>Null</strong></td><td>A AND 0 = 0</td><td>A OR 1 = 1</td></tr>
+    <tr><td><strong>Idempotent</strong></td><td>A AND A = A</td><td>A OR A = A</td></tr>
+    <tr><td><strong>Complement</strong></td><td>A AND NOT A = 0</td><td>A OR NOT A = 1</td></tr>
+    <tr><td><strong>Double Negation</strong></td><td colspan="2">NOT (NOT A) = A</td></tr>
+    <tr><td><strong>Commutative</strong></td><td>A AND B = B AND A</td><td>A OR B = B OR A</td></tr>
+    <tr><td><strong>Associative</strong></td><td>(A AND B) AND C = A AND (B AND C)</td><td>(A OR B) OR C = A OR (B OR C)</td></tr>
+</table>
+
+<h2>De Morgan's Laws - VERY IMPORTANT!</h2>
+
+<div class="definition-box">
+    <strong>De Morgan's Laws:</strong> Two rules for converting between AND and OR expressions by using NOT. Essential for simplifying Boolean expressions.
+</div>
+
+<h3>The Two Laws</h3>
+<table class="notes-table">
+    <tr><th>Law</th><th>Formula</th><th>In Words</th></tr>
+    <tr><td><strong>First Law</strong></td><td>NOT (A AND B) = (NOT A) OR (NOT B)</td><td>"NOT both" = "either NOT"</td></tr>
+    <tr><td><strong>Second Law</strong></td><td>NOT (A OR B) = (NOT A) AND (NOT B)</td><td>"NOT either" = "both NOT"</td></tr>
+</table>
+
+<div class="tip-box">
+    <strong>Memory Trick:</strong> "Break the line, change the sign"<br>
+    When you push NOT through brackets:<br>
+    • AND becomes OR<br>
+    • OR becomes AND<br>
+    • Each term gets inverted
+</div>
+
+<h3>De Morgan's Examples</h3>
+<div class="example-box">
+    <h4>Example 1: Simplify NOT (A AND B)</h4>
+<pre><code>Using De Morgan's First Law:
+NOT (A AND B) = (NOT A) OR (NOT B)
+
+Verification with truth table:
+A | B | A AND B | NOT(A AND B) | NOT A | NOT B | (NOT A) OR (NOT B)
+0 | 0 |    0    |      1       |   1   |   1   |         1
+0 | 1 |    0    |      1       |   1   |   0   |         1
+1 | 0 |    0    |      1       |   0   |   1   |         1
+1 | 1 |    1    |      0       |   0   |   0   |         0
+
+Both columns match! ✓</code></pre>
+</div>
+
+<div class="example-box">
+    <h4>Example 2: Simplify NOT (P OR Q)</h4>
+<pre><code>Using De Morgan's Second Law:
+NOT (P OR Q) = (NOT P) AND (NOT Q)
+
+Real-world meaning:
+"It's NOT raining OR snowing" 
+means
+"It's NOT raining AND it's NOT snowing"</code></pre>
+</div>
+
+<div class="example-box">
+    <h4>Example 3: Simplify NOT ((NOT A) AND B)</h4>
+<pre><code>Step 1: Apply De Morgan's First Law
+NOT ((NOT A) AND B) = (NOT (NOT A)) OR (NOT B)
+
+Step 2: Apply Double Negation
+(NOT (NOT A)) = A
+
+Final answer: A OR (NOT B)</code></pre>
+</div>
+
+<h2>Simplification Techniques</h2>
+
+<h3>Using Boolean Laws to Simplify</h3>
+<div class="example-box">
+    <h4>Simplify: A AND (A OR B)</h4>
+<pre><code>Using Absorption Law:
+A AND (A OR B) = A
+
+Proof:
+If A = 0: 0 AND (0 OR B) = 0 AND B = 0 = A ✓
+If A = 1: 1 AND (1 OR B) = 1 AND 1 = 1 = A ✓</code></pre>
+</div>
+
+<div class="example-box">
+    <h4>Simplify: (A AND B) OR (A AND NOT B)</h4>
+<pre><code>Step 1: Factor out A (Distributive Law)
+= A AND (B OR NOT B)
+
+Step 2: Apply Complement Law (B OR NOT B = 1)
+= A AND 1
+
+Step 3: Apply Identity Law
+= A
+
+Final answer: A</code></pre>
+</div>
+
+<div class="example-box">
+    <h4>Simplify: NOT A AND NOT B OR NOT A AND B</h4>
+<pre><code>Step 1: Factor out NOT A
+= NOT A AND (NOT B OR B)
+
+Step 2: Apply Complement Law (NOT B OR B = 1)
+= NOT A AND 1
+
+Step 3: Apply Identity Law
+= NOT A
+
+Final answer: NOT A</code></pre>
+</div>
+
+<h3>Practice Questions</h3>
+<div class="example-box">
+    <ol>
+        <li>Evaluate: (1 AND 0) OR (NOT 0)</li>
+        <li>Simplify using De Morgan: NOT (X OR Y)</li>
+        <li>Simplify: A OR (NOT A AND B)</li>
+        <li>What is NOT (NOT (P AND Q))?</li>
+        <li>Evaluate: NOT (1 AND 1) OR 0</li>
+    </ol>
+    <details>
+        <summary>Click for answers</summary>
+        <ol>
+            <li>(1 AND 0) OR (NOT 0) = 0 OR 1 = 1</li>
+            <li>NOT (X OR Y) = (NOT X) AND (NOT Y)</li>
+            <li>A OR (NOT A AND B) = A OR B (Absorption Law)</li>
+            <li>NOT (NOT (P AND Q)) = P AND Q (Double Negation)</li>
+            <li>NOT (1 AND 1) OR 0 = NOT 1 OR 0 = 0 OR 0 = 0</li>
+        </ol>
+    </details>
 </div>
 
 <h3>Boolean in Programming</h3>
 <pre><code class="language-python">age = 18
 hasLicense = True
+hasCar = False
 
-# Boolean expression in IF statement
-IF age >= 17 AND hasLicense = True THEN
+# Using AND - both must be true
+IF age >= 17 AND hasLicense THEN
     OUTPUT "Can drive"
 ENDIF
 
-# Combining conditions
-IF (score >= 50 AND attendance >= 80) OR hasExemption THEN
-    OUTPUT "Passed"
+# Using OR - at least one must be true
+IF hasCar OR hasLicense THEN
+    OUTPUT "Has some driving qualification"
+ENDIF
+
+# Using NOT - inverts the condition
+IF NOT hasCar THEN
+    OUTPUT "Needs to get a car"
+ENDIF
+
+# Complex condition
+IF (age >= 17 AND hasLicense) OR (age >= 21) THEN
+    OUTPUT "Can rent a car"
 ENDIF</code></pre>
 
 <div class="tip-box">
-    <strong>Key Point:</strong> Boolean algebra is the mathematics behind all digital logic - every computer operation ultimately reduces to combinations of AND, OR, and NOT.
+    <strong>Exam Tips:</strong>
+    <ul>
+        <li>Know De Morgan's Laws by heart - they come up frequently!</li>
+        <li>Remember order of precedence: NOT, then AND, then OR</li>
+        <li>Use brackets to make expressions clearer</li>
+        <li>Verify your simplifications with a truth table if unsure</li>
+        <li>A AND NOT A always = 0, A OR NOT A always = 1</li>
+    </ul>
 </div>
             `
         },

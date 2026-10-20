@@ -184,14 +184,16 @@ print(f"Sum of 1-5 = {total}")</textarea>
 
     renderLearnMode: () => {
         const topics = [
-            { id: 'intro', name: 'Introduction to Python', icon: '🐍', lessons: 3 },
-            { id: 'variables', name: 'Variables & Data Types', icon: '📦', lessons: 4 },
-            { id: 'operators', name: 'Operators', icon: '➕', lessons: 3 },
-            { id: 'conditionals', name: 'If Statements', icon: '🔀', lessons: 3 },
-            { id: 'loops', name: 'Loops', icon: '🔄', lessons: 4 },
-            { id: 'lists', name: 'Lists', icon: '📋', lessons: 4 },
-            { id: 'functions', name: 'Functions', icon: '⚙️', lessons: 3 },
-            { id: 'algorithms', name: 'Algorithms', icon: '🔍', lessons: 3 },
+            { id: 'intro', name: 'Introduction to Python', icon: '🐍', lessons: 4 },
+            { id: 'variables', name: 'Variables & Data Types', icon: '📦', lessons: 6 },
+            { id: 'operators', name: 'Operators', icon: '➕', lessons: 5 },
+            { id: 'conditionals', name: 'Selection (If Statements)', icon: '🔀', lessons: 5 },
+            { id: 'loops', name: 'Iteration (Loops)', icon: '🔄', lessons: 7 },
+            { id: 'lists', name: 'Lists (Arrays)', icon: '📋', lessons: 6 },
+            { id: 'functions', name: 'Subprograms (Functions)', icon: '⚙️', lessons: 6 },
+            { id: 'algorithms', name: 'Standard Algorithms', icon: '🔍', lessons: 7 },
+            { id: 'arrays2d', name: '2D Arrays (Matrices)', icon: '📊', lessons: 4 },
+            { id: 'filehandling', name: 'File Handling', icon: '📁', lessons: 4 },
         ];
         
         return `
@@ -920,92 +922,257 @@ print(f"Sum of 1-5 = {total}")</textarea>
     },
 
     // ==========================================
-    // CHALLENGES
+    // CHALLENGES - Aligned with Edexcel IGCSE 4CP0 Paper 2
     // ==========================================
     getChallenges: () => [
+        // ============ EXISTING CHALLENGES ============
         {
-            id: 'hello', name: 'Hello World', icon: '👋', difficulty: 'Easy', xp: 10,
+            id: 'hello', name: 'Hello World', icon: '👋', difficulty: 'Beginner', xp: 50,
             description: 'Print "Hello, World!" to the screen.',
-            hint: 'Use print("Hello, World!")',
+            hints: ['Use the print() function', 'Put the text inside quotes'],
             starterCode: '# Print Hello, World!\n',
             tests: [{ expected: 'Hello, World!' }]
         },
         {
-            id: 'sum_two', name: 'Add Numbers', icon: '➕', difficulty: 'Easy', xp: 15,
+            id: 'sum_two', name: 'Add Numbers', icon: '➕', difficulty: 'Beginner', xp: 50,
             description: 'Create a=5 and b=3, then print their sum (8).',
-            hint: 'print(a + b)',
+            hints: ['Use + to add numbers', 'print(a + b)'],
             starterCode: '# Add two numbers\na = 5\nb = 3\n',
             tests: [{ expected: '8' }]
         },
         {
-            id: 'even_odd', name: 'Even or Odd', icon: '🔢', difficulty: 'Easy', xp: 20,
+            id: 'even_odd', name: 'Even or Odd', icon: '🔢', difficulty: 'Beginner', xp: 50,
             description: 'Given num=7, print "Even" or "Odd".',
-            hint: 'Use if num % 2 == 0',
+            hints: ['Use if num % 2 == 0', 'MOD (%) gives remainder after division'],
             starterCode: 'num = 7\n',
             tests: [{ expected: 'Odd' }]
         },
         {
-            id: 'countdown', name: 'Countdown', icon: '🚀', difficulty: 'Easy', xp: 25,
+            id: 'countdown', name: 'Countdown', icon: '🚀', difficulty: 'Beginner', xp: 50,
             description: 'Print 5 to 1, then "Blast off!"',
-            hint: 'Use range(5, 0, -1)',
+            hints: ['Use range(5, 0, -1) to count down', 'Print "Blast off!" after the loop'],
             starterCode: '# Countdown\n',
             tests: [{ contains: ['5', '4', '3', '2', '1', 'Blast off!'] }]
         },
+        
+        // ============ NEW BEGINNER CHALLENGES (8) ============
         {
-            id: 'sum_range', name: 'Sum 1 to 10', icon: '📊', difficulty: 'Medium', xp: 30,
-            description: 'Print the sum of 1 to 10 (55).',
-            hint: 'Use a loop with total += i',
+            id: 'greet_user', name: 'Greeting Message', icon: '🙋', difficulty: 'Beginner', xp: 50,
+            description: 'Create a variable name="Alice" and print "Hello, Alice!" using an f-string.\n\nExample output:\nHello, Alice!',
+            hints: ['Use f-strings: f"Hello, {name}!"', 'f-strings let you embed variables in text'],
+            starterCode: '# Create a greeting\nname = "Alice"\n',
+            tests: [{ expected: 'Hello, Alice!' }]
+        },
+        {
+            id: 'rectangle_area', name: 'Rectangle Area', icon: '📐', difficulty: 'Beginner', xp: 50,
+            description: 'Calculate the area of a rectangle with length=8 and width=5. Print the result (40).\n\nFormula: area = length × width',
+            hints: ['Area = length * width', 'Store result in a variable, then print it'],
+            starterCode: '# Calculate rectangle area\nlength = 8\nwidth = 5\n',
+            tests: [{ expected: '40' }]
+        },
+        {
+            id: 'temperature', name: 'Celsius to Fahrenheit', icon: '🌡️', difficulty: 'Beginner', xp: 50,
+            description: 'Convert celsius=25 to Fahrenheit and print the result (77.0).\n\nFormula: F = (C × 9/5) + 32',
+            hints: ['Formula: fahrenheit = (celsius * 9/5) + 32', 'Order of operations matters - use brackets'],
+            starterCode: '# Temperature conversion\ncelsius = 25\n',
+            tests: [{ expected: '77.0' }]
+        },
+        {
+            id: 'swap_vars', name: 'Swap Variables', icon: '🔀', difficulty: 'Beginner', xp: 50,
+            description: 'Given a=10 and b=20, swap their values and print both.\n\nExpected output:\na = 20\nb = 10',
+            hints: ['Use a temporary variable: temp = a', 'Or use Python swap: a, b = b, a'],
+            starterCode: '# Swap two variables\na = 10\nb = 20\n# Swap them\n\nprint(f"a = {a}")\nprint(f"b = {b}")',
+            tests: [{ contains: ['a = 20', 'b = 10'] }]
+        },
+        {
+            id: 'avg_three', name: 'Average of Three', icon: '📊', difficulty: 'Beginner', xp: 50,
+            description: 'Calculate and print the average of num1=15, num2=20, num3=25.\n\nExpected output: 20.0',
+            hints: ['Average = (sum of all) / (count)', 'Add all three and divide by 3'],
+            starterCode: '# Calculate average\nnum1 = 15\nnum2 = 20\nnum3 = 25\n',
+            tests: [{ expected: '20.0' }]
+        },
+        {
+            id: 'remainder', name: 'DIV and MOD', icon: '➗', difficulty: 'Beginner', xp: 50,
+            description: 'Given dividend=17 and divisor=5, print the quotient (integer division) and remainder on separate lines.\n\nExpected output:\n3\n2',
+            hints: ['Use // for integer division (DIV)', 'Use % for remainder (MOD)'],
+            starterCode: '# DIV and MOD operations\ndividend = 17\ndivisor = 5\n',
+            tests: [{ contains: ['3', '2'] }]
+        },
+        {
+            id: 'string_length', name: 'String Length', icon: '📏', difficulty: 'Beginner', xp: 50,
+            description: 'Given text="Computer Science", print the number of characters including spaces.\n\nExpected output: 16',
+            hints: ['Use len() to get string length', 'Spaces count as characters'],
+            starterCode: '# Find string length\ntext = "Computer Science"\n',
+            tests: [{ expected: '16' }]
+        },
+        {
+            id: 'string_upper', name: 'Uppercase Output', icon: '🔠', difficulty: 'Beginner', xp: 50,
+            description: 'Given message="hello world", print it in uppercase.\n\nExpected output: HELLO WORLD',
+            hints: ['Use .upper() method on strings', 'Example: text.upper()'],
+            starterCode: '# Convert to uppercase\nmessage = "hello world"\n',
+            tests: [{ expected: 'HELLO WORLD' }]
+        },
+        
+        // ============ EXISTING INTERMEDIATE CHALLENGES ============
+        {
+            id: 'sum_range', name: 'Sum 1 to 10', icon: '📊', difficulty: 'Intermediate', xp: 100,
+            description: 'Print the sum of numbers from 1 to 10 (55).\n\nUse a FOR loop to add each number to a running total.',
+            hints: ['Use a loop with total += i', 'Start total at 0', 'range(1, 11) gives 1 to 10'],
             starterCode: 'total = 0\n',
             tests: [{ expected: '55' }]
         },
         {
-            id: 'factorial', name: 'Factorial', icon: '❗', difficulty: 'Medium', xp: 35,
-            description: 'Calculate and print 5! (120).',
-            hint: 'Multiply 1*2*3*4*5',
+            id: 'factorial', name: 'Factorial', icon: '❗', difficulty: 'Intermediate', xp: 100,
+            description: 'Calculate and print 5! (factorial of 5 = 120).\n\n5! = 5 × 4 × 3 × 2 × 1 = 120',
+            hints: ['Multiply 1*2*3*4*5', 'Use a loop and multiply each number', 'Start result at 1 (not 0!)'],
             starterCode: 'n = 5\nresult = 1\n',
             tests: [{ expected: '120' }]
         },
         {
-            id: 'fizzbuzz', name: 'FizzBuzz', icon: '🎯', difficulty: 'Medium', xp: 40,
-            description: 'Print 1-15: "Fizz" for 3, "Buzz" for 5, "FizzBuzz" for both.',
-            hint: 'Check 15 first, then 3, then 5',
+            id: 'fizzbuzz', name: 'FizzBuzz', icon: '🎯', difficulty: 'Intermediate', xp: 100,
+            description: 'Print numbers 1-15, but:\n- Print "Fizz" for multiples of 3\n- Print "Buzz" for multiples of 5\n- Print "FizzBuzz" for multiples of both',
+            hints: ['Check 15 first (divisible by both)', 'Use elif for the conditions', 'if i % 3 == 0 and i % 5 == 0'],
             starterCode: 'for i in range(1, 16):\n    pass\n',
             tests: [{ contains: ['FizzBuzz', 'Fizz', 'Buzz'] }]
         },
         {
-            id: 'reverse', name: 'Reverse String', icon: '🔄', difficulty: 'Medium', xp: 30,
-            description: 'Print "Python" reversed (nohtyP).',
-            hint: 'Use text[::-1]',
+            id: 'reverse', name: 'Reverse String', icon: '🔄', difficulty: 'Intermediate', xp: 100,
+            description: 'Print "Python" reversed (nohtyP).\n\nUse string slicing with a negative step.',
+            hints: ['Use text[::-1] for reverse', 'Slicing: [start:stop:step]', '-1 step goes backwards'],
             starterCode: 'text = "Python"\n',
             tests: [{ expected: 'nohtyP' }]
         },
         {
-            id: 'find_max', name: 'Find Maximum', icon: '📈', difficulty: 'Medium', xp: 35,
-            description: 'Find and print the max in [3,7,2,9,4] (9).',
-            hint: 'Loop and track largest',
+            id: 'find_max', name: 'Find Maximum', icon: '📈', difficulty: 'Intermediate', xp: 100,
+            description: 'Find and print the maximum value in [3, 7, 2, 9, 4].\n\nDo NOT use the built-in max() function - write the algorithm yourself.',
+            hints: ['Start with first element as largest', 'Loop through and compare each', 'Update largest if current is bigger'],
             starterCode: 'nums = [3, 7, 2, 9, 4]\nlargest = nums[0]\n',
             tests: [{ expected: '9' }]
         },
+        
+        // ============ NEW INTERMEDIATE CHALLENGES (8) ============
         {
-            id: 'prime', name: 'Prime Check', icon: '🔐', difficulty: 'Hard', xp: 50,
-            description: 'Check if 17 is prime. Print "Prime" or "Not prime".',
-            hint: 'Check divisors from 2 to n-1',
+            id: 'count_vowels', name: 'Count Vowels', icon: '🔤', difficulty: 'Intermediate', xp: 100,
+            description: 'Count and print the number of vowels (a,e,i,o,u) in "Programming is fun".\n\nExpected output: 5',
+            hints: ['Loop through each character', 'Check if char in "aeiouAEIOU"', 'Use a counter variable'],
+            starterCode: '# Count vowels\ntext = "Programming is fun"\ncount = 0\n',
+            tests: [{ expected: '5' }]
+        },
+        {
+            id: 'multiplication_table', name: 'Times Table', icon: '✖️', difficulty: 'Intermediate', xp: 100,
+            description: 'Print the 7 times table from 1 to 10.\n\nFormat each line as: 7 x 1 = 7\n\nExpected output includes:\n7 x 1 = 7\n7 x 2 = 14\n... (up to 10)',
+            hints: ['Use a FOR loop from 1 to 10', 'Use f-string for formatting', 'Calculate 7 * i for each'],
+            starterCode: '# Print 7 times table\nnum = 7\n',
+            tests: [{ contains: ['7 x 1 = 7', '7 x 5 = 35', '7 x 10 = 70'] }]
+        },
+        {
+            id: 'grade_calc', name: 'Grade Calculator', icon: '📝', difficulty: 'Intermediate', xp: 100,
+            description: 'Given score=73, print the grade using this scale:\n- A: 90-100\n- B: 80-89\n- C: 70-79\n- D: 60-69\n- F: below 60\n\nExpected output: C',
+            hints: ['Use if-elif-else chain', 'Check from highest to lowest', 'score >= 90 for A, etc.'],
+            starterCode: '# Grade calculator\nscore = 73\n',
+            tests: [{ expected: 'C' }]
+        },
+        {
+            id: 'password_check', name: 'Password Validation', icon: '🔑', difficulty: 'Intermediate', xp: 100,
+            description: 'Check if password="Secret123" meets these criteria:\n- At least 8 characters long\n- Contains at least one digit\n\nPrint "Valid" or "Invalid".\n\nExpected output: Valid',
+            hints: ['Use len() for length check', 'Loop to check for digits', 'char.isdigit() checks if digit'],
+            starterCode: '# Password validation\npassword = "Secret123"\nhas_digit = False\n',
+            tests: [{ expected: 'Valid' }]
+        },
+        {
+            id: 'list_sum_even', name: 'Sum Even Numbers', icon: '🔢', difficulty: 'Intermediate', xp: 100,
+            description: 'Sum only the EVEN numbers in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].\n\nExpected output: 30\n(2+4+6+8+10=30)',
+            hints: ['Use % 2 == 0 to check even', 'Add to total only if even', 'Loop through the list'],
+            starterCode: '# Sum even numbers only\nnums = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]\ntotal = 0\n',
+            tests: [{ expected: '30' }]
+        },
+        {
+            id: 'list_filter', name: 'Filter Passing Scores', icon: '✅', difficulty: 'Intermediate', xp: 100,
+            description: 'Given scores=[45, 78, 62, 39, 88, 55, 91], create and print a new list containing only passing scores (50 or above).\n\nExpected output: [78, 62, 88, 55, 91]',
+            hints: ['Create empty list: passing = []', 'Use append() to add items', 'Check if score >= 50'],
+            starterCode: '# Filter passing scores\nscores = [45, 78, 62, 39, 88, 55, 91]\npassing = []\n',
+            tests: [{ contains: ['78', '62', '88', '55', '91'] }]
+        },
+        {
+            id: 'count_occurrences', name: 'Count Target Value', icon: '🔍', difficulty: 'Intermediate', xp: 100,
+            description: 'Count how many times the value 3 appears in [1, 3, 5, 3, 7, 3, 9, 2, 3].\n\nExpected output: 4',
+            hints: ['Use a counter variable', 'Loop and check if item == target', 'Increment counter when found'],
+            starterCode: '# Count occurrences\nnums = [1, 3, 5, 3, 7, 3, 9, 2, 3]\ntarget = 3\ncount = 0\n',
+            tests: [{ expected: '4' }]
+        },
+        {
+            id: 'nested_loop', name: 'Star Rectangle', icon: '⭐', difficulty: 'Intermediate', xp: 100,
+            description: 'Print a 3×5 rectangle of stars using nested loops.\n\nExpected output:\n*****\n*****\n*****',
+            hints: ['Outer loop for rows (3)', 'Inner loop for columns (5)', 'Use print() with end="" for same line'],
+            starterCode: '# Print star rectangle\nrows = 3\ncols = 5\n',
+            tests: [{ contains: ['*****'] }]
+        },
+        
+        // ============ EXISTING ADVANCED CHALLENGES ============
+        {
+            id: 'prime', name: 'Prime Check', icon: '🔐', difficulty: 'Advanced', xp: 150,
+            description: 'Check if n=17 is prime. Print "Prime" or "Not prime".\n\nA prime number is only divisible by 1 and itself.',
+            hints: ['Check divisors from 2 to n-1', 'If any divides evenly, not prime', 'Use a flag variable'],
             starterCode: 'n = 17\nis_prime = True\n',
             tests: [{ expected: 'Prime' }]
         },
         {
-            id: 'palindrome', name: 'Palindrome', icon: '🪞', difficulty: 'Hard', xp: 50,
-            description: 'Check if "radar" is a palindrome. Print "Yes" or "No".',
-            hint: 'Compare word to word[::-1]',
+            id: 'palindrome', name: 'Palindrome', icon: '🪞', difficulty: 'Advanced', xp: 150,
+            description: 'Check if "radar" is a palindrome (same forwards and backwards). Print "Yes" or "No".',
+            hints: ['Compare word to word[::-1]', 'Or compare first half to reversed second half', 'A palindrome reads same both ways'],
             starterCode: 'word = "radar"\n',
             tests: [{ expected: 'Yes' }]
         },
         {
-            id: 'fibonacci', name: 'Fibonacci', icon: '🌀', difficulty: 'Hard', xp: 60,
-            description: 'Print first 10 Fibonacci numbers.',
-            hint: 'Each = sum of previous two',
+            id: 'fibonacci', name: 'Fibonacci', icon: '🌀', difficulty: 'Advanced', xp: 150,
+            description: 'Print the first 10 Fibonacci numbers.\n\nSequence: 0, 1, 1, 2, 3, 5, 8, 13, 21, 34\n(Each number = sum of previous two)',
+            hints: ['Start with a=0, b=1', 'Each = sum of previous two', 'Use: a, b = b, a + b'],
             starterCode: 'a = 0\nb = 1\n',
             tests: [{ contains: ['0', '1', '1', '2', '3', '5', '8', '13', '21', '34'] }]
+        },
+        
+        // ============ NEW ADVANCED CHALLENGES (6) ============
+        {
+            id: 'bubble_sort', name: 'Bubble Sort', icon: '🫧', difficulty: 'Advanced', xp: 150,
+            description: 'Sort the list [64, 34, 25, 12, 22, 11, 90] using the BUBBLE SORT algorithm.\n\nPrint the sorted list.\n\nExpected output: [11, 12, 22, 25, 34, 64, 90]',
+            hints: ['Compare adjacent elements', 'Swap if in wrong order', 'Repeat until no swaps needed', 'Use nested loops'],
+            starterCode: '# Bubble Sort algorithm\nnums = [64, 34, 25, 12, 22, 11, 90]\nn = len(nums)\n\n# Implement bubble sort here\n\nprint(nums)',
+            tests: [{ contains: ['11', '12', '22', '25', '34', '64', '90'] }]
+        },
+        {
+            id: 'linear_search', name: 'Linear Search', icon: '🔎', difficulty: 'Advanced', xp: 150,
+            description: 'Implement LINEAR SEARCH to find target=7 in [4, 2, 7, 1, 9, 3].\n\nPrint the index if found, or -1 if not found.\n\nExpected output: 2',
+            hints: ['Loop through each element', 'Compare each with target', 'Return index when found', 'Use enumerate() or index counter'],
+            starterCode: '# Linear Search algorithm\nnums = [4, 2, 7, 1, 9, 3]\ntarget = 7\nfound_index = -1\n\n# Implement linear search here\n\nprint(found_index)',
+            tests: [{ expected: '2' }]
+        },
+        {
+            id: 'binary_search', name: 'Binary Search', icon: '🎯', difficulty: 'Advanced', xp: 150,
+            description: 'Implement BINARY SEARCH to find target=23 in sorted list [2, 5, 8, 12, 16, 23, 38, 56, 72, 91].\n\nPrint the index if found, or -1 if not found.\n\nExpected output: 5',
+            hints: ['List MUST be sorted first', 'Use low, mid, high pointers', 'mid = (low + high) // 2', 'Halve search space each step'],
+            starterCode: '# Binary Search algorithm (list is pre-sorted)\nnums = [2, 5, 8, 12, 16, 23, 38, 56, 72, 91]\ntarget = 23\nlow = 0\nhigh = len(nums) - 1\nfound_index = -1\n\n# Implement binary search here\n\nprint(found_index)',
+            tests: [{ expected: '5' }]
+        },
+        {
+            id: '2d_array_sum', name: '2D Array Sum', icon: '📊', difficulty: 'Advanced', xp: 150,
+            description: 'Given a 2D array (matrix), calculate and print the sum of all elements.\n\nMatrix:\n[[1, 2, 3],\n [4, 5, 6],\n [7, 8, 9]]\n\nExpected output: 45',
+            hints: ['Use nested loops', 'Outer loop for rows', 'Inner loop for columns', 'Access element: matrix[row][col]'],
+            starterCode: '# Sum all elements in 2D array\nmatrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]\ntotal = 0\n\n# Sum all elements\n\nprint(total)',
+            tests: [{ expected: '45' }]
+        },
+        {
+            id: '2d_array_max', name: '2D Array Maximum', icon: '🏆', difficulty: 'Advanced', xp: 150,
+            description: 'Find and print the maximum value in this 2D array:\n\n[[3, 8, 2],\n [9, 1, 5],\n [4, 7, 6]]\n\nExpected output: 9',
+            hints: ['Initialize max with first element: matrix[0][0]', 'Use nested loops to check all', 'Update max when larger found'],
+            starterCode: '# Find maximum in 2D array\nmatrix = [[3, 8, 2], [9, 1, 5], [4, 7, 6]]\nmax_val = matrix[0][0]\n\n# Find the maximum\n\nprint(max_val)',
+            tests: [{ expected: '9' }]
+        },
+        {
+            id: 'file_simulation', name: 'File Data Processing', icon: '📁', difficulty: 'Advanced', xp: 150,
+            description: 'Simulate reading student data from a "file" (given as a list).\n\nData format: ["Alice,85", "Bob,92", "Charlie,78", "Diana,88"]\n\nParse each record, calculate the average score, and print:\n- Each student name and score\n- The class average\n\nExpected output includes:\nAlice: 85\nBob: 92\nCharlie: 78\nDiana: 88\nAverage: 85.75',
+            hints: ['Use .split(",") to separate name and score', 'Convert score to int: int(parts[1])', 'Calculate average: total / count', 'This simulates file handling from Paper 2'],
+            starterCode: '# Simulate file processing\nfile_data = ["Alice,85", "Bob,92", "Charlie,78", "Diana,88"]\ntotal = 0\ncount = 0\n\n# Process each record\n\n# Print average',
+            tests: [{ contains: ['Alice: 85', 'Bob: 92', 'Average: 85.75'] }]
         }
     ],
 
@@ -1018,6 +1185,11 @@ print(f"Sum of 1-5 = {total}")</textarea>
         if (!challenge) return;
         
         PlaygroundView.currentChallenge = challenge;
+        
+        // Handle both old single hint and new hints array format
+        const hintsHtml = Array.isArray(challenge.hints) 
+            ? challenge.hints.map((h, i) => `<p>💡 Hint ${i + 1}: ${h}</p>`).join('')
+            : `<p>💡 ${challenge.hint || 'No hints available'}</p>`;
         
         document.getElementById('challenge-workspace').innerHTML = `
             <div class="challenge-detail">
@@ -1033,9 +1205,9 @@ print(f"Sum of 1-5 = {total}")</textarea>
                 </div>
                 <div class="challenge-body">
                     <div class="challenge-description">
-                        <p>${challenge.description}</p>
-                        <button class="btn btn-small btn-secondary" onclick="document.getElementById('hint').style.display='block'">💡 Hint</button>
-                        <p id="hint" style="display:none;margin-top:8px;color:var(--yellow)">💡 ${challenge.hint}</p>
+                        <p>${challenge.description.replace(/\n/g, '<br>')}</p>
+                        <button class="btn btn-small btn-secondary" onclick="document.getElementById('hint').style.display='block'">💡 Show Hints</button>
+                        <div id="hint" style="display:none;margin-top:8px;color:var(--yellow)">${hintsHtml}</div>
                     </div>
                     <div class="challenge-editor-section">
                         <div class="ce-header">
@@ -1113,74 +1285,327 @@ print(f"Sum of 1-5 = {total}")</textarea>
     },
 
     // ==========================================
-    // LESSONS
+    // LESSONS - Comprehensive Python Course for Edexcel IGCSE 4CP0
     // ==========================================
     lessons: {
         intro: {
             title: 'Introduction to Python',
             sections: [
-                { title: 'Hello World', content: 'Your first program!', code: 'print("Hello, World!")' },
-                { title: 'Comments', content: 'Comments start with #', code: '# This is a comment\nprint("Code runs")' },
-                { title: 'Multiple Lines', content: 'Code runs top to bottom', code: 'print("Line 1")\nprint("Line 2")' }
+                { 
+                    title: 'Hello World', 
+                    content: 'The print() function displays output to the screen. Text strings must be enclosed in quotation marks (single or double).', 
+                    code: 'print("Hello, World!")\nprint(\'Single quotes work too!\')' 
+                },
+                { 
+                    title: 'Comments', 
+                    content: 'Comments explain code and are ignored when running. They start with # symbol. Good practice: add comments to explain complex logic.', 
+                    code: '# This is a comment - Python ignores it\nprint("This runs")  # Comments can be on same line\n\n# Use comments to explain your code\n# Calculate area of rectangle\narea = 5 * 3\nprint(area)' 
+                },
+                { 
+                    title: 'Program Flow', 
+                    content: 'Python executes code line by line from top to bottom. Each instruction runs in sequence (sequential execution).', 
+                    code: 'print("Step 1: First this runs")\nprint("Step 2: Then this runs")\nprint("Step 3: Finally this runs")' 
+                },
+                { 
+                    title: 'Print Multiple Items', 
+                    content: 'The print() function can output multiple items separated by commas. By default, they are separated by spaces.', 
+                    code: 'name = "Alice"\nage = 16\nprint("Name:", name)\nprint("Age:", age)\nprint(name, "is", age, "years old")' 
+                }
             ]
         },
         variables: {
             title: 'Variables & Data Types',
             sections: [
-                { title: 'Creating Variables', content: 'Variables store data', code: 'name = "Alice"\nage = 15\nprint(name)\nprint(age)' },
-                { title: 'Data Types', content: 'String, int, float, bool', code: 'text = "Hello"  # str\nnum = 42        # int\npi = 3.14       # float\nok = True       # bool\nprint(type(num))' },
-                { title: 'f-Strings', content: 'Embed variables in strings', code: 'name = "Bob"\nage = 20\nprint(f"{name} is {age}")' },
-                { title: 'Type Conversion', content: 'Convert between types', code: 'x = "42"\ny = int(x)\nprint(y + 8)' }
+                { 
+                    title: 'Creating Variables', 
+                    content: 'Variables store data in memory. Use meaningful names! The assignment operator (=) assigns a value to a variable. Variable names are case-sensitive.', 
+                    code: '# Good variable names are descriptive\nstudent_name = "Alice"\nstudent_age = 16\ntest_score = 85.5\n\nprint(student_name)\nprint(student_age)\nprint(test_score)' 
+                },
+                { 
+                    title: 'Data Types', 
+                    content: 'Python has several built-in data types:<br>• <b>str</b> (string) - Text in quotes<br>• <b>int</b> (integer) - Whole numbers<br>• <b>float</b> - Decimal numbers<br>• <b>bool</b> (boolean) - True or False', 
+                    code: '# Four main data types for IGCSE\ntext = "Hello"      # str (string)\nwhole = 42          # int (integer)\ndecimal = 3.14      # float\nflag = True         # bool (boolean)\n\nprint(type(text))\nprint(type(whole))\nprint(type(decimal))\nprint(type(flag))' 
+                },
+                { 
+                    title: 'f-Strings (Formatted Strings)', 
+                    content: 'f-strings let you embed variables directly in text. Put f before the string and wrap variables in curly braces {}. This is the modern, preferred way to format output.', 
+                    code: 'name = "Bob"\nage = 15\nscore = 92.5\n\n# f-string - modern way (preferred)\nprint(f"Name: {name}")\nprint(f"{name} is {age} years old")\nprint(f"Score: {score}%")' 
+                },
+                { 
+                    title: 'Type Conversion (Casting)', 
+                    content: 'Convert between data types using int(), float(), str(). Essential when combining numbers with text or reading user input.', 
+                    code: '# String to Integer\ntext_num = "42"\nreal_num = int(text_num)\nprint(real_num + 8)  # 50\n\n# Integer to String\nage = 16\nmessage = "Age: " + str(age)\nprint(message)\n\n# Float to Integer (removes decimal)\nprice = 19.99\nwhole_price = int(price)  # 19\nprint(whole_price)' 
+                },
+                { 
+                    title: 'Input from User', 
+                    content: 'The input() function reads text from the user. It ALWAYS returns a string, so convert to int or float if needed for calculations.', 
+                    code: '# Input always returns a string\nname = "Alice"  # Simulated input\nage_str = "16"  # Simulated input\n\n# Convert string to integer for math\nage = int(age_str)\nnext_year = age + 1\n\nprint(f"Hello {name}!")\nprint(f"Next year you will be {next_year}")' 
+                },
+                { 
+                    title: 'Constants', 
+                    content: 'Constants are values that should not change. By convention, use UPPERCASE names. Python does not enforce this, but it signals intent to other programmers.', 
+                    code: '# Constants use UPPERCASE by convention\nPI = 3.14159\nMAX_SCORE = 100\nTAX_RATE = 0.20\n\n# Using constants\nradius = 5\narea = PI * radius ** 2\nprint(f"Circle area: {area}")\n\ntotal = 80\ntax = total * TAX_RATE\nprint(f"Tax: {tax}")' 
+                }
             ]
         },
         operators: {
             title: 'Operators',
             sections: [
-                { title: 'Arithmetic', content: 'Math operations', code: 'print(5 + 3)   # 8\nprint(10 - 4)  # 6\nprint(3 * 4)   # 12\nprint(15 / 3)  # 5.0\nprint(17 % 5)  # 2\nprint(2 ** 3)  # 8' },
-                { title: 'Comparison', content: 'Return True/False', code: 'print(5 > 3)   # True\nprint(5 == 5)  # True\nprint(5 != 3)  # True' },
-                { title: 'Logical', content: 'and, or, not', code: 'x = 5\nprint(x > 3 and x < 10)\nprint(x < 3 or x > 4)\nprint(not x > 10)' }
+                { 
+                    title: 'Arithmetic Operators', 
+                    content: 'Python supports standard math operations plus some special ones:<br>• + Addition<br>• - Subtraction<br>• * Multiplication<br>• / Division (always gives float)<br>• // Integer Division (DIV)<br>• % Modulus (MOD - remainder)<br>• ** Exponent (power)', 
+                    code: 'a = 17\nb = 5\n\nprint(f"Addition: {a} + {b} = {a + b}")      # 22\nprint(f"Subtraction: {a} - {b} = {a - b}")  # 12\nprint(f"Multiply: {a} * {b} = {a * b}")     # 85\nprint(f"Division: {a} / {b} = {a / b}")     # 3.4\nprint(f"DIV: {a} // {b} = {a // b}")        # 3\nprint(f"MOD: {a} % {b} = {a % b}")          # 2\nprint(f"Power: {a} ** 2 = {a ** 2}")        # 289' 
+                },
+                { 
+                    title: 'DIV and MOD Explained', 
+                    content: '<b>DIV (//):</b> Integer division - gives whole number result<br><b>MOD (%):</b> Modulus - gives the remainder<br><br>Example: 17 ÷ 5 = 3 remainder 2<br>So: 17 // 5 = 3 and 17 % 5 = 2', 
+                    code: '# DIV and MOD are essential for IGCSE!\ntotal_minutes = 135\n\n# Convert to hours and minutes\nhours = total_minutes // 60   # DIV gives whole hours\nmins = total_minutes % 60     # MOD gives remaining mins\n\nprint(f"{total_minutes} minutes = {hours}h {mins}m")\n\n# Check if number is even or odd\nnum = 17\nif num % 2 == 0:\n    print("Even")\nelse:\n    print("Odd")' 
+                },
+                { 
+                    title: 'Comparison Operators', 
+                    content: 'Compare values and return True or False:<br>• == Equal to (NOT single =)<br>• != Not equal to<br>• < Less than<br>• > Greater than<br>• <= Less than or equal<br>• >= Greater than or equal', 
+                    code: 'x = 10\ny = 5\n\nprint(f"{x} == {y}: {x == y}")   # False\nprint(f"{x} != {y}: {x != y}")   # True\nprint(f"{x} > {y}: {x > y}")     # True\nprint(f"{x} < {y}: {x < y}")     # False\nprint(f"{x} >= 10: {x >= 10}")   # True\nprint(f"{y} <= 5: {y <= 5}")     # True' 
+                },
+                { 
+                    title: 'Logical Operators', 
+                    content: 'Combine conditions:<br>• <b>and</b> - Both must be True<br>• <b>or</b> - At least one must be True<br>• <b>not</b> - Reverses True/False', 
+                    code: 'age = 16\nhas_ticket = True\n\n# AND - both conditions must be true\nif age >= 12 and has_ticket:\n    print("Can enter cinema")\n\n# OR - at least one must be true\nday = "Saturday"\nif day == "Saturday" or day == "Sunday":\n    print("It is the weekend!")\n\n# NOT - reverses the condition\nraining = False\nif not raining:\n    print("No umbrella needed!")' 
+                },
+                { 
+                    title: 'Operator Precedence', 
+                    content: 'Order of operations (BIDMAS):<br>1. Brackets ()<br>2. Indices ** (power)<br>3. Division /, //, %<br>4. Multiplication *<br>5. Addition +<br>6. Subtraction -<br><br>Use brackets to make order clear!', 
+                    code: '# Without brackets - follows BIDMAS\nresult1 = 2 + 3 * 4      # 3*4 first = 14\nprint(f"2 + 3 * 4 = {result1}")\n\n# With brackets - changes order\nresult2 = (2 + 3) * 4    # 2+3 first = 20\nprint(f"(2 + 3) * 4 = {result2}")\n\n# Power has high precedence\nresult3 = 2 ** 3 * 2     # 8 * 2 = 16\nprint(f"2 ** 3 * 2 = {result3}")' 
+                }
             ]
         },
         conditionals: {
-            title: 'If Statements',
+            title: 'Selection (If Statements)',
             sections: [
-                { title: 'Basic If', content: 'Execute code conditionally', code: 'age = 18\nif age >= 18:\n    print("Adult")' },
-                { title: 'If-Else', content: 'Alternative path', code: 'x = 10\nif x > 5:\n    print("Big")\nelse:\n    print("Small")' },
-                { title: 'If-Elif-Else', content: 'Multiple conditions', code: 'score = 75\nif score >= 90:\n    print("A")\nelif score >= 80:\n    print("B")\nelif score >= 70:\n    print("C")\nelse:\n    print("D")' }
+                { 
+                    title: 'Basic If Statement', 
+                    content: 'The IF statement executes code only when a condition is True. Indentation (4 spaces) is crucial - it defines the code block.', 
+                    code: 'age = 18\n\nif age >= 18:\n    print("You are an adult")\n    print("You can vote!")\n\nprint("Program continues here")' 
+                },
+                { 
+                    title: 'If-Else Statement', 
+                    content: 'ELSE provides an alternative when the IF condition is False. Exactly one block will run.', 
+                    code: 'temperature = 25\n\nif temperature >= 30:\n    print("It is hot!")\n    print("Stay hydrated")\nelse:\n    print("Temperature is OK")\n    print("Enjoy your day")' 
+                },
+                { 
+                    title: 'If-Elif-Else Chain', 
+                    content: 'ELIF (else if) checks multiple conditions in sequence. Only the FIRST matching block runs. Order matters - check strictest conditions first!', 
+                    code: 'score = 75\n\nif score >= 90:\n    grade = "A"\nelif score >= 80:\n    grade = "B"\nelif score >= 70:\n    grade = "C"\nelif score >= 60:\n    grade = "D"\nelse:\n    grade = "F"\n\nprint(f"Score: {score} = Grade {grade}")' 
+                },
+                { 
+                    title: 'Nested If Statements', 
+                    content: 'If statements can be placed inside other if statements. Each level needs more indentation. Use this for complex decision trees.', 
+                    code: 'age = 16\nhas_id = True\n\nif age >= 18:\n    print("Adult")\n    if has_id:\n        print("Can buy alcohol")\n    else:\n        print("Need ID to buy alcohol")\nelse:\n    print("Under 18")\n    if age >= 16:\n        print("Can buy lottery tickets")\n    else:\n        print("Too young for lottery")' 
+                },
+                { 
+                    title: 'Complex Conditions', 
+                    content: 'Combine multiple conditions using AND, OR, NOT. Use brackets for clarity.', 
+                    code: '# Check if year is a leap year\nyear = 2024\n\nif (year % 4 == 0 and year % 100 != 0) or (year % 400 == 0):\n    print(f"{year} is a leap year")\nelse:\n    print(f"{year} is not a leap year")\n\n# Range check\nage = 25\nif age >= 18 and age <= 65:\n    print("Working age")\n\n# Membership check\nday = "Monday"\nif day == "Saturday" or day == "Sunday":\n    print("Weekend!")\nelse:\n    print("Weekday")' 
+                }
             ]
         },
         loops: {
-            title: 'Loops',
+            title: 'Iteration (Loops)',
             sections: [
-                { title: 'FOR Loop', content: 'Repeat a set number of times', code: 'for i in range(5):\n    print(f"i = {i}")' },
-                { title: 'Range Options', content: 'start, stop, step', code: 'for i in range(1, 6):\n    print(i)\n\nfor i in range(10, 0, -2):\n    print(i)' },
-                { title: 'Loop Through List', content: 'Iterate over items', code: 'fruits = ["apple", "banana"]\nfor fruit in fruits:\n    print(fruit)' },
-                { title: 'WHILE Loop', content: 'Loop while condition true', code: 'x = 0\nwhile x < 5:\n    print(x)\n    x = x + 1' }
+                { 
+                    title: 'FOR Loop with Range', 
+                    content: 'FOR loops repeat a set number of times. range(n) generates numbers 0 to n-1. The loop variable updates automatically each iteration.', 
+                    code: '# Basic range - 0 to 4\nprint("range(5): 0 to 4")\nfor i in range(5):\n    print(i)\n\n# Counting from 1 to 5\nprint("range(1, 6): 1 to 5")\nfor i in range(1, 6):\n    print(i)' 
+                },
+                { 
+                    title: 'Range with Step', 
+                    content: 'range(start, stop, step) gives more control:<br>• start: First number (included)<br>• stop: End number (excluded)<br>• step: How much to add each time', 
+                    code: '# Count by 2s\nprint("Even numbers 0-10:")\nfor i in range(0, 11, 2):\n    print(i)\n\n# Countdown (negative step)\nprint("Countdown:")\nfor i in range(5, 0, -1):\n    print(i)\nprint("Blast off!")' 
+                },
+                { 
+                    title: 'FOR Loop Through Lists', 
+                    content: 'FOR loops can iterate through each item in a list (or string). The loop variable takes each value in turn.', 
+                    code: '# Loop through list items\nfruits = ["apple", "banana", "cherry"]\nfor fruit in fruits:\n    print(f"I like {fruit}")\n\n# Loop through characters in string\nword = "PYTHON"\nfor letter in word:\n    print(letter)' 
+                },
+                { 
+                    title: 'FOR Loop with Index', 
+                    content: 'Sometimes you need both the index AND the value. Use range(len(list)) to access by position.', 
+                    code: '# Access by index\ncolors = ["red", "green", "blue"]\nfor i in range(len(colors)):\n    print(f"Index {i}: {colors[i]}")\n\n# Useful for modifying list elements\nnums = [1, 2, 3, 4, 5]\nfor i in range(len(nums)):\n    nums[i] = nums[i] * 2\nprint(nums)' 
+                },
+                { 
+                    title: 'WHILE Loop', 
+                    content: 'WHILE loops repeat while a condition is True. Useful when you do not know how many iterations needed. WARNING: Ensure condition eventually becomes False!', 
+                    code: '# Basic while loop\ncount = 0\nwhile count < 5:\n    print(f"Count is {count}")\n    count = count + 1\n\nprint("Loop finished!")\n\n# While with condition\npassword = ""\nattempts = 0\nwhile password != "secret" and attempts < 3:\n    password = "wrong"  # Simulated input\n    attempts = attempts + 1\n    print(f"Attempt {attempts}")' 
+                },
+                { 
+                    title: 'Totalling and Counting', 
+                    content: 'Common patterns using loops:<br>• <b>Totalling:</b> Add up values (start with 0)<br>• <b>Counting:</b> Count occurrences (start with 0)', 
+                    code: '# TOTALLING - sum all values\nnums = [10, 20, 30, 40, 50]\ntotal = 0\nfor num in nums:\n    total = total + num\nprint(f"Sum: {total}")\n\n# COUNTING - count matches\nscores = [85, 92, 78, 95, 88, 91]\npass_count = 0\nfor score in scores:\n    if score >= 80:\n        pass_count = pass_count + 1\nprint(f"Passed: {pass_count}")' 
+                },
+                { 
+                    title: 'Nested Loops', 
+                    content: 'A loop inside another loop. The inner loop runs completely for each iteration of the outer loop.', 
+                    code: '# Print a rectangle of stars\nfor row in range(3):\n    for col in range(5):\n        print("*", end="")\n    print()  # New line after each row\n\nprint()\n\n# Times tables\nfor i in range(1, 4):\n    for j in range(1, 4):\n        result = i * j\n        print(f"{i} x {j} = {result}")' 
+                }
             ]
         },
         lists: {
-            title: 'Lists',
+            title: 'Lists (Arrays)',
             sections: [
-                { title: 'Creating Lists', content: 'Store multiple items', code: 'nums = [1, 2, 3, 4, 5]\nprint(nums)\nprint(len(nums))' },
-                { title: 'Indexing', content: 'Access by position', code: 'colors = ["red", "green", "blue"]\nprint(colors[0])   # red\nprint(colors[-1])  # blue' },
-                { title: 'Modifying', content: 'Add and remove items', code: 'nums = [1, 2, 3]\nnums.append(4)\nprint(nums)\nnums.remove(2)\nprint(nums)' },
-                { title: 'List Functions', content: 'Built-in functions', code: 'nums = [3, 1, 4, 1, 5]\nprint(max(nums))\nprint(min(nums))\nprint(sum(nums))' }
+                { 
+                    title: 'Creating Lists', 
+                    content: 'Lists store multiple items in order. Items are separated by commas and enclosed in square brackets. Lists can hold any data type.', 
+                    code: '# Creating lists\nnumbers = [10, 20, 30, 40, 50]\nnames = ["Alice", "Bob", "Charlie"]\nmixed = [1, "hello", 3.14, True]\nempty = []\n\nprint(numbers)\nprint(names)\nprint(f"List length: {len(numbers)}")' 
+                },
+                { 
+                    title: 'Accessing Elements (Indexing)', 
+                    content: 'Access items by their index (position). Indices start at 0! Use negative indices to count from the end: -1 is last item.', 
+                    code: 'colors = ["red", "green", "blue", "yellow"]\n#           0       1        2        3\n#          -4      -3       -2       -1\n\nprint(colors[0])    # First: red\nprint(colors[2])    # Third: blue\nprint(colors[-1])   # Last: yellow\nprint(colors[-2])   # Second last: blue' 
+                },
+                { 
+                    title: 'Modifying Lists', 
+                    content: 'Lists are mutable - you can change them.<br>• Change item: list[index] = new_value<br>• Add item: list.append(item)<br>• Remove item: list.remove(item)', 
+                    code: '# Modify by index\nnums = [1, 2, 3, 4, 5]\nnums[2] = 99\nprint(f"After change: {nums}")\n\n# Append (add to end)\nnums.append(6)\nprint(f"After append: {nums}")\n\n# Remove by value\nnums.remove(99)\nprint(f"After remove: {nums}")' 
+                },
+                { 
+                    title: 'List Slicing', 
+                    content: 'Extract a portion of a list using slicing: list[start:stop]<br>• start: First index (included)<br>• stop: End index (excluded)<br>• Omit start = from beginning<br>• Omit stop = to end', 
+                    code: 'nums = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]\n\nprint(nums[2:5])    # [2, 3, 4]\nprint(nums[:4])     # [0, 1, 2, 3]\nprint(nums[6:])     # [6, 7, 8, 9]\nprint(nums[::2])    # [0, 2, 4, 6, 8] every 2nd\nprint(nums[::-1])   # Reversed!' 
+                },
+                { 
+                    title: 'List Functions', 
+                    content: 'Useful built-in functions for lists:<br>• len() - Number of items<br>• sum() - Total of numeric list<br>• max() - Largest value<br>• min() - Smallest value', 
+                    code: 'scores = [85, 92, 78, 95, 88]\n\nprint(f"Count: {len(scores)}")\nprint(f"Total: {sum(scores)}")\nprint(f"Highest: {max(scores)}")\nprint(f"Lowest: {min(scores)}")\n\n# Calculate average\naverage = sum(scores) / len(scores)\nprint(f"Average: {average}")' 
+                },
+                { 
+                    title: 'Searching in Lists', 
+                    content: 'Check if item exists and find its position.', 
+                    code: 'fruits = ["apple", "banana", "cherry", "date"]\n\n# Check if item exists\nif "banana" in fruits:\n    print("Banana found!")\n\nif "grape" not in fruits:\n    print("No grape")\n\n# Find index of item\nnames = ["Alice", "Bob", "Charlie"]\ntarget = "Bob"\nfor i in range(len(names)):\n    if names[i] == target:\n        print(f"Found {target} at index {i}")' 
+                }
             ]
         },
         functions: {
-            title: 'Functions',
+            title: 'Subprograms (Functions)',
             sections: [
-                { title: 'Defining Functions', content: 'Reusable code blocks', code: 'def greet():\n    print("Hello!")\n\ngreet()\ngreet()' },
-                { title: 'Parameters', content: 'Pass data to functions', code: 'def greet(name):\n    print(f"Hello, {name}!")\n\ngreet("Alice")\ngreet("Bob")' },
-                { title: 'Return Values', content: 'Get results back', code: 'def add(a, b):\n    return a + b\n\nresult = add(5, 3)\nprint(result)' }
+                { 
+                    title: 'Why Use Functions?', 
+                    content: 'Functions are reusable blocks of code.<br>Benefits:<br>• Avoid code repetition (DRY principle)<br>• Make code easier to read and maintain<br>• Break complex problems into smaller parts<br>• Can be tested independently', 
+                    code: '# Without function - repeated code\nprint("*" * 20)\nprint("Welcome!")\nprint("*" * 20)\n\nprint("*" * 20)\nprint("Goodbye!")\nprint("*" * 20)' 
+                },
+                { 
+                    title: 'Defining Functions', 
+                    content: 'Use def keyword to define a function. Function body must be indented. Call the function by name with parentheses.', 
+                    code: '# Define a function\ndef display_border():\n    print("*" * 20)\n\ndef greet():\n    print("Hello!")\n    print("Welcome to Python")\n\n# Call the functions\ndisplay_border()\ngreet()\ndisplay_border()' 
+                },
+                { 
+                    title: 'Parameters (Arguments)', 
+                    content: 'Parameters pass data INTO a function. Define them in parentheses. Values passed when calling are called arguments.', 
+                    code: '# Function with one parameter\ndef greet(name):\n    print(f"Hello, {name}!")\n\ngreet("Alice")\ngreet("Bob")\n\n# Function with multiple parameters\ndef add_numbers(a, b):\n    result = a + b\n    print(f"{a} + {b} = {result}")\n\nadd_numbers(5, 3)\nadd_numbers(10, 20)' 
+                },
+                { 
+                    title: 'Return Values', 
+                    content: 'Functions can send data back using return. The returned value can be stored in a variable or used directly.', 
+                    code: '# Function that returns a value\ndef calculate_area(length, width):\n    area = length * width\n    return area\n\n# Store returned value\nroom_area = calculate_area(5, 4)\nprint(f"Room area: {room_area}")\n\n# Use directly in expression\ntotal = calculate_area(3, 3) + calculate_area(2, 2)\nprint(f"Total area: {total}")' 
+                },
+                { 
+                    title: 'Multiple Returns & Validation', 
+                    content: 'Functions can have multiple return statements (usually with conditions). Return stops function execution immediately.', 
+                    code: '# Function with validation\ndef calculate_grade(score):\n    if score < 0 or score > 100:\n        return "Invalid score"\n    \n    if score >= 90:\n        return "A"\n    elif score >= 80:\n        return "B"\n    elif score >= 70:\n        return "C"\n    elif score >= 60:\n        return "D"\n    else:\n        return "F"\n\nprint(calculate_grade(85))\nprint(calculate_grade(72))\nprint(calculate_grade(150))' 
+                },
+                { 
+                    title: 'Procedures vs Functions', 
+                    content: '<b>Procedure:</b> Performs action, no return value<br><b>Function:</b> Returns a value<br><br>In Python, both use def. A procedure is just a function without return.', 
+                    code: '# PROCEDURE - performs action, no return\ndef display_menu():\n    print("=== MENU ===")\n    print("1. Start")\n    print("2. Exit")\n\n# FUNCTION - returns a value\ndef get_maximum(a, b):\n    if a > b:\n        return a\n    else:\n        return b\n\n# Call procedure (no value captured)\ndisplay_menu()\n\n# Call function (capture return value)\nbigger = get_maximum(10, 25)\nprint(f"Maximum: {bigger}")' 
+                }
             ]
         },
         algorithms: {
-            title: 'Algorithms',
+            title: 'Standard Algorithms',
             sections: [
-                { title: 'Linear Search', content: 'Find item in list', code: 'nums = [4, 2, 7, 1, 9]\ntarget = 7\nfound = -1\nfor i in range(len(nums)):\n    if nums[i] == target:\n        found = i\nprint(f"Found at {found}")' },
-                { title: 'Finding Max', content: 'Find largest value', code: 'nums = [3, 7, 2, 9, 4]\nlargest = nums[0]\nfor n in nums:\n    if n > largest:\n        largest = n\nprint(largest)' },
-                { title: 'Counting', content: 'Count occurrences', code: 'text = "hello"\ncount = 0\nfor char in text:\n    if char == "l":\n        count = count + 1\nprint(count)' }
+                { 
+                    title: 'Linear Search', 
+                    content: 'Search through list one item at a time. Returns index if found, -1 if not found. Works on unsorted lists. Time complexity: O(n)', 
+                    code: '# Linear Search Algorithm\nnums = [4, 2, 7, 1, 9, 3]\ntarget = 7\nfound_index = -1\n\nfor i in range(len(nums)):\n    if nums[i] == target:\n        found_index = i\n\nif found_index != -1:\n    print(f"Found {target} at index {found_index}")\nelse:\n    print(f"{target} not found")' 
+                },
+                { 
+                    title: 'Binary Search', 
+                    content: 'Efficient search for SORTED lists. Repeatedly halve the search space. Much faster than linear for large lists. Time complexity: O(log n)', 
+                    code: '# Binary Search (list MUST be sorted!)\nnums = [2, 5, 8, 12, 16, 23, 38, 56]\ntarget = 23\n\nlow = 0\nhigh = len(nums) - 1\nfound_index = -1\n\nwhile low <= high:\n    mid = (low + high) // 2\n    if nums[mid] == target:\n        found_index = mid\n        low = high + 1  # Exit loop\n    elif nums[mid] < target:\n        low = mid + 1\n    else:\n        high = mid - 1\n\nprint(f"Found at index: {found_index}")' 
+                },
+                { 
+                    title: 'Bubble Sort', 
+                    content: 'Compare adjacent elements and swap if in wrong order. Repeat until no swaps needed. Simple but inefficient for large lists.', 
+                    code: '# Bubble Sort Algorithm\nnums = [64, 34, 25, 12, 22, 11, 90]\nn = len(nums)\n\nfor i in range(n - 1):\n    for j in range(n - 1 - i):\n        if nums[j] > nums[j + 1]:\n            # Swap adjacent elements\n            nums[j], nums[j + 1] = nums[j + 1], nums[j]\n\nprint(f"Sorted: {nums}")' 
+                },
+                { 
+                    title: 'Finding Maximum', 
+                    content: 'Iterate through list tracking the largest value seen. Initialize with first element.', 
+                    code: '# Find Maximum Algorithm\nnums = [34, 67, 23, 89, 45, 12]\n\nmax_val = nums[0]  # Start with first\nmax_idx = 0\n\nfor i in range(1, len(nums)):\n    if nums[i] > max_val:\n        max_val = nums[i]\n        max_idx = i\n\nprint(f"Maximum: {max_val}")\nprint(f"At index: {max_idx}")' 
+                },
+                { 
+                    title: 'Finding Minimum', 
+                    content: 'Same as maximum but track smallest value instead.', 
+                    code: '# Find Minimum Algorithm\nnums = [34, 67, 23, 89, 45, 12]\n\nmin_val = nums[0]  # Start with first\n\nfor i in range(1, len(nums)):\n    if nums[i] < min_val:\n        min_val = nums[i]\n\nprint(f"Minimum: {min_val}")' 
+                },
+                { 
+                    title: 'Calculating Average', 
+                    content: 'Sum all values then divide by count. Watch out for division by zero!', 
+                    code: '# Calculate Average Algorithm\nscores = [85, 92, 78, 95, 88, 76]\n\n# Manual calculation (exam style)\ntotal = 0\ncount = 0\n\nfor score in scores:\n    total = total + score\n    count = count + 1\n\nif count > 0:\n    average = total / count\n    print(f"Average: {average}")\nelse:\n    print("No data!")' 
+                },
+                { 
+                    title: 'Counting Occurrences', 
+                    content: 'Count how many times a specific value appears in a list.', 
+                    code: '# Count Occurrences Algorithm\ndata = [1, 3, 5, 3, 7, 3, 9, 2, 3]\ntarget = 3\ncount = 0\n\nfor item in data:\n    if item == target:\n        count = count + 1\n\nprint(f"{target} appears {count} times")\n\n# Count vowels in text\ntext = "Hello World"\nvowels = "aeiouAEIOU"\nvowel_count = 0\n\nfor char in text:\n    if char in vowels:\n        vowel_count = vowel_count + 1\n\nprint(f"Vowels: {vowel_count}")' 
+                }
+            ]
+        },
+        arrays2d: {
+            title: '2D Arrays (Matrices)',
+            sections: [
+                { 
+                    title: 'Creating 2D Arrays', 
+                    content: 'A 2D array is a list of lists - think of it as a table with rows and columns. Access elements using two indices: [row][column]', 
+                    code: '# 2D Array - list of lists\nmatrix = [\n    [1, 2, 3],\n    [4, 5, 6],\n    [7, 8, 9]\n]\n\n# Access element: matrix[row][column]\nprint(matrix[0][0])  # Row 0, Col 0 = 1\nprint(matrix[1][2])  # Row 1, Col 2 = 6\nprint(matrix[2][1])  # Row 2, Col 1 = 8' 
+                },
+                { 
+                    title: 'Iterating 2D Arrays', 
+                    content: 'Use nested loops to access all elements. Outer loop for rows, inner loop for columns.', 
+                    code: '# Print entire 2D array\nmatrix = [\n    [1, 2, 3],\n    [4, 5, 6],\n    [7, 8, 9]\n]\n\nfor row in range(len(matrix)):\n    for col in range(len(matrix[row])):\n        print(matrix[row][col], end=" ")\n    print()  # New line after each row' 
+                },
+                { 
+                    title: 'Sum All Elements', 
+                    content: 'Calculate the total of all elements in a 2D array.', 
+                    code: '# Sum all elements in 2D array\nmatrix = [\n    [1, 2, 3],\n    [4, 5, 6],\n    [7, 8, 9]\n]\n\ntotal = 0\nfor row in range(len(matrix)):\n    for col in range(len(matrix[row])):\n        total = total + matrix[row][col]\n\nprint(f"Sum of all elements: {total}")' 
+                },
+                { 
+                    title: 'Find Maximum in 2D', 
+                    content: 'Find the largest value in a 2D array.', 
+                    code: '# Find maximum in 2D array\nmatrix = [\n    [3, 8, 2],\n    [9, 1, 5],\n    [4, 7, 6]\n]\n\nmax_val = matrix[0][0]\n\nfor row in range(len(matrix)):\n    for col in range(len(matrix[row])):\n        if matrix[row][col] > max_val:\n            max_val = matrix[row][col]\n\nprint(f"Maximum value: {max_val}")' 
+                }
+            ]
+        },
+        filehandling: {
+            title: 'File Handling (Simulation)',
+            sections: [
+                { 
+                    title: 'Why File Handling?', 
+                    content: 'Files store data permanently. When a program ends, variables are lost - but files persist. Common operations: Read, Write, Append.', 
+                    code: '# In the exam, file handling is tested\n# Here we simulate with lists\n\n# Simulated file data (each item = one line)\nfile_data = [\n    "Alice,85",\n    "Bob,92",\n    "Charlie,78"\n]\n\n# Process each "line"\nfor line in file_data:\n    print(line)' 
+                },
+                { 
+                    title: 'Reading File Data', 
+                    content: 'Simulating reading records from a file. Each line is typically one record. Split lines to extract fields.', 
+                    code: '# Simulate reading student records\nfile_data = [\n    "Alice,85",\n    "Bob,92",\n    "Charlie,78"\n]\n\nfor line in file_data:\n    parts = line.split(",")  # Split by comma\n    name = parts[0]\n    score = int(parts[1])\n    print(f"Student: {name}, Score: {score}")' 
+                },
+                { 
+                    title: 'Processing File Data', 
+                    content: 'Calculate statistics from file data - a common exam question pattern.', 
+                    code: '# Calculate average from file data\nfile_data = [\n    "Alice,85",\n    "Bob,92",\n    "Charlie,78",\n    "Diana,88"\n]\n\ntotal = 0\ncount = 0\n\nfor line in file_data:\n    parts = line.split(",")\n    score = int(parts[1])\n    total = total + score\n    count = count + 1\n\naverage = total / count\nprint(f"Class average: {average}")' 
+                },
+                { 
+                    title: 'Writing to File (Simulation)', 
+                    content: 'Simulating writing new data to a file. In reality, you would use file operations.', 
+                    code: '# Simulate writing to a file\noutput_data = []  # Our "file"\n\n# Add records\noutput_data.append("David,95")\noutput_data.append("Eve,81")\n\n# Display "file" contents\nprint("File contents:")\nfor line in output_data:\n    print(line)' 
+                }
             ]
         }
     },

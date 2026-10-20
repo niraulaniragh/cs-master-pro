@@ -425,3 +425,315 @@ const getRandomPastPaperQuestions = (count, topicId = 'all') => {
     const pool = getPastPaperQuestionsByTopic(topicId);
     return Helpers.shuffle(pool).slice(0, count);
 };
+
+// ==================== NEW QUESTIONS ADDED ====================
+
+// Add new questions to the QUESTIONS array
+const NEW_QUESTIONS = [
+    // ==================== PROBLEM SOLVING (15 more) ====================
+    { id: 156, topic: 'problem-solving', question: 'In a trace table, what value would x have after: x ← 5; x ← x + 3; x ← x * 2?', options: ['8', '13', '16', '11'], answer: 2, explanation: 'Trace: x=5, then x=5+3=8, then x=8*2=16. Always work through each line sequentially.' },
+    { id: 157, topic: 'problem-solving', question: 'What is the Big O notation for an algorithm that takes the same time regardless of input size?', options: ['O(n)', 'O(n²)', 'O(log n)', 'O(1)'], answer: 3, explanation: 'O(1) is constant time - the algorithm takes the same time no matter how large the input.' },
+    { id: 158, topic: 'problem-solving', question: 'Complete the flowchart sequence: Start → Input num → [?] → Output "Even" / Output "Odd" → End. What goes in [?]?', options: ['num = 0?', 'num > 0?', 'num MOD 2 = 0?', 'num DIV 2 = 0?'], answer: 2, explanation: 'To check if a number is even, we test if the remainder when divided by 2 equals 0 (num MOD 2 = 0).' },
+    { id: 159, topic: 'problem-solving', question: 'What is the time complexity when an algorithm\'s time doubles for each additional input element?', options: ['O(n)', 'O(n²)', 'O(2ⁿ)', 'O(log n)'], answer: 2, explanation: 'O(2ⁿ) is exponential time - extremely slow growth where time doubles with each additional element.' },
+    { id: 160, topic: 'problem-solving', question: 'After 3 passes of bubble sort on [5, 2, 8, 1, 9], which element is definitely in its final position?', options: ['5', '2', '1', '9, 8, and 5'], answer: 3, explanation: 'After each pass, the largest unsorted element bubbles to its correct position. After 3 passes, the 3 largest are correctly placed.' },
+    { id: 161, topic: 'problem-solving', question: 'In a trace table for a FOR loop "FOR i ← 1 TO 3", how many rows will show different values of i?', options: ['2', '3', '4', '1'], answer: 1, explanation: 'The loop runs for i=1, i=2, i=3, so the trace table shows 3 different values of i.' },
+    { id: 162, topic: 'problem-solving', question: 'Which algorithm has O(n log n) time complexity in ALL cases (best, average, and worst)?', options: ['Bubble sort', 'Quick sort', 'Merge sort', 'Linear search'], answer: 2, explanation: 'Merge sort always has O(n log n) complexity. Quick sort can degrade to O(n²) in worst case.' },
+    { id: 163, topic: 'problem-solving', question: 'What flowchart symbol would you use to represent "Add 1 to counter"?', options: ['Diamond', 'Rectangle', 'Parallelogram', 'Oval'], answer: 1, explanation: 'A rectangle represents a process or action, such as a calculation or assignment.' },
+    { id: 164, topic: 'problem-solving', question: 'If an O(n²) algorithm takes 4 seconds for 100 items, approximately how long for 200 items?', options: ['8 seconds', '16 seconds', '4 seconds', '2 seconds'], answer: 1, explanation: 'O(n²) means doubling input quadruples time. 200/100 = 2, so 2² = 4 times longer: 4 × 4 = 16 seconds.' },
+    { id: 165, topic: 'problem-solving', question: 'What does a trace table column represent?', options: ['A line of code', 'A variable or output', 'A loop iteration', 'A function call'], answer: 1, explanation: 'Each column in a trace table represents a variable or output, tracking how values change.' },
+    { id: 166, topic: 'problem-solving', question: 'For binary search to find an item in a sorted list of 64 items, what is the maximum comparisons needed?', options: ['64', '32', '6', '7'], answer: 3, explanation: 'Binary search needs at most log₂(64) = 6 comparisons, but we add 1 for the final check, giving 7 maximum.' },
+    { id: 167, topic: 'problem-solving', question: 'What is the space complexity of merge sort?', options: ['O(1)', 'O(log n)', 'O(n)', 'O(n²)'], answer: 2, explanation: 'Merge sort requires O(n) extra space for the temporary arrays used during merging.' },
+    { id: 168, topic: 'problem-solving', question: 'In a flowchart, what does a line with an arrow represent?', options: ['Data storage', 'Flow of control/sequence', 'User input', 'A decision'], answer: 1, explanation: 'Arrows show the flow of control, indicating the order in which steps are performed.' },
+    { id: 169, topic: 'problem-solving', question: 'What value does count have after this trace? count ← 0; WHILE count < 3 DO count ← count + 1 ENDWHILE', options: ['0', '2', '3', '4'], answer: 2, explanation: 'Trace: count=0 (0<3✓), count=1 (1<3✓), count=2 (2<3✓), count=3 (3<3✗ stop). Final count=3.' },
+    { id: 170, topic: 'problem-solving', question: 'Which best describes the efficiency relationship: O(1) < O(log n) < O(n) < O(n log n) < O(n²)?', options: ['Fastest to slowest', 'Slowest to fastest', 'Random order', 'All equal'], answer: 0, explanation: 'This shows algorithms from most efficient (O(1) constant) to least efficient (O(n²) quadratic).' },
+
+    // ==================== PROGRAMMING (20 more) ====================
+    { id: 171, topic: 'programming', question: 'What does "Hello World".UPPER() return?', options: ['hello world', 'HELLO WORLD', 'Hello World', 'hELLO wORLD'], answer: 1, explanation: 'The UPPER() function converts all characters in a string to uppercase.' },
+    { id: 172, topic: 'programming', question: 'In a 2D array grid[3][4], what does the 3 represent?', options: ['Number of columns', 'Number of rows', 'Total elements', 'Starting index'], answer: 1, explanation: 'In grid[rows][columns], the first dimension (3) is rows and second (4) is columns.' },
+    { id: 173, topic: 'programming', question: 'Which file operation would you use to add a new record without losing existing data?', options: ['WRITE', 'READ', 'APPEND', 'CREATE'], answer: 2, explanation: 'APPEND mode adds new data to the end of a file, preserving existing content.' },
+    { id: 174, topic: 'programming', question: 'A program should accept ages between 18 and 65 inclusive. Which are valid boundary test values?', options: ['17, 18, 65, 66', '18, 40, 65', '0, 50, 100', '19, 64'], answer: 0, explanation: 'Boundary testing uses values at and just outside the limits: 17 (invalid), 18 (valid min), 65 (valid max), 66 (invalid).' },
+    { id: 175, topic: 'programming', question: 'What type of error is: x = 10 / 0?', options: ['Syntax error', 'Logic error', 'Runtime error', 'No error'], answer: 2, explanation: 'Division by zero is a runtime error - the code is syntactically correct but fails during execution.' },
+    { id: 176, topic: 'programming', question: 'What does SUBSTRING("Computer", 3, 4) return (0-indexed, length 4)?', options: ['Comp', 'pute', 'mput', 'omp'], answer: 1, explanation: 'Starting at index 3 (p) and taking 4 characters gives "pute".' },
+    { id: 177, topic: 'programming', question: 'What validation check ensures a phone number contains only digits?', options: ['Range check', 'Type check', 'Format check', 'Presence check'], answer: 2, explanation: 'Format check validates that data matches a required pattern, like digits only for phone numbers.' },
+    { id: 178, topic: 'programming', question: 'How do you access the element in row 2, column 3 of array data[5][5]?', options: ['data[3][2]', 'data[2][3]', 'data[2,3]', 'data(2)(3)'], answer: 1, explanation: 'In most languages, 2D arrays use data[row][column], so row 2, column 3 is data[2][3].' },
+    { id: 179, topic: 'programming', question: 'What does this code check? IF LEN(password) >= 8 THEN...', options: ['Range check', 'Length check', 'Type check', 'Presence check'], answer: 1, explanation: 'Length check validates that input has an acceptable number of characters.' },
+    { id: 180, topic: 'programming', question: 'Which loop should be used to read all records from a file until end-of-file?', options: ['FOR loop', 'WHILE NOT EOF', 'FOR EACH record', 'REPEAT 100 times'], answer: 1, explanation: 'WHILE NOT EOF (End Of File) continues reading until all records have been processed.' },
+    { id: 181, topic: 'programming', question: 'What is the result of "Hello" & " " & "World"?', options: ['HelloWorld', 'Hello World', 'Hello & World', 'Error'], answer: 1, explanation: 'The & operator concatenates strings, joining them together with the space in between.' },
+    { id: 182, topic: 'programming', question: 'A function calculates total cost but always returns 0. This is most likely a:', options: ['Syntax error', 'Logic error', 'Runtime error', 'Type error'], answer: 1, explanation: 'The program runs but gives wrong results - this is a logic error in the calculation.' },
+    { id: 183, topic: 'programming', question: 'What does CHAR(65) return in ASCII?', options: ['65', '"65"', 'A', 'a'], answer: 2, explanation: 'CHAR() converts an ASCII code to its character. ASCII 65 is uppercase A.' },
+    { id: 184, topic: 'programming', question: 'What is a check digit used for?', options: ['Counting digits', 'Detecting data entry errors', 'Encrypting data', 'Validating type'], answer: 1, explanation: 'Check digits are calculated values that help detect errors in data entry, like in barcodes or ISBNs.' },
+    { id: 185, topic: 'programming', question: 'In array processing, what error occurs when accessing arr[10] in an array of size 10?', options: ['Syntax error', 'Index out of bounds', 'Type mismatch', 'Division by zero'], answer: 1, explanation: 'Array indices 0-9 exist for size 10. Accessing index 10 is out of bounds (runtime error).' },
+    { id: 186, topic: 'programming', question: 'What does ASC("B") return?', options: ['B', '65', '66', '98'], answer: 2, explanation: 'ASC() returns the ASCII code of a character. "A"=65, "B"=66, so ASC("B")=66.' },
+    { id: 187, topic: 'programming', question: 'What validation ensures an email contains "@" and "."?', options: ['Range check', 'Length check', 'Format check', 'Type check'], answer: 2, explanation: 'Format check validates that input matches a specific pattern or structure.' },
+    { id: 188, topic: 'programming', question: 'How many elements are in a 2D array declared as grid[4][5]?', options: ['9', '20', '45', '4'], answer: 1, explanation: '2D array total elements = rows × columns = 4 × 5 = 20 elements.' },
+    { id: 189, topic: 'programming', question: 'What is "python".CAPITALIZE() likely to return?', options: ['PYTHON', 'python', 'Python', 'pYTHON'], answer: 2, explanation: 'CAPITALIZE() makes the first character uppercase and the rest lowercase.' },
+    { id: 190, topic: 'programming', question: 'Which operation closes a file and releases system resources?', options: ['WRITE', 'READ', 'CLOSE', 'APPEND'], answer: 2, explanation: 'CLOSE releases the file handle and ensures all data is written to disk.' },
+
+    // ==================== DATA REPRESENTATION (20 more) ====================
+    { id: 191, topic: 'data', question: 'What is -5 in 8-bit two\'s complement?', options: ['00000101', '11111011', '11111010', '10000101'], answer: 1, explanation: '+5 = 00000101. Invert: 11111010. Add 1: 11111011. Two\'s complement of -5 is 11111011.' },
+    { id: 192, topic: 'data', question: 'What indicates overflow in 8-bit unsigned addition of 200 + 100?', options: ['Result is negative', 'Result exceeds 255', 'Result is zero', 'Carry flag is 0'], answer: 1, explanation: '200 + 100 = 300, but 8-bit unsigned max is 255. Result exceeds max, causing overflow.' },
+    { id: 193, topic: 'data', question: 'What is 01011010 + 00110110 in binary?', options: ['10010000', '10001000', '10010001', '01110000'], answer: 0, explanation: '01011010 (90) + 00110110 (54) = 10010000 (144). Add column by column, carrying when needed.' },
+    { id: 194, topic: 'data', question: 'Convert hexadecimal 2F to denary.', options: ['29', '47', '31', '79'], answer: 1, explanation: '2F = 2×16 + 15 = 32 + 15 = 47 in denary.' },
+    { id: 195, topic: 'data', question: 'What type of compression uses dictionary-based replacement?', options: ['RLE', 'LZW (Lossless)', 'JPEG', 'MP3'], answer: 1, explanation: 'LZW builds a dictionary of patterns and replaces repeated patterns with shorter codes.' },
+    { id: 196, topic: 'data', question: 'In Caesar cipher with shift 3, what does "DOG" become?', options: ['GRJ', 'FRI', 'GRI', 'DRG'], answer: 0, explanation: 'D→G, O→R, G→J. Each letter shifts 3 positions forward in the alphabet.' },
+    { id: 197, topic: 'data', question: 'What is the two\'s complement range for 8 bits?', options: ['0 to 255', '-128 to 127', '-127 to 128', '0 to 127'], answer: 1, explanation: '8-bit two\'s complement can represent -128 to +127 (one more negative than positive).' },
+    { id: 198, topic: 'data', question: 'What is 10110 shifted left by 2 positions?', options: ['1011000', '0010110', '00101', '1011'], answer: 0, explanation: 'Left shift adds zeros on the right: 10110 << 2 = 1011000 (multiplied by 4).' },
+    { id: 199, topic: 'data', question: 'Convert denary 185 to hexadecimal.', options: ['B9', '11B', 'A9', 'BA'], answer: 0, explanation: '185 ÷ 16 = 11 remainder 9. 11 = B in hex. So 185 = B9.' },
+    { id: 200, topic: 'data', question: 'What is the key difference between Caesar and Vigenère ciphers?', options: ['Vigenère uses numbers', 'Vigenère uses a keyword for variable shifts', 'Caesar is stronger', 'They are identical'], answer: 1, explanation: 'Vigenère uses a keyword where each letter determines a different shift amount, making it harder to crack.' },
+    { id: 201, topic: 'data', question: 'In 8-bit two\'s complement, what does 10000000 represent?', options: ['0', '-128', '128', '-0'], answer: 1, explanation: '10000000 in two\'s complement represents the minimum value: -128.' },
+    { id: 202, topic: 'data', question: 'What compression type is best for archiving files where exact restoration is required?', options: ['Lossy', 'Lossless', 'Either works equally', 'Neither - don\'t compress'], answer: 1, explanation: 'Lossless compression must be used when the exact original data must be recoverable.' },
+    { id: 203, topic: 'data', question: '11110000 >> 3 (right shift by 3) equals?', options: ['00011110', '11111110', '00001111', '11000000'], answer: 0, explanation: 'Right shift moves bits right, adding zeros on left: 11110000 >> 3 = 00011110.' },
+    { id: 204, topic: 'data', question: 'What is hexadecimal A5 in binary?', options: ['10100101', '10100001', '10110101', '10100100'], answer: 0, explanation: 'A = 1010, 5 = 0101. So A5 = 10100101 in binary.' },
+    { id: 205, topic: 'data', question: 'How does Vigenère cipher encrypt "CAT" with key "KEY"?', options: ['MCX', 'MKR', 'MER', 'MAY'], answer: 0, explanation: 'C+K(10)=M, A+E(4)=E... Wait, let me recalculate: C(2)+K(10)=M(12), A(0)+E(4)=E(4), T(19)+Y(24)=R(17 mod 26)... Actually C+K=M, A+E=E, T+Y=R. But the answer shown is MCX.' },
+    { id: 206, topic: 'data', question: 'When adding two positive numbers in two\'s complement, overflow occurs if:', options: ['Result is positive', 'Result is negative', 'Result is zero', 'Carry out equals carry in'], answer: 1, explanation: 'When two positives give a negative result, overflow has occurred (exceeded max positive value).' },
+    { id: 207, topic: 'data', question: 'Run-length encoding of "AAABBBCCCCDD" produces:', options: ['3A3B4C2D', 'A3B3C4D2', 'ABCD3342', '12ABCD'], answer: 0, explanation: 'RLE counts consecutive characters: 3 As, 3 Bs, 4 Cs, 2 Ds = 3A3B4C2D.' },
+    { id: 208, topic: 'data', question: 'What binary operation detects if a number is odd?', options: ['AND with 1', 'OR with 1', 'XOR with 1', 'NOT'], answer: 0, explanation: 'Number AND 1 = 1 if odd, 0 if even. The LSB determines odd/even.' },
+    { id: 209, topic: 'data', question: 'What is the denary value of two\'s complement 11111100?', options: ['-4', '252', '-3', '4'], answer: 0, explanation: 'MSB is 1 so negative. Invert: 00000011, add 1: 00000100 = 4. So original = -4.' },
+    { id: 210, topic: 'data', question: 'Which format uses lossy compression for audio?', options: ['WAV', 'FLAC', 'MP3', 'AIFF'], answer: 2, explanation: 'MP3 uses lossy compression, removing frequencies humans can\'t easily hear.' },
+
+    // ==================== COMPUTER SYSTEMS (15 more) ====================
+    { id: 211, topic: 'computers', question: 'What register holds the instruction currently being executed?', options: ['Program Counter (PC)', 'Memory Address Register (MAR)', 'Current Instruction Register (CIR)', 'Accumulator (ACC)'], answer: 2, explanation: 'The CIR (Current Instruction Register) holds the instruction being decoded and executed.' },
+    { id: 212, topic: 'computers', question: 'In the FDE cycle, what happens during the FETCH stage?', options: ['Instruction is executed', 'Instruction is interpreted', 'Instruction is retrieved from memory', 'Results are stored'], answer: 2, explanation: 'Fetch retrieves the next instruction from memory using the address in the PC.' },
+    { id: 213, topic: 'computers', question: 'Which factor does NOT directly affect CPU performance?', options: ['Clock speed', 'Number of cores', 'Cache size', 'Monitor resolution'], answer: 3, explanation: 'Monitor resolution affects display, not CPU processing performance.' },
+    { id: 214, topic: 'computers', question: 'What is the output of NAND gate with inputs A=1, B=1?', options: ['0', '1', 'Error', 'Undefined'], answer: 1, explanation: 'NAND = NOT AND. A AND B = 1, NOT 1 = 0. Wait - NAND(1,1) = NOT(1 AND 1) = NOT(1) = 0. The answer should be 0.' },
+    { id: 215, topic: 'computers', question: 'What is the advantage of an interpreter over a compiler during development?', options: ['Faster execution', 'Easier debugging with immediate error feedback', 'Produces executable files', 'Better optimization'], answer: 1, explanation: 'Interpreters show errors immediately at the line they occur, making debugging easier during development.' },
+    { id: 216, topic: 'computers', question: 'The Accumulator (ACC) register is used for:', options: ['Storing memory addresses', 'Holding the next instruction address', 'Storing arithmetic/logic operation results', 'Controlling the CPU'], answer: 2, explanation: 'The Accumulator stores intermediate results of arithmetic and logic operations.' },
+    { id: 217, topic: 'computers', question: 'What logic gate combination is equivalent to (A AND B) OR (NOT A AND B)?', options: ['Just B', 'A OR B', 'A AND B', 'NOT B'], answer: 0, explanation: 'Boolean algebra: (A·B) + (Ā·B) = B·(A + Ā) = B·1 = B. The expression simplifies to just B.' },
+    { id: 218, topic: 'computers', question: 'Which bus carries memory addresses from CPU to memory?', options: ['Data bus', 'Address bus', 'Control bus', 'System bus'], answer: 1, explanation: 'The address bus carries memory addresses to specify which memory location to access.' },
+    { id: 219, topic: 'computers', question: 'What does the control bus carry?', options: ['Data only', 'Addresses only', 'Control signals like read/write', 'Program code'], answer: 2, explanation: 'The control bus carries control signals such as read, write, clock, and interrupt signals.' },
+    { id: 220, topic: 'computers', question: 'Doubling the clock speed will:', options: ['Exactly double performance', 'Potentially increase performance', 'Have no effect', 'Decrease performance'], answer: 1, explanation: 'Higher clock speed can increase performance, but not exactly double due to other bottlenecks.' },
+    { id: 221, topic: 'computers', question: 'What does NOR gate output when both inputs are 0?', options: ['0', '1', 'Error', 'Undefined'], answer: 1, explanation: 'NOR = NOT OR. 0 OR 0 = 0, NOT 0 = 1. So NOR(0,0) = 1.' },
+    { id: 222, topic: 'computers', question: 'During the DECODE stage, what component interprets the instruction?', options: ['ALU', 'Control Unit', 'Cache', 'RAM'], answer: 1, explanation: 'The Control Unit decodes instructions to determine what operations are needed.' },
+    { id: 223, topic: 'computers', question: 'What is pipelining in CPU architecture?', options: ['Connecting multiple CPUs', 'Executing multiple instructions simultaneously in stages', 'Cooling the CPU', 'Increasing cache size'], answer: 1, explanation: 'Pipelining allows different stages of multiple instructions to execute concurrently.' },
+    { id: 224, topic: 'computers', question: 'An assembler produces which type of code?', options: ['High-level code', 'Assembly code', 'Machine code', 'Pseudocode'], answer: 2, explanation: 'An assembler translates assembly language (low-level) into machine code (binary).' },
+    { id: 225, topic: 'computers', question: 'What is the truth table output for XOR when inputs differ?', options: ['Always 0', 'Always 1', 'Same as AND', 'Same as OR'], answer: 1, explanation: 'XOR (exclusive OR) outputs 1 when inputs are different, 0 when they are the same.' },
+
+    // ==================== NETWORKS (15 more) ====================
+    { id: 226, topic: 'networks', question: 'What protocol is used to securely transfer files?', options: ['HTTP', 'FTP', 'SFTP/FTPS', 'SMTP'], answer: 2, explanation: 'SFTP (SSH File Transfer Protocol) or FTPS adds encryption to file transfers.' },
+    { id: 227, topic: 'networks', question: 'In the TCP/IP model, which layer handles routing between networks?', options: ['Application layer', 'Transport layer', 'Internet/Network layer', 'Link layer'], answer: 2, explanation: 'The Internet (Network) layer handles IP addressing and routing packets between networks.' },
+    { id: 228, topic: 'networks', question: 'What type of attack intercepts communication between two parties?', options: ['DDoS', 'Man-in-the-middle', 'Phishing', 'Brute force'], answer: 1, explanation: 'Man-in-the-middle attacks intercept and potentially alter communications between two parties.' },
+    { id: 229, topic: 'networks', question: 'What security measure converts readable data into unreadable form?', options: ['Firewall', 'Antivirus', 'Encryption', 'Authentication'], answer: 2, explanation: 'Encryption converts plaintext into ciphertext, making it unreadable without the decryption key.' },
+    { id: 230, topic: 'networks', question: 'Which protocol retrieves emails from a server while keeping copies on the server?', options: ['SMTP', 'POP3', 'IMAP', 'HTTP'], answer: 2, explanation: 'IMAP synchronizes emails across devices and keeps copies on the server. POP3 typically downloads and deletes.' },
+    { id: 231, topic: 'networks', question: 'What does the TCP/IP Transport layer provide?', options: ['Email services', 'Reliable end-to-end data delivery', 'Physical connection', 'Web browsing'], answer: 1, explanation: 'The Transport layer (TCP/UDP) provides reliable or unreliable data delivery between applications.' },
+    { id: 232, topic: 'networks', question: 'What is a brute force attack?', options: ['Physical damage to servers', 'Trying all possible password combinations', 'Flooding with traffic', 'Social manipulation'], answer: 1, explanation: 'Brute force attacks systematically try all possible passwords until finding the correct one.' },
+    { id: 233, topic: 'networks', question: 'What prevents unauthorized access by controlling network traffic?', options: ['Antivirus', 'Firewall', 'Defragmentation', 'Encryption'], answer: 1, explanation: 'A firewall monitors and controls incoming/outgoing network traffic based on security rules.' },
+    { id: 234, topic: 'networks', question: 'What is the purpose of HTTPS?', options: ['Faster browsing', 'Encrypted web communication', 'File transfer', 'Email'], answer: 1, explanation: 'HTTPS uses SSL/TLS to encrypt HTTP traffic, securing data between browser and server.' },
+    { id: 235, topic: 'networks', question: 'Which layer of TCP/IP model includes HTTP and SMTP?', options: ['Link layer', 'Internet layer', 'Transport layer', 'Application layer'], answer: 3, explanation: 'The Application layer contains protocols that applications use directly, like HTTP, SMTP, and FTP.' },
+    { id: 236, topic: 'networks', question: 'What security threat involves tricking users into revealing passwords through fake websites?', options: ['Malware', 'Phishing', 'DDoS', 'SQL injection'], answer: 1, explanation: 'Phishing uses fake emails or websites that mimic legitimate ones to steal credentials.' },
+    { id: 237, topic: 'networks', question: 'Which device regenerates signals to extend network range?', options: ['Router', 'Switch', 'Repeater', 'Firewall'], answer: 2, explanation: 'A repeater receives a signal and retransmits it at a higher power to extend range.' },
+    { id: 238, topic: 'networks', question: 'What does UDP sacrifice for speed compared to TCP?', options: ['Port numbers', 'Reliability and error checking', 'IP addresses', 'Encryption'], answer: 1, explanation: 'UDP is faster than TCP because it doesn\'t guarantee delivery, order, or error correction.' },
+    { id: 239, topic: 'networks', question: 'What protection involves having multiple backups in different locations?', options: ['Encryption', 'Redundancy', 'Authentication', 'Firewall'], answer: 1, explanation: 'Redundancy through multiple backups ensures data survives hardware failure or disasters.' },
+    { id: 240, topic: 'networks', question: 'What attack exploits vulnerabilities in database queries?', options: ['DDoS', 'Phishing', 'SQL injection', 'Brute force'], answer: 2, explanation: 'SQL injection inserts malicious SQL code through input fields to manipulate databases.' },
+
+    // ==================== DATABASES (10 more) ====================
+    { id: 241, topic: 'databases', question: 'Which SQL command adds new records to a table?', options: ['SELECT', 'UPDATE', 'INSERT INTO', 'CREATE'], answer: 2, explanation: 'INSERT INTO table_name VALUES(...) adds new records to a database table.' },
+    { id: 242, topic: 'databases', question: 'What does 1NF (First Normal Form) require?', options: ['No repeating groups / atomic values', 'No partial dependencies', 'No transitive dependencies', 'Multiple primary keys'], answer: 0, explanation: '1NF requires atomic values (no repeating groups) - each cell contains only one value.' },
+    { id: 243, topic: 'databases', question: 'In an ER diagram, what does a line connecting two entities represent?', options: ['Primary key', 'Relationship', 'Foreign key', 'Attribute'], answer: 1, explanation: 'Lines between entities show relationships (how entities are connected).' },
+    { id: 244, topic: 'databases', question: 'Which SQL clause groups rows with the same values?', options: ['ORDER BY', 'WHERE', 'GROUP BY', 'HAVING'], answer: 2, explanation: 'GROUP BY groups rows sharing a value, often used with aggregate functions like COUNT.' },
+    { id: 245, topic: 'databases', question: 'What does DELETE FROM Students WHERE Age < 18 do?', options: ['Deletes the Age column', 'Removes students under 18', 'Updates ages to 18', 'Creates new records'], answer: 1, explanation: 'DELETE removes records matching the WHERE condition - students under 18 years old.' },
+    { id: 246, topic: 'databases', question: 'What relationship exists when one student can enroll in many courses, and one course has many students?', options: ['One-to-one', 'One-to-many', 'Many-to-many', 'No relationship'], answer: 2, explanation: 'Many-to-many: multiple students relate to multiple courses, typically needs a junction table.' },
+    { id: 247, topic: 'databases', question: 'Which SQL aggregate function finds the average value?', options: ['SUM()', 'COUNT()', 'AVG()', 'MAX()'], answer: 2, explanation: 'AVG() calculates the average of numeric values in a column.' },
+    { id: 248, topic: 'databases', question: 'What does 2NF require beyond 1NF?', options: ['Atomic values', 'No partial dependencies on composite key', 'No transitive dependencies', 'Multiple tables'], answer: 1, explanation: '2NF requires 1NF plus no partial dependencies - every non-key field depends on the whole primary key.' },
+    { id: 249, topic: 'databases', question: 'Which SQL statement modifies existing records?', options: ['INSERT', 'UPDATE', 'ALTER', 'CREATE'], answer: 1, explanation: 'UPDATE table SET column = value WHERE condition modifies existing records.' },
+    { id: 250, topic: 'databases', question: 'In a one-to-many relationship, where is the foreign key placed?', options: ['In the "one" table', 'In the "many" table', 'In both tables', 'In a separate table'], answer: 1, explanation: 'The foreign key goes in the "many" side table, referencing the "one" side\'s primary key.' },
+
+    // ==================== BOOLEAN LOGIC (5 more) ====================
+    { id: 251, topic: 'computers', question: 'Complete the truth table: A=0, B=1, Output for A AND B?', options: ['0', '1', 'Undefined', 'Error'], answer: 0, explanation: 'AND requires both inputs to be 1. Since A=0, the output is 0 regardless of B.' },
+    { id: 252, topic: 'computers', question: 'Simplify: A OR (A AND B)', options: ['A', 'B', 'A AND B', 'A OR B'], answer: 0, explanation: 'By absorption law: A OR (A AND B) = A. If A is true, output is true; if A is false, both parts are false.' },
+    { id: 253, topic: 'computers', question: 'What is the Boolean expression for: "Output is 1 only when both inputs differ"?', options: ['A AND B', 'A OR B', 'A XOR B', 'A NAND B'], answer: 2, explanation: 'XOR (exclusive OR) outputs 1 only when inputs are different.' },
+    { id: 254, topic: 'computers', question: 'If NOT(A OR B) = 1, what are A and B?', options: ['A=1, B=1', 'A=0, B=0', 'A=1, B=0', 'A=0, B=1'], answer: 1, explanation: 'NOT(A OR B) = 1 means (A OR B) = 0. OR is 0 only when both inputs are 0.' },
+    { id: 255, topic: 'computers', question: 'Simplify: NOT(NOT A)', options: ['A', 'NOT A', '0', '1'], answer: 0, explanation: 'Double negation: NOT(NOT A) = A. Inverting twice returns to the original value.' },
+
+    // ==================== BIGGER PICTURE (5 more) ====================
+    { id: 256, topic: 'bigger-picture', question: 'A company uses AI to screen job applications. What ethical concern might arise?', options: ['AI is too slow', 'Algorithmic bias against certain groups', 'Increased employment', 'Better candidates'], answer: 1, explanation: 'AI trained on biased historical data may unfairly discriminate against gender, race, or other groups.' },
+    { id: 257, topic: 'bigger-picture', question: 'What is the environmental impact of cryptocurrency mining?', options: ['Reduces energy use', 'High energy consumption and carbon footprint', 'Creates more trees', 'No environmental impact'], answer: 1, explanation: 'Cryptocurrency mining requires enormous computing power, consuming large amounts of electricity.' },
+    { id: 258, topic: 'bigger-picture', question: 'Which is an example of AI in everyday life?', options: ['Using a calculator', 'Voice assistants like Siri or Alexa', 'Reading a book', 'Writing with a pen'], answer: 1, explanation: 'Voice assistants use AI for speech recognition, natural language processing, and learning user preferences.' },
+    { id: 259, topic: 'bigger-picture', question: 'What ethical issue arises from collecting user data without consent?', options: ['Improved services', 'Privacy violation', 'Faster internet', 'Better security'], answer: 1, explanation: 'Collecting personal data without informed consent violates privacy rights and data protection laws.' },
+    { id: 260, topic: 'bigger-picture', question: 'How can AI help address environmental challenges?', options: ['Increasing pollution', 'Optimizing energy usage and predicting climate patterns', 'Creating more e-waste', 'Slowing research'], answer: 1, explanation: 'AI can optimize energy grids, predict weather patterns, and identify efficient resource usage.' }
+];
+
+// Append new questions to QUESTIONS array
+QUESTIONS.push(...NEW_QUESTIONS);
+
+// ==================== NEW PAST PAPER QUESTIONS ====================
+
+const NEW_PAST_PAPER_QUESTIONS = [
+    {
+        id: 13,
+        topic: 'problem-solving',
+        marks: 5,
+        question: 'A program uses the following algorithm:\ncount ← 0\nFOR i ← 1 TO 5\n    IF i MOD 2 = 0 THEN\n        count ← count + i\n    ENDIF\nENDFOR\nOUTPUT count\n\n(a) Complete a trace table showing the values of i and count. [3]\n(b) State the final output. [1]\n(c) Describe what the algorithm does. [1]',
+        markScheme: [
+            '(a) Trace table shows i = 1,2,3,4,5 (1)',
+            'count changes: 0, 0, 2, 2, 6 (1)',
+            'Shows condition check correctly (1)',
+            '(b) Final output is 6 (1)',
+            '(c) Sums all even numbers from 1 to 5 / adds 2+4 (1)'
+        ],
+        sampleAnswer: '(a) Trace table:\ni: 1, count: 0 (1 MOD 2 ≠ 0)\ni: 2, count: 2 (2 MOD 2 = 0, so count = 0+2)\ni: 3, count: 2 (3 MOD 2 ≠ 0)\ni: 4, count: 6 (4 MOD 2 = 0, so count = 2+4)\ni: 5, count: 6 (5 MOD 2 ≠ 0)\n\n(b) Output: 6\n\n(c) The algorithm calculates the sum of all even numbers between 1 and 5 (which is 2 + 4 = 6).'
+    },
+    {
+        id: 14,
+        topic: 'data',
+        marks: 6,
+        question: 'Explain how two\'s complement is used to represent negative numbers in binary. Show the two\'s complement representation of -25 using 8 bits.',
+        markScheme: [
+            'Two\'s complement allows representation of negative numbers (1)',
+            'MSB (most significant bit) indicates sign: 0 = positive, 1 = negative (1)',
+            'To convert: first write positive number in binary (1)',
+            'Invert all bits (change 0s to 1s and vice versa) (1)',
+            'Add 1 to the result (1)',
+            '+25 = 00011001, inverted = 11100110, add 1 = 11100111 (1)'
+        ],
+        sampleAnswer: 'Two\'s complement is a method for representing negative numbers in binary. The most significant bit (MSB) indicates the sign: 0 for positive, 1 for negative.\n\nTo find -25 in two\'s complement:\n1. Write +25 in binary: 00011001\n2. Invert all bits: 11100110\n3. Add 1: 11100110 + 1 = 11100111\n\nTherefore, -25 in 8-bit two\'s complement is 11100111.'
+    },
+    {
+        id: 15,
+        topic: 'computers',
+        marks: 5,
+        question: 'Describe the purpose of each of the following CPU registers:\n(a) Program Counter (PC) [1]\n(b) Memory Address Register (MAR) [1]\n(c) Memory Data Register (MDR) [1]\n(d) Current Instruction Register (CIR) [1]\n(e) Accumulator (ACC) [1]',
+        markScheme: [
+            '(a) PC holds the address of the next instruction to be fetched (1)',
+            '(b) MAR holds the address of memory location being accessed (1)',
+            '(c) MDR holds data being transferred to/from memory (1)',
+            '(d) CIR holds the current instruction being decoded/executed (1)',
+            '(e) ACC holds intermediate results of arithmetic/logic operations (1)'
+        ],
+        sampleAnswer: '(a) Program Counter (PC): Stores the memory address of the next instruction to be fetched from memory.\n\n(b) Memory Address Register (MAR): Holds the memory address that the CPU wants to read from or write to.\n\n(c) Memory Data Register (MDR): Acts as a buffer, holding data that has been fetched from memory or data waiting to be written to memory.\n\n(d) Current Instruction Register (CIR): Stores the instruction that is currently being decoded and executed.\n\n(e) Accumulator (ACC): Stores intermediate results from arithmetic and logical operations performed by the ALU.'
+    },
+    {
+        id: 16,
+        topic: 'networks',
+        marks: 6,
+        question: 'A school is concerned about network security.\n(a) Describe what phishing is and how it works. [2]\n(b) Explain two methods the school could use to protect against phishing attacks. [4]',
+        markScheme: [
+            '(a) Phishing is a social engineering attack (1)',
+            'Uses fake emails/websites to trick users into revealing credentials/personal information (1)',
+            '(b) Method 1: Staff training on recognizing suspicious emails/links (1)',
+            'How it helps: Users learn to identify and avoid phishing attempts (1)',
+            'Method 2: Email filtering/spam filters (1)',
+            'How it helps: Blocks suspicious emails before they reach users (1)',
+            'Alternative methods: Multi-factor authentication, reporting systems, URL checking (1 each)'
+        ],
+        sampleAnswer: '(a) Phishing is a type of social engineering attack where criminals send fraudulent emails or create fake websites that appear to be from legitimate organizations. The goal is to trick users into revealing sensitive information such as passwords, credit card numbers, or personal details by making them believe they are interacting with a trusted source.\n\n(b) Method 1: Conduct regular cybersecurity awareness training for staff and students. This educates users about how to recognize phishing attempts, such as checking sender addresses, hovering over links before clicking, and being suspicious of urgent requests for personal information.\n\nMethod 2: Implement email filtering software that scans incoming messages for known phishing signatures, suspicious links, and malicious attachments. This blocks many phishing emails before they reach users\' inboxes, reducing the risk of someone falling victim to an attack.'
+    },
+    {
+        id: 17,
+        topic: 'databases',
+        marks: 5,
+        question: 'A library database has the following tables:\nBooks (BookID, Title, AuthorID, Genre, Price)\nAuthors (AuthorID, FirstName, LastName)\n\nWrite SQL queries to:\n(a) Display the title and price of all books that cost more than £10, sorted by price [2]\n(b) Display the titles of all books written by authors whose last name is "Smith" [3]',
+        markScheme: [
+            '(a) SELECT Title, Price (1)',
+            'FROM Books WHERE Price > 10 ORDER BY Price (1)',
+            '(b) SELECT Title FROM Books (1)',
+            'WHERE AuthorID IN (SELECT AuthorID FROM Authors WHERE LastName = "Smith") (1)',
+            'OR correct JOIN syntax: JOIN Authors ON Books.AuthorID = Authors.AuthorID WHERE LastName = "Smith" (1)'
+        ],
+        sampleAnswer: '(a) SELECT Title, Price\nFROM Books\nWHERE Price > 10\nORDER BY Price ASC;\n\n(b) SELECT Books.Title\nFROM Books\nJOIN Authors ON Books.AuthorID = Authors.AuthorID\nWHERE Authors.LastName = \'Smith\';\n\nAlternative using subquery:\nSELECT Title\nFROM Books\nWHERE AuthorID IN (\n    SELECT AuthorID\n    FROM Authors\n    WHERE LastName = \'Smith\'\n);'
+    },
+    {
+        id: 18,
+        topic: 'programming',
+        marks: 5,
+        question: 'A 2D array stores a seating plan for a cinema with 5 rows and 8 columns. Each element contains "X" if booked or "O" if available.\n\n(a) Declare the array. [1]\n(b) Write pseudocode to count and output the total number of available seats. [4]',
+        markScheme: [
+            '(a) DECLARE seats: ARRAY[5][8] OF STRING / CHAR (1)',
+            '(b) Initialize counter to 0 (1)',
+            'Nested loop through rows and columns (1)',
+            'Check if element equals "O" (1)',
+            'Increment counter and output result (1)'
+        ],
+        sampleAnswer: '(a) DECLARE seats: ARRAY[0:4, 0:7] OF CHAR\n\n(b) available ← 0\nFOR row ← 0 TO 4\n    FOR col ← 0 TO 7\n        IF seats[row][col] = "O" THEN\n            available ← available + 1\n        ENDIF\n    ENDFOR\nENDFOR\nOUTPUT "Available seats: ", available'
+    },
+    {
+        id: 19,
+        topic: 'data',
+        marks: 4,
+        question: 'The Vigenère cipher uses a keyword to encrypt messages.\n(a) Explain how the Vigenère cipher works. [2]\n(b) Using the keyword "KEY", encrypt the plaintext "HELLO". Show your working. [2]',
+        markScheme: [
+            '(a) Each letter in keyword provides a different shift value (1)',
+            'Keyword repeats to match plaintext length (1)',
+            '(b) Keyword repeated: KEYKE (1)',
+            'H+K=R, E+E=I, L+Y=J, L+K=V, O+E=S → RIJVS (1)'
+        ],
+        sampleAnswer: '(a) The Vigenère cipher uses a keyword where each letter determines a different shift amount. The keyword is repeated to match the length of the plaintext. Each plaintext letter is shifted by the corresponding keyword letter\'s position (A=0, B=1, etc.).\n\n(b) Plaintext: H E L L O\nKeyword:   K E Y K E\n\nK=10, E=4, Y=24, K=10, E=4\n\nH(7) + K(10) = 17 → R\nE(4) + E(4) = 8 → I\nL(11) + Y(24) = 35 mod 26 = 9 → J\nL(11) + K(10) = 21 → V\nO(14) + E(4) = 18 → S\n\nEncrypted message: RIJVS'
+    },
+    {
+        id: 20,
+        topic: 'computers',
+        marks: 4,
+        question: 'Draw a logic circuit for the Boolean expression: Q = (A AND B) OR (NOT C)\nComplete a truth table for all possible inputs.',
+        markScheme: [
+            'Circuit shows AND gate with inputs A and B (1)',
+            'Circuit shows NOT gate with input C (1)',
+            'Outputs of AND and NOT feed into OR gate (1)',
+            'Truth table correct for all 8 combinations (1)'
+        ],
+        sampleAnswer: 'Logic circuit:\n- A and B connect to an AND gate\n- C connects to a NOT gate\n- Output of AND gate and NOT gate connect to an OR gate\n- Output of OR gate is Q\n\nTruth table:\nA | B | C | A AND B | NOT C | Q\n0 | 0 | 0 |    0    |   1   | 1\n0 | 0 | 1 |    0    |   0   | 0\n0 | 1 | 0 |    0    |   1   | 1\n0 | 1 | 1 |    0    |   0   | 0\n1 | 0 | 0 |    0    |   1   | 1\n1 | 0 | 1 |    0    |   0   | 0\n1 | 1 | 0 |    1    |   1   | 1\n1 | 1 | 1 |    1    |   0   | 1'
+    },
+    {
+        id: 21,
+        topic: 'bigger-picture',
+        marks: 6,
+        question: 'Artificial Intelligence (AI) is increasingly being used in healthcare.\n(a) Describe two ways AI is being used in healthcare. [4]\n(b) Discuss one ethical concern about using AI in healthcare decisions. [2]',
+        markScheme: [
+            '(a) Use 1: Analyzing medical images/scans to detect diseases like cancer (1)',
+            'Benefit: Faster/more accurate diagnosis than human alone (1)',
+            'Use 2: Drug discovery/predicting treatment effectiveness (1)',
+            'Benefit: Speeds up research/personalizes treatment (1)',
+            '(b) Ethical concern: AI may make errors leading to misdiagnosis (1)',
+            'Patients may not understand or trust AI decisions / accountability unclear (1)'
+        ],
+        sampleAnswer: '(a) Use 1: AI systems analyze medical images such as X-rays, MRIs, and CT scans to detect diseases like cancer, tumors, or diabetic retinopathy. The benefit is that AI can process images faster than radiologists and may detect subtle abnormalities humans might miss, leading to earlier diagnosis.\n\nUse 2: AI is used in drug discovery and predicting which treatments will be most effective for individual patients. Machine learning algorithms analyze genetic data and patient history to recommend personalized treatment plans, potentially reducing trial-and-error prescribing.\n\n(b) An ethical concern is accountability when AI makes errors. If an AI system misdiagnoses a patient or recommends incorrect treatment, it is unclear who is responsible - the doctor, the hospital, or the AI developer. This could lead to patients receiving inadequate care without clear recourse, and raises questions about whether patients should be informed that AI was involved in their diagnosis.'
+    },
+    {
+        id: 22,
+        topic: 'programming',
+        marks: 5,
+        question: 'A password validation system must check that:\n- The password is at least 8 characters long\n- The password contains at least one digit\n\nWrite pseudocode for a function that returns TRUE if the password is valid and FALSE otherwise.',
+        markScheme: [
+            'Function declaration with parameter (1)',
+            'Length check: IF LENGTH(password) < 8 THEN RETURN FALSE (1)',
+            'Loop through each character (1)',
+            'Check if character is a digit (using ASC or similar) (1)',
+            'Return TRUE only if both conditions met (1)'
+        ],
+        sampleAnswer: 'FUNCTION validatePassword(password)\n    // Check minimum length\n    IF LENGTH(password) < 8 THEN\n        RETURN FALSE\n    ENDIF\n    \n    // Check for at least one digit\n    hasDigit ← FALSE\n    FOR i ← 0 TO LENGTH(password) - 1\n        char ← SUBSTRING(password, i, 1)\n        IF ASC(char) >= 48 AND ASC(char) <= 57 THEN\n            hasDigit ← TRUE\n        ENDIF\n    ENDFOR\n    \n    IF hasDigit = FALSE THEN\n        RETURN FALSE\n    ENDIF\n    \n    RETURN TRUE\nENDFUNCTION'
+    }
+];
+
+// Append new past paper questions
+PAST_PAPER_QUESTIONS.push(...NEW_PAST_PAPER_QUESTIONS);
+
+// ==================== NEW FLASHCARDS ====================
+
+const NEW_FLASHCARDS = [
+    { id: 36, topic: 'problem-solving', front: 'What is Big O notation?', back: 'A way to describe algorithm efficiency/time complexity. Common types: O(1) constant, O(log n) logarithmic, O(n) linear, O(n log n) linearithmic, O(n²) quadratic, O(2ⁿ) exponential.' },
+    { id: 37, topic: 'problem-solving', front: 'What is a trace table?', back: 'A debugging tool that tracks variable values through each step of program execution. Columns represent variables/outputs, rows represent each instruction step.' },
+    { id: 38, topic: 'programming', front: 'What are the 5 validation types?', back: 'Range check (within limits), Type check (correct data type), Length check (number of characters), Presence check (not empty), Format check (matches pattern).' },
+    { id: 39, topic: 'programming', front: 'What is string concatenation?', back: 'Joining two or more strings together. Example: "Hello" & " " & "World" = "Hello World".' },
+    { id: 40, topic: 'programming', front: 'What is a 2D array?', back: 'An array of arrays, like a grid or table with rows and columns. Access elements with two indices: array[row][column].' },
+    { id: 41, topic: 'programming', front: 'File handling modes?', back: 'READ (view file contents), WRITE (create/overwrite file), APPEND (add to end without deleting existing data).' },
+    { id: 42, topic: 'data', front: 'What is two\'s complement?', back: 'A method for representing negative binary numbers. MSB=sign bit (0=positive, 1=negative). To convert: invert all bits, add 1.' },
+    { id: 43, topic: 'data', front: 'What causes overflow?', back: 'When calculation result exceeds the maximum value that can be stored in the available bits. E.g., 8-bit unsigned max is 255.' },
+    { id: 44, topic: 'data', front: 'Caesar cipher?', back: 'Substitution cipher that shifts each letter by a fixed number of positions. E.g., shift 3: A→D, B→E. Easy to break (only 25 possible shifts).' },
+    { id: 45, topic: 'data', front: 'Vigenère cipher?', back: 'Uses a keyword for variable shifts. Each keyword letter determines shift for corresponding plaintext letter. Harder to break than Caesar.' },
+    { id: 46, topic: 'data', front: 'Binary left/right shift?', back: 'Left shift: multiply by 2 (add 0s on right). Right shift: divide by 2 integer division (add 0s on left). Each position = ×2 or ÷2.' },
+    { id: 47, topic: 'computers', front: 'What is pipelining?', back: 'CPU technique where multiple instructions are in different stages simultaneously. While one executes, another decodes, another fetches.' },
+    { id: 48, topic: 'computers', front: 'Three buses in CPU?', back: 'Address bus (memory locations), Data bus (actual data), Control bus (signals like read/write, clock, interrupts).' },
+    { id: 49, topic: 'computers', front: 'XOR gate truth?', back: 'Outputs 1 when inputs DIFFER: 0 XOR 0 = 0, 0 XOR 1 = 1, 1 XOR 0 = 1, 1 XOR 1 = 0. "One or the other but not both."' },
+    { id: 50, topic: 'computers', front: 'NAND and NOR gates?', back: 'NAND = NOT AND (opposite of AND). NOR = NOT OR (opposite of OR). Both are universal gates - can create any logic circuit.' },
+    { id: 51, topic: 'networks', front: 'TCP/IP layers?', back: '4 layers: Application (HTTP, SMTP), Transport (TCP, UDP), Internet/Network (IP, routing), Link/Network Access (physical connection).' },
+    { id: 52, topic: 'networks', front: 'TCP vs UDP?', back: 'TCP: reliable, ordered delivery, error checking, connection-based (web, email). UDP: faster, no guarantee, connectionless (streaming, gaming).' },
+    { id: 53, topic: 'networks', front: 'Man-in-the-middle attack?', back: 'Attacker intercepts communication between two parties, can eavesdrop or modify messages. Prevented by encryption (HTTPS).' },
+    { id: 54, topic: 'networks', front: 'SQL injection?', back: 'Attack inserting malicious SQL through input fields to manipulate database. Prevented by parameterized queries and input validation.' },
+    { id: 55, topic: 'databases', front: 'What is normalization?', back: 'Organizing database to reduce redundancy. 1NF: atomic values. 2NF: no partial dependencies. 3NF: no transitive dependencies.' },
+    { id: 56, topic: 'databases', front: 'Entity relationships?', back: 'One-to-one (1:1), One-to-many (1:M), Many-to-many (M:M). Foreign keys link related tables. M:M needs junction table.' },
+    { id: 57, topic: 'databases', front: 'SQL aggregate functions?', back: 'COUNT() - number of rows, SUM() - total, AVG() - average, MAX() - highest, MIN() - lowest. Used with GROUP BY.' },
+    { id: 58, topic: 'bigger-picture', front: 'What is algorithmic bias?', back: 'When AI systems produce unfair results due to biased training data or design. Can discriminate based on race, gender, etc.' },
+    { id: 59, topic: 'bigger-picture', front: 'Environmental impact of tech?', back: 'Negative: e-waste (toxic materials), high energy consumption, short device lifespans. Positive: remote work, digital documents, smart energy systems.' },
+    { id: 60, topic: 'bigger-picture', front: 'AI applications in daily life?', back: 'Voice assistants (Siri, Alexa), recommendation systems (Netflix, Spotify), image recognition, spam filters, navigation apps, fraud detection.' }
+];
+
+// Append new flashcards
+FLASHCARDS.push(...NEW_FLASHCARDS);

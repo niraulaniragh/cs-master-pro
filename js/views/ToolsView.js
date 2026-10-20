@@ -41,6 +41,18 @@ const ToolsView = {
                         <h3>File Size Calculator</h3>
                         <p>Calculate image and sound file sizes</p>
                     </button>
+                    
+                    <button class="tool-card" onclick="ToolsView.openTool('cipher')">
+                        <span class="tool-icon">🔐</span>
+                        <h3>Cipher Tool</h3>
+                        <p>Practice Caesar and Vigenère ciphers</p>
+                    </button>
+                    
+                    <button class="tool-card" onclick="ToolsView.openTool('tracetable')">
+                        <span class="tool-icon">📋</span>
+                        <h3>Trace Table Creator</h3>
+                        <p>Create and practice trace tables</p>
+                    </button>
                 </div>
                 
                 <div class="tool-workspace" id="tool-workspace">
@@ -83,6 +95,13 @@ const ToolsView = {
                 break;
             case 'filesize':
                 workspace.innerHTML = ToolsView.renderFileSizeCalculator();
+                ToolsView.calcImageSize();
+                break;
+            case 'cipher':
+                workspace.innerHTML = ToolsView.renderCipherTool();
+                break;
+            case 'tracetable':
+                workspace.innerHTML = ToolsView.renderTraceTable();
                 break;
         }
 
@@ -983,5 +1002,365 @@ const ToolsView = {
     showASCII: (code) => {
         document.getElementById('ascii-input').value = code;
         ToolsView.lookupASCII(code.toString());
+    },
+
+    // ==================== CIPHER TOOL ====================
+    renderCipherTool: () => {
+        return `
+            <div class="tool-panel cipher-tool">
+                <h3>🔐 Encryption Ciphers</h3>
+                
+                <div class="cipher-info">
+                    <p>Practice the encryption methods required for Edexcel IGCSE 4CP0</p>
+                </div>
+                
+                <div class="cipher-tabs">
+                    <button class="cipher-tab active" onclick="ToolsView.switchCipherTab('caesar', this)">Caesar Cipher</button>
+                    <button class="cipher-tab" onclick="ToolsView.switchCipherTab('vigenere', this)">Vigenère Cipher</button>
+                </div>
+                
+                <!-- Caesar Cipher -->
+                <div class="cipher-content" id="cipher-caesar">
+                    <div class="cipher-explanation">
+                        <h4>📚 How Caesar Cipher Works</h4>
+                        <p>Each letter is shifted by a fixed number of positions in the alphabet.</p>
+                        <ul>
+                            <li><strong>Shift 3:</strong> A → D, B → E, C → F, ... Z → C</li>
+                            <li>Named after Julius Caesar who used shift of 3</li>
+                            <li>Easy to break - only 25 possible keys!</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="cipher-inputs">
+                        <div class="input-group">
+                            <label>Plaintext:</label>
+                            <input type="text" id="caesar-plain" placeholder="Enter text to encrypt"
+                                   oninput="ToolsView.applyCaesar()">
+                        </div>
+                        <div class="input-group">
+                            <label>Shift (1-25):</label>
+                            <input type="number" id="caesar-shift" value="3" min="1" max="25"
+                                   oninput="ToolsView.applyCaesar()">
+                        </div>
+                        <div class="input-group">
+                            <label>Ciphertext:</label>
+                            <input type="text" id="caesar-cipher" readonly>
+                        </div>
+                    </div>
+                    
+                    <div class="cipher-working" id="caesar-working">
+                        <h4>📝 Working</h4>
+                        <div class="working-steps">Enter text to see step-by-step working</div>
+                    </div>
+                    
+                    <div class="cipher-alphabet">
+                        <h4>Shifted Alphabet (Shift: <span id="shift-display">3</span>)</h4>
+                        <div class="alphabet-row" id="alphabet-plain">A B C D E F G H I J K L M N O P Q R S T U V W X Y Z</div>
+                        <div class="alphabet-arrow">↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓</div>
+                        <div class="alphabet-row shifted" id="alphabet-shifted">D E F G H I J K L M N O P Q R S T U V W X Y Z A B C</div>
+                    </div>
+                </div>
+                
+                <!-- Vigenère Cipher -->
+                <div class="cipher-content hidden" id="cipher-vigenere">
+                    <div class="cipher-explanation">
+                        <h4>📚 How Vigenère Cipher Works</h4>
+                        <p>Uses a keyword to apply different shifts to each letter - much stronger than Caesar!</p>
+                        <ul>
+                            <li>Each letter in keyword = a different shift amount (A=0, B=1, ... Z=25)</li>
+                            <li>Keyword repeats to match plaintext length</li>
+                            <li>Example: KEY → shifts of 10, 4, 24 repeating</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="cipher-inputs">
+                        <div class="input-group">
+                            <label>Plaintext:</label>
+                            <input type="text" id="vigenere-plain" placeholder="Enter text to encrypt"
+                                   oninput="ToolsView.applyVigenere()">
+                        </div>
+                        <div class="input-group">
+                            <label>Keyword:</label>
+                            <input type="text" id="vigenere-key" placeholder="e.g., KEY" value="KEY"
+                                   oninput="ToolsView.applyVigenere()">
+                        </div>
+                        <div class="input-group">
+                            <label>Ciphertext:</label>
+                            <input type="text" id="vigenere-cipher" readonly>
+                        </div>
+                    </div>
+                    
+                    <div class="cipher-working" id="vigenere-working">
+                        <h4>📝 Step-by-Step Working</h4>
+                        <div class="working-steps">Enter text and keyword to see working</div>
+                    </div>
+                    
+                    <div class="key-values" id="key-values">
+                        <h4>Keyword Letter Values</h4>
+                        <div class="key-display">K=10, E=4, Y=24</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+
+    switchCipherTab: (tab, btn) => {
+        document.querySelectorAll('.cipher-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.cipher-content').forEach(c => c.classList.add('hidden'));
+        btn.classList.add('active');
+        document.getElementById(`cipher-${tab}`).classList.remove('hidden');
+    },
+
+    applyCaesar: () => {
+        const plain = document.getElementById('caesar-plain').value.toUpperCase();
+        const shift = parseInt(document.getElementById('caesar-shift').value) || 3;
+        
+        // Update shifted alphabet display
+        document.getElementById('shift-display').textContent = shift;
+        const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const shifted = alphabet.slice(shift) + alphabet.slice(0, shift);
+        document.getElementById('alphabet-shifted').textContent = shifted.split('').join(' ');
+        
+        let cipher = '';
+        let working = [];
+        
+        for (let char of plain) {
+            if (/[A-Z]/.test(char)) {
+                const pos = char.charCodeAt(0) - 65;
+                const newPos = (pos + shift) % 26;
+                const newChar = String.fromCharCode(newPos + 65);
+                cipher += newChar;
+                working.push(`${char}(${pos}) + ${shift} = ${newPos} → ${newChar}`);
+            } else {
+                cipher += char;
+                working.push(`${char} (not a letter, unchanged)`);
+            }
+        }
+        
+        document.getElementById('caesar-cipher').value = cipher;
+        document.getElementById('caesar-working').querySelector('.working-steps').innerHTML = 
+            working.length ? working.join('<br>') : 'Enter text to see step-by-step working';
+    },
+
+    applyVigenere: () => {
+        const plain = document.getElementById('vigenere-plain').value.toUpperCase();
+        const key = document.getElementById('vigenere-key').value.toUpperCase().replace(/[^A-Z]/g, '');
+        
+        if (!key) {
+            document.getElementById('vigenere-cipher').value = '';
+            return;
+        }
+        
+        // Display key values
+        const keyValues = key.split('').map(c => `${c}=${c.charCodeAt(0) - 65}`).join(', ');
+        document.getElementById('key-values').querySelector('.key-display').textContent = keyValues;
+        
+        let cipher = '';
+        let working = [];
+        let keyIndex = 0;
+        
+        for (let char of plain) {
+            if (/[A-Z]/.test(char)) {
+                const plainPos = char.charCodeAt(0) - 65;
+                const keyChar = key[keyIndex % key.length];
+                const keyPos = keyChar.charCodeAt(0) - 65;
+                const newPos = (plainPos + keyPos) % 26;
+                const newChar = String.fromCharCode(newPos + 65);
+                cipher += newChar;
+                working.push(`${char}(${plainPos}) + ${keyChar}(${keyPos}) = ${plainPos + keyPos}${plainPos + keyPos >= 26 ? ' mod 26 = ' + newPos : ''} → ${newChar}`);
+                keyIndex++;
+            } else {
+                cipher += char;
+            }
+        }
+        
+        document.getElementById('vigenere-cipher').value = cipher;
+        document.getElementById('vigenere-working').querySelector('.working-steps').innerHTML = 
+            working.length ? working.join('<br>') : 'Enter text and keyword to see working';
+    },
+
+    // ==================== TRACE TABLE CREATOR ====================
+    renderTraceTable: () => {
+        return `
+            <div class="tool-panel trace-table-tool">
+                <h3>📋 Trace Table Creator</h3>
+                
+                <div class="trace-explanation">
+                    <h4>📚 What is a Trace Table?</h4>
+                    <p>A trace table tracks how variable values change as a program executes. 
+                       Each row represents one step of execution.</p>
+                    <ul>
+                        <li>Columns = Variables in the program</li>
+                        <li>Rows = Each step/iteration</li>
+                        <li>Used to debug programs and predict output</li>
+                    </ul>
+                </div>
+                
+                <div class="trace-examples">
+                    <h4>Practice Examples</h4>
+                    <select id="trace-example" onchange="ToolsView.loadTraceExample()">
+                        <option value="">Select an example...</option>
+                        <option value="counter">Counter Loop</option>
+                        <option value="total">Running Total</option>
+                        <option value="factorial">Factorial</option>
+                        <option value="search">Linear Search</option>
+                        <option value="bubble">Bubble Sort (1 pass)</option>
+                    </select>
+                </div>
+                
+                <div class="trace-content" id="trace-content">
+                    <div class="trace-placeholder">
+                        <p>Select an example above to practice trace tables</p>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+
+    loadTraceExample: () => {
+        const example = document.getElementById('trace-example').value;
+        const content = document.getElementById('trace-content');
+        
+        const examples = {
+            counter: {
+                title: 'Counter Loop',
+                code: `count ← 0
+FOR i ← 1 TO 5
+    count ← count + i
+NEXT i
+OUTPUT count`,
+                variables: ['i', 'count'],
+                steps: [
+                    ['-', '0'],
+                    ['1', '1'],
+                    ['2', '3'],
+                    ['3', '6'],
+                    ['4', '10'],
+                    ['5', '15']
+                ],
+                output: '15',
+                explanation: 'count accumulates 1+2+3+4+5 = 15'
+            },
+            total: {
+                title: 'Running Total',
+                code: `total ← 0
+numbers ← [3, 7, 2, 8]
+FOR i ← 0 TO 3
+    total ← total + numbers[i]
+NEXT i
+OUTPUT total`,
+                variables: ['i', 'numbers[i]', 'total'],
+                steps: [
+                    ['-', '-', '0'],
+                    ['0', '3', '3'],
+                    ['1', '7', '10'],
+                    ['2', '2', '12'],
+                    ['3', '8', '20']
+                ],
+                output: '20',
+                explanation: 'Adds all elements: 3+7+2+8 = 20'
+            },
+            factorial: {
+                title: 'Factorial (5!)',
+                code: `n ← 5
+result ← 1
+FOR i ← 1 TO n
+    result ← result * i
+NEXT i
+OUTPUT result`,
+                variables: ['i', 'result'],
+                steps: [
+                    ['-', '1'],
+                    ['1', '1'],
+                    ['2', '2'],
+                    ['3', '6'],
+                    ['4', '24'],
+                    ['5', '120']
+                ],
+                output: '120',
+                explanation: '5! = 1×1×2×3×4×5 = 120'
+            },
+            search: {
+                title: 'Linear Search for 7',
+                code: `list ← [4, 2, 7, 1, 9]
+target ← 7
+found ← FALSE
+FOR i ← 0 TO 4
+    IF list[i] = target THEN
+        found ← TRUE
+        OUTPUT "Found at", i
+    ENDIF
+NEXT i`,
+                variables: ['i', 'list[i]', 'list[i]=target?', 'found'],
+                steps: [
+                    ['-', '-', '-', 'FALSE'],
+                    ['0', '4', 'NO', 'FALSE'],
+                    ['1', '2', 'NO', 'FALSE'],
+                    ['2', '7', 'YES ✓', 'TRUE'],
+                    ['3', '1', 'NO', 'TRUE'],
+                    ['4', '9', 'NO', 'TRUE']
+                ],
+                output: 'Found at 2',
+                explanation: 'Target 7 found at index 2'
+            },
+            bubble: {
+                title: 'Bubble Sort - First Pass',
+                code: `list ← [5, 2, 8, 1, 9]
+// First pass only
+FOR j ← 0 TO 3
+    IF list[j] > list[j+1] THEN
+        swap list[j] and list[j+1]
+    ENDIF
+NEXT j`,
+                variables: ['j', 'list[j]', 'list[j+1]', 'Swap?', 'List after'],
+                steps: [
+                    ['-', '-', '-', '-', '[5,2,8,1,9]'],
+                    ['0', '5', '2', 'YES', '[2,5,8,1,9]'],
+                    ['1', '5', '8', 'NO', '[2,5,8,1,9]'],
+                    ['2', '8', '1', 'YES', '[2,5,1,8,9]'],
+                    ['3', '8', '9', 'NO', '[2,5,1,8,9]']
+                ],
+                output: '[2,5,1,8,9]',
+                explanation: 'After 1 pass, largest (9) is in correct position'
+            }
+        };
+        
+        if (!example || !examples[example]) {
+            content.innerHTML = '<div class="trace-placeholder"><p>Select an example above</p></div>';
+            return;
+        }
+        
+        const ex = examples[example];
+        content.innerHTML = `
+            <div class="trace-example-content">
+                <h4>${ex.title}</h4>
+                
+                <div class="trace-code">
+                    <h5>Code:</h5>
+                    <pre><code>${ex.code}</code></pre>
+                </div>
+                
+                <div class="trace-table-container">
+                    <h5>Trace Table:</h5>
+                    <table class="trace-table">
+                        <tr>
+                            <th>Step</th>
+                            ${ex.variables.map(v => `<th>${v}</th>`).join('')}
+                        </tr>
+                        ${ex.steps.map((step, i) => `
+                            <tr>
+                                <td>${i === 0 ? 'Init' : i}</td>
+                                ${step.map(val => `<td>${val}</td>`).join('')}
+                            </tr>
+                        `).join('')}
+                    </table>
+                </div>
+                
+                <div class="trace-output">
+                    <h5>Output: <strong>${ex.output}</strong></h5>
+                    <p class="trace-explanation">${ex.explanation}</p>
+                </div>
+            </div>
+        `;
     }
 };

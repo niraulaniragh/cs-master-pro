@@ -7689,3 +7689,289 @@ textarea:focus {
         transition-duration: 0.01ms !important;
     }
 }
+
+
+/* Cipher Tool Styles */
+.cipher-tool .cipher-tabs {
+    display: flex;
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
+}
+
+.cipher-tab {
+    padding: var(--space-2) var(--space-4);
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-md);
+    color: var(--text-secondary) !important;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.cipher-tab:hover, .cipher-tab.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white !important;
+}
+
+.cipher-explanation {
+    background: var(--bg-tertiary);
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-4);
+    border-left: 3px solid var(--primary);
+}
+
+.cipher-explanation h4 {
+    color: var(--text-primary) !important;
+    margin-bottom: var(--space-2);
+}
+
+.cipher-explanation ul {
+    margin-left: var(--space-4);
+}
+
+.cipher-explanation li {
+    color: var(--text-secondary) !important;
+    margin-bottom: var(--space-1);
+}
+
+.cipher-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+}
+
+.cipher-inputs .input-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.cipher-inputs label {
+    color: var(--text-secondary) !important;
+    font-weight: 500;
+}
+
+.cipher-inputs input {
+    padding: var(--space-2) var(--space-3);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-md);
+    color: var(--text-primary) !important;
+    font-family: var(--font-mono);
+}
+
+.cipher-inputs input[readonly] {
+    background: var(--bg-tertiary);
+    color: var(--success) !important;
+    font-weight: 600;
+}
+
+.cipher-working {
+    background: var(--bg-secondary);
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-4);
+}
+
+.cipher-working h4 {
+    color: var(--text-primary) !important;
+    margin-bottom: var(--space-2);
+}
+
+.cipher-working .working-steps {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    color: var(--text-secondary) !important;
+    line-height: 1.8;
+}
+
+.cipher-alphabet {
+    background: var(--bg-tertiary);
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    text-align: center;
+}
+
+.cipher-alphabet h4 {
+    color: var(--text-primary) !important;
+    margin-bottom: var(--space-2);
+}
+
+.alphabet-row {
+    font-family: var(--font-mono);
+    letter-spacing: 0.5em;
+    color: var(--text-secondary) !important;
+    font-size: 0.9rem;
+}
+
+.alphabet-row.shifted {
+    color: var(--primary) !important;
+    font-weight: 600;
+}
+
+.alphabet-arrow {
+    font-size: 0.7rem;
+    letter-spacing: 0.5em;
+    color: var(--text-muted) !important;
+}
+
+.key-values {
+    background: var(--bg-secondary);
+    padding: var(--space-3);
+    border-radius: var(--radius-md);
+    text-align: center;
+}
+
+.key-values h4 {
+    color: var(--text-primary) !important;
+    margin-bottom: var(--space-1);
+    font-size: 0.9rem;
+}
+
+.key-display {
+    font-family: var(--font-mono);
+    color: var(--primary) !important;
+    font-weight: 600;
+}
+
+/* Trace Table Styles */
+.trace-table-tool .trace-explanation {
+    background: var(--bg-tertiary);
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-4);
+    border-left: 3px solid var(--secondary);
+}
+
+.trace-explanation h4 {
+    color: var(--text-primary) !important;
+    margin-bottom: var(--space-2);
+}
+
+.trace-explanation ul {
+    margin-left: var(--space-4);
+}
+
+.trace-explanation li {
+    color: var(--text-secondary) !important;
+}
+
+.trace-examples {
+    margin-bottom: var(--space-4);
+}
+
+.trace-examples h4 {
+    color: var(--text-primary) !important;
+    margin-bottom: var(--space-2);
+}
+
+.trace-examples select {
+    width: 100%;
+    padding: var(--space-2) var(--space-3);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: var(--radius-md);
+    color: var(--text-primary) !important;
+}
+
+.trace-placeholder {
+    background: var(--bg-secondary);
+    padding: var(--space-8);
+    border-radius: var(--radius-md);
+    text-align: center;
+    color: var(--text-muted) !important;
+}
+
+.trace-example-content h4 {
+    color: var(--text-primary) !important;
+    margin-bottom: var(--space-4);
+}
+
+.trace-code {
+    background: var(--bg-secondary);
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-4);
+}
+
+.trace-code h5 {
+    color: var(--text-primary) !important;
+    margin-bottom: var(--space-2);
+}
+
+.trace-code pre {
+    background: var(--bg-tertiary);
+    padding: var(--space-3);
+    border-radius: var(--radius-sm);
+    overflow-x: auto;
+}
+
+.trace-code code {
+    color: var(--text-secondary) !important;
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    white-space: pre;
+}
+
+.trace-table-container {
+    margin-bottom: var(--space-4);
+}
+
+.trace-table-container h5 {
+    color: var(--text-primary) !important;
+    margin-bottom: var(--space-2);
+}
+
+.trace-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.trace-table th,
+.trace-table td {
+    padding: var(--space-2) var(--space-3);
+    text-align: center;
+    border: 1px solid var(--border-primary);
+}
+
+.trace-table th {
+    background: var(--primary);
+    color: white !important;
+    font-weight: 600;
+}
+
+.trace-table td {
+    color: var(--text-secondary) !important;
+    font-family: var(--font-mono);
+}
+
+.trace-table tr:nth-child(even) {
+    background: var(--bg-tertiary);
+}
+
+.trace-output {
+    background: var(--bg-tertiary);
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    border-left: 3px solid var(--success);
+}
+
+.trace-output h5 {
+    color: var(--text-primary) !important;
+}
+
+.trace-output strong {
+    color: var(--success) !important;
+}
+
+.trace-explanation {
+    color: var(--text-secondary) !important;
+    margin-top: var(--space-2);
+    font-size: 0.9rem;
+}
