@@ -669,6 +669,133 @@ label {
     color: var(--text-muted);
 }
 
+/* =====================================================
+   NEW PROGRESS CARD DESIGN
+   ===================================================== */
+
+.progress-card {
+    background: linear-gradient(145deg, var(--bg-card) 0%, var(--bg-secondary) 100%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-6);
+}
+
+.progress-top {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    margin-bottom: var(--space-6);
+}
+
+.user-level-badge {
+    width: 64px;
+    height: 64px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+}
+
+.user-level-badge .level-num {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: white;
+}
+
+.user-rank-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.rank-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.rank-subtitle {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.xp-progress-section {
+    margin-bottom: var(--space-5);
+}
+
+.xp-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-2);
+}
+
+.xp-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.xp-numbers {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.xp-progress-bar {
+    height: 10px;
+    background: var(--bg-elevated);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+    margin-bottom: var(--space-2);
+}
+
+.xp-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    border-radius: var(--radius-full);
+    transition: width 0.5s ease;
+}
+
+.xp-to-go {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+}
+
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-3);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--border);
+}
+
+.stat-box {
+    text-align: center;
+    padding: var(--space-3);
+    background: var(--bg-elevated);
+    border-radius: var(--radius-md);
+}
+
+.stat-box .stat-num {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.2;
+}
+
+.stat-box .stat-label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
 /* Stats Panel */
 .stats-grid {
     display: grid;

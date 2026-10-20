@@ -46,52 +46,41 @@ const HomeView = {
 
                 <!-- Main Dashboard -->
                 <section class="dashboard-grid">
-                    <!-- Progress Panel -->
-                    <div class="dashboard-panel user-panel">
-                        <div class="panel-header">
-                            <h3>📊 Your Progress</h3>
-                            <span class="rank-badge">${rank.icon} ${rank.name}</span>
-                        </div>
-                        
-                        <div class="level-display">
-                            <div class="level-circle">
-                                <svg viewBox="0 0 100 100">
-                                    <circle class="level-circle-bg" cx="50" cy="50" r="45"/>
-                                    <circle class="level-circle-progress" cx="50" cy="50" r="45"
-                                        stroke-dasharray="${progress * 2.83} 283"
-                                        style="--progress-color: ${rank.color}"/>
-                                </svg>
-                                <div class="level-number">
-                                    <span class="level-value">${user.level}</span>
-                                    <span class="level-label">Level</span>
-                                </div>
+                    <!-- Progress Panel - New Design -->
+                    <div class="progress-card">
+                        <div class="progress-top">
+                            <div class="user-level-badge">
+                                <span class="level-num">${user.level}</span>
                             </div>
-                            <div class="level-info">
-                                <div class="xp-display">
-                                    <span class="xp-current">${user.xp.toLocaleString()}</span>
-                                    <span class="xp-divider">/</span>
-                                    <span class="xp-target">${xpForNext.toLocaleString()} XP</span>
-                                </div>
-                                <div class="xp-bar">
-                                    <div class="xp-fill" style="width: ${progress}%; background: ${rank.color}"></div>
-                                </div>
-                                <p class="xp-needed">${(xpForNext - user.xp).toLocaleString()} XP to Level ${user.level + 1}</p>
+                            <div class="user-rank-info">
+                                <span class="rank-title">${rank.name}</span>
+                                <span class="rank-subtitle">${rank.icon} Level ${user.level} Player</span>
                             </div>
                         </div>
                         
-                        <!-- Mini Stats -->
-                        <div class="mini-stats">
-                            <div class="mini-stat">
-                                <span class="mini-stat-value">${user.totalCorrect}</span>
-                                <span class="mini-stat-label">Correct</span>
+                        <div class="xp-progress-section">
+                            <div class="xp-header">
+                                <span class="xp-label">Experience</span>
+                                <span class="xp-numbers">${user.xp.toLocaleString()} / ${xpForNext.toLocaleString()} XP</span>
                             </div>
-                            <div class="mini-stat">
-                                <span class="mini-stat-value">${accuracy}%</span>
-                                <span class="mini-stat-label">Accuracy</span>
+                            <div class="xp-progress-bar">
+                                <div class="xp-progress-fill" style="width: ${progress}%"></div>
                             </div>
-                            <div class="mini-stat">
-                                <span class="mini-stat-value">${user.achievements.length}</span>
-                                <span class="mini-stat-label">Achievements</span>
+                            <span class="xp-to-go">${(xpForNext - user.xp).toLocaleString()} XP until Level ${user.level + 1}</span>
+                        </div>
+                        
+                        <div class="stats-row">
+                            <div class="stat-box">
+                                <span class="stat-num">${user.totalCorrect}</span>
+                                <span class="stat-label">Correct</span>
+                            </div>
+                            <div class="stat-box">
+                                <span class="stat-num">${accuracy}%</span>
+                                <span class="stat-label">Accuracy</span>
+                            </div>
+                            <div class="stat-box">
+                                <span class="stat-num">${user.achievements.length}</span>
+                                <span class="stat-label">Badges</span>
                             </div>
                         </div>
                     </div>
