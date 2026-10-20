@@ -164,9 +164,12 @@ const Auth = {
             userId: user.id,
             email: user.email,
             username: user.username,
-            loginTime: new Date().toISOString()
+            loginTime: new Date().toISOString(),
+            rememberMe: true
         };
+        // Store in both localStorage (persistent) and sessionStorage (backup)
         localStorage.setItem(Auth.SESSION_KEY, JSON.stringify(session));
+        sessionStorage.setItem(Auth.SESSION_KEY, JSON.stringify(session));
     },
 
     /**
@@ -174,7 +177,16 @@ const Auth = {
      */
     getSession: () => {
         try {
-            return JSON.parse(localStorage.getItem(Auth.SESSION_KEY));
+            // Try localStorage first, then sessionStorage
+            let session = localStorage.getItem(Auth.SESSION_KEY);
+            if (!session) {
+                session = sessionStorage.getItem(Auth.SESSION_KEY);
+                // If found in session, copy to localStorage
+                if (session) {
+                    localStorage.setItem(Auth.SESSION_KEY, session);
+                }
+            }
+            return session ? JSON.parse(session) : null;
         } catch {
             return null;
         }

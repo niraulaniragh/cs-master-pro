@@ -12,20 +12,34 @@ const App = (() => {
         Auth.init();
         
         // Check authentication
-        if (Auth.isLoggedIn()) {
+        const session = Auth.getSession();
+        const isLoggedIn = session !== null;
+        
+        console.log('🔑 Session check:', isLoggedIn ? 'Found session' : 'No session');
+        
+        if (isLoggedIn) {
             // User is logged in - load their profile
             const user = Auth.getCurrentUser();
-            const profile = Auth.getProfile();
-            if (profile) {
-                AppState.initWithProfile(profile);
+            
+            if (user) {
+                const profile = user.profile;
+                if (profile) {
+                    AppState.initWithProfile(profile);
+                } else {
+                    AppState.init();
+                }
+                
+                // Update last active
+                Auth.updateProfile({ lastActive: new Date().toISOString() });
+                
+                console.log(`👤 Logged in as: ${user.username}`);
             } else {
+                // Session exists but user not found - clear invalid session
+                console.log('⚠️ Invalid session, clearing...');
+                Auth.logout();
                 AppState.init();
+                setTimeout(() => AuthModal.show('login'), 100);
             }
-            
-            // Update last active
-            Auth.updateProfile({ lastActive: new Date().toISOString() });
-            
-            console.log(`👤 Logged in as: ${user?.username || Auth.getSession()?.email}`);
         } else {
             // Not logged in - show auth modal
             AppState.init();
