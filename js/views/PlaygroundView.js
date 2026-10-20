@@ -1,6 +1,7 @@
 /**
  * PlaygroundView.js - Enhanced Code Playground
  * Features: Line-by-line execution, complex challenges, comprehensive Python lessons
+ * Note: Uses safe expression parsing (no eval) for CSP compliance
  */
 
 const PlaygroundView = {
@@ -57,26 +58,19 @@ const PlaygroundView = {
                                 <optgroup label="Basics">
                                     <option value="hello">Hello World</option>
                                     <option value="variables">Variables & Types</option>
-                                    <option value="input">User Input</option>
+                                    <option value="arithmetic">Arithmetic</option>
                                 </optgroup>
                                 <optgroup label="Control Flow">
                                     <option value="if">If Statements</option>
                                     <option value="for">FOR Loop</option>
                                     <option value="while">WHILE Loop</option>
-                                    <option value="nested">Nested Loops</option>
                                 </optgroup>
                                 <optgroup label="Data Structures">
                                     <option value="list">Lists</option>
-                                    <option value="dict">Dictionaries</option>
-                                </optgroup>
-                                <optgroup label="Functions">
-                                    <option value="function">Functions</option>
-                                    <option value="recursion">Recursion</option>
                                 </optgroup>
                                 <optgroup label="Algorithms">
-                                    <option value="linear">Linear Search</option>
-                                    <option value="binary">Binary Search</option>
-                                    <option value="bubble">Bubble Sort</option>
+                                    <option value="factorial">Factorial</option>
+                                    <option value="fizzbuzz">FizzBuzz</option>
                                 </optgroup>
                             </select>
                             <button class="btn btn-small btn-secondary" onclick="PlaygroundView.clearCode()">
@@ -91,7 +85,6 @@ const PlaygroundView = {
                             onkeydown="PlaygroundView.handleTab(event)"
                             onscroll="PlaygroundView.syncScroll()"
                             placeholder="# Write your Python code here"># Welcome to Python Playground!
-# Try the Step-by-Step debugger!
 
 total = 0
 for i in range(1, 6):
@@ -102,16 +95,10 @@ print(f"Sum of 1-5 = {total}")</textarea>
                     </div>
                     <div class="execution-controls">
                         <button class="btn btn-primary" onclick="PlaygroundView.runCode()">
-                            <i class="fas fa-play"></i> Run All
+                            <i class="fas fa-play"></i> Run Code
                         </button>
-                        <button class="btn btn-secondary" onclick="PlaygroundView.startStepMode()">
-                            <i class="fas fa-shoe-prints"></i> Step-by-Step
-                        </button>
-                        <button class="btn btn-secondary" id="step-next-btn" onclick="PlaygroundView.stepNext()" disabled>
-                            <i class="fas fa-forward-step"></i> Next Line
-                        </button>
-                        <button class="btn btn-secondary" id="step-reset-btn" onclick="PlaygroundView.resetStepMode()" disabled>
-                            <i class="fas fa-rotate-left"></i> Reset
+                        <button class="btn btn-secondary" onclick="PlaygroundView.clearOutput()">
+                            <i class="fas fa-eraser"></i> Clear Output
                         </button>
                     </div>
                 </div>
@@ -124,9 +111,6 @@ print(f"Sum of 1-5 = {total}")</textarea>
                         <button class="tab-btn" onclick="PlaygroundView.showTab('variables', this)">
                             📊 Variables
                         </button>
-                        <button class="tab-btn" onclick="PlaygroundView.showTab('trace', this)">
-                            📋 Trace Table
-                        </button>
                     </div>
                     
                     <div class="tab-content active" id="output-tab">
@@ -134,7 +118,7 @@ print(f"Sum of 1-5 = {total}")</textarea>
                             <span>Program Output</span>
                             <span class="execution-status" id="exec-status"></span>
                         </div>
-                        <pre id="code-output" class="output-display">Click "Run All" or "Step-by-Step" to execute</pre>
+                        <pre id="code-output" class="output-display">Click "Run Code" to execute your program</pre>
                     </div>
                     
                     <div class="tab-content" id="variables-tab">
@@ -143,17 +127,7 @@ print(f"Sum of 1-5 = {total}")</textarea>
                             <span class="var-count" id="var-count">0 variables</span>
                         </div>
                         <div id="variables-display" class="variables-display">
-                            <p class="placeholder-text">Variables will appear here during execution</p>
-                        </div>
-                    </div>
-                    
-                    <div class="tab-content" id="trace-tab">
-                        <div class="output-header">
-                            <span>Execution Trace</span>
-                            <button class="btn btn-small" onclick="PlaygroundView.clearTrace()">Clear</button>
-                        </div>
-                        <div id="trace-display" class="trace-display">
-                            <p class="placeholder-text">Step through code to see execution trace</p>
+                            <p class="placeholder-text">Run code to see variables</p>
                         </div>
                     </div>
                 </div>
@@ -164,10 +138,6 @@ print(f"Sum of 1-5 = {total}")</textarea>
     renderChallenges: () => {
         const challenges = PlaygroundView.getChallenges();
         const completed = PlaygroundView.getCompletedChallenges();
-        
-        const easyCount = challenges.filter(c => c.difficulty === 'Easy').length;
-        const mediumCount = challenges.filter(c => c.difficulty === 'Medium').length;
-        const hardCount = challenges.filter(c => c.difficulty === 'Hard').length;
         
         return `
             <div class="challenges-layout">
@@ -182,12 +152,6 @@ print(f"Sum of 1-5 = {total}")</textarea>
                             <span class="stat-num">${challenges.length}</span>
                             <span class="stat-label">Total</span>
                         </div>
-                    </div>
-                    <div class="difficulty-filter">
-                        <button class="diff-btn active" onclick="PlaygroundView.filterChallenges('all', this)">All</button>
-                        <button class="diff-btn easy" onclick="PlaygroundView.filterChallenges('Easy', this)">Easy (${easyCount})</button>
-                        <button class="diff-btn medium" onclick="PlaygroundView.filterChallenges('Medium', this)">Medium (${mediumCount})</button>
-                        <button class="diff-btn hard" onclick="PlaygroundView.filterChallenges('Hard', this)">Hard (${hardCount})</button>
                     </div>
                     <div class="challenges-list" id="challenges-list">
                         ${challenges.map(c => `
@@ -211,15 +175,7 @@ print(f"Sum of 1-5 = {total}")</textarea>
                     <div class="challenge-placeholder">
                         <span class="placeholder-icon">🎯</span>
                         <h3>Select a Challenge</h3>
-                        <p>Choose from ${challenges.length} coding challenges to test your Python skills!</p>
-                        <div class="challenge-tips">
-                            <h4>Tips:</h4>
-                            <ul>
-                                <li>Start with Easy challenges to learn the basics</li>
-                                <li>Use the hint button if you get stuck</li>
-                                <li>You can run your code before submitting</li>
-                            </ul>
-                        </div>
+                        <p>Choose from ${challenges.length} coding challenges!</p>
                     </div>
                 </div>
             </div>
@@ -230,21 +186,18 @@ print(f"Sum of 1-5 = {total}")</textarea>
         const topics = [
             { id: 'intro', name: 'Introduction to Python', icon: '🐍', lessons: 3 },
             { id: 'variables', name: 'Variables & Data Types', icon: '📦', lessons: 4 },
-            { id: 'operators', name: 'Operators & Expressions', icon: '➕', lessons: 3 },
-            { id: 'strings', name: 'Working with Strings', icon: '📝', lessons: 4 },
-            { id: 'conditionals', name: 'If Statements & Logic', icon: '🔀', lessons: 4 },
-            { id: 'loops', name: 'Loops & Iteration', icon: '🔄', lessons: 5 },
-            { id: 'lists', name: 'Lists & Arrays', icon: '📋', lessons: 5 },
-            { id: 'functions', name: 'Functions', icon: '⚙️', lessons: 4 },
-            { id: 'algorithms', name: 'Basic Algorithms', icon: '🔍', lessons: 4 },
-            { id: 'filehandling', name: 'File Handling', icon: '📁', lessons: 3 },
+            { id: 'operators', name: 'Operators', icon: '➕', lessons: 3 },
+            { id: 'conditionals', name: 'If Statements', icon: '🔀', lessons: 3 },
+            { id: 'loops', name: 'Loops', icon: '🔄', lessons: 4 },
+            { id: 'lists', name: 'Lists', icon: '📋', lessons: 4 },
+            { id: 'functions', name: 'Functions', icon: '⚙️', lessons: 3 },
+            { id: 'algorithms', name: 'Algorithms', icon: '🔍', lessons: 3 },
         ];
         
         return `
             <div class="learn-layout">
                 <div class="learn-topics">
                     <h3>📖 Python Course</h3>
-                    <p class="learn-subtitle">Master Python with interactive lessons</p>
                     <div class="topic-cards">
                         ${topics.map((t, idx) => `
                             <button class="learn-topic-card" onclick="PlaygroundView.loadLesson('${t.id}')">
@@ -262,49 +215,13 @@ print(f"Sum of 1-5 = {total}")</textarea>
                 <div class="learn-content" id="learn-content">
                     <div class="learn-welcome">
                         <h3>🐍 Welcome to Python!</h3>
-                        <p>Python is a powerful, beginner-friendly programming language used for:</p>
-                        <div class="python-uses">
-                            <div class="use-card"><span>🌐</span>Web Development</div>
-                            <div class="use-card"><span>🤖</span>AI & Machine Learning</div>
-                            <div class="use-card"><span>📊</span>Data Science</div>
-                            <div class="use-card"><span>🎮</span>Game Development</div>
-                        </div>
-                        <h4>Quick Reference</h4>
+                        <p>Select a topic from the left to start learning!</p>
                         <div class="quick-ref-grid">
-                            <div class="ref-item">
-                                <code>print("Hello")</code>
-                                <span>Output text</span>
-                            </div>
-                            <div class="ref-item">
-                                <code>x = 10</code>
-                                <span>Create variable</span>
-                            </div>
-                            <div class="ref-item">
-                                <code>input("Name? ")</code>
-                                <span>Get user input</span>
-                            </div>
-                            <div class="ref-item">
-                                <code>if x > 5:</code>
-                                <span>Condition check</span>
-                            </div>
-                            <div class="ref-item">
-                                <code>for i in range(5):</code>
-                                <span>Loop 0 to 4</span>
-                            </div>
-                            <div class="ref-item">
-                                <code>def func():</code>
-                                <span>Define function</span>
-                            </div>
-                            <div class="ref-item">
-                                <code>list = [1, 2, 3]</code>
-                                <span>Create list</span>
-                            </div>
-                            <div class="ref-item">
-                                <code>len(list)</code>
-                                <span>Get length</span>
-                            </div>
+                            <div class="ref-item"><code>print("Hi")</code><span>Output</span></div>
+                            <div class="ref-item"><code>x = 10</code><span>Variable</span></div>
+                            <div class="ref-item"><code>if x > 5:</code><span>Condition</span></div>
+                            <div class="ref-item"><code>for i in range(5):</code><span>Loop</span></div>
                         </div>
-                        <p class="start-hint">👈 Select a topic to start learning!</p>
                     </div>
                 </div>
             </div>
@@ -324,1111 +241,242 @@ print(f"Sum of 1-5 = {total}")</textarea>
     },
 
     // ==========================================
-    // LINE-BY-LINE EXECUTION
+    // SAFE EXPRESSION PARSER (No eval!)
     // ==========================================
-    startStepMode: () => {
-        const code = document.getElementById('code-editor').value;
-        PlaygroundView.executionState = {
-            lines: code.split('\n'),
-            currentLine: 0,
-            variables: {},
-            output: [],
-            trace: [],
-            callStack: [],
-            loopStack: []
-        };
-        PlaygroundView.isStepMode = true;
-        
-        // Enable step controls
-        document.getElementById('step-next-btn').disabled = false;
-        document.getElementById('step-reset-btn').disabled = false;
-        document.getElementById('exec-status').textContent = '⏸️ Step Mode';
-        document.getElementById('code-output').textContent = '';
-        
-        // Clear and prepare displays
-        PlaygroundView.updateVariablesDisplay();
-        PlaygroundView.updateTraceDisplay();
-        PlaygroundView.highlightLine(0);
-        
-        Toast.show('Step mode started. Click "Next Line" to execute', 'info');
-    },
-
-    stepNext: () => {
-        if (!PlaygroundView.executionState) return;
-        
-        const state = PlaygroundView.executionState;
-        if (state.currentLine >= state.lines.length) {
-            PlaygroundView.finishStepMode();
-            return;
-        }
-        
-        // Skip empty lines and comments
-        while (state.currentLine < state.lines.length) {
-            const line = state.lines[state.currentLine].trim();
-            if (line && !line.startsWith('#')) break;
-            state.currentLine++;
-        }
-        
-        if (state.currentLine >= state.lines.length) {
-            PlaygroundView.finishStepMode();
-            return;
-        }
-        
-        // Execute current line
-        const result = PlaygroundView.executeSingleLine(state.currentLine, state);
-        
-        // Record in trace
-        state.trace.push({
-            line: state.currentLine + 1,
-            code: state.lines[state.currentLine].trim(),
-            variables: { ...state.variables },
-            output: result.output || null
-        });
-        
-        // Update displays
-        PlaygroundView.updateVariablesDisplay();
-        PlaygroundView.updateTraceDisplay();
-        PlaygroundView.updateOutput(state.output);
-        
-        // Move to next line (unless loop/function changed it)
-        if (!result.jumped) {
-            state.currentLine++;
-        }
-        
-        // Highlight next line
-        PlaygroundView.highlightLine(state.currentLine);
-        
-        // Check if finished
-        if (state.currentLine >= state.lines.length) {
-            PlaygroundView.finishStepMode();
-        }
-    },
-
-    executeSingleLine: (lineNum, state) => {
-        const line = state.lines[lineNum];
-        const trimmed = line.trim();
-        const indent = line.search(/\S/);
-        let result = { jumped: false, output: null };
-        
-        // Variable assignment
-        if (trimmed.match(/^\w+\s*=\s*.+$/) && !trimmed.startsWith('if ') && !trimmed.startsWith('while ') && !trimmed.startsWith('for ')) {
-            const match = trimmed.match(/^(\w+)\s*=\s*(.+)$/);
-            if (match) {
-                const [, varName, expr] = match;
-                state.variables[varName] = PlaygroundView.evalExpr(expr, state.variables);
-            }
-        }
-        // Augmented assignment
-        else if (trimmed.match(/^\w+\s*[+\-*\/]=\s*.+$/)) {
-            const match = trimmed.match(/^(\w+)\s*([+\-*\/])=\s*(.+)$/);
-            if (match) {
-                const [, varName, op, expr] = match;
-                const current = state.variables[varName] ?? 0;
-                const val = PlaygroundView.evalExpr(expr, state.variables);
-                state.variables[varName] = eval(`${current} ${op} ${val}`);
-            }
-        }
-        // Print statement
-        else if (trimmed.startsWith('print(')) {
-            const content = trimmed.slice(6, -1);
-            const output = PlaygroundView.evalPrint(content, state.variables);
-            state.output.push(output);
-            result.output = output;
-        }
-        // FOR loop
-        else if (trimmed.startsWith('for ')) {
-            const match = trimmed.match(/for\s+(\w+)\s+in\s+(.+):/);
-            if (match) {
-                const varName = match[1];
-                const iterable = PlaygroundView.evalExpr(match[2], state.variables);
-                
-                // Find loop end
-                let loopEnd = lineNum + 1;
-                while (loopEnd < state.lines.length && 
-                       (state.lines[loopEnd].trim() === '' || 
-                        state.lines[loopEnd].search(/\S/) > indent)) {
-                    loopEnd++;
+    
+    // Tokenize expression
+    tokenize: (expr) => {
+        const tokens = [];
+        let i = 0;
+        while (i < expr.length) {
+            // Skip whitespace
+            if (/\s/.test(expr[i])) { i++; continue; }
+            
+            // Numbers
+            if (/\d/.test(expr[i]) || (expr[i] === '-' && /\d/.test(expr[i+1]) && tokens.length === 0)) {
+                let num = '';
+                if (expr[i] === '-') { num = '-'; i++; }
+                while (i < expr.length && /[\d.]/.test(expr[i])) {
+                    num += expr[i++];
                 }
-                loopEnd--;
-                
-                // Initialize loop
-                let items = [];
-                if (iterable?.type === 'range') {
-                    for (let k = iterable.start; iterable.step > 0 ? k < iterable.end : k > iterable.end; k += iterable.step) {
-                        items.push(k);
+                tokens.push({ type: 'number', value: parseFloat(num) });
+                continue;
+            }
+            
+            // Strings
+            if (expr[i] === '"' || expr[i] === "'") {
+                const quote = expr[i++];
+                let str = '';
+                while (i < expr.length && expr[i] !== quote) {
+                    if (expr[i] === '\\' && i + 1 < expr.length) {
+                        i++;
+                        if (expr[i] === 'n') str += '\n';
+                        else if (expr[i] === 't') str += '\t';
+                        else str += expr[i];
+                    } else {
+                        str += expr[i];
                     }
-                } else if (Array.isArray(iterable)) {
-                    items = iterable;
+                    i++;
                 }
-                
-                state.loopStack.push({
-                    type: 'for',
-                    varName,
-                    items,
-                    index: 0,
-                    startLine: lineNum,
-                    endLine: loopEnd,
-                    bodyStart: lineNum + 1
-                });
-                
-                if (items.length > 0) {
-                    state.variables[varName] = items[0];
+                i++; // Skip closing quote
+                tokens.push({ type: 'string', value: str });
+                continue;
+            }
+            
+            // Operators
+            const ops = ['==', '!=', '<=', '>=', '**', '//', '+=', '-=', '*=', '/=', 
+                        '+', '-', '*', '/', '%', '<', '>', '(', ')', '[', ']', ',', ':'];
+            let matched = false;
+            for (const op of ops) {
+                if (expr.slice(i, i + op.length) === op) {
+                    tokens.push({ type: 'op', value: op });
+                    i += op.length;
+                    matched = true;
+                    break;
                 }
             }
+            if (matched) continue;
+            
+            // Identifiers/keywords
+            if (/[a-zA-Z_]/.test(expr[i])) {
+                let id = '';
+                while (i < expr.length && /[a-zA-Z0-9_]/.test(expr[i])) {
+                    id += expr[i++];
+                }
+                if (id === 'True') tokens.push({ type: 'boolean', value: true });
+                else if (id === 'False') tokens.push({ type: 'boolean', value: false });
+                else if (id === 'None') tokens.push({ type: 'none', value: null });
+                else if (id === 'and') tokens.push({ type: 'op', value: 'and' });
+                else if (id === 'or') tokens.push({ type: 'op', value: 'or' });
+                else if (id === 'not') tokens.push({ type: 'op', value: 'not' });
+                else tokens.push({ type: 'identifier', value: id });
+                continue;
+            }
+            
+            i++; // Skip unknown
         }
-        // WHILE loop
-        else if (trimmed.startsWith('while ')) {
-            const condition = trimmed.match(/while\s+(.+):/)?.[1];
-            
-            // Find loop end
-            let loopEnd = lineNum + 1;
-            while (loopEnd < state.lines.length && 
-                   (state.lines[loopEnd].trim() === '' || 
-                    state.lines[loopEnd].search(/\S/) > indent)) {
-                loopEnd++;
-            }
-            loopEnd--;
-            
-            state.loopStack.push({
-                type: 'while',
-                condition,
-                startLine: lineNum,
-                endLine: loopEnd,
-                bodyStart: lineNum + 1
+        return tokens;
+    },
+
+    // Safe expression evaluator
+    safeEval: (expr, vars = {}) => {
+        if (expr === undefined || expr === null || expr === '') return null;
+        expr = String(expr).trim();
+        
+        // Handle f-strings
+        if (expr.startsWith('f"') || expr.startsWith("f'")) {
+            const quote = expr[1];
+            const content = expr.slice(2, -1);
+            return content.replace(/\{([^}]+)\}/g, (_, e) => {
+                const val = PlaygroundView.safeEval(e, vars);
+                if (Array.isArray(val)) return '[' + val.join(', ') + ']';
+                return String(val);
             });
-            
-            // Check condition
-            if (!PlaygroundView.evalExpr(condition, state.variables)) {
-                state.currentLine = loopEnd + 1;
-                state.loopStack.pop();
-                result.jumped = true;
-            }
-        }
-        // IF statement
-        else if (trimmed.startsWith('if ')) {
-            const condition = trimmed.match(/if\s+(.+):/)?.[1];
-            
-            // Find if block end
-            let blockEnd = lineNum + 1;
-            while (blockEnd < state.lines.length && 
-                   (state.lines[blockEnd].trim() === '' || 
-                    state.lines[blockEnd].search(/\S/) > indent)) {
-                blockEnd++;
-            }
-            blockEnd--;
-            
-            if (!PlaygroundView.evalExpr(condition, state.variables)) {
-                // Skip to after the block (or elif/else)
-                state.currentLine = blockEnd + 1;
-                result.jumped = true;
-            }
         }
         
-        // Check if we're at the end of a loop body
-        const currentLoop = state.loopStack[state.loopStack.length - 1];
-        if (currentLoop && lineNum === currentLoop.endLine) {
-            if (currentLoop.type === 'for') {
-                currentLoop.index++;
-                if (currentLoop.index < currentLoop.items.length) {
-                    state.variables[currentLoop.varName] = currentLoop.items[currentLoop.index];
-                    state.currentLine = currentLoop.bodyStart;
-                    result.jumped = true;
-                } else {
-                    state.loopStack.pop();
-                }
-            } else if (currentLoop.type === 'while') {
-                if (PlaygroundView.evalExpr(currentLoop.condition, state.variables)) {
-                    state.currentLine = currentLoop.bodyStart;
-                    result.jumped = true;
-                } else {
-                    state.loopStack.pop();
-                }
-            }
+        // Simple string
+        if ((expr.startsWith('"') && expr.endsWith('"')) || 
+            (expr.startsWith("'") && expr.endsWith("'"))) {
+            return expr.slice(1, -1).replace(/\\n/g, '\n').replace(/\\t/g, '\t');
         }
         
-        return result;
-    },
-
-    highlightLine: (lineNum) => {
-        const editor = document.getElementById('code-editor');
-        const lines = editor.value.split('\n');
-        
-        // Update line numbers with highlight
-        const lineNumbers = document.getElementById('line-numbers');
-        lineNumbers.innerHTML = lines.map((_, i) => 
-            `<span class="${i === lineNum ? 'current-line' : ''}">${i + 1}</span>`
-        ).join('<br>');
-    },
-
-    finishStepMode: () => {
-        PlaygroundView.isStepMode = false;
-        document.getElementById('step-next-btn').disabled = true;
-        document.getElementById('exec-status').textContent = '✅ Finished';
-        PlaygroundView.highlightLine(-1);
-        Toast.show('Execution complete!', 'success');
-    },
-
-    resetStepMode: () => {
-        PlaygroundView.executionState = null;
-        PlaygroundView.isStepMode = false;
-        document.getElementById('step-next-btn').disabled = true;
-        document.getElementById('step-reset-btn').disabled = true;
-        document.getElementById('exec-status').textContent = '';
-        document.getElementById('code-output').textContent = 'Click "Run All" or "Step-by-Step" to execute';
-        document.getElementById('variables-display').innerHTML = '<p class="placeholder-text">Variables will appear here during execution</p>';
-        document.getElementById('trace-display').innerHTML = '<p class="placeholder-text">Step through code to see execution trace</p>';
-        PlaygroundView.updateLineNumbers();
-    },
-
-    updateVariablesDisplay: () => {
-        const state = PlaygroundView.executionState;
-        if (!state) return;
-        
-        const container = document.getElementById('variables-display');
-        const vars = Object.entries(state.variables);
-        
-        document.getElementById('var-count').textContent = `${vars.length} variable${vars.length !== 1 ? 's' : ''}`;
-        
-        if (vars.length === 0) {
-            container.innerHTML = '<p class="placeholder-text">No variables yet</p>';
-            return;
-        }
-        
-        container.innerHTML = vars.map(([name, value]) => {
-            const type = Array.isArray(value) ? 'list' : typeof value;
-            const displayValue = Array.isArray(value) ? JSON.stringify(value) : String(value);
-            return `
-                <div class="var-item">
-                    <span class="var-name">${name}</span>
-                    <span class="var-type">${type}</span>
-                    <span class="var-value">${displayValue}</span>
-                </div>
-            `;
-        }).join('');
-    },
-
-    updateTraceDisplay: () => {
-        const state = PlaygroundView.executionState;
-        if (!state || state.trace.length === 0) return;
-        
-        const container = document.getElementById('trace-display');
-        container.innerHTML = `
-            <table class="trace-table">
-                <thead>
-                    <tr>
-                        <th>Step</th>
-                        <th>Line</th>
-                        <th>Code</th>
-                        <th>Variables Changed</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${state.trace.map((t, i) => `
-                        <tr>
-                            <td>${i + 1}</td>
-                            <td>${t.line}</td>
-                            <td><code>${t.code.substring(0, 30)}${t.code.length > 30 ? '...' : ''}</code></td>
-                            <td>${Object.entries(t.variables).map(([k,v]) => `${k}=${Array.isArray(v) ? '[...]' : v}`).join(', ') || '-'}</td>
-                        </tr>
-                    `).join('')}
-                </tbody>
-            </table>
-        `;
-    },
-
-    updateOutput: (outputLines) => {
-        document.getElementById('code-output').textContent = outputLines.join('\n') || '(No output yet)';
-    },
-
-    clearTrace: () => {
-        if (PlaygroundView.executionState) {
-            PlaygroundView.executionState.trace = [];
-        }
-        document.getElementById('trace-display').innerHTML = '<p class="placeholder-text">Trace cleared</p>';
-    },
-
-    // ==========================================
-    // CHALLENGES (15+ with varying difficulty)
-    // ==========================================
-    getChallenges: () => [
-        // EASY (5)
-        {
-            id: 'hello',
-            name: 'Hello World',
-            icon: '👋',
-            difficulty: 'Easy',
-            xp: 10,
-            description: 'Print "Hello, World!" to the screen. This is the classic first program every programmer writes!',
-            hint: 'Use print() with a string inside quotes.',
-            starterCode: '# Print Hello, World!\n',
-            tests: [{ expected: 'Hello, World!' }]
-        },
-        {
-            id: 'sum_two',
-            name: 'Add Two Numbers',
-            icon: '➕',
-            difficulty: 'Easy',
-            xp: 15,
-            description: 'Create variables a=5 and b=3, then print their sum.',
-            hint: 'Create two variables, add them, and print the result.',
-            starterCode: '# Add two numbers\na = 5\nb = 3\n# Print the sum\n',
-            tests: [{ expected: '8' }]
-        },
-        {
-            id: 'even_odd',
-            name: 'Even or Odd',
-            icon: '🔢',
-            difficulty: 'Easy',
-            xp: 20,
-            description: 'Given num = 7, print "Even" if it\'s even, or "Odd" if it\'s odd.',
-            hint: 'Use the modulo operator (%) - if num % 2 == 0, it\'s even.',
-            starterCode: '# Check if even or odd\nnum = 7\n',
-            tests: [{ expected: 'Odd' }]
-        },
-        {
-            id: 'countdown',
-            name: 'Countdown',
-            icon: '🚀',
-            difficulty: 'Easy',
-            xp: 25,
-            description: 'Print numbers from 5 down to 1, then print "Blast off!"',
-            hint: 'Use range(5, 0, -1) to count backwards.',
-            starterCode: '# Countdown from 5\n',
-            tests: [{ contains: ['5', '4', '3', '2', '1', 'Blast off!'] }]
-        },
-        {
-            id: 'greeting',
-            name: 'Personal Greeting',
-            icon: '🙋',
-            difficulty: 'Easy',
-            xp: 20,
-            description: 'Create a variable name = "Alex" and print "Hello, Alex!"',
-            hint: 'Use an f-string: f"Hello, {name}!"',
-            starterCode: '# Create a greeting\nname = "Alex"\n',
-            tests: [{ expected: 'Hello, Alex!' }]
-        },
-        
-        // MEDIUM (6)
-        {
-            id: 'sum_range',
-            name: 'Sum 1 to N',
-            icon: '📊',
-            difficulty: 'Medium',
-            xp: 30,
-            description: 'Calculate and print the sum of numbers from 1 to 10.',
-            hint: 'Use a for loop with range(1, 11) and keep a running total.',
-            starterCode: '# Sum numbers 1 to 10\ntotal = 0\n',
-            tests: [{ expected: '55' }]
-        },
-        {
-            id: 'factorial',
-            name: 'Factorial',
-            icon: '❗',
-            difficulty: 'Medium',
-            xp: 35,
-            description: 'Calculate 5! (5 factorial = 5×4×3×2×1 = 120)',
-            hint: 'Start with result=1, then multiply by each number from 1 to 5.',
-            starterCode: '# Calculate 5!\nn = 5\nresult = 1\n',
-            tests: [{ expected: '120' }]
-        },
-        {
-            id: 'fizzbuzz',
-            name: 'FizzBuzz',
-            icon: '🎯',
-            difficulty: 'Medium',
-            xp: 40,
-            description: 'Print 1-15. For multiples of 3 print "Fizz", for 5 print "Buzz", for both print "FizzBuzz".',
-            hint: 'Check divisibility by 15 first (for FizzBuzz), then 3, then 5.',
-            starterCode: '# FizzBuzz 1-15\nfor i in range(1, 16):\n    pass  # Replace this\n',
-            tests: [{ contains: ['FizzBuzz', 'Fizz', 'Buzz', '1', '2'] }]
-        },
-        {
-            id: 'reverse_string',
-            name: 'Reverse String',
-            icon: '🔄',
-            difficulty: 'Medium',
-            xp: 30,
-            description: 'Reverse the string "Python" and print it.',
-            hint: 'You can use string slicing: text[::-1]',
-            starterCode: '# Reverse a string\ntext = "Python"\n',
-            tests: [{ expected: 'nohtyP' }]
-        },
-        {
-            id: 'find_max',
-            name: 'Find Maximum',
-            icon: '📈',
-            difficulty: 'Medium',
-            xp: 35,
-            description: 'Find and print the largest number in the list [3, 7, 2, 9, 4, 1, 8] without using max().',
-            hint: 'Loop through and keep track of the biggest value seen.',
-            starterCode: '# Find the maximum\nnumbers = [3, 7, 2, 9, 4, 1, 8]\nlargest = numbers[0]\n',
-            tests: [{ expected: '9' }]
-        },
-        {
-            id: 'count_vowels',
-            name: 'Count Vowels',
-            icon: '🔤',
-            difficulty: 'Medium',
-            xp: 35,
-            description: 'Count and print the number of vowels in "Hello World".',
-            hint: 'Check if each character is in "aeiouAEIOU".',
-            starterCode: '# Count vowels\ntext = "Hello World"\ncount = 0\n',
-            tests: [{ expected: '3' }]
-        },
-        
-        // HARD (5)
-        {
-            id: 'prime_check',
-            name: 'Prime Checker',
-            icon: '🔐',
-            difficulty: 'Hard',
-            xp: 50,
-            description: 'Check if 17 is a prime number. Print "Prime" or "Not prime".',
-            hint: 'A prime only has divisors 1 and itself. Check if any number from 2 to n-1 divides evenly.',
-            starterCode: '# Check if prime\nn = 17\nis_prime = True\n',
-            tests: [{ expected: 'Prime' }]
-        },
-        {
-            id: 'palindrome',
-            name: 'Palindrome Check',
-            icon: '🪞',
-            difficulty: 'Hard',
-            xp: 50,
-            description: 'Check if "radar" is a palindrome (same forwards and backwards). Print "Yes" or "No".',
-            hint: 'Compare the string to its reverse.',
-            starterCode: '# Check palindrome\nword = "radar"\n',
-            tests: [{ expected: 'Yes' }]
-        },
-        {
-            id: 'fibonacci',
-            name: 'Fibonacci Sequence',
-            icon: '🌀',
-            difficulty: 'Hard',
-            xp: 60,
-            description: 'Print the first 10 Fibonacci numbers (0, 1, 1, 2, 3, 5, 8, 13, 21, 34).',
-            hint: 'Each number is the sum of the two before it. Start with a=0, b=1.',
-            starterCode: '# Fibonacci sequence\na = 0\nb = 1\n',
-            tests: [{ contains: ['0', '1', '1', '2', '3', '5', '8', '13', '21', '34'] }]
-        },
-        {
-            id: 'bubble_sort',
-            name: 'Bubble Sort',
-            icon: '🫧',
-            difficulty: 'Hard',
-            xp: 70,
-            description: 'Sort the list [64, 34, 25, 12, 22] using bubble sort and print the sorted list.',
-            hint: 'Compare adjacent elements and swap if out of order. Repeat until sorted.',
-            starterCode: '# Bubble sort\nnums = [64, 34, 25, 12, 22]\n',
-            tests: [{ contains: ['12', '22', '25', '34', '64'] }]
-        },
-        {
-            id: 'binary_search',
-            name: 'Binary Search',
-            icon: '🔍',
-            difficulty: 'Hard',
-            xp: 70,
-            description: 'Find the index of 7 in sorted list [1, 3, 5, 7, 9, 11] using binary search. Print "Found at index X".',
-            hint: 'Compare middle element. If target is smaller, search left half; if larger, search right half.',
-            starterCode: '# Binary search\nnums = [1, 3, 5, 7, 9, 11]\ntarget = 7\n',
-            tests: [{ contains: ['Found', 'index', '3'] }]
-        }
-    ],
-
-    getCompletedChallenges: () => {
-        return JSON.parse(localStorage.getItem('csmaster_completed_challenges') || '[]');
-    },
-
-    filterChallenges: (difficulty, btn) => {
-        document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        
-        document.querySelectorAll('.challenge-item').forEach(item => {
-            if (difficulty === 'all' || item.dataset.difficulty === difficulty) {
-                item.style.display = '';
-            } else {
-                item.style.display = 'none';
-            }
-        });
-    },
-
-    loadChallenge: (id) => {
-        const challenge = PlaygroundView.getChallenges().find(c => c.id === id);
-        if (!challenge) return;
-        
-        PlaygroundView.currentChallenge = challenge;
-        
-        const workspace = document.getElementById('challenge-workspace');
-        workspace.innerHTML = `
-            <div class="challenge-detail">
-                <div class="challenge-header">
-                    <div class="ch-title">
-                        <span class="ch-icon">${challenge.icon}</span>
-                        <h3>${challenge.name}</h3>
-                    </div>
-                    <div class="ch-badges">
-                        <span class="ch-difficulty ${challenge.difficulty.toLowerCase()}">${challenge.difficulty}</span>
-                        <span class="ch-xp">+${challenge.xp} XP</span>
-                    </div>
-                </div>
-                
-                <div class="challenge-body">
-                    <div class="challenge-description">
-                        <p>${challenge.description}</p>
-                        <button class="btn btn-small btn-secondary" onclick="PlaygroundView.showHint()">
-                            💡 Show Hint
-                        </button>
-                        <div class="challenge-hint" id="challenge-hint" style="display: none;">
-                            <strong>💡 Hint:</strong> ${challenge.hint}
-                        </div>
-                    </div>
-                    
-                    <div class="challenge-editor-section">
-                        <div class="ce-header">
-                            <span>Your Code</span>
-                            <div class="ce-actions">
-                                <button class="btn btn-small btn-secondary" onclick="PlaygroundView.resetChallenge()">
-                                    <i class="fas fa-undo"></i> Reset
-                                </button>
-                                <button class="btn btn-small btn-secondary" onclick="PlaygroundView.runChallenge()">
-                                    <i class="fas fa-play"></i> Test
-                                </button>
-                                <button class="btn btn-small btn-primary" onclick="PlaygroundView.submitChallenge()">
-                                    <i class="fas fa-check"></i> Submit
-                                </button>
-                            </div>
-                        </div>
-                        <textarea id="challenge-editor" spellcheck="false"
-                            onkeydown="PlaygroundView.handleTab(event)">${challenge.starterCode}</textarea>
-                    </div>
-                    
-                    <div class="challenge-output-section">
-                        <h4>Output</h4>
-                        <pre id="challenge-output" class="challenge-output">Run your code to see output...</pre>
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        // Highlight active challenge
-        document.querySelectorAll('.challenge-item').forEach(item => item.classList.remove('active'));
-        document.querySelector(`.challenge-item[onclick*="${id}"]`)?.classList.add('active');
-    },
-
-    showHint: () => {
-        const hint = document.getElementById('challenge-hint');
-        hint.style.display = hint.style.display === 'none' ? 'block' : 'none';
-    },
-
-    resetChallenge: () => {
-        if (PlaygroundView.currentChallenge) {
-            document.getElementById('challenge-editor').value = PlaygroundView.currentChallenge.starterCode;
-            document.getElementById('challenge-output').textContent = 'Run your code to see output...';
-        }
-    },
-
-    runChallenge: () => {
-        const code = document.getElementById('challenge-editor').value;
-        const output = document.getElementById('challenge-output');
-        
-        try {
-            const result = PlaygroundView.interpretPython(code);
-            output.textContent = result.output || '(No output)';
-            output.className = 'challenge-output';
-        } catch (e) {
-            output.textContent = `Error: ${e.message}`;
-            output.className = 'challenge-output error';
-        }
-    },
-
-    submitChallenge: () => {
-        const code = document.getElementById('challenge-editor').value;
-        const output = document.getElementById('challenge-output');
-        const challenge = PlaygroundView.currentChallenge;
-        
-        if (!challenge) return;
-        
-        try {
-            const result = PlaygroundView.interpretPython(code);
-            const outputText = result.output.trim();
-            
-            let passed = false;
-            const test = challenge.tests[0];
-            
-            if (test.contains) {
-                passed = test.contains.every(s => outputText.includes(s));
-            } else if (test.expected) {
-                passed = outputText.includes(test.expected);
-            }
-            
-            if (passed) {
-                output.innerHTML = `<span class="success">✅ Correct! Challenge completed!</span>\n\n${outputText}`;
-                
-                const completed = PlaygroundView.getCompletedChallenges();
-                if (!completed.includes(challenge.id)) {
-                    completed.push(challenge.id);
-                    localStorage.setItem('csmaster_completed_challenges', JSON.stringify(completed));
-                    
-                    if (typeof AppState !== 'undefined') {
-                        AppState.addXP(challenge.xp);
-                    }
-                    Toast.show(`🎉 +${challenge.xp} XP earned!`, 'success');
-                    
-                    // Update UI
-                    document.querySelector(`.challenge-item[onclick*="${challenge.id}"]`)?.classList.add('completed');
-                    const icon = document.querySelector(`.challenge-item[onclick*="${challenge.id}"] .challenge-icon`);
-                    if (icon) icon.textContent = '✅';
-                }
-            } else {
-                output.innerHTML = `<span class="error">❌ Not quite right. Try again!</span>\n\nYour output:\n${outputText}`;
-            }
-        } catch (e) {
-            output.innerHTML = `<span class="error">Error: ${e.message}</span>`;
-        }
-    },
-
-    // ==========================================
-    // COMPREHENSIVE LESSONS
-    // ==========================================
-    lessons: {
-        intro: {
-            title: 'Introduction to Python',
-            sections: [
-                {
-                    title: 'What is Python?',
-                    content: `Python is a high-level, interpreted programming language known for its clear syntax and readability. Created by Guido van Rossum in 1991, it's now one of the world's most popular languages.`,
-                    code: `# Your first Python program!\nprint("Hello, Python!")\nprint("I'm learning to code!")`
-                },
-                {
-                    title: 'Running Python Code',
-                    content: `Python executes code line by line from top to bottom. Each print() statement outputs text to the screen.`,
-                    code: `print("Line 1")\nprint("Line 2")\nprint("Line 3")`
-                },
-                {
-                    title: 'Comments',
-                    content: `Comments start with # and are ignored by Python. Use them to explain your code!`,
-                    code: `# This is a comment - Python ignores it\nprint("This runs")  # Inline comment\n\n# Comments help others understand your code\n# They also help YOU remember what you did!`
-                }
-            ]
-        },
-        variables: {
-            title: 'Variables & Data Types',
-            sections: [
-                {
-                    title: 'Creating Variables',
-                    content: `Variables store data. In Python, you don't need to declare types - Python figures it out automatically!`,
-                    code: `name = "Alice"    # String (text)\nage = 15          # Integer (whole number)\nheight = 1.65     # Float (decimal)\nis_student = True # Boolean (True/False)\n\nprint(name)\nprint(age)`
-                },
-                {
-                    title: 'Data Types',
-                    content: `Python has several built-in data types: str (text), int (whole numbers), float (decimals), bool (True/False), list, dict, and more.`,
-                    code: `# Check types with type()\nprint(type("hello"))  # <class 'str'>\nprint(type(42))       # <class 'int'>\nprint(type(3.14))     # <class 'float'>\nprint(type(True))     # <class 'bool'>`
-                },
-                {
-                    title: 'Type Conversion',
-                    content: `Convert between types using int(), str(), float(), bool().`,
-                    code: `# Convert string to int\nnum_str = "42"\nnum_int = int(num_str)\nprint(num_int + 8)  # 50\n\n# Convert int to string\nage = 15\nprint("Age: " + str(age))`
-                },
-                {
-                    title: 'f-Strings (Formatted Strings)',
-                    content: `f-strings let you embed variables directly in strings. Put f before the quotes and use {variable} to insert values.`,
-                    code: `name = "Alex"\nage = 15\nscore = 95.5\n\n# f-string makes this easy!\nprint(f"Name: {name}")\nprint(f"Age: {age} years old")\nprint(f"Score: {score}%")`
-                }
-            ]
-        },
-        operators: {
-            title: 'Operators & Expressions',
-            sections: [
-                {
-                    title: 'Arithmetic Operators',
-                    content: `Python supports all basic math operations plus some special ones.`,
-                    code: `print("Addition:", 5 + 3)       # 8\nprint("Subtraction:", 10 - 4)   # 6\nprint("Multiplication:", 6 * 7) # 42\nprint("Division:", 15 / 4)      # 3.75\nprint("Integer div:", 15 // 4)  # 3\nprint("Modulo:", 17 % 5)        # 2 (remainder)\nprint("Power:", 2 ** 8)         # 256`
-                },
-                {
-                    title: 'Comparison Operators',
-                    content: `Comparisons return True or False. Used in conditions.`,
-                    code: `x = 10\ny = 5\n\nprint(x > y)   # True (greater than)\nprint(x < y)   # False (less than)\nprint(x == 10) # True (equal to)\nprint(x != y)  # True (not equal)\nprint(x >= 10) # True (greater or equal)\nprint(x <= 5)  # False (less or equal)`
-                },
-                {
-                    title: 'Logical Operators',
-                    content: `Combine conditions with and, or, not.`,
-                    code: `age = 15\nhas_ticket = True\n\n# Both must be true\nprint(age >= 13 and has_ticket)  # True\n\n# At least one must be true\nprint(age >= 18 or has_ticket)   # True\n\n# Inverts the value\nprint(not has_ticket)            # False`
-                }
-            ]
-        },
-        strings: {
-            title: 'Working with Strings',
-            sections: [
-                {
-                    title: 'String Basics',
-                    content: `Strings are sequences of characters. Create them with quotes (single or double).`,
-                    code: `message = "Hello, World!"\nname = 'Python'\n\nprint(message)\nprint(len(message))  # Length: 13`
-                },
-                {
-                    title: 'String Indexing & Slicing',
-                    content: `Access individual characters with [index]. First character is index 0. Negative indices count from the end.`,
-                    code: `text = "Python"\n\nprint(text[0])   # P (first)\nprint(text[-1])  # n (last)\nprint(text[0:3]) # Pyt (slice)\nprint(text[2:])  # thon (from index 2)\nprint(text[::-1]) # nohtyP (reversed)`
-                },
-                {
-                    title: 'String Methods',
-                    content: `Strings have many useful methods for manipulation.`,
-                    code: `text = "  Hello World  "\n\nprint(text.upper())      # "  HELLO WORLD  "\nprint(text.lower())      # "  hello world  "\nprint(text.strip())      # "Hello World"\nprint(text.replace("World", "Python"))\n# "  Hello Python  "`
-                },
-                {
-                    title: 'String Concatenation',
-                    content: `Join strings with + or use f-strings for cleaner code.`,
-                    code: `first = "Hello"\nlast = "World"\n\n# Method 1: Concatenation\nprint(first + " " + last)\n\n# Method 2: f-strings (preferred)\nprint(f"{first} {last}")`
-                }
-            ]
-        },
-        conditionals: {
-            title: 'If Statements & Logic',
-            sections: [
-                {
-                    title: 'Basic If Statement',
-                    content: `if statements execute code only when a condition is True. Indentation (4 spaces) defines the code block.`,
-                    code: `age = 18\n\nif age >= 18:\n    print("You are an adult")\n    print("You can vote!")`
-                },
-                {
-                    title: 'If-Else',
-                    content: `else provides an alternative when the condition is False.`,
-                    code: `temperature = 25\n\nif temperature > 30:\n    print("It's hot!")\nelse:\n    print("Nice weather!")`
-                },
-                {
-                    title: 'If-Elif-Else',
-                    content: `elif (else if) checks multiple conditions in order.`,
-                    code: `score = 75\n\nif score >= 90:\n    print("Grade: A")\nelif score >= 80:\n    print("Grade: B")\nelif score >= 70:\n    print("Grade: C")\nelif score >= 60:\n    print("Grade: D")\nelse:\n    print("Grade: F")`
-                },
-                {
-                    title: 'Nested Conditions',
-                    content: `You can put if statements inside other if statements.`,
-                    code: `age = 20\nhas_license = True\n\nif age >= 18:\n    print("Old enough to drive")\n    if has_license:\n        print("You can drive!")\n    else:\n        print("Get a license first")\nelse:\n    print("Too young to drive")`
-                }
-            ]
-        },
-        loops: {
-            title: 'Loops & Iteration',
-            sections: [
-                {
-                    title: 'FOR Loop Basics',
-                    content: `FOR loops iterate a specific number of times. range(n) generates numbers 0 to n-1.`,
-                    code: `# Print 0 to 4\nfor i in range(5):\n    print(f"Count: {i}")`
-                },
-                {
-                    title: 'FOR Loop with Range',
-                    content: `range() can take start, stop, and step arguments.`,
-                    code: `# range(start, stop, step)\nprint("1 to 10:")\nfor i in range(1, 11):\n    print(i, end=" ")\n\nprint("\\n\\nCountdown:")\nfor i in range(10, 0, -1):\n    print(i, end=" ")\nprint("\\nBlast off!")`
-                },
-                {
-                    title: 'FOR Loop with Lists',
-                    content: `Loop directly through items in a list.`,
-                    code: `fruits = ["apple", "banana", "cherry"]\n\nfor fruit in fruits:\n    print(f"I like {fruit}")`
-                },
-                {
-                    title: 'WHILE Loop',
-                    content: `WHILE loops continue as long as a condition is True.`,
-                    code: `count = 0\n\nwhile count < 5:\n    print(f"Count is {count}")\n    count = count + 1\n\nprint("Loop finished!")`
-                },
-                {
-                    title: 'Break and Continue',
-                    content: `break exits the loop early. continue skips to the next iteration.`,
-                    code: `# break example\nfor i in range(10):\n    if i == 5:\n        break\n    print(i, end=" ")\n\nprint("\\n")\n\n# continue example\nfor i in range(5):\n    if i == 2:\n        continue\n    print(i, end=" ")`
-                }
-            ]
-        },
-        lists: {
-            title: 'Lists & Arrays',
-            sections: [
-                {
-                    title: 'Creating Lists',
-                    content: `Lists store multiple items in order. Items can be any type.`,
-                    code: `numbers = [1, 2, 3, 4, 5]\nfruits = ["apple", "banana", "cherry"]\nmixed = [1, "hello", True, 3.14]\n\nprint(numbers)\nprint(fruits)\nprint(f"Length: {len(fruits)}")`
-                },
-                {
-                    title: 'Accessing List Items',
-                    content: `Use indices to access items. First item is index 0.`,
-                    code: `colors = ["red", "green", "blue", "yellow"]\n\nprint(colors[0])   # red (first)\nprint(colors[-1])  # yellow (last)\nprint(colors[1:3]) # ['green', 'blue'] (slice)`
-                },
-                {
-                    title: 'Modifying Lists',
-                    content: `Lists are mutable - you can change, add, and remove items.`,
-                    code: `nums = [1, 2, 3]\n\n# Change item\nnums[0] = 10\nprint(nums)  # [10, 2, 3]\n\n# Add items\nnums.append(4)     # Add to end\nprint(nums)  # [10, 2, 3, 4]\n\n# Remove items\nnums.remove(2)     # Remove by value\nprint(nums)  # [10, 3, 4]`
-                },
-                {
-                    title: 'List Methods',
-                    content: `Lists have many useful methods for manipulation.`,
-                    code: `nums = [3, 1, 4, 1, 5, 9, 2, 6]\n\nprint(f"Length: {len(nums)}")\nprint(f"Max: {max(nums)}")\nprint(f"Min: {min(nums)}")\nprint(f"Sum: {sum(nums)}")\n\nnums.sort()\nprint(f"Sorted: {nums}")`
-                },
-                {
-                    title: 'List Comprehension',
-                    content: `A concise way to create lists based on existing lists.`,
-                    code: `# Create list of squares\nsquares = []\nfor i in range(1, 6):\n    squares.append(i ** 2)\nprint(squares)\n\n# Same thing with list comprehension\nsquares2 = [i ** 2 for i in range(1, 6)]\nprint(squares2)`
-                }
-            ]
-        },
-        functions: {
-            title: 'Functions',
-            sections: [
-                {
-                    title: 'Defining Functions',
-                    content: `Functions are reusable blocks of code. Define with def, call by name.`,
-                    code: `def greet():\n    print("Hello!")\n    print("Welcome to Python!")\n\n# Call the function\ngreet()\ngreet()  # Can call multiple times`
-                },
-                {
-                    title: 'Function Parameters',
-                    content: `Functions can accept inputs (parameters) to work with.`,
-                    code: `def greet(name):\n    print(f"Hello, {name}!")\n\ndef add(a, b):\n    print(f"{a} + {b} = {a + b}")\n\ngreet("Alice")\ngreet("Bob")\nadd(5, 3)`
-                },
-                {
-                    title: 'Return Values',
-                    content: `Functions can return values using return.`,
-                    code: `def square(n):\n    return n * n\n\ndef is_even(n):\n    return n % 2 == 0\n\nresult = square(5)\nprint(f"5 squared = {result}")\n\nprint(f"Is 4 even? {is_even(4)}")\nprint(f"Is 7 even? {is_even(7)}")`
-                },
-                {
-                    title: 'Default Parameters',
-                    content: `Give parameters default values that are used if no argument is provided.`,
-                    code: `def greet(name, greeting="Hello"):\n    print(f"{greeting}, {name}!")\n\ngreet("Alice")           # Uses default\ngreet("Bob", "Hi")       # Custom greeting\ngreet("Charlie", "Hey")  # Custom greeting`
-                }
-            ]
-        },
-        algorithms: {
-            title: 'Basic Algorithms',
-            sections: [
-                {
-                    title: 'Linear Search',
-                    content: `Linear search checks each element one by one until finding the target or reaching the end.`,
-                    code: `def linear_search(arr, target):\n    for i in range(len(arr)):\n        if arr[i] == target:\n            return i  # Found!\n    return -1  # Not found\n\nnumbers = [4, 2, 7, 1, 9, 3]\nresult = linear_search(numbers, 7)\nprint(f"Found at index: {result}")`
-                },
-                {
-                    title: 'Binary Search',
-                    content: `Binary search is faster but requires a sorted list. It repeatedly divides the search space in half.`,
-                    code: `def binary_search(arr, target):\n    low = 0\n    high = len(arr) - 1\n    \n    while low <= high:\n        mid = (low + high) // 2\n        if arr[mid] == target:\n            return mid\n        elif arr[mid] < target:\n            low = mid + 1\n        else:\n            high = mid - 1\n    return -1\n\nnums = [1, 3, 5, 7, 9, 11]\nprint(binary_search(nums, 7))`
-                },
-                {
-                    title: 'Bubble Sort',
-                    content: `Bubble sort repeatedly swaps adjacent elements if they're in the wrong order.`,
-                    code: `def bubble_sort(arr):\n    n = len(arr)\n    for i in range(n):\n        for j in range(0, n-i-1):\n            if arr[j] > arr[j+1]:\n                arr[j], arr[j+1] = arr[j+1], arr[j]\n    return arr\n\nnums = [64, 34, 25, 12, 22]\nprint(f"Before: {nums}")\nbubble_sort(nums)\nprint(f"After: {nums}")`
-                },
-                {
-                    title: 'Counting Algorithm',
-                    content: `Count occurrences of items or find statistics in data.`,
-                    code: `def count_item(arr, target):\n    count = 0\n    for item in arr:\n        if item == target:\n            count += 1\n    return count\n\ngrades = ['A', 'B', 'A', 'C', 'A', 'B']\nprint(f"Number of A's: {count_item(grades, 'A')}")`
-                }
-            ]
-        },
-        filehandling: {
-            title: 'File Handling',
-            sections: [
-                {
-                    title: 'Reading Files',
-                    content: `Python uses open() to work with files. (Note: This is simulated in the playground)`,
-                    code: `# Reading a file (conceptual example)\n# file = open("data.txt", "r")\n# content = file.read()\n# file.close()\n\n# Simulated example:\ndata = "Line 1\\nLine 2\\nLine 3"\nlines = data.split("\\n")\n\nfor line in lines:\n    print(line)`
-                },
-                {
-                    title: 'Writing Files',
-                    content: `Use "w" mode to write (overwrites) or "a" mode to append.`,
-                    code: `# Writing to a file (conceptual)\n# file = open("output.txt", "w")\n# file.write("Hello, World!")\n# file.close()\n\n# Simulated example:\noutput = []\noutput.append("First line")\noutput.append("Second line")\n\nfor line in output:\n    print(line)`
-                },
-                {
-                    title: 'CSV Data',
-                    content: `CSV (Comma Separated Values) is a common data format.`,
-                    code: `# CSV data example\ncsv_data = \"\"\"name,age,grade\nAlice,15,A\nBob,16,B\nCharlie,15,A\"\"\"\n\nlines = csv_data.split("\\n")\nheaders = lines[0].split(",")\n\nfor line in lines[1:]:\n    values = line.split(",")\n    print(f"{values[0]} is {values[1]} years old")`
-                }
-            ]
-        }
-    },
-
-    loadLesson: (topicId) => {
-        const lesson = PlaygroundView.lessons[topicId];
-        if (!lesson) return;
-        
-        const content = document.getElementById('learn-content');
-        content.innerHTML = `
-            <div class="lesson-content">
-                <h3>${lesson.title}</h3>
-                ${lesson.sections.map((section, idx) => `
-                    <div class="lesson-section">
-                        <h4>${idx + 1}. ${section.title}</h4>
-                        <p>${section.content}</p>
-                        <div class="lesson-code">
-                            <pre><code>${section.code}</code></pre>
-                            <button class="btn btn-small btn-primary" onclick="PlaygroundView.tryLesson(\`${section.code.replace(/`/g, '\\`').replace(/\\/g, '\\\\')}\`)">
-                                ▶ Try It
-                            </button>
-                        </div>
-                    </div>
-                `).join('')}
-            </div>
-        `;
-    },
-
-    tryLesson: (code) => {
-        PlaygroundView.showMode('sandbox', document.querySelector('.mode-tab'));
-        document.getElementById('code-editor').value = code;
-        PlaygroundView.updateLineNumbers();
-        PlaygroundView.runCode();
-    },
-
-    // ==========================================
-    // CODE EXAMPLES
-    // ==========================================
-    examples: {
-        hello: `# Hello World\nprint("Hello, World!")`,
-        variables: `# Variables\nname = "Alice"\nage = 15\nprint(f"{name} is {age}")`,
-        input: `# User Input\nname = input("Name? ")\nprint(f"Hello, {name}!")`,
-        if: `# If Statement\nscore = 75\nif score >= 70:\n    print("Pass!")\nelse:\n    print("Fail")`,
-        for: `# FOR Loop\nfor i in range(5):\n    print(f"i = {i}")`,
-        while: `# WHILE Loop\nx = 0\nwhile x < 5:\n    print(x)\n    x += 1`,
-        nested: `# Nested Loops\nfor i in range(3):\n    for j in range(3):\n        print(f"({i},{j})", end=" ")\n    print()`,
-        list: `# Lists\nnums = [1, 2, 3]\nnums.append(4)\nprint(nums)`,
-        dict: `# Dictionary\nperson = {"name": "Alice", "age": 15}\nprint(person["name"])`,
-        function: `# Functions\ndef greet(name):\n    return f"Hello, {name}!"\n\nprint(greet("World"))`,
-        recursion: `# Recursion\ndef factorial(n):\n    if n <= 1:\n        return 1\n    return n * factorial(n-1)\n\nprint(factorial(5))`,
-        linear: `# Linear Search\ndef search(arr, x):\n    for i in range(len(arr)):\n        if arr[i] == x:\n            return i\n    return -1\n\nprint(search([4,2,7,1], 7))`,
-        binary: `# Binary Search\ndef binary(arr, x):\n    lo, hi = 0, len(arr)-1\n    while lo <= hi:\n        mid = (lo+hi)//2\n        if arr[mid] == x: return mid\n        elif arr[mid] < x: lo = mid+1\n        else: hi = mid-1\n    return -1\n\nprint(binary([1,3,5,7,9], 5))`,
-        bubble: `# Bubble Sort\narr = [64, 34, 25]\nfor i in range(len(arr)):\n    for j in range(len(arr)-1):\n        if arr[j] > arr[j+1]:\n            arr[j], arr[j+1] = arr[j+1], arr[j]\nprint(arr)`
-    },
-
-    loadExample: (name) => {
-        if (name && PlaygroundView.examples[name]) {
-            document.getElementById('code-editor').value = PlaygroundView.examples[name];
-            PlaygroundView.updateLineNumbers();
-            document.getElementById('example-select').value = '';
-        }
-    },
-
-    // ==========================================
-    // PYTHON INTERPRETER
-    // ==========================================
-    evalExpr: (expr, vars = {}) => {
-        let processed = expr.trim();
-        
-        // f-strings
-        if (processed.startsWith('f"') || processed.startsWith("f'")) {
-            const content = processed.slice(2, -1);
-            return content.replace(/\{([^}]+)\}/g, (_, e) => PlaygroundView.evalExpr(e, vars));
-        }
-        
-        // Strings
-        if ((processed.startsWith('"') && processed.endsWith('"')) ||
-            (processed.startsWith("'") && processed.endsWith("'"))) {
-            return processed.slice(1, -1);
-        }
-        
-        // Lists
-        if (processed.startsWith('[') && processed.endsWith(']')) {
-            const inner = processed.slice(1, -1).trim();
+        // List literal
+        if (expr.startsWith('[') && expr.endsWith(']')) {
+            const inner = expr.slice(1, -1).trim();
             if (!inner) return [];
-            return inner.split(',').map(item => PlaygroundView.evalExpr(item.trim(), vars));
+            return PlaygroundView.parseListItems(inner, vars);
         }
         
         // Built-in functions
-        if (processed.startsWith('len(')) {
-            const arg = processed.match(/len\((.+)\)/)?.[1];
-            const val = PlaygroundView.evalExpr(arg, vars);
-            return val?.length ?? 0;
-        }
-        if (processed.startsWith('range(')) {
-            const match = processed.match(/range\(([^)]+)\)/);
-            if (match) {
-                const args = match[1].split(',').map(s => PlaygroundView.evalExpr(s.trim(), vars));
-                if (args.length === 1) return { type: 'range', start: 0, end: args[0], step: 1 };
-                if (args.length === 2) return { type: 'range', start: args[0], end: args[1], step: 1 };
-                return { type: 'range', start: args[0], end: args[1], step: args[2] };
+        const funcMatch = expr.match(/^(\w+)\((.*)$/);
+        if (funcMatch) {
+            const fname = funcMatch[1];
+            // Find matching closing paren
+            let depth = 1, i = fname.length + 1;
+            while (i < expr.length && depth > 0) {
+                if (expr[i] === '(') depth++;
+                else if (expr[i] === ')') depth--;
+                i++;
             }
-        }
-        if (processed.startsWith('int(')) {
-            const arg = processed.match(/int\((.+)\)/)?.[1];
-            return parseInt(PlaygroundView.evalExpr(arg, vars)) || 0;
-        }
-        if (processed.startsWith('str(')) {
-            const arg = processed.match(/str\((.+)\)/)?.[1];
-            return String(PlaygroundView.evalExpr(arg, vars));
-        }
-        if (processed.startsWith('max(')) {
-            const arg = processed.match(/max\((.+)\)/)?.[1];
-            const val = PlaygroundView.evalExpr(arg, vars);
-            return Array.isArray(val) ? Math.max(...val) : val;
-        }
-        if (processed.startsWith('min(')) {
-            const arg = processed.match(/min\((.+)\)/)?.[1];
-            const val = PlaygroundView.evalExpr(arg, vars);
-            return Array.isArray(val) ? Math.min(...val) : val;
-        }
-        if (processed.startsWith('sum(')) {
-            const arg = processed.match(/sum\((.+)\)/)?.[1];
-            const val = PlaygroundView.evalExpr(arg, vars);
-            return Array.isArray(val) ? val.reduce((a, b) => a + b, 0) : 0;
-        }
-        if (processed.startsWith('abs(')) {
-            const arg = processed.match(/abs\((.+)\)/)?.[1];
-            return Math.abs(PlaygroundView.evalExpr(arg, vars));
+            const argStr = expr.slice(fname.length + 1, i - 1);
+            
+            switch (fname) {
+                case 'len':
+                    const lenVal = PlaygroundView.safeEval(argStr, vars);
+                    return (lenVal && lenVal.length !== undefined) ? lenVal.length : 0;
+                case 'int':
+                    return Math.floor(Number(PlaygroundView.safeEval(argStr, vars))) || 0;
+                case 'str':
+                    return String(PlaygroundView.safeEval(argStr, vars));
+                case 'float':
+                    return Number(PlaygroundView.safeEval(argStr, vars)) || 0;
+                case 'abs':
+                    return Math.abs(PlaygroundView.safeEval(argStr, vars));
+                case 'max':
+                    const maxVal = PlaygroundView.safeEval(argStr, vars);
+                    return Array.isArray(maxVal) ? Math.max(...maxVal) : maxVal;
+                case 'min':
+                    const minVal = PlaygroundView.safeEval(argStr, vars);
+                    return Array.isArray(minVal) ? Math.min(...minVal) : minVal;
+                case 'sum':
+                    const sumVal = PlaygroundView.safeEval(argStr, vars);
+                    return Array.isArray(sumVal) ? sumVal.reduce((a, b) => a + b, 0) : 0;
+                case 'range':
+                    const rangeArgs = PlaygroundView.parseArgs(argStr, vars);
+                    if (rangeArgs.length === 1) return { type: 'range', start: 0, end: rangeArgs[0], step: 1 };
+                    if (rangeArgs.length === 2) return { type: 'range', start: rangeArgs[0], end: rangeArgs[1], step: 1 };
+                    return { type: 'range', start: rangeArgs[0], end: rangeArgs[1], step: rangeArgs[2] };
+                case 'type':
+                    const typeVal = PlaygroundView.safeEval(argStr, vars);
+                    if (Array.isArray(typeVal)) return "<class 'list'>";
+                    if (typeof typeVal === 'number') return Number.isInteger(typeVal) ? "<class 'int'>" : "<class 'float'>";
+                    if (typeof typeVal === 'string') return "<class 'str'>";
+                    if (typeof typeVal === 'boolean') return "<class 'bool'>";
+                    return "<class 'NoneType'>";
+                case 'print':
+                    return null; // Handled separately
+                case 'input':
+                    return 'test'; // Simulated input
+            }
         }
         
         // String methods
-        if (processed.includes('.upper()')) {
-            const varName = processed.split('.')[0];
+        if (expr.includes('.upper()')) {
+            const varName = expr.split('.')[0].trim();
             return String(vars[varName] || '').toUpperCase();
         }
-        if (processed.includes('.lower()')) {
-            const varName = processed.split('.')[0];
+        if (expr.includes('.lower()')) {
+            const varName = expr.split('.')[0].trim();
             return String(vars[varName] || '').toLowerCase();
         }
+        if (expr.includes('.strip()')) {
+            const varName = expr.split('.')[0].trim();
+            return String(vars[varName] || '').trim();
+        }
         
-        // List indexing
-        const indexMatch = processed.match(/^(\w+)\[([^\]]+)\]$/);
+        // List indexing: arr[i] or string[i]
+        const indexMatch = expr.match(/^(\w+)\[(.+)\]$/);
         if (indexMatch) {
             const arr = vars[indexMatch[1]];
-            const idx = PlaygroundView.evalExpr(indexMatch[2], vars);
+            const idx = PlaygroundView.safeEval(indexMatch[2], vars);
             if (Array.isArray(arr) || typeof arr === 'string') {
-                return idx < 0 ? arr[arr.length + idx] : arr[idx];
+                const index = idx < 0 ? arr.length + idx : idx;
+                return arr[index];
             }
         }
         
-        // Replace variables
-        for (const [name, value] of Object.entries(vars)) {
-            const regex = new RegExp(`\\b${name}\\b`, 'g');
-            if (typeof value === 'string') {
-                processed = processed.replace(regex, `"${value}"`);
-            } else if (Array.isArray(value)) {
-                processed = processed.replace(regex, JSON.stringify(value));
-            } else {
-                processed = processed.replace(regex, value);
+        // Slicing: arr[start:end]
+        const sliceMatch = expr.match(/^(\w+)\[([^:]*):([^\]]*)\]$/);
+        if (sliceMatch) {
+            const arr = vars[sliceMatch[1]];
+            if (Array.isArray(arr) || typeof arr === 'string') {
+                const start = sliceMatch[2] ? PlaygroundView.safeEval(sliceMatch[2], vars) : 0;
+                const end = sliceMatch[3] ? PlaygroundView.safeEval(sliceMatch[3], vars) : arr.length;
+                return typeof arr === 'string' ? arr.slice(start, end) : arr.slice(start, end);
             }
         }
         
-        // Python to JS operators
-        processed = processed.replace(/\band\b/g, '&&');
-        processed = processed.replace(/\bor\b/g, '||');
-        processed = processed.replace(/\bnot\b/g, '!');
-        processed = processed.replace(/\bTrue\b/g, 'true');
-        processed = processed.replace(/\bFalse\b/g, 'false');
-        
-        try {
-            return eval(processed);
-        } catch {
-            return processed;
+        // Reverse slice: text[::-1]
+        if (expr.match(/^(\w+)\[::-1\]$/)) {
+            const varName = expr.match(/^(\w+)/)[1];
+            const val = vars[varName];
+            if (typeof val === 'string') return val.split('').reverse().join('');
+            if (Array.isArray(val)) return [...val].reverse();
         }
+        
+        // Parse and evaluate expression
+        return PlaygroundView.evalExpression(expr, vars);
     },
 
-    evalPrint: (content, vars) => {
-        // Handle end= parameter
-        let endChar = '\n';
-        if (content.includes('end=')) {
-            const endMatch = content.match(/,\s*end=["']([^"']*)["']/);
-            if (endMatch) {
-                endChar = endMatch[1];
-                content = content.replace(/,\s*end=["'][^"']*["']/, '');
-            }
-        }
+    parseArgs: (argStr, vars) => {
+        const args = [];
+        let current = '';
+        let depth = 0;
         
-        // Parse print arguments
-        const parts = [];
+        for (const char of argStr) {
+            if (char === '(' || char === '[') depth++;
+            else if (char === ')' || char === ']') depth--;
+            else if (char === ',' && depth === 0) {
+                if (current.trim()) args.push(PlaygroundView.safeEval(current.trim(), vars));
+                current = '';
+                continue;
+            }
+            current += char;
+        }
+        if (current.trim()) args.push(PlaygroundView.safeEval(current.trim(), vars));
+        return args;
+    },
+
+    parseListItems: (inner, vars) => {
+        const items = [];
         let current = '';
         let depth = 0;
         let inString = false;
         let stringChar = '';
         
-        for (const char of content) {
+        for (let i = 0; i < inner.length; i++) {
+            const char = inner[i];
+            
             if ((char === '"' || char === "'") && !inString) {
                 inString = true;
                 stringChar = char;
@@ -1437,32 +485,155 @@ print(f"Sum of 1-5 = {total}")</textarea>
             }
             
             if (!inString) {
-                if (char === '(' || char === '[') depth++;
-                if (char === ')' || char === ']') depth--;
-                if (char === ',' && depth === 0) {
-                    parts.push(current.trim());
+                if (char === '[' || char === '(') depth++;
+                else if (char === ']' || char === ')') depth--;
+                else if (char === ',' && depth === 0) {
+                    if (current.trim()) items.push(PlaygroundView.safeEval(current.trim(), vars));
                     current = '';
                     continue;
                 }
             }
             current += char;
         }
-        if (current.trim()) parts.push(current.trim());
-        
-        return parts.map(p => {
-            const val = PlaygroundView.evalExpr(p, vars);
-            if (Array.isArray(val)) return JSON.stringify(val).replace(/"/g, "'");
-            return String(val);
-        }).join(' ');
+        if (current.trim()) items.push(PlaygroundView.safeEval(current.trim(), vars));
+        return items;
     },
 
+    evalExpression: (expr, vars) => {
+        expr = expr.trim();
+        
+        // Check for variable first
+        if (vars.hasOwnProperty(expr)) {
+            return vars[expr];
+        }
+        
+        // Numbers
+        if (/^-?\d+(\.\d+)?$/.test(expr)) {
+            return parseFloat(expr);
+        }
+        
+        // Boolean
+        if (expr === 'True') return true;
+        if (expr === 'False') return false;
+        if (expr === 'None') return null;
+        
+        // Handle comparisons and logical ops
+        // Order matters: check multi-char ops first
+        const ops = [
+            { op: ' and ', fn: (a, b, v) => PlaygroundView.evalExpression(a, v) && PlaygroundView.evalExpression(b, v) },
+            { op: ' or ', fn: (a, b, v) => PlaygroundView.evalExpression(a, v) || PlaygroundView.evalExpression(b, v) },
+            { op: '==', fn: (a, b, v) => PlaygroundView.evalExpression(a, v) === PlaygroundView.evalExpression(b, v) },
+            { op: '!=', fn: (a, b, v) => PlaygroundView.evalExpression(a, v) !== PlaygroundView.evalExpression(b, v) },
+            { op: '<=', fn: (a, b, v) => PlaygroundView.evalExpression(a, v) <= PlaygroundView.evalExpression(b, v) },
+            { op: '>=', fn: (a, b, v) => PlaygroundView.evalExpression(a, v) >= PlaygroundView.evalExpression(b, v) },
+            { op: '<', fn: (a, b, v) => PlaygroundView.evalExpression(a, v) < PlaygroundView.evalExpression(b, v) },
+            { op: '>', fn: (a, b, v) => PlaygroundView.evalExpression(a, v) > PlaygroundView.evalExpression(b, v) },
+        ];
+        
+        for (const { op, fn } of ops) {
+            const idx = expr.indexOf(op);
+            if (idx > 0) {
+                return fn(expr.slice(0, idx), expr.slice(idx + op.length), vars);
+            }
+        }
+        
+        // Handle not
+        if (expr.startsWith('not ')) {
+            return !PlaygroundView.evalExpression(expr.slice(4), vars);
+        }
+        
+        // Handle arithmetic (respecting precedence)
+        // First: + and - (left to right, but not inside parens)
+        let depth = 0;
+        for (let i = expr.length - 1; i >= 0; i--) {
+            const char = expr[i];
+            if (char === ')') depth++;
+            else if (char === '(') depth--;
+            else if (depth === 0 && (char === '+' || char === '-') && i > 0) {
+                // Check it's not a unary minus
+                const prev = expr[i - 1];
+                if (!/[\+\-\*\/\%\(]/.test(prev)) {
+                    const left = PlaygroundView.evalExpression(expr.slice(0, i), vars);
+                    const right = PlaygroundView.evalExpression(expr.slice(i + 1), vars);
+                    if (typeof left === 'string' || typeof right === 'string') {
+                        return String(left) + String(right);
+                    }
+                    return char === '+' ? left + right : left - right;
+                }
+            }
+        }
+        
+        // Then: *, /, //, %
+        depth = 0;
+        for (let i = expr.length - 1; i >= 0; i--) {
+            const char = expr[i];
+            if (char === ')') depth++;
+            else if (char === '(') depth--;
+            else if (depth === 0) {
+                if (expr.slice(i - 1, i + 1) === '//') {
+                    const left = PlaygroundView.evalExpression(expr.slice(0, i - 1), vars);
+                    const right = PlaygroundView.evalExpression(expr.slice(i + 1), vars);
+                    return Math.floor(left / right);
+                }
+                if (char === '*' && expr[i + 1] !== '*' && expr[i - 1] !== '*') {
+                    const left = PlaygroundView.evalExpression(expr.slice(0, i), vars);
+                    const right = PlaygroundView.evalExpression(expr.slice(i + 1), vars);
+                    // String repetition
+                    if (typeof left === 'string') return left.repeat(right);
+                    if (typeof right === 'string') return right.repeat(left);
+                    return left * right;
+                }
+                if (char === '/' && expr[i + 1] !== '/') {
+                    const left = PlaygroundView.evalExpression(expr.slice(0, i), vars);
+                    const right = PlaygroundView.evalExpression(expr.slice(i + 1), vars);
+                    return left / right;
+                }
+                if (char === '%') {
+                    const left = PlaygroundView.evalExpression(expr.slice(0, i), vars);
+                    const right = PlaygroundView.evalExpression(expr.slice(i + 1), vars);
+                    return left % right;
+                }
+            }
+        }
+        
+        // Then: ** (exponent)
+        depth = 0;
+        for (let i = 0; i < expr.length - 1; i++) {
+            const char = expr[i];
+            if (char === '(') depth++;
+            else if (char === ')') depth--;
+            else if (depth === 0 && expr.slice(i, i + 2) === '**') {
+                const left = PlaygroundView.evalExpression(expr.slice(0, i), vars);
+                const right = PlaygroundView.evalExpression(expr.slice(i + 2), vars);
+                return Math.pow(left, right);
+            }
+        }
+        
+        // Handle parentheses
+        if (expr.startsWith('(') && expr.endsWith(')')) {
+            return PlaygroundView.evalExpression(expr.slice(1, -1), vars);
+        }
+        
+        // Variable lookup
+        if (vars.hasOwnProperty(expr)) {
+            return vars[expr];
+        }
+        
+        return expr; // Return as-is if can't parse
+    },
+
+    // ==========================================
+    // PYTHON INTERPRETER
+    // ==========================================
     interpretPython: (code) => {
         const lines = code.split('\n');
         const vars = {};
         const output = [];
         
-        const executeBlock = (start, end, indent) => {
+        const executeBlock = (start, end, indent, localVars = {}) => {
+            const allVars = { ...vars, ...localVars };
             let i = start;
+            
             while (i <= end) {
                 const line = lines[i];
                 if (!line || line.trim() === '' || line.trim().startsWith('#')) {
@@ -1471,86 +642,224 @@ print(f"Sum of 1-5 = {total}")</textarea>
                 }
                 
                 const lineIndent = line.search(/\S/);
-                if (lineIndent < indent && line.trim()) break;
+                if (lineIndent >= 0 && lineIndent < indent && line.trim()) break;
                 if (lineIndent > indent) { i++; continue; }
                 
                 const trimmed = line.trim();
                 
-                if (trimmed.startsWith('print(')) {
-                    output.push(PlaygroundView.evalPrint(trimmed.slice(6, -1), vars));
+                // Print statement
+                if (trimmed.startsWith('print(') && trimmed.endsWith(')')) {
+                    const content = trimmed.slice(6, -1);
+                    output.push(PlaygroundView.evalPrint(content, { ...vars, ...localVars }));
                 }
-                else if (trimmed.match(/^\w+\s*=\s*.+$/) && !trimmed.includes('==')) {
+                // Variable assignment
+                else if (trimmed.match(/^\w+\s*=\s*.+$/) && !trimmed.startsWith('if ') && 
+                         !trimmed.startsWith('while ') && !trimmed.startsWith('for ') &&
+                         !trimmed.includes('==')) {
                     const match = trimmed.match(/^(\w+)\s*=\s*(.+)$/);
-                    if (match) vars[match[1]] = PlaygroundView.evalExpr(match[2], vars);
+                    if (match) {
+                        const val = PlaygroundView.safeEval(match[2], { ...vars, ...localVars });
+                        vars[match[1]] = val;
+                        if (localVars.hasOwnProperty(match[1])) localVars[match[1]] = val;
+                    }
                 }
+                // Augmented assignment
                 else if (trimmed.match(/^\w+\s*[+\-*\/]=\s*.+$/)) {
                     const match = trimmed.match(/^(\w+)\s*([+\-*\/])=\s*(.+)$/);
                     if (match) {
-                        const current = vars[match[1]] ?? 0;
-                        vars[match[1]] = eval(`${current} ${match[2]} ${PlaygroundView.evalExpr(match[3], vars)}`);
+                        const current = vars[match[1]] ?? localVars[match[1]] ?? 0;
+                        const val = PlaygroundView.safeEval(match[3], { ...vars, ...localVars });
+                        let newVal;
+                        switch (match[2]) {
+                            case '+': newVal = typeof current === 'string' ? current + val : current + val; break;
+                            case '-': newVal = current - val; break;
+                            case '*': newVal = current * val; break;
+                            case '/': newVal = current / val; break;
+                        }
+                        vars[match[1]] = newVal;
                     }
                 }
-                else if (trimmed.startsWith('for ')) {
+                // List operations
+                else if (trimmed.match(/^\w+\.append\(.+\)$/)) {
+                    const match = trimmed.match(/^(\w+)\.append\((.+)\)$/);
+                    if (match && Array.isArray(vars[match[1]])) {
+                        vars[match[1]].push(PlaygroundView.safeEval(match[2], { ...vars, ...localVars }));
+                    }
+                }
+                else if (trimmed.match(/^\w+\.remove\(.+\)$/)) {
+                    const match = trimmed.match(/^(\w+)\.remove\((.+)\)$/);
+                    if (match && Array.isArray(vars[match[1]])) {
+                        const val = PlaygroundView.safeEval(match[2], { ...vars, ...localVars });
+                        const idx = vars[match[1]].indexOf(val);
+                        if (idx > -1) vars[match[1]].splice(idx, 1);
+                    }
+                }
+                // List index assignment
+                else if (trimmed.match(/^\w+\[.+\]\s*=\s*.+$/)) {
+                    const match = trimmed.match(/^(\w+)\[(.+)\]\s*=\s*(.+)$/);
+                    if (match) {
+                        const idx = PlaygroundView.safeEval(match[2], { ...vars, ...localVars });
+                        const val = PlaygroundView.safeEval(match[3], { ...vars, ...localVars });
+                        if (Array.isArray(vars[match[1]])) {
+                            vars[match[1]][idx] = val;
+                        }
+                    }
+                }
+                // Swap: a, b = b, a
+                else if (trimmed.match(/^\w+\s*,\s*\w+\s*=\s*.+,\s*.+$/)) {
+                    const match = trimmed.match(/^(\w+)\s*,\s*(\w+)\s*=\s*(.+),\s*(.+)$/);
+                    if (match) {
+                        const val1 = PlaygroundView.safeEval(match[3].trim(), { ...vars, ...localVars });
+                        const val2 = PlaygroundView.safeEval(match[4].trim(), { ...vars, ...localVars });
+                        vars[match[1]] = val1;
+                        vars[match[2]] = val2;
+                    }
+                }
+                // FOR loop
+                else if (trimmed.startsWith('for ') && trimmed.endsWith(':')) {
                     const match = trimmed.match(/for\s+(\w+)\s+in\s+(.+):/);
                     if (match) {
                         const varName = match[1];
-                        const iterable = PlaygroundView.evalExpr(match[2], vars);
+                        const iterable = PlaygroundView.safeEval(match[2], { ...vars, ...localVars });
                         
                         let blockEnd = i + 1;
                         while (blockEnd < lines.length && 
-                               (lines[blockEnd].trim() === '' || lines[blockEnd].search(/\S/) > indent)) {
+                               (lines[blockEnd].trim() === '' || 
+                                lines[blockEnd].search(/\S/) > indent ||
+                                lines[blockEnd].trim().startsWith('#'))) {
                             blockEnd++;
                         }
                         blockEnd--;
                         
-                        const iterate = (items) => {
-                            for (const item of items) {
-                                vars[varName] = item;
-                                executeBlock(i + 1, blockEnd, indent + 4);
-                            }
-                        };
-                        
-                        if (iterable?.type === 'range') {
-                            const items = [];
-                            for (let k = iterable.start; iterable.step > 0 ? k < iterable.end : k > iterable.end; k += iterable.step) {
+                        let items = [];
+                        if (iterable && iterable.type === 'range') {
+                            for (let k = iterable.start; 
+                                 iterable.step > 0 ? k < iterable.end : k > iterable.end; 
+                                 k += iterable.step) {
                                 items.push(k);
                             }
-                            iterate(items);
                         } else if (Array.isArray(iterable)) {
-                            iterate(iterable);
+                            items = iterable;
+                        } else if (typeof iterable === 'string') {
+                            items = iterable.split('');
+                        }
+                        
+                        for (const item of items) {
+                            vars[varName] = item;
+                            executeBlock(i + 1, blockEnd, indent + 4, localVars);
                         }
                         
                         i = blockEnd;
                     }
                 }
-                else if (trimmed.startsWith('while ')) {
+                // WHILE loop
+                else if (trimmed.startsWith('while ') && trimmed.endsWith(':')) {
                     const condition = trimmed.match(/while\s+(.+):/)?.[1];
+                    
                     let blockEnd = i + 1;
                     while (blockEnd < lines.length && 
-                           (lines[blockEnd].trim() === '' || lines[blockEnd].search(/\S/) > indent)) {
+                           (lines[blockEnd].trim() === '' || 
+                            lines[blockEnd].search(/\S/) > indent ||
+                            lines[blockEnd].trim().startsWith('#'))) {
                         blockEnd++;
                     }
                     blockEnd--;
                     
                     let iterations = 0;
-                    while (PlaygroundView.evalExpr(condition, vars) && iterations < 10000) {
-                        executeBlock(i + 1, blockEnd, indent + 4);
+                    while (PlaygroundView.safeEval(condition, { ...vars, ...localVars }) && iterations < 10000) {
+                        executeBlock(i + 1, blockEnd, indent + 4, localVars);
                         iterations++;
                     }
                     i = blockEnd;
                 }
-                else if (trimmed.startsWith('if ')) {
+                // IF statement
+                else if (trimmed.startsWith('if ') && trimmed.endsWith(':')) {
                     const condition = trimmed.match(/if\s+(.+):/)?.[1];
+                    
                     let blockEnd = i + 1;
                     while (blockEnd < lines.length && 
-                           (lines[blockEnd].trim() === '' || lines[blockEnd].search(/\S/) > indent)) {
+                           (lines[blockEnd].trim() === '' || 
+                            lines[blockEnd].search(/\S/) > indent ||
+                            lines[blockEnd].trim().startsWith('#'))) {
                         blockEnd++;
                     }
                     blockEnd--;
                     
-                    if (PlaygroundView.evalExpr(condition, vars)) {
-                        executeBlock(i + 1, blockEnd, indent + 4);
+                    // Find elif/else
+                    let hasElse = false;
+                    let elseStart = -1;
+                    let k = blockEnd + 1;
+                    while (k < lines.length) {
+                        const nextLine = lines[k]?.trim();
+                        if (!nextLine || nextLine.startsWith('#')) { k++; continue; }
+                        const nextIndent = lines[k].search(/\S/);
+                        if (nextIndent === indent) {
+                            if (nextLine.startsWith('elif ') || nextLine.startsWith('else:')) {
+                                if (!hasElse) {
+                                    hasElse = true;
+                                    elseStart = k;
+                                }
+                                // Find this block's end
+                                let elseEnd = k + 1;
+                                while (elseEnd < lines.length && 
+                                       (lines[elseEnd].trim() === '' || 
+                                        lines[elseEnd].search(/\S/) > indent)) {
+                                    elseEnd++;
+                                }
+                                blockEnd = elseEnd - 1;
+                                k = elseEnd;
+                            } else {
+                                break;
+                            }
+                        } else {
+                            break;
+                        }
                     }
+                    
+                    if (PlaygroundView.safeEval(condition, { ...vars, ...localVars })) {
+                        // Find the actual if block end (before elif/else)
+                        let ifBlockEnd = i + 1;
+                        while (ifBlockEnd < lines.length) {
+                            const l = lines[ifBlockEnd]?.trim();
+                            if (!l || l.startsWith('#')) { ifBlockEnd++; continue; }
+                            const li = lines[ifBlockEnd].search(/\S/);
+                            if (li <= indent && l && !l.startsWith('#')) break;
+                            ifBlockEnd++;
+                        }
+                        ifBlockEnd--;
+                        executeBlock(i + 1, ifBlockEnd, indent + 4, localVars);
+                    } else if (hasElse) {
+                        // Handle elif/else chain
+                        let found = false;
+                        let j = elseStart;
+                        while (j <= blockEnd && !found) {
+                            const elseLine = lines[j]?.trim();
+                            if (elseLine?.startsWith('elif ')) {
+                                const elifCond = elseLine.match(/elif\s+(.+):/)?.[1];
+                                if (PlaygroundView.safeEval(elifCond, { ...vars, ...localVars })) {
+                                    let elifEnd = j + 1;
+                                    while (elifEnd < lines.length && 
+                                           (lines[elifEnd].trim() === '' || 
+                                            lines[elifEnd].search(/\S/) > indent)) {
+                                        elifEnd++;
+                                    }
+                                    executeBlock(j + 1, elifEnd - 1, indent + 4, localVars);
+                                    found = true;
+                                }
+                            } else if (elseLine === 'else:') {
+                                let elseEnd = j + 1;
+                                while (elseEnd < lines.length && 
+                                       (lines[elseEnd].trim() === '' || 
+                                        lines[elseEnd].search(/\S/) > indent)) {
+                                    elseEnd++;
+                                }
+                                executeBlock(j + 1, elseEnd - 1, indent + 4, localVars);
+                                found = true;
+                            }
+                            j++;
+                        }
+                    }
+                    
                     i = blockEnd;
                 }
                 
@@ -1562,13 +871,382 @@ print(f"Sum of 1-5 = {total}")</textarea>
         return { output: output.join('\n'), variables: vars };
     },
 
+    evalPrint: (content, vars) => {
+        // Handle end= parameter
+        let endChar = '\n';
+        const endMatch = content.match(/,\s*end\s*=\s*["']([^"']*)["']\s*$/);
+        if (endMatch) {
+            endChar = endMatch[1];
+            content = content.replace(/,\s*end\s*=\s*["'][^"']*["']\s*$/, '');
+        }
+        
+        // Parse arguments
+        const parts = [];
+        let current = '';
+        let depth = 0;
+        let inString = false;
+        let stringChar = '';
+        
+        for (let i = 0; i < content.length; i++) {
+            const char = content[i];
+            
+            if ((char === '"' || char === "'") && !inString && content[i-1] !== 'f') {
+                inString = true;
+                stringChar = char;
+            } else if (char === stringChar && inString && content[i-1] !== '\\') {
+                inString = false;
+            }
+            
+            if (!inString) {
+                if (char === '(' || char === '[') depth++;
+                else if (char === ')' || char === ']') depth--;
+                else if (char === ',' && depth === 0) {
+                    if (current.trim()) parts.push(current.trim());
+                    current = '';
+                    continue;
+                }
+            }
+            current += char;
+        }
+        if (current.trim()) parts.push(current.trim());
+        
+        const result = parts.map(p => {
+            const val = PlaygroundView.safeEval(p, vars);
+            if (Array.isArray(val)) return '[' + val.map(v => typeof v === 'string' ? `'${v}'` : v).join(', ') + ']';
+            return val === null ? 'None' : String(val);
+        }).join(' ');
+        
+        return result;
+    },
+
+    // ==========================================
+    // CHALLENGES
+    // ==========================================
+    getChallenges: () => [
+        {
+            id: 'hello', name: 'Hello World', icon: '👋', difficulty: 'Easy', xp: 10,
+            description: 'Print "Hello, World!" to the screen.',
+            hint: 'Use print("Hello, World!")',
+            starterCode: '# Print Hello, World!\n',
+            tests: [{ expected: 'Hello, World!' }]
+        },
+        {
+            id: 'sum_two', name: 'Add Numbers', icon: '➕', difficulty: 'Easy', xp: 15,
+            description: 'Create a=5 and b=3, then print their sum (8).',
+            hint: 'print(a + b)',
+            starterCode: '# Add two numbers\na = 5\nb = 3\n',
+            tests: [{ expected: '8' }]
+        },
+        {
+            id: 'even_odd', name: 'Even or Odd', icon: '🔢', difficulty: 'Easy', xp: 20,
+            description: 'Given num=7, print "Even" or "Odd".',
+            hint: 'Use if num % 2 == 0',
+            starterCode: 'num = 7\n',
+            tests: [{ expected: 'Odd' }]
+        },
+        {
+            id: 'countdown', name: 'Countdown', icon: '🚀', difficulty: 'Easy', xp: 25,
+            description: 'Print 5 to 1, then "Blast off!"',
+            hint: 'Use range(5, 0, -1)',
+            starterCode: '# Countdown\n',
+            tests: [{ contains: ['5', '4', '3', '2', '1', 'Blast off!'] }]
+        },
+        {
+            id: 'sum_range', name: 'Sum 1 to 10', icon: '📊', difficulty: 'Medium', xp: 30,
+            description: 'Print the sum of 1 to 10 (55).',
+            hint: 'Use a loop with total += i',
+            starterCode: 'total = 0\n',
+            tests: [{ expected: '55' }]
+        },
+        {
+            id: 'factorial', name: 'Factorial', icon: '❗', difficulty: 'Medium', xp: 35,
+            description: 'Calculate and print 5! (120).',
+            hint: 'Multiply 1*2*3*4*5',
+            starterCode: 'n = 5\nresult = 1\n',
+            tests: [{ expected: '120' }]
+        },
+        {
+            id: 'fizzbuzz', name: 'FizzBuzz', icon: '🎯', difficulty: 'Medium', xp: 40,
+            description: 'Print 1-15: "Fizz" for 3, "Buzz" for 5, "FizzBuzz" for both.',
+            hint: 'Check 15 first, then 3, then 5',
+            starterCode: 'for i in range(1, 16):\n    pass\n',
+            tests: [{ contains: ['FizzBuzz', 'Fizz', 'Buzz'] }]
+        },
+        {
+            id: 'reverse', name: 'Reverse String', icon: '🔄', difficulty: 'Medium', xp: 30,
+            description: 'Print "Python" reversed (nohtyP).',
+            hint: 'Use text[::-1]',
+            starterCode: 'text = "Python"\n',
+            tests: [{ expected: 'nohtyP' }]
+        },
+        {
+            id: 'find_max', name: 'Find Maximum', icon: '📈', difficulty: 'Medium', xp: 35,
+            description: 'Find and print the max in [3,7,2,9,4] (9).',
+            hint: 'Loop and track largest',
+            starterCode: 'nums = [3, 7, 2, 9, 4]\nlargest = nums[0]\n',
+            tests: [{ expected: '9' }]
+        },
+        {
+            id: 'prime', name: 'Prime Check', icon: '🔐', difficulty: 'Hard', xp: 50,
+            description: 'Check if 17 is prime. Print "Prime" or "Not prime".',
+            hint: 'Check divisors from 2 to n-1',
+            starterCode: 'n = 17\nis_prime = True\n',
+            tests: [{ expected: 'Prime' }]
+        },
+        {
+            id: 'palindrome', name: 'Palindrome', icon: '🪞', difficulty: 'Hard', xp: 50,
+            description: 'Check if "radar" is a palindrome. Print "Yes" or "No".',
+            hint: 'Compare word to word[::-1]',
+            starterCode: 'word = "radar"\n',
+            tests: [{ expected: 'Yes' }]
+        },
+        {
+            id: 'fibonacci', name: 'Fibonacci', icon: '🌀', difficulty: 'Hard', xp: 60,
+            description: 'Print first 10 Fibonacci numbers.',
+            hint: 'Each = sum of previous two',
+            starterCode: 'a = 0\nb = 1\n',
+            tests: [{ contains: ['0', '1', '1', '2', '3', '5', '8', '13', '21', '34'] }]
+        }
+    ],
+
+    getCompletedChallenges: () => {
+        return JSON.parse(localStorage.getItem('csmaster_completed_challenges') || '[]');
+    },
+
+    loadChallenge: (id) => {
+        const challenge = PlaygroundView.getChallenges().find(c => c.id === id);
+        if (!challenge) return;
+        
+        PlaygroundView.currentChallenge = challenge;
+        
+        document.getElementById('challenge-workspace').innerHTML = `
+            <div class="challenge-detail">
+                <div class="challenge-header">
+                    <div class="ch-title">
+                        <span class="ch-icon">${challenge.icon}</span>
+                        <h3>${challenge.name}</h3>
+                    </div>
+                    <div class="ch-badges">
+                        <span class="ch-difficulty ${challenge.difficulty.toLowerCase()}">${challenge.difficulty}</span>
+                        <span class="ch-xp">+${challenge.xp} XP</span>
+                    </div>
+                </div>
+                <div class="challenge-body">
+                    <div class="challenge-description">
+                        <p>${challenge.description}</p>
+                        <button class="btn btn-small btn-secondary" onclick="document.getElementById('hint').style.display='block'">💡 Hint</button>
+                        <p id="hint" style="display:none;margin-top:8px;color:var(--yellow)">💡 ${challenge.hint}</p>
+                    </div>
+                    <div class="challenge-editor-section">
+                        <div class="ce-header">
+                            <span>Your Code</span>
+                            <div class="ce-actions">
+                                <button class="btn btn-small btn-secondary" onclick="PlaygroundView.resetChallenge()">Reset</button>
+                                <button class="btn btn-small btn-secondary" onclick="PlaygroundView.runChallenge()">▶ Test</button>
+                                <button class="btn btn-small btn-primary" onclick="PlaygroundView.submitChallenge()">✓ Submit</button>
+                            </div>
+                        </div>
+                        <textarea id="challenge-editor" onkeydown="PlaygroundView.handleTab(event)">${challenge.starterCode}</textarea>
+                    </div>
+                    <div class="challenge-output-section">
+                        <h4>Output</h4>
+                        <pre id="challenge-output" class="challenge-output">Run to see output...</pre>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.querySelectorAll('.challenge-item').forEach(item => item.classList.remove('active'));
+        document.querySelector(`.challenge-item[onclick*="${id}"]`)?.classList.add('active');
+    },
+
+    resetChallenge: () => {
+        if (PlaygroundView.currentChallenge) {
+            document.getElementById('challenge-editor').value = PlaygroundView.currentChallenge.starterCode;
+        }
+    },
+
+    runChallenge: () => {
+        const code = document.getElementById('challenge-editor').value;
+        const output = document.getElementById('challenge-output');
+        try {
+            const result = PlaygroundView.interpretPython(code);
+            output.textContent = result.output || '(No output)';
+            output.className = 'challenge-output';
+        } catch (e) {
+            output.textContent = 'Error: ' + e.message;
+            output.className = 'challenge-output error';
+        }
+    },
+
+    submitChallenge: () => {
+        const code = document.getElementById('challenge-editor').value;
+        const output = document.getElementById('challenge-output');
+        const challenge = PlaygroundView.currentChallenge;
+        if (!challenge) return;
+        
+        try {
+            const result = PlaygroundView.interpretPython(code);
+            const text = result.output.trim();
+            const test = challenge.tests[0];
+            
+            let passed = test.contains 
+                ? test.contains.every(s => text.includes(s))
+                : text.includes(test.expected);
+            
+            if (passed) {
+                output.innerHTML = '<span class="success">✅ Correct!</span>\n\n' + text;
+                const completed = PlaygroundView.getCompletedChallenges();
+                if (!completed.includes(challenge.id)) {
+                    completed.push(challenge.id);
+                    localStorage.setItem('csmaster_completed_challenges', JSON.stringify(completed));
+                    if (typeof AppState !== 'undefined') AppState.addXP(challenge.xp);
+                    if (typeof Toast !== 'undefined') Toast.show(`🎉 +${challenge.xp} XP!`, 'success');
+                    document.querySelector(`.challenge-item[onclick*="${challenge.id}"]`)?.classList.add('completed');
+                }
+            } else {
+                output.innerHTML = '<span class="error">❌ Try again!</span>\n\nYour output:\n' + text;
+            }
+        } catch (e) {
+            output.innerHTML = '<span class="error">Error: ' + e.message + '</span>';
+        }
+    },
+
+    // ==========================================
+    // LESSONS
+    // ==========================================
+    lessons: {
+        intro: {
+            title: 'Introduction to Python',
+            sections: [
+                { title: 'Hello World', content: 'Your first program!', code: 'print("Hello, World!")' },
+                { title: 'Comments', content: 'Comments start with #', code: '# This is a comment\nprint("Code runs")' },
+                { title: 'Multiple Lines', content: 'Code runs top to bottom', code: 'print("Line 1")\nprint("Line 2")' }
+            ]
+        },
+        variables: {
+            title: 'Variables & Data Types',
+            sections: [
+                { title: 'Creating Variables', content: 'Variables store data', code: 'name = "Alice"\nage = 15\nprint(name)\nprint(age)' },
+                { title: 'Data Types', content: 'String, int, float, bool', code: 'text = "Hello"  # str\nnum = 42        # int\npi = 3.14       # float\nok = True       # bool\nprint(type(num))' },
+                { title: 'f-Strings', content: 'Embed variables in strings', code: 'name = "Bob"\nage = 20\nprint(f"{name} is {age}")' },
+                { title: 'Type Conversion', content: 'Convert between types', code: 'x = "42"\ny = int(x)\nprint(y + 8)' }
+            ]
+        },
+        operators: {
+            title: 'Operators',
+            sections: [
+                { title: 'Arithmetic', content: 'Math operations', code: 'print(5 + 3)   # 8\nprint(10 - 4)  # 6\nprint(3 * 4)   # 12\nprint(15 / 3)  # 5.0\nprint(17 % 5)  # 2\nprint(2 ** 3)  # 8' },
+                { title: 'Comparison', content: 'Return True/False', code: 'print(5 > 3)   # True\nprint(5 == 5)  # True\nprint(5 != 3)  # True' },
+                { title: 'Logical', content: 'and, or, not', code: 'x = 5\nprint(x > 3 and x < 10)\nprint(x < 3 or x > 4)\nprint(not x > 10)' }
+            ]
+        },
+        conditionals: {
+            title: 'If Statements',
+            sections: [
+                { title: 'Basic If', content: 'Execute code conditionally', code: 'age = 18\nif age >= 18:\n    print("Adult")' },
+                { title: 'If-Else', content: 'Alternative path', code: 'x = 10\nif x > 5:\n    print("Big")\nelse:\n    print("Small")' },
+                { title: 'If-Elif-Else', content: 'Multiple conditions', code: 'score = 75\nif score >= 90:\n    print("A")\nelif score >= 80:\n    print("B")\nelif score >= 70:\n    print("C")\nelse:\n    print("D")' }
+            ]
+        },
+        loops: {
+            title: 'Loops',
+            sections: [
+                { title: 'FOR Loop', content: 'Repeat a set number of times', code: 'for i in range(5):\n    print(f"i = {i}")' },
+                { title: 'Range Options', content: 'start, stop, step', code: 'for i in range(1, 6):\n    print(i)\n\nfor i in range(10, 0, -2):\n    print(i)' },
+                { title: 'Loop Through List', content: 'Iterate over items', code: 'fruits = ["apple", "banana"]\nfor fruit in fruits:\n    print(fruit)' },
+                { title: 'WHILE Loop', content: 'Loop while condition true', code: 'x = 0\nwhile x < 5:\n    print(x)\n    x = x + 1' }
+            ]
+        },
+        lists: {
+            title: 'Lists',
+            sections: [
+                { title: 'Creating Lists', content: 'Store multiple items', code: 'nums = [1, 2, 3, 4, 5]\nprint(nums)\nprint(len(nums))' },
+                { title: 'Indexing', content: 'Access by position', code: 'colors = ["red", "green", "blue"]\nprint(colors[0])   # red\nprint(colors[-1])  # blue' },
+                { title: 'Modifying', content: 'Add and remove items', code: 'nums = [1, 2, 3]\nnums.append(4)\nprint(nums)\nnums.remove(2)\nprint(nums)' },
+                { title: 'List Functions', content: 'Built-in functions', code: 'nums = [3, 1, 4, 1, 5]\nprint(max(nums))\nprint(min(nums))\nprint(sum(nums))' }
+            ]
+        },
+        functions: {
+            title: 'Functions',
+            sections: [
+                { title: 'Defining Functions', content: 'Reusable code blocks', code: 'def greet():\n    print("Hello!")\n\ngreet()\ngreet()' },
+                { title: 'Parameters', content: 'Pass data to functions', code: 'def greet(name):\n    print(f"Hello, {name}!")\n\ngreet("Alice")\ngreet("Bob")' },
+                { title: 'Return Values', content: 'Get results back', code: 'def add(a, b):\n    return a + b\n\nresult = add(5, 3)\nprint(result)' }
+            ]
+        },
+        algorithms: {
+            title: 'Algorithms',
+            sections: [
+                { title: 'Linear Search', content: 'Find item in list', code: 'nums = [4, 2, 7, 1, 9]\ntarget = 7\nfound = -1\nfor i in range(len(nums)):\n    if nums[i] == target:\n        found = i\nprint(f"Found at {found}")' },
+                { title: 'Finding Max', content: 'Find largest value', code: 'nums = [3, 7, 2, 9, 4]\nlargest = nums[0]\nfor n in nums:\n    if n > largest:\n        largest = n\nprint(largest)' },
+                { title: 'Counting', content: 'Count occurrences', code: 'text = "hello"\ncount = 0\nfor char in text:\n    if char == "l":\n        count = count + 1\nprint(count)' }
+            ]
+        }
+    },
+
+    loadLesson: (topicId) => {
+        const lesson = PlaygroundView.lessons[topicId];
+        if (!lesson) return;
+        
+        document.getElementById('learn-content').innerHTML = `
+            <div class="lesson-content">
+                <h3>${lesson.title}</h3>
+                ${lesson.sections.map((s, i) => `
+                    <div class="lesson-section">
+                        <h4>${i + 1}. ${s.title}</h4>
+                        <p>${s.content}</p>
+                        <div class="lesson-code">
+                            <pre><code>${s.code}</code></pre>
+                            <button class="btn btn-small btn-primary" onclick="PlaygroundView.tryCode(\`${s.code.replace(/`/g, '\\`')}\`)">▶ Try It</button>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    },
+
+    tryCode: (code) => {
+        PlaygroundView.showMode('sandbox', document.querySelector('.mode-tab'));
+        document.getElementById('code-editor').value = code;
+        PlaygroundView.updateLineNumbers();
+        PlaygroundView.runCode();
+    },
+
+    // ==========================================
+    // EXAMPLES
+    // ==========================================
+    examples: {
+        hello: 'print("Hello, World!")',
+        variables: 'name = "Alice"\nage = 15\nprint(f"{name} is {age}")',
+        arithmetic: 'a = 10\nb = 3\nprint(f"{a} + {b} = {a + b}")\nprint(f"{a} * {b} = {a * b}")\nprint(f"{a} / {b} = {a / b}")',
+        if: 'score = 75\nif score >= 70:\n    print("Pass!")\nelse:\n    print("Fail")',
+        for: 'for i in range(1, 6):\n    print(f"Count: {i}")',
+        while: 'x = 5\nwhile x > 0:\n    print(x)\n    x = x - 1\nprint("Done!")',
+        list: 'nums = [1, 2, 3]\nnums.append(4)\nprint(nums)\nprint(f"Sum: {sum(nums)}")',
+        factorial: 'n = 5\nresult = 1\nfor i in range(1, n + 1):\n    result = result * i\nprint(f"{n}! = {result}")',
+        fizzbuzz: 'for i in range(1, 16):\n    if i % 15 == 0:\n        print("FizzBuzz")\n    elif i % 3 == 0:\n        print("Fizz")\n    elif i % 5 == 0:\n        print("Buzz")\n    else:\n        print(i)'
+    },
+
+    loadExample: (name) => {
+        if (name && PlaygroundView.examples[name]) {
+            document.getElementById('code-editor').value = PlaygroundView.examples[name];
+            PlaygroundView.updateLineNumbers();
+            document.getElementById('example-select').value = '';
+        }
+    },
+
     // ==========================================
     // UI HELPERS
     // ==========================================
     clearCode: () => {
         document.getElementById('code-editor').value = '';
-        document.getElementById('code-output').textContent = '';
         PlaygroundView.updateLineNumbers();
+    },
+
+    clearOutput: () => {
+        document.getElementById('code-output').textContent = '';
+        document.getElementById('exec-status').textContent = '';
     },
 
     showTab: (tabId, btn) => {
@@ -1581,16 +1259,37 @@ print(f"Sum of 1-5 = {total}")</textarea>
     runCode: () => {
         const code = document.getElementById('code-editor').value;
         const output = document.getElementById('code-output');
+        const status = document.getElementById('exec-status');
+        const varsDisplay = document.getElementById('variables-display');
+        const varCount = document.getElementById('var-count');
         
         try {
             const result = PlaygroundView.interpretPython(code);
             output.textContent = result.output || '(No output)';
             output.className = 'output-display';
-            document.getElementById('exec-status').textContent = '✅ Completed';
+            status.textContent = '✅ Success';
+            
+            // Update variables display
+            const vars = Object.entries(result.variables);
+            varCount.textContent = `${vars.length} variable${vars.length !== 1 ? 's' : ''}`;
+            
+            if (vars.length > 0) {
+                varsDisplay.innerHTML = vars.map(([name, value]) => {
+                    const type = Array.isArray(value) ? 'list' : typeof value;
+                    const display = Array.isArray(value) ? '[' + value.join(', ') + ']' : String(value);
+                    return `<div class="var-item">
+                        <span class="var-name">${name}</span>
+                        <span class="var-type">${type}</span>
+                        <span class="var-value">${display}</span>
+                    </div>`;
+                }).join('');
+            } else {
+                varsDisplay.innerHTML = '<p class="placeholder-text">No variables</p>';
+            }
         } catch (e) {
-            output.textContent = `Error: ${e.message}`;
+            output.textContent = 'Error: ' + e.message;
             output.className = 'output-display error';
-            document.getElementById('exec-status').textContent = '❌ Error';
+            status.textContent = '❌ Error';
         }
     },
 
@@ -1598,7 +1297,6 @@ print(f"Sum of 1-5 = {total}")</textarea>
         const editor = document.getElementById('code-editor');
         const lineNumbers = document.getElementById('line-numbers');
         if (!editor || !lineNumbers) return;
-        
         const lines = editor.value.split('\n').length;
         lineNumbers.innerHTML = Array.from({ length: lines }, (_, i) => i + 1).join('<br>');
     },
@@ -1614,8 +1312,7 @@ print(f"Sum of 1-5 = {total}")</textarea>
             e.preventDefault();
             const editor = e.target;
             const start = editor.selectionStart;
-            const end = editor.selectionEnd;
-            editor.value = editor.value.substring(0, start) + '    ' + editor.value.substring(end);
+            editor.value = editor.value.substring(0, start) + '    ' + editor.value.substring(editor.selectionEnd);
             editor.selectionStart = editor.selectionEnd = start + 4;
             PlaygroundView.updateLineNumbers();
         }
