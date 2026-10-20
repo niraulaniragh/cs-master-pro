@@ -1,6 +1,6 @@
 /**
  * HomeView.js - Enhanced Home/Dashboard View
- * Features: Daily Challenge, Study Timer, Leaderboard, Progress Charts
+ * New Modern Design - Clean, Professional, Inspired
  */
 
 const HomeView = {
@@ -15,110 +15,184 @@ const HomeView = {
         const username = isLoggedIn ? Auth.getSession()?.username : 'Student';
 
         return `
-            <div class="home-view">
-                <!-- Welcome Hero -->
-                <section class="hero">
-                    <div class="hero-content">
-                        <div class="hero-welcome">
-                            <h1>Welcome back, ${username}! 👋</h1>
-                            <p class="hero-subtitle">Ready to master IGCSE Computer Science?</p>
-                        </div>
-                        <div class="hero-badges">
-                            <span class="badge badge-primary">Edexcel 4CP0</span>
-                            <span class="badge badge-green">155+ Questions</span>
-                            <span class="badge badge-cyan">Interactive Learning</span>
+            <div class="home-view-new">
+                <!-- Hero Section -->
+                <section class="hero-new">
+                    <div class="hero-left">
+                        <span class="hero-greeting">Welcome back</span>
+                        <h1 class="hero-name">${username}</h1>
+                        <p class="hero-tagline">Continue your Computer Science journey</p>
+                        <div class="hero-tags">
+                            <span class="hero-tag">Edexcel 4CP0</span>
+                            <span class="hero-tag accent">155+ Questions</span>
                         </div>
                     </div>
-                    <div class="hero-search">
-                        <button class="search-btn" onclick="SearchNotes.open()">
+                    <div class="hero-right">
+                        <button class="search-box" onclick="SearchNotes.open()">
                             <i class="fas fa-search"></i>
-                            <span>Search notes...</span>
-                            <kbd>Ctrl+K</kbd>
+                            <span>Search topics, notes...</span>
+                            <kbd>⌘K</kbd>
                         </button>
                     </div>
                 </section>
 
-                <!-- Daily Challenge & Timer Row -->
-                <section class="feature-row">
-                    ${DailyChallenge.renderCard()}
-                    ${StudyTimer.render()}
+                <!-- Stats Overview -->
+                <section class="stats-overview">
+                    <div class="stat-card primary">
+                        <div class="stat-icon-wrap">
+                            <span class="stat-icon-inner">${user.level}</span>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-value">${rank.name}</span>
+                            <span class="stat-desc">${rank.icon} Current Rank</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon-wrap blue">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-value">${user.xp.toLocaleString()}</span>
+                            <span class="stat-desc">Total XP Earned</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon-wrap green">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-value">${user.totalCorrect}</span>
+                            <span class="stat-desc">Correct Answers</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon-wrap orange">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-value">${user.achievements.length}</span>
+                            <span class="stat-desc">Achievements</span>
+                        </div>
+                    </div>
                 </section>
 
-                <!-- Main Dashboard -->
-                <section class="dashboard-grid">
-                    <!-- Progress Panel - New Design -->
-                    <div class="progress-card">
-                        <div class="progress-top">
-                            <div class="user-level-badge">
-                                <span class="level-num">${user.level}</span>
+                <!-- Main Grid -->
+                <section class="main-grid">
+                    <!-- Left Column -->
+                    <div class="main-left">
+                        <!-- Quick Actions -->
+                        <div class="card-new">
+                            <div class="card-header">
+                                <h2>Quick Actions</h2>
                             </div>
-                            <div class="user-rank-info">
-                                <span class="rank-title">${rank.name}</span>
-                                <span class="rank-subtitle">${rank.icon} Level ${user.level} Player</span>
+                            <div class="quick-grid">
+                                <button class="quick-btn" onclick="Router.navigate('learn')">
+                                    <div class="quick-icon blue">📚</div>
+                                    <span class="quick-label">Learn</span>
+                                </button>
+                                <button class="quick-btn" onclick="Router.navigate('practice')">
+                                    <div class="quick-icon green">🎯</div>
+                                    <span class="quick-label">Practice</span>
+                                </button>
+                                <button class="quick-btn" onclick="Router.navigate('games')">
+                                    <div class="quick-icon purple">🎮</div>
+                                    <span class="quick-label">Games</span>
+                                </button>
+                                <button class="quick-btn" onclick="Router.navigate('playground')">
+                                    <div class="quick-icon cyan">💻</div>
+                                    <span class="quick-label">Code</span>
+                                </button>
                             </div>
                         </div>
-                        
-                        <div class="xp-progress-section">
-                            <div class="xp-header">
-                                <span class="xp-label">Experience</span>
-                                <span class="xp-numbers">${user.xp.toLocaleString()} / ${xpForNext.toLocaleString()} XP</span>
+
+                        <!-- Progress Card -->
+                        <div class="card-new progress-card-new">
+                            <div class="card-header">
+                                <h2>Your Progress</h2>
+                                <span class="card-badge">${accuracy}% Accuracy</span>
                             </div>
-                            <div class="xp-progress-bar">
-                                <div class="xp-progress-fill" style="width: ${progress}%"></div>
+                            <div class="progress-content">
+                                <div class="level-badge-big">
+                                    <span class="level-number">${user.level}</span>
+                                    <span class="level-text">LEVEL</span>
+                                </div>
+                                <div class="progress-details">
+                                    <div class="progress-row">
+                                        <span>Next Level</span>
+                                        <span>${user.xp} / ${xpForNext} XP</span>
+                                    </div>
+                                    <div class="progress-bar-new">
+                                        <div class="progress-fill-new" style="width: ${progress}%"></div>
+                                    </div>
+                                    <span class="progress-hint">${(xpForNext - user.xp).toLocaleString()} XP to go</span>
+                                </div>
                             </div>
-                            <span class="xp-to-go">${(xpForNext - user.xp).toLocaleString()} XP until Level ${user.level + 1}</span>
                         </div>
-                        
-                        <div class="stats-row">
-                            <div class="stat-box">
-                                <span class="stat-num">${user.totalCorrect}</span>
-                                <span class="stat-label">Correct</span>
+
+                        <!-- Topics -->
+                        <div class="card-new">
+                            <div class="card-header">
+                                <h2>Topics</h2>
+                                <button class="link-btn" onclick="Router.navigate('learn')">View all →</button>
                             </div>
-                            <div class="stat-box">
-                                <span class="stat-num">${accuracy}%</span>
-                                <span class="stat-label">Accuracy</span>
-                            </div>
-                            <div class="stat-box">
-                                <span class="stat-num">${user.achievements.length}</span>
-                                <span class="stat-label">Badges</span>
+                            <div class="topics-list">
+                                ${TOPICS.slice(0, 4).map(topic => {
+                                    const questionCount = QUESTIONS.filter(q => q.topic === topic.id).length;
+                                    return `
+                                        <div class="topic-row" onclick="Router.navigate('learn'); setTimeout(() => LearnView.selectTopic('${topic.id}'), 100)">
+                                            <div class="topic-icon-new" style="background: ${topic.color}">${topic.icon}</div>
+                                            <div class="topic-details">
+                                                <span class="topic-title">${topic.name}</span>
+                                                <span class="topic-sub">${topic.subtopics.length} subtopics • ${questionCount} questions</span>
+                                            </div>
+                                            <i class="fas fa-chevron-right topic-arrow"></i>
+                                        </div>
+                                    `;
+                                }).join('')}
                             </div>
                         </div>
                     </div>
 
-                    <!-- Leaderboard -->
-                    <div class="dashboard-panel leaderboard-panel">
-                        ${Leaderboard.renderMini()}
-                    </div>
-                </section>
+                    <!-- Right Column -->
+                    <div class="main-right">
+                        <!-- Daily Challenge -->
+                        <div class="card-new highlight-card">
+                            <div class="highlight-icon">⚡</div>
+                            <div class="highlight-content">
+                                <h3>Daily Challenge</h3>
+                                <p>Complete today's challenge for bonus XP!</p>
+                                <button class="btn-new primary" onclick="DailyChallenge.start()">Start Challenge</button>
+                            </div>
+                        </div>
 
-                <!-- Quick Actions -->
-                <section class="quick-actions">
-                    <h3>🚀 Quick Start</h3>
-                    <div class="action-grid">
-                        <button class="action-card" onclick="Router.navigate('learn')">
-                            <span class="action-icon">📚</span>
-                            <span class="action-title">Learn</span>
-                            <span class="action-desc">Study revision notes</span>
-                            <kbd>L</kbd>
-                        </button>
-                        <button class="action-card highlight" onclick="Router.navigate('practice')">
-                            <span class="action-icon">🎯</span>
-                            <span class="action-title">Practice</span>
-                            <span class="action-desc">Quiz & Flashcards</span>
-                            <kbd>P</kbd>
-                        </button>
-                        <button class="action-card" onclick="Router.navigate('tools')">
-                            <span class="action-icon">🔧</span>
-                            <span class="action-title">Tools</span>
-                            <span class="action-desc">Interactive tools</span>
-                            <kbd>T</kbd>
-                        </button>
-                        <button class="action-card" onclick="Router.navigate('playground')">
-                            <span class="action-icon">💻</span>
-                            <span class="action-title">Code</span>
-                            <span class="action-desc">Write & trace code</span>
-                            <kbd>C</kbd>
-                        </button>
+                        <!-- Leaderboard -->
+                        <div class="card-new">
+                            <div class="card-header">
+                                <h2>Leaderboard</h2>
+                                <span class="card-badge green">Live</span>
+                            </div>
+                            <div class="leaderboard-list">
+                                ${HomeView.renderLeaderboard()}
+                            </div>
+                        </div>
+
+                        <!-- Achievements -->
+                        <div class="card-new">
+                            <div class="card-header">
+                                <h2>Achievements</h2>
+                                <span class="card-badge">${user.achievements.length}/${ACHIEVEMENTS.length}</span>
+                            </div>
+                            <div class="achievements-grid">
+                                ${ACHIEVEMENTS.slice(0, 6).map(ach => {
+                                    const unlocked = user.achievements.includes(ach.id);
+                                    return `
+                                        <div class="ach-item ${unlocked ? 'unlocked' : ''}" title="${ach.description}">
+                                            <span class="ach-emoji">${unlocked ? ach.icon : '🔒'}</span>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
                     </div>
                 </section>
 
@@ -127,58 +201,22 @@ const HomeView = {
                 
                 <!-- Assignments Section (for students) -->
                 ${Auth.isStudent() ? AssignmentView.renderStudentAssignments() : ''}
-
-                <!-- Topics Overview -->
-                <section class="topic-progress-section">
-                    <div class="section-header-row">
-                        <h3>📖 Topics Overview</h3>
-                        <button class="btn btn-small btn-secondary" onclick="Router.navigate('learn')">
-                            View All →
-                        </button>
-                    </div>
-                    <div class="topics-progress-grid">
-                        ${TOPICS.slice(0, 6).map(topic => {
-                            const questionCount = QUESTIONS.filter(q => q.topic === topic.id).length;
-                            return `
-                                <div class="topic-progress-card" onclick="Router.navigate('learn'); setTimeout(() => LearnView.selectTopic('${topic.id}'), 100)">
-                                    <div class="topic-header" style="border-color: ${topic.color}">
-                                        <span class="topic-icon" style="background: ${topic.color}">${topic.icon}</span>
-                                        <div class="topic-info">
-                                            <span class="topic-name">${topic.name}</span>
-                                            <span class="topic-meta">${topic.subtopics.length} subtopics • ${questionCount} questions</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            `;
-                        }).join('')}
-                    </div>
-                </section>
-
-                <!-- Achievements Preview -->
-                <section class="achievements-section">
-                    <div class="section-header-row">
-                        <h3>🏆 Achievements</h3>
-                        <span class="achievement-count">${user.achievements.length}/${ACHIEVEMENTS.length} Unlocked</span>
-                    </div>
-                    <div class="achievements-scroll">
-                        ${ACHIEVEMENTS.slice(0, 8).map(ach => {
-                            const unlocked = user.achievements.includes(ach.id);
-                            return `
-                                <div class="achievement-card ${unlocked ? 'unlocked' : 'locked'}" title="${ach.description}">
-                                    <span class="ach-icon">${unlocked ? ach.icon : '🔒'}</span>
-                                    <span class="ach-name">${ach.name}</span>
-                                </div>
-                            `;
-                        }).join('')}
-                    </div>
-                </section>
-
-                <!-- Keyboard Shortcut Hint -->
-                <div class="keyboard-hint">
-                    <p>💡 Press <kbd>?</kbd> for keyboard shortcuts</p>
-                </div>
             </div>
         `;
+    },
+    
+    renderLeaderboard: () => {
+        const leaders = Leaderboard.getTop(5);
+        if (leaders.length === 0) {
+            return '<p class="empty-text">No players yet</p>';
+        }
+        return leaders.map((p, i) => `
+            <div class="lb-row-new">
+                <span class="lb-rank-new ${i < 3 ? 'top' + (i+1) : ''}">${i + 1}</span>
+                <span class="lb-name-new">${p.username}</span>
+                <span class="lb-xp-new">${p.xp.toLocaleString()} XP</span>
+            </div>
+        `).join('');
     },
 
     init: () => {
