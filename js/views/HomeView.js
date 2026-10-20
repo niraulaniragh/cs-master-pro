@@ -135,6 +135,9 @@ const HomeView = {
 
                 <!-- Classroom Section (for students) -->
                 ${HomeView.renderClassroomSection()}
+                
+                <!-- Assignments Section (for students) -->
+                ${Auth.isStudent() ? AssignmentView.renderStudentAssignments() : ''}
 
                 <!-- Topics Overview -->
                 <section class="topic-progress-section">

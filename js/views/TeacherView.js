@@ -40,6 +40,10 @@ const TeacherView = {
                             onclick="TeacherView.switchTab('classrooms')">
                         🏫 My Classrooms (${classrooms.length})
                     </button>
+                    <button class="teacher-tab ${TeacherView.currentTab === 'assignments' ? 'active' : ''}"
+                            onclick="TeacherView.switchTab('assignments')">
+                        📝 Assignments
+                    </button>
                     <button class="teacher-tab ${TeacherView.currentTab === 'games' ? 'active' : ''}"
                             onclick="TeacherView.switchTab('games')">
                         🎮 Active Games
@@ -56,6 +60,8 @@ const TeacherView = {
     renderContent: () => {
         if (TeacherView.currentTab === 'classrooms') {
             return TeacherView.renderClassrooms();
+        } else if (TeacherView.currentTab === 'assignments') {
+            return AssignmentView.renderTeacherAssignments();
         } else if (TeacherView.currentTab === 'games') {
             return TeacherView.renderActiveGames();
         }

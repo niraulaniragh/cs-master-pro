@@ -268,6 +268,7 @@ const App = (() => {
         showChangePassword,
         handleChangePassword,
         showDeleteAccount,
-        handleDeleteAccount
+        handleDeleteAccount,
+        updateTeacherNav
     };
 })();
