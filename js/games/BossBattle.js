@@ -51,7 +51,7 @@ const BossBattle = {
             description: 'Shadow of the Web',
             hp: 110,
             attack: 20,
-            color: '#8b5cf6',
+            color: '#ef4444',
             reward: 550,
             attacks: ['Packet Punch', 'Protocol Slash', 'Firewall Fury']
         },
@@ -99,7 +99,7 @@ const BossBattle = {
             description: 'Lord of Tables',
             hp: 115,
             attack: 19,
-            color: '#ec4899',
+            color: '#f97316',
             reward: 580,
             attacks: ['Query Quake', 'SQL Slash', 'Table Tornado']
         },

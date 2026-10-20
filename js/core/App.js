@@ -117,7 +117,7 @@ const App = (() => {
         const joinDate = new Date(user.createdAt).toLocaleDateString();
         const lastActive = new Date(user.profile.lastActive).toLocaleDateString();
         const accountType = user.accountType || 'student';
-        const avatarColor = user.avatarColor || '#6366f1';
+        const avatarColor = user.avatarColor || '#ef4444';
         const avatarEmoji = user.avatarEmoji || '';
 
         Modal.show({
@@ -196,13 +196,13 @@ const App = (() => {
      */
     const showAvatarEditor = () => {
         const user = Auth.getCurrentUser();
-        const currentColor = user.avatarColor || '#6366f1';
+        const currentColor = user.avatarColor || '#ef4444';
         const currentEmoji = user.avatarEmoji || '';
         
         const colors = [
             '#ef4444', '#f97316', '#f59e0b', '#eab308', '#84cc16', '#22c55e',
-            '#10b981', '#14b8a6', '#06b6d4', '#0ea5e9', '#3b82f6', '#6366f1',
-            '#8b5cf6', '#a855f7', '#d946ef', '#ec4899', '#f43f5e', '#6b7280'
+            '#10b981', '#14b8a6', '#06b6d4', '#0ea5e9', '#3b82f6', '#ef4444',
+            '#ef4444', '#ef4444', '#f87171', '#f97316', '#f43f5e', '#6b7280'
         ];
         
         const emojis = ['', '😀', '😎', '🤓', '🧑‍💻', '👨‍🎓', '👩‍🎓', '🦊', '🐱', '🐶', '🦁', '🐼', '🐨', '🦄', '🐉', '🎮', '🎯', '🚀', '⭐', '🔥'];
@@ -259,7 +259,7 @@ const App = (() => {
         }, 0);
     };
     
-    let tempAvatarColor = '#6366f1';
+    let tempAvatarColor = '#ef4444';
     let tempAvatarEmoji = '';
     
     const selectAvatarColor = (color) => {

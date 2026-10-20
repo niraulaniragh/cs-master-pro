@@ -125,7 +125,7 @@ function createParticles() {
             position: absolute;
             width: ${Math.random() * 4 + 2}px;
             height: ${Math.random() * 4 + 2}px;
-            background: rgba(99, 102, 241, ${Math.random() * 0.5});
+            background: rgba(239, 68, 68, ${Math.random() * 0.5});
             border-radius: 50%;
             left: ${Math.random() * 100}%;
             top: ${Math.random() * 100}%;

@@ -66,7 +66,7 @@ const TOPICS = [
         id: 'computers',
         name: 'Computer Systems',
         icon: '🖥️',
-        color: '#8b5cf6',
+        color: '#ef4444',
         paper: 'Paper 1',
         description: 'Architecture, CPU, memory, storage, logic gates, software, translators',
         subtopics: [
@@ -85,7 +85,7 @@ const TOPICS = [
         id: 'networks',
         name: 'Networks & Internet',
         icon: '🌐',
-        color: '#ec4899',
+        color: '#f97316',
         paper: 'Paper 1',
         description: 'LAN/WAN, topologies, hardware, protocols, TCP/IP, security threats, prevention',
         subtopics: [

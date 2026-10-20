@@ -76,7 +76,7 @@
 .game-header h2 {
     font-size: 2rem;
     margin-bottom: var(--space-2);
-    background: linear-gradient(135deg, var(--text-primary), var(--purple));
+    background: linear-gradient(135deg, var(--text-primary), var(--primary));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -130,7 +130,7 @@
     display: block;
     font-size: 2rem;
     font-weight: 700;
-    color: var(--purple);
+    color: var(--primary);
 }
 
 .sr-stat-label,
@@ -201,7 +201,7 @@
 
 .sr-lb-rank { width: 30px; }
 .sr-lb-name { flex: 1; }
-.sr-lb-score { font-weight: 700; color: var(--purple); }
+.sr-lb-score { font-weight: 700; color: var(--primary); }
 
 /* Speed Run Game View */
 .sr-game-view {
@@ -240,7 +240,7 @@
 
 .sr-timer-progress {
     fill: none;
-    stroke: var(--purple);
+    stroke: var(--primary);
     stroke-width: 8;
     stroke-linecap: round;
     transition: stroke-dashoffset 0.1s linear;
@@ -333,7 +333,7 @@
 }
 
 .sr-option:hover {
-    border-color: var(--purple);
+    border-color: var(--primary);
     background: var(--bg-hover);
 }
 
@@ -343,7 +343,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--purple);
+    background: var(--primary);
     color: white;
     border-radius: var(--radius-sm);
     font-weight: 700;
@@ -359,7 +359,7 @@
 
 .sr-progress-fill {
     height: 100%;
-    background: var(--purple);
+    background: var(--primary);
     transition: width 0.3s;
 }
 
@@ -445,7 +445,7 @@
     display: block;
     font-size: 4rem;
     font-weight: 700;
-    background: linear-gradient(135deg, var(--purple), var(--purple-light));
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -540,12 +540,12 @@
 
 .difficulty-btn:hover,
 .difficulty-btn.selected {
-    border-color: var(--diff-color, var(--purple));
+    border-color: var(--diff-color, var(--primary));
     background: rgba(var(--diff-color), 0.1);
 }
 
 .difficulty-btn.selected {
-    box-shadow: 0 0 0 2px var(--diff-color, var(--purple));
+    box-shadow: 0 0 0 2px var(--diff-color, var(--primary));
 }
 
 .diff-name {
@@ -613,7 +613,7 @@
     width: 80px;
     height: 80px;
     border-radius: var(--radius-full);
-    background: var(--purple);
+    background: var(--primary);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -672,7 +672,7 @@
 .bp-score {
     font-size: 1.5rem;
     font-weight: 700;
-    color: var(--purple);
+    color: var(--primary);
 }
 
 .battle-vs {
@@ -754,7 +754,7 @@
 }
 
 .bq-option:hover:not(:disabled) {
-    border-color: var(--purple);
+    border-color: var(--primary);
 }
 
 .bq-option.correct {
@@ -773,7 +773,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--purple);
+    background: var(--primary);
     color: white;
     border-radius: var(--radius-sm);
     font-weight: 700;
@@ -796,7 +796,7 @@
 
 .pu-btn:hover:not(.used) {
     background: var(--bg-hover);
-    border-color: var(--purple);
+    border-color: var(--primary);
 }
 
 .pu-btn.used {
@@ -872,7 +872,7 @@
     display: block;
     font-size: 2rem;
     font-weight: 700;
-    color: var(--purple);
+    color: var(--primary);
 }
 
 .bf-hp {
@@ -891,7 +891,7 @@
     border-radius: var(--radius-full);
     display: inline-block;
     margin-bottom: var(--space-6);
-    color: var(--purple);
+    color: var(--primary);
     font-weight: 700;
 }
 
@@ -924,7 +924,7 @@
 
 .mm-si-score {
     display: block;
-    color: var(--purple);
+    color: var(--primary);
 }
 
 .mm-si-time {
@@ -959,7 +959,7 @@
 .mm-diff-btn.selected,
 .fc-diff-btn:hover,
 .fc-diff-btn.selected {
-    border-color: var(--purple);
+    border-color: var(--primary);
 }
 
 .mm-diff-btn.selected,
@@ -1038,7 +1038,7 @@
 }
 
 .mm-card-front {
-    background: linear-gradient(135deg, var(--purple), var(--purple-light));
+    background: linear-gradient(135deg, var(--primary), var(--primary-light));
     border: 2px solid var(--border);
 }
 
@@ -1113,7 +1113,7 @@
 
 .tr-mode-btn:hover,
 .tr-mode-btn.selected {
-    border-color: var(--purple);
+    border-color: var(--primary);
 }
 
 .tr-mode-btn.selected {
@@ -1163,7 +1163,7 @@
     display: block;
     font-size: 2rem;
     font-weight: 700;
-    color: var(--purple);
+    color: var(--primary);
 }
 
 .tr-ls-label {
@@ -1182,7 +1182,7 @@
 
 .tr-progress-fill {
     height: 100%;
-    background: var(--purple);
+    background: var(--primary);
     transition: width 0.1s;
 }
 
@@ -1212,7 +1212,7 @@
 }
 
 .tr-text-display span.current {
-    background: var(--purple);
+    background: var(--primary);
     color: white;
     animation: blink 0.5s infinite;
 }
@@ -1239,7 +1239,7 @@
 }
 
 .tr-input:focus {
-    border-color: var(--purple);
+    border-color: var(--primary);
     outline: none;
 }
 
@@ -1283,7 +1283,7 @@
 }
 
 .rating.legendary { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: var(--bg-primary); }
-.rating.master { background: var(--purple); color: white; }
+.rating.master { background: var(--primary); color: white; }
 .rating.expert { background: var(--blue); color: white; }
 .rating.good { background: var(--green); color: white; }
 .rating.beginner { background: var(--bg-elevated); color: var(--text-muted); }
@@ -1557,7 +1557,7 @@
 
 .ab-fill {
     width: 100%;
-    background: var(--purple);
+    background: var(--primary);
     border-radius: var(--radius-sm) var(--radius-sm) 0 0;
     transition: height 0.5s;
 }
@@ -1638,13 +1638,13 @@
 
 .fc-progress-fill {
     height: 100%;
-    background: var(--purple);
+    background: var(--primary);
     transition: width 0.3s;
 }
 
 .fc-score {
     font-weight: 700;
-    color: var(--purple);
+    color: var(--primary);
 }
 
 .fc-challenge {
@@ -1695,11 +1695,11 @@
     min-width: 80px;
     padding: var(--space-1) var(--space-2);
     background: var(--bg-card);
-    border: 2px dashed var(--purple);
+    border: 2px dashed var(--primary);
     border-radius: var(--radius-sm);
     font-family: 'Fira Code', monospace;
     font-size: 1rem;
-    color: var(--purple);
+    color: var(--primary);
     text-align: center;
 }
 
@@ -1745,7 +1745,7 @@
 
 .fc-word {
     padding: var(--space-2) var(--space-3);
-    background: var(--purple);
+    background: var(--primary);
     color: white;
     border: none;
     border-radius: var(--radius-md);
@@ -1812,7 +1812,7 @@
 }
 
 .boss-card:hover:not(:disabled) {
-    border-color: var(--boss-color, var(--purple));
+    border-color: var(--boss-color, var(--primary));
     transform: translateY(-4px);
 }
 
@@ -2009,7 +2009,7 @@
 }
 
 .boss-option:hover:not(:disabled) {
-    border-color: var(--purple);
+    border-color: var(--primary);
 }
 
 .boss-option.correct { border-color: var(--green); background: rgba(16, 185, 129, 0.2); }
@@ -2021,7 +2021,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--purple);
+    background: var(--primary);
     color: white;
     border-radius: var(--radius-sm);
     font-weight: 700;
@@ -2043,7 +2043,7 @@
 }
 
 .boss-pu-btn:hover:not(.used) {
-    border-color: var(--purple);
+    border-color: var(--primary);
 }
 
 .boss-pu-btn.used {
@@ -2140,7 +2140,7 @@
     display: block;
     font-size: 1.5rem;
     font-weight: 700;
-    color: var(--purple);
+    color: var(--primary);
 }
 
 .brs-label {
@@ -2165,7 +2165,7 @@
 .games-hero h1 {
     font-size: 2.5rem;
     margin-bottom: var(--space-2);
-    background: linear-gradient(135deg, var(--text-primary), var(--purple));
+    background: linear-gradient(135deg, var(--text-primary), var(--primary));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -2191,7 +2191,7 @@
     display: block;
     font-size: 2rem;
     font-weight: 700;
-    color: var(--purple);
+    color: var(--primary);
 }
 
 .gqs-label {
@@ -2217,7 +2217,7 @@
 .game-card:hover {
     transform: translateY(-8px);
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-    border-color: var(--game-color, var(--purple));
+    border-color: var(--game-color, var(--primary));
 }
 
 .game-card-header {
@@ -2244,7 +2244,7 @@
 .game-difficulty.medium { background: rgba(251, 191, 36, 0.2); color: var(--yellow); }
 .game-difficulty.hard { background: rgba(239, 68, 68, 0.2); color: var(--red); }
 .game-difficulty.variable { background: rgba(59, 130, 246, 0.2); color: var(--blue); }
-.game-difficulty.easyhard { background: rgba(168, 85, 247, 0.2); color: var(--purple); }
+.game-difficulty.easyhard { background: rgba(168, 85, 247, 0.2); color: var(--primary); }
 
 .game-card-title {
     font-size: 1.25rem;
