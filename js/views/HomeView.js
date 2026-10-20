@@ -1,6 +1,6 @@
 /**
  * HomeView.js - Enhanced Home/Dashboard View
- * New Modern Design - Clean, Professional, Inspired
+ * New Modern Design - Clean, Professional
  */
 
 const HomeView = {
@@ -8,11 +8,12 @@ const HomeView = {
         const user = AppState.getState('user');
         const xpForNext = HomeView.getXPForNextLevel(user.level);
         const currentLevelXP = HomeView.getXPForLevel(user.level);
-        const progress = Math.min(100, ((user.xp - currentLevelXP) / (xpForNext - currentLevelXP)) * 100);
+        const progress = Math.min(100, ((user.xp - currentLevelXP) / (xpForNext - currentLevelXP)) * 100) || 0;
         const accuracy = user.totalAnswered > 0 ? Math.round((user.totalCorrect / user.totalAnswered) * 100) : 0;
         const rank = HomeView.getRank(user.level);
         const isLoggedIn = typeof Auth !== 'undefined' && Auth.isLoggedIn();
-        const username = isLoggedIn ? Auth.getSession()?.username : 'Student';
+        const username = isLoggedIn ? (Auth.getSession()?.username || 'Student') : 'Student';
+        const totalQuestions = QUESTIONS?.length || 0;
 
         return `
             <div class="home-view-new">
@@ -24,7 +25,7 @@ const HomeView = {
                         <p class="hero-tagline">Continue your Computer Science journey</p>
                         <div class="hero-tags">
                             <span class="hero-tag">Edexcel 4CP0</span>
-                            <span class="hero-tag accent">155+ Questions</span>
+                            <span class="hero-tag accent">${totalQuestions}+ Questions</span>
                         </div>
                     </div>
                     <div class="hero-right">
@@ -53,7 +54,7 @@ const HomeView = {
                         </div>
                         <div class="stat-content">
                             <span class="stat-value">${user.xp.toLocaleString()}</span>
-                            <span class="stat-desc">Total XP Earned</span>
+                            <span class="stat-desc">Total XP</span>
                         </div>
                     </div>
                     <div class="stat-card">
@@ -62,16 +63,69 @@ const HomeView = {
                         </div>
                         <div class="stat-content">
                             <span class="stat-value">${user.totalCorrect}</span>
-                            <span class="stat-desc">Correct Answers</span>
+                            <span class="stat-desc">Correct</span>
                         </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon-wrap orange">
-                            <i class="fas fa-trophy"></i>
+                            <i class="fas fa-percent"></i>
                         </div>
                         <div class="stat-content">
-                            <span class="stat-value">${user.achievements.length}</span>
-                            <span class="stat-desc">Achievements</span>
+                            <span class="stat-value">${accuracy}%</span>
+                            <span class="stat-desc">Accuracy</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Quick Actions - Full Width -->
+                <section class="quick-actions-section">
+                    <div class="card-new">
+                        <div class="card-header">
+                            <h2>🚀 Quick Actions</h2>
+                        </div>
+                        <div class="quick-grid-6">
+                            <button class="quick-btn-new" onclick="Router.navigate('learn')">
+                                <div class="quick-icon-lg" style="background: linear-gradient(135deg, #3b82f6, #60a5fa);">📚</div>
+                                <div class="quick-info">
+                                    <span class="quick-title">Learn</span>
+                                    <span class="quick-desc">Study notes</span>
+                                </div>
+                            </button>
+                            <button class="quick-btn-new" onclick="Router.navigate('practice')">
+                                <div class="quick-icon-lg" style="background: linear-gradient(135deg, #10b981, #34d399);">🎯</div>
+                                <div class="quick-info">
+                                    <span class="quick-title">Practice</span>
+                                    <span class="quick-desc">Quiz yourself</span>
+                                </div>
+                            </button>
+                            <button class="quick-btn-new" onclick="Router.navigate('games')">
+                                <div class="quick-icon-lg" style="background: linear-gradient(135deg, #8b5cf6, #a78bfa);">🎮</div>
+                                <div class="quick-info">
+                                    <span class="quick-title">Games</span>
+                                    <span class="quick-desc">Fun learning</span>
+                                </div>
+                            </button>
+                            <button class="quick-btn-new" onclick="Router.navigate('playground')">
+                                <div class="quick-icon-lg" style="background: linear-gradient(135deg, #06b6d4, #22d3ee);">💻</div>
+                                <div class="quick-info">
+                                    <span class="quick-title">Code</span>
+                                    <span class="quick-desc">Write code</span>
+                                </div>
+                            </button>
+                            <button class="quick-btn-new" onclick="Router.navigate('tools')">
+                                <div class="quick-icon-lg" style="background: linear-gradient(135deg, #f97316, #fb923c);">🔧</div>
+                                <div class="quick-info">
+                                    <span class="quick-title">Tools</span>
+                                    <span class="quick-desc">Converters</span>
+                                </div>
+                            </button>
+                            <button class="quick-btn-new" onclick="DailyChallenge.start()">
+                                <div class="quick-icon-lg" style="background: linear-gradient(135deg, #ef4444, #f87171);">⚡</div>
+                                <div class="quick-info">
+                                    <span class="quick-title">Challenge</span>
+                                    <span class="quick-desc">Daily quest</span>
+                                </div>
+                            </button>
                         </div>
                     </div>
                 </section>
@@ -80,51 +134,39 @@ const HomeView = {
                 <section class="main-grid">
                     <!-- Left Column -->
                     <div class="main-left">
-                        <!-- Quick Actions -->
+                        <!-- Progress Card -->
                         <div class="card-new">
                             <div class="card-header">
-                                <h2>Quick Actions</h2>
+                                <h2>📊 Your Progress</h2>
                             </div>
-                            <div class="quick-grid">
-                                <button class="quick-btn" onclick="Router.navigate('learn')">
-                                    <div class="quick-icon blue">📚</div>
-                                    <span class="quick-label">Learn</span>
-                                </button>
-                                <button class="quick-btn" onclick="Router.navigate('practice')">
-                                    <div class="quick-icon green">🎯</div>
-                                    <span class="quick-label">Practice</span>
-                                </button>
-                                <button class="quick-btn" onclick="Router.navigate('games')">
-                                    <div class="quick-icon purple">🎮</div>
-                                    <span class="quick-label">Games</span>
-                                </button>
-                                <button class="quick-btn" onclick="Router.navigate('playground')">
-                                    <div class="quick-icon cyan">💻</div>
-                                    <span class="quick-label">Code</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Progress Card -->
-                        <div class="card-new progress-card-new">
-                            <div class="card-header">
-                                <h2>Your Progress</h2>
-                                <span class="card-badge">${accuracy}% Accuracy</span>
-                            </div>
-                            <div class="progress-content">
-                                <div class="level-badge-big">
-                                    <span class="level-number">${user.level}</span>
-                                    <span class="level-text">LEVEL</span>
+                            <div class="progress-content-new">
+                                <div class="level-badge-large">
+                                    <span class="level-num-lg">${user.level}</span>
+                                    <span class="level-label-sm">LEVEL</span>
                                 </div>
-                                <div class="progress-details">
-                                    <div class="progress-row">
-                                        <span>Next Level</span>
-                                        <span>${user.xp} / ${xpForNext} XP</span>
+                                <div class="progress-info">
+                                    <div class="progress-title">${rank.name} ${rank.icon}</div>
+                                    <div class="progress-bar-wrap">
+                                        <div class="progress-bar-bg">
+                                            <div class="progress-bar-fill" style="width: ${progress}%"></div>
+                                        </div>
+                                        <span class="progress-text">${user.xp} / ${xpForNext} XP</span>
                                     </div>
-                                    <div class="progress-bar-new">
-                                        <div class="progress-fill-new" style="width: ${progress}%"></div>
-                                    </div>
-                                    <span class="progress-hint">${(xpForNext - user.xp).toLocaleString()} XP to go</span>
+                                    <p class="progress-next">${(xpForNext - user.xp).toLocaleString()} XP until Level ${user.level + 1}</p>
+                                </div>
+                            </div>
+                            <div class="progress-stats">
+                                <div class="p-stat">
+                                    <span class="p-stat-val">${user.totalAnswered}</span>
+                                    <span class="p-stat-lbl">Answered</span>
+                                </div>
+                                <div class="p-stat">
+                                    <span class="p-stat-val">${user.totalCorrect}</span>
+                                    <span class="p-stat-lbl">Correct</span>
+                                </div>
+                                <div class="p-stat">
+                                    <span class="p-stat-val">${user.achievements?.length || 0}</span>
+                                    <span class="p-stat-lbl">Badges</span>
                                 </div>
                             </div>
                         </div>
@@ -132,20 +174,20 @@ const HomeView = {
                         <!-- Topics -->
                         <div class="card-new">
                             <div class="card-header">
-                                <h2>Topics</h2>
+                                <h2>📖 Study Topics</h2>
                                 <button class="link-btn" onclick="Router.navigate('learn')">View all →</button>
                             </div>
-                            <div class="topics-list">
-                                ${TOPICS.slice(0, 4).map(topic => {
-                                    const questionCount = QUESTIONS.filter(q => q.topic === topic.id).length;
+                            <div class="topics-list-new">
+                                ${(TOPICS || []).slice(0, 6).map(topic => {
+                                    const questionCount = (QUESTIONS || []).filter(q => q.topic === topic.id).length;
                                     return `
-                                        <div class="topic-row" onclick="Router.navigate('learn'); setTimeout(() => LearnView.selectTopic('${topic.id}'), 100)">
-                                            <div class="topic-icon-new" style="background: ${topic.color}">${topic.icon}</div>
-                                            <div class="topic-details">
-                                                <span class="topic-title">${topic.name}</span>
-                                                <span class="topic-sub">${topic.subtopics.length} subtopics • ${questionCount} questions</span>
+                                        <div class="topic-item" onclick="Router.navigate('learn'); setTimeout(() => LearnView.selectTopic('${topic.id}'), 100)">
+                                            <div class="topic-icon-box" style="background: ${topic.color}20; color: ${topic.color};">${topic.icon}</div>
+                                            <div class="topic-text">
+                                                <span class="topic-name">${topic.name}</span>
+                                                <span class="topic-meta">${topic.subtopics?.length || 0} subtopics • ${questionCount} Qs</span>
                                             </div>
-                                            <i class="fas fa-chevron-right topic-arrow"></i>
+                                            <i class="fas fa-chevron-right"></i>
                                         </div>
                                     `;
                                 }).join('')}
@@ -155,23 +197,13 @@ const HomeView = {
 
                     <!-- Right Column -->
                     <div class="main-right">
-                        <!-- Daily Challenge -->
-                        <div class="card-new highlight-card">
-                            <div class="highlight-icon">⚡</div>
-                            <div class="highlight-content">
-                                <h3>Daily Challenge</h3>
-                                <p>Complete today's challenge for bonus XP!</p>
-                                <button class="btn-new primary" onclick="DailyChallenge.start()">Start Challenge</button>
-                            </div>
-                        </div>
-
                         <!-- Leaderboard -->
                         <div class="card-new">
                             <div class="card-header">
-                                <h2>Leaderboard</h2>
-                                <span class="card-badge green">Live</span>
+                                <h2>🏆 Leaderboard</h2>
+                                <span class="live-badge">● Live</span>
                             </div>
-                            <div class="leaderboard-list">
+                            <div class="leaderboard-new">
                                 ${HomeView.renderLeaderboard()}
                             </div>
                         </div>
@@ -179,18 +211,28 @@ const HomeView = {
                         <!-- Achievements -->
                         <div class="card-new">
                             <div class="card-header">
-                                <h2>Achievements</h2>
-                                <span class="card-badge">${user.achievements.length}/${ACHIEVEMENTS.length}</span>
+                                <h2>🎖️ Achievements</h2>
+                                <span class="count-badge">${user.achievements?.length || 0}/${ACHIEVEMENTS?.length || 0}</span>
                             </div>
-                            <div class="achievements-grid">
-                                ${ACHIEVEMENTS.slice(0, 6).map(ach => {
-                                    const unlocked = user.achievements.includes(ach.id);
+                            <div class="achievements-new">
+                                ${(ACHIEVEMENTS || []).slice(0, 8).map(ach => {
+                                    const unlocked = user.achievements?.includes(ach.id);
                                     return `
-                                        <div class="ach-item ${unlocked ? 'unlocked' : ''}" title="${ach.description}">
-                                            <span class="ach-emoji">${unlocked ? ach.icon : '🔒'}</span>
+                                        <div class="ach-item-new ${unlocked ? 'unlocked' : ''}" title="${ach.name}: ${ach.description}">
+                                            <span class="ach-icon">${unlocked ? ach.icon : '🔒'}</span>
+                                            <span class="ach-name">${ach.name}</span>
                                         </div>
                                     `;
                                 }).join('')}
+                            </div>
+                        </div>
+
+                        <!-- Study Tip -->
+                        <div class="card-new tip-card">
+                            <div class="tip-icon">💡</div>
+                            <div class="tip-content">
+                                <h3>Study Tip</h3>
+                                <p>${HomeView.getRandomTip()}</p>
                             </div>
                         </div>
                     </div>
@@ -198,30 +240,43 @@ const HomeView = {
 
                 <!-- Classroom Section (for students) -->
                 ${HomeView.renderClassroomSection()}
-                
-                <!-- Assignments Section (for students) -->
-                ${Auth.isStudent() ? AssignmentView.renderStudentAssignments() : ''}
             </div>
         `;
     },
     
     renderLeaderboard: () => {
         try {
+            if (typeof Leaderboard === 'undefined') {
+                return '<p class="empty-text">Leaderboard loading...</p>';
+            }
             const leaders = Leaderboard.getRankings().slice(0, 5);
-            if (leaders.length === 0) {
-                return '<p class="empty-text">No players yet</p>';
+            if (!leaders || leaders.length === 0) {
+                return '<p class="empty-text">No players yet. Be the first!</p>';
             }
             return leaders.map((p, i) => `
-                <div class="lb-row-new ${p.isCurrentUser ? 'is-you' : ''}">
-                    <span class="lb-rank-new ${i < 3 ? 'top' + (i+1) : ''}">${i + 1}</span>
-                    <span class="lb-name-new">${p.username}</span>
-                    <span class="lb-xp-new">${p.xp.toLocaleString()} XP</span>
+                <div class="lb-item ${p.isCurrentUser ? 'is-me' : ''}">
+                    <span class="lb-rank ${i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : ''}">${i + 1}</span>
+                    <span class="lb-name">${p.username || 'Anonymous'}</span>
+                    <span class="lb-xp">${(p.xp || 0).toLocaleString()} XP</span>
                 </div>
             `).join('');
         } catch (e) {
             console.error('Leaderboard error:', e);
-            return '<p class="empty-text">Loading...</p>';
+            return '<p class="empty-text">Could not load leaderboard</p>';
         }
+    },
+    
+    getRandomTip: () => {
+        const tips = [
+            "Practice a little every day for the best results!",
+            "Use flashcards to memorize key terms and definitions.",
+            "Try explaining concepts to others - it helps you learn!",
+            "Take breaks every 25 minutes using the Pomodoro technique.",
+            "Review your mistakes - they're your best teachers!",
+            "Write pseudocode before actual code to plan your logic.",
+            "Binary and hexadecimal conversions get easier with practice!"
+        ];
+        return tips[Math.floor(Math.random() * tips.length)];
     },
 
     init: () => {

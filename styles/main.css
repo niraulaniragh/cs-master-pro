@@ -11863,3 +11863,419 @@ textarea:focus {
         width: 100%;
     }
 }
+
+
+/* =====================================================
+   FIXED HOME VIEW STYLES
+   ===================================================== */
+
+/* Quick Actions Full Width */
+.quick-actions-section {
+    margin-bottom: var(--space-6);
+}
+
+.quick-grid-6 {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: var(--space-3);
+}
+
+.quick-btn-new {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-5) var(--space-3);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.quick-btn-new:hover {
+    transform: translateY(-4px);
+    border-color: var(--primary);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+}
+
+.quick-icon-lg {
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    font-size: 1.75rem;
+}
+
+.quick-info {
+    text-align: center;
+}
+
+.quick-title {
+    display: block;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.quick-desc {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+/* Progress Content New */
+.progress-content-new {
+    display: flex;
+    gap: var(--space-5);
+    align-items: center;
+    margin-bottom: var(--space-5);
+}
+
+.level-badge-large {
+    width: 90px;
+    height: 90px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.3);
+}
+
+.level-num-lg {
+    font-size: 2.25rem;
+    font-weight: 800;
+    color: white;
+    line-height: 1;
+}
+
+.level-label-sm {
+    font-size: 0.6rem;
+    font-weight: 700;
+    color: rgba(255,255,255,0.8);
+    letter-spacing: 1px;
+    margin-top: 2px;
+}
+
+.progress-info {
+    flex: 1;
+}
+
+.progress-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--space-3);
+}
+
+.progress-bar-wrap {
+    margin-bottom: var(--space-2);
+}
+
+.progress-bar-bg {
+    height: 10px;
+    background: var(--bg-elevated);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+    margin-bottom: var(--space-2);
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    border-radius: var(--radius-full);
+    transition: width 0.5s;
+}
+
+.progress-text {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.progress-next {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+.progress-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-3);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--border);
+}
+
+.p-stat {
+    text-align: center;
+    padding: var(--space-3);
+    background: var(--bg-elevated);
+    border-radius: 10px;
+}
+
+.p-stat-val {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.p-stat-lbl {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+/* Topics List New */
+.topics-list-new {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.topic-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3);
+    background: var(--bg-elevated);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.topic-item:hover {
+    background: var(--bg-hover);
+    transform: translateX(4px);
+}
+
+.topic-icon-box {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    font-size: 1.3rem;
+}
+
+.topic-text {
+    flex: 1;
+}
+
+.topic-name {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+}
+
+.topic-meta {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.topic-item i {
+    color: var(--text-dim);
+    font-size: 0.8rem;
+}
+
+/* Leaderboard New */
+.leaderboard-new {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.lb-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3);
+    background: var(--bg-elevated);
+    border-radius: 10px;
+    transition: background 0.2s;
+}
+
+.lb-item:hover {
+    background: var(--bg-hover);
+}
+
+.lb-item.is-me {
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.lb-rank {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-hover);
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-muted);
+}
+
+.lb-rank.gold { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: white; }
+.lb-rank.silver { background: linear-gradient(135deg, #9ca3af, #6b7280); color: white; }
+.lb-rank.bronze { background: linear-gradient(135deg, #f97316, #ea580c); color: white; }
+
+.lb-name {
+    flex: 1;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.lb-xp {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--primary);
+}
+
+/* Live Badge */
+.live-badge {
+    padding: 4px 10px;
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--primary);
+    border-radius: var(--radius-full);
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.count-badge {
+    padding: 4px 10px;
+    background: var(--bg-elevated);
+    color: var(--text-muted);
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* Achievements New */
+.achievements-new {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-2);
+}
+
+.ach-item-new {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: var(--space-3);
+    background: var(--bg-elevated);
+    border-radius: 10px;
+    opacity: 0.4;
+    transition: all 0.2s;
+}
+
+.ach-item-new.unlocked {
+    opacity: 1;
+}
+
+.ach-item-new:hover {
+    transform: scale(1.05);
+}
+
+.ach-item-new .ach-icon {
+    font-size: 1.5rem;
+}
+
+.ach-item-new .ach-name {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    text-align: center;
+    line-height: 1.2;
+}
+
+/* Tip Card */
+.tip-card {
+    display: flex;
+    gap: var(--space-4);
+    align-items: flex-start;
+    background: linear-gradient(135deg, var(--bg-card), rgba(16, 185, 129, 0.05));
+    border-color: rgba(16, 185, 129, 0.2);
+}
+
+.tip-icon {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.tip-content h3 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 4px;
+}
+
+.tip-content p {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* Empty Text */
+.empty-text {
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    text-align: center;
+    padding: var(--space-4);
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .quick-grid-6 {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .quick-grid-6 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .progress-content-new {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .progress-info {
+        width: 100%;
+    }
+    
+    .achievements-new {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .quick-grid-6 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .quick-icon-lg {
+        width: 48px;
+        height: 48px;
+        font-size: 1.5rem;
+    }
+}
