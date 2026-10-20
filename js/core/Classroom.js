@@ -351,12 +351,14 @@ const Classroom = {
         }
         
         const gameId = Date.now().toString(36) + Math.random().toString(36).substr(2);
+        const joinCode = Classroom.generateCode(); // 6-character code for students to join
         
         const game = {
             id: gameId,
+            joinCode: joinCode, // Code students use to join
             classroomCode: classroomCode,
             classroomName: classroom.name,
-            gameType: gameType, // 'race', 'speedrun', 'battle'
+            gameType: gameType, // 'race', 'crypto', 'tower', 'factory', 'gold'
             hostId: user.id,
             hostName: user.username,
             status: 'waiting', // 'waiting', 'playing', 'finished'
@@ -511,6 +513,17 @@ const Classroom = {
     getGame: (gameId) => {
         const games = Classroom.getActiveGames();
         return games[gameId] || null;
+    },
+    
+    /**
+     * Find game by join code
+     */
+    findGameByCode: (code) => {
+        const games = Classroom.getActiveGames();
+        return Object.values(games).find(g => 
+            g.joinCode === code && 
+            (g.status === 'waiting' || g.status === 'playing')
+        ) || null;
     },
     
     /**

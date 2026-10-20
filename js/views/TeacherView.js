@@ -161,6 +161,10 @@ const TeacherView = {
     getGameTitle: (gameType) => {
         const titles = {
             'race': '🏎️ Car Race',
+            'crypto': '🔐 Crypto Hack',
+            'tower': '🏰 Tower Defense',
+            'factory': '🏭 Factory',
+            'gold': '💰 Gold Quest',
             'speedrun': '⚡ Speed Run',
             'battle': '⚔️ Battle Mode'
         };
@@ -320,11 +324,31 @@ const TeacherView = {
                     
                     <div class="form-group">
                         <label>Game Type</label>
-                        <div class="game-type-selector">
+                        <div class="game-type-grid">
                             <button type="button" class="game-type-btn active" data-type="race" onclick="TeacherView.selectGameType('race', this)">
                                 <span class="type-icon">🏎️</span>
                                 <span class="type-name">Car Race</span>
-                                <span class="type-desc">Race to the finish!</span>
+                                <span class="type-desc">Race to finish!</span>
+                            </button>
+                            <button type="button" class="game-type-btn" data-type="crypto" onclick="TeacherView.selectGameType('crypto', this)">
+                                <span class="type-icon">🔐</span>
+                                <span class="type-name">Crypto Hack</span>
+                                <span class="type-desc">Hack the vault!</span>
+                            </button>
+                            <button type="button" class="game-type-btn" data-type="tower" onclick="TeacherView.selectGameType('tower', this)">
+                                <span class="type-icon">🏰</span>
+                                <span class="type-name">Tower Defense</span>
+                                <span class="type-desc">Defend your tower!</span>
+                            </button>
+                            <button type="button" class="game-type-btn" data-type="factory" onclick="TeacherView.selectGameType('factory', this)">
+                                <span class="type-icon">🏭</span>
+                                <span class="type-name">Factory</span>
+                                <span class="type-desc">Build & produce!</span>
+                            </button>
+                            <button type="button" class="game-type-btn" data-type="gold" onclick="TeacherView.selectGameType('gold', this)">
+                                <span class="type-icon">💰</span>
+                                <span class="type-name">Gold Quest</span>
+                                <span class="type-desc">Mine for gold!</span>
                             </button>
                             <button type="button" class="game-type-btn" data-type="speedrun" onclick="TeacherView.selectGameType('speedrun', this)">
                                 <span class="type-icon">⚡</span>
@@ -374,20 +398,140 @@ const TeacherView = {
                 
                 if (result.success) {
                     Modal.close();
-                    Toast.show('Game created! Waiting for players...', 'success');
-                    TeacherView.switchTab('games');
-                    TeacherView.refresh();
-                    
-                    // Open the game view
-                    if (TeacherView.selectedGameType === 'race') {
-                        CarRace.startAsHost(result.game);
-                    }
+                    // Show the join code screen
+                    TeacherView.showGameJoinCode(result.game);
                 } else {
                     Toast.show(result.error, 'error');
                 }
             });
         }, 0);
     },
+    
+    // Display large join code for students
+    showGameJoinCode: (game) => {
+        Modal.show({
+            title: `${TeacherView.getGameTitle(game.gameType)}`,
+            content: `
+                <div class="game-join-code-display">
+                    <p class="join-instruction">Students: Join at</p>
+                    <div class="join-url">niraulaniragh.github.io/cs-master-pro</div>
+                    
+                    <div class="join-code-mega">
+                        <span class="code-label-small">Game Code</span>
+                        <div class="mega-code">${game.joinCode}</div>
+                    </div>
+                    
+                    <div class="waiting-players">
+                        <div class="spinner-dots">
+                            <span></span><span></span><span></span>
+                        </div>
+                        <p>Waiting for players to join...</p>
+                        <div class="player-count" id="player-count-display">
+                            <span class="count-number">${game.players.length}</span>
+                            <span class="count-label">players joined</span>
+                        </div>
+                    </div>
+                    
+                    <div class="joined-players" id="joined-players-list">
+                        ${game.players.map(p => `<span class="player-tag">${p.username}</span>`).join('')}
+                    </div>
+                </div>
+            `,
+            footer: `
+                <button class="btn btn-secondary" id="cancel-game-btn">Cancel Game</button>
+                <button class="btn btn-primary btn-large" id="start-game-btn" ${game.players.length === 0 ? 'disabled' : ''}>
+                    🚀 Start Game
+                </button>
+            `,
+            className: 'modal-fullscreen modal-game-lobby'
+        });
+        
+        // Poll for new players
+        TeacherView.lobbyGameId = game.id;
+        TeacherView.lobbyPollInterval = setInterval(() => {
+            TeacherView.updateLobbyPlayers(game.id);
+        }, 1000);
+        
+        setTimeout(() => {
+            document.getElementById('cancel-game-btn')?.addEventListener('click', () => {
+                clearInterval(TeacherView.lobbyPollInterval);
+                // Delete the game
+                const games = Classroom.getActiveGames();
+                delete games[game.id];
+                Classroom.saveActiveGames(games);
+                Modal.close();
+                Toast.show('Game cancelled', 'info');
+            });
+            
+            document.getElementById('start-game-btn')?.addEventListener('click', () => {
+                clearInterval(TeacherView.lobbyPollInterval);
+                Modal.close();
+                TeacherView.launchGame(game.id);
+            });
+        }, 0);
+    },
+    
+    updateLobbyPlayers: (gameId) => {
+        const game = Classroom.getGame(gameId);
+        if (!game) return;
+        
+        const countEl = document.getElementById('player-count-display');
+        const listEl = document.getElementById('joined-players-list');
+        const startBtn = document.getElementById('start-game-btn');
+        
+        if (countEl) {
+            countEl.innerHTML = `
+                <span class="count-number">${game.players.length}</span>
+                <span class="count-label">players joined</span>
+            `;
+        }
+        
+        if (listEl) {
+            listEl.innerHTML = game.players.map(p => `<span class="player-tag">${p.username}</span>`).join('');
+        }
+        
+        if (startBtn) {
+            startBtn.disabled = game.players.length === 0;
+        }
+    },
+    
+    launchGame: (gameId) => {
+        const game = Classroom.getGame(gameId);
+        if (!game) return;
+        
+        // Update game status
+        game.status = 'playing';
+        game.startedAt = new Date().toISOString();
+        const games = Classroom.getActiveGames();
+        games[gameId] = game;
+        Classroom.saveActiveGames(games);
+        
+        Toast.show('Game started!', 'success');
+        
+        // Launch appropriate game
+        switch(game.gameType) {
+            case 'race':
+                CarRace.startAsHost(game);
+                break;
+            case 'crypto':
+                CryptoHack.startAsHost(game);
+                break;
+            case 'tower':
+                TowerDefense.startAsHost(game);
+                break;
+            case 'factory':
+                Factory.startAsHost(game);
+                break;
+            case 'gold':
+                GoldQuest.startAsHost(game);
+                break;
+            default:
+                Toast.show('Game type not implemented yet', 'warning');
+        }
+    },
+    
+    lobbyGameId: null,
+    lobbyPollInterval: null,
     
     selectedGameType: 'race',
     

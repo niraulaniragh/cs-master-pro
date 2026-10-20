@@ -227,8 +227,25 @@ const HomeView = {
             <section class="classroom-section">
                 <div class="section-header-row">
                     <h3>🏫 My Classrooms</h3>
-                    <button class="btn btn-small btn-primary" onclick="HomeView.showJoinClassroom()">
-                        + Join Classroom
+                </div>
+                
+                <!-- Prominent Join Buttons -->
+                <div class="join-buttons-row">
+                    <button class="join-big-btn join-classroom-btn" onclick="HomeView.showJoinClassroom()">
+                        <span class="join-icon">🏫</span>
+                        <span class="join-text">
+                            <span class="join-title">Join Classroom</span>
+                            <span class="join-subtitle">Enter teacher's code</span>
+                        </span>
+                        <span class="join-arrow">→</span>
+                    </button>
+                    <button class="join-big-btn join-game-btn" onclick="HomeView.showJoinGame()">
+                        <span class="join-icon">🎮</span>
+                        <span class="join-text">
+                            <span class="join-title">Join Game</span>
+                            <span class="join-subtitle">Enter game code</span>
+                        </span>
+                        <span class="join-arrow">→</span>
                     </button>
                 </div>
                 
@@ -341,9 +358,68 @@ const HomeView = {
             const game = result.game;
             if (game.gameType === 'race') {
                 CarRace.startAsPlayer(game);
+            } else if (game.gameType === 'crypto') {
+                CryptoHack.startAsPlayer(game);
+            } else if (game.gameType === 'tower') {
+                TowerDefense.startAsPlayer(game);
+            } else if (game.gameType === 'factory') {
+                Factory.startAsPlayer(game);
+            } else if (game.gameType === 'gold') {
+                GoldQuest.startAsPlayer(game);
             }
         } else {
             Toast.show(result.error, 'error');
         }
+    },
+    
+    showJoinGame: () => {
+        Modal.show({
+            title: '🎮 Join a Game',
+            content: `
+                <div class="join-game-form">
+                    <p>Enter the game code from your teacher:</p>
+                    <div class="code-input-wrapper large-code">
+                        <input type="text" id="game-code-input" 
+                               placeholder="XXXXXX" 
+                               maxlength="6"
+                               autocomplete="off"
+                               style="text-transform: uppercase; font-family: var(--font-mono); font-size: 2rem; text-align: center; letter-spacing: 0.4em; padding: 15px;">
+                    </div>
+                    <p class="join-hint">Game codes are 6 characters long</p>
+                </div>
+            `,
+            footer: `
+                <button class="btn btn-secondary" id="game-join-cancel">Cancel</button>
+                <button class="btn btn-primary" id="game-join-submit">Join Game</button>
+            `
+        });
+        
+        setTimeout(() => {
+            const input = document.getElementById('game-code-input');
+            input?.focus();
+            
+            // Auto-uppercase while typing
+            input?.addEventListener('input', (e) => {
+                e.target.value = e.target.value.toUpperCase();
+            });
+            
+            document.getElementById('game-join-cancel')?.addEventListener('click', Modal.close);
+            document.getElementById('game-join-submit')?.addEventListener('click', () => {
+                const code = document.getElementById('game-code-input').value.trim().toUpperCase();
+                if (code.length !== 6) {
+                    Toast.show('Please enter a 6-character game code', 'error');
+                    return;
+                }
+                
+                // Find the game by code
+                const game = Classroom.findGameByCode(code);
+                if (game) {
+                    Modal.close();
+                    HomeView.joinGame(game.id);
+                } else {
+                    Toast.show('Game not found. Check the code and try again.', 'error');
+                }
+            });
+        }, 0);
     }
 };
