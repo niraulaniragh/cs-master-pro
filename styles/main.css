@@ -29,9 +29,9 @@
     
     /* Text - HIGH CONTRAST for readability */
     --text-primary: #ffffff;
-    --text-secondary: #e5e7eb;
-    --text-muted: #b0b5bd;
-    --text-dim: #8b919a;
+    --text-secondary: #d1d5db;
+    --text-muted: #9ca3af;
+    --text-dim: #6b7280;
     
     /* Borders */
     --border: #2e2e3a;
