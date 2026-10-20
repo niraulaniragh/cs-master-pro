@@ -116,75 +116,298 @@ const App = (() => {
 
         const joinDate = new Date(user.createdAt).toLocaleDateString();
         const lastActive = new Date(user.profile.lastActive).toLocaleDateString();
+        const accountType = user.accountType || 'student';
+        const avatarColor = user.avatarColor || '#6366f1';
+        const avatarEmoji = user.avatarEmoji || '';
 
-        Modal.show('User Profile', `
-            <div class="profile-modal">
-                <div class="profile-header">
-                    <div class="profile-avatar">
-                        ${user.username.charAt(0).toUpperCase()}
+        Modal.show({
+            title: '👤 Profile & Settings',
+            content: `
+                <div class="profile-modal">
+                    <div class="profile-header">
+                        <div class="profile-avatar-wrapper">
+                            <div class="profile-avatar" style="background: ${avatarColor}" onclick="App.showAvatarEditor()">
+                                ${avatarEmoji || user.username.charAt(0).toUpperCase()}
+                            </div>
+                            <button class="avatar-edit-btn" onclick="App.showAvatarEditor()">✏️</button>
+                        </div>
+                        <div class="profile-info">
+                            <h3>${user.username}</h3>
+                            <p>${user.email}</p>
+                            <span class="account-type-badge ${accountType}">${accountType === 'teacher' ? '👩‍🏫 Teacher' : '🎒 Student'}</span>
+                        </div>
                     </div>
-                    <div class="profile-info">
-                        <h3>${user.username}</h3>
-                        <p>${user.email}</p>
+                    
+                    <div class="profile-stats">
+                        <div class="profile-stat">
+                            <span class="stat-value">${user.profile.level}</span>
+                            <span class="stat-label">Level</span>
+                        </div>
+                        <div class="profile-stat">
+                            <span class="stat-value">${user.profile.xp.toLocaleString()}</span>
+                            <span class="stat-label">XP</span>
+                        </div>
+                        <div class="profile-stat">
+                            <span class="stat-value">${user.profile.achievements.length}</span>
+                            <span class="stat-label">Achievements</span>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-details">
+                        <p><strong>Joined:</strong> ${joinDate}</p>
+                        <p><strong>Last Active:</strong> ${lastActive}</p>
+                        <p><strong>Questions Answered:</strong> ${user.profile.totalAnswered}</p>
+                        <p><strong>Correct Answers:</strong> ${user.profile.totalCorrect}</p>
+                    </div>
+                    
+                    <div class="profile-section">
+                        <h4>⚙️ Settings</h4>
+                        <div class="settings-list">
+                            <div class="setting-item">
+                                <span>Account Type</span>
+                                <button class="btn btn-small btn-secondary" onclick="App.showSwitchAccountType()">
+                                    Switch to ${accountType === 'teacher' ? 'Student' : 'Teacher'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-actions">
+                        <button class="btn btn-secondary" onclick="App.showChangePassword()">
+                            🔑 Change Password
+                        </button>
+                        <button class="btn btn-danger" onclick="App.showDeleteAccount()">
+                            🗑️ Delete Account
+                        </button>
                     </div>
                 </div>
-                
-                <div class="profile-stats">
-                    <div class="profile-stat">
-                        <span class="stat-value">${user.profile.level}</span>
-                        <span class="stat-label">Level</span>
+            `,
+            footer: '<button class="btn btn-primary" id="profile-close">Close</button>',
+            className: 'modal-profile'
+        });
+        
+        setTimeout(() => {
+            document.getElementById('profile-close')?.addEventListener('click', Modal.close);
+        }, 0);
+    };
+    
+    /**
+     * Show avatar editor
+     */
+    const showAvatarEditor = () => {
+        const user = Auth.getCurrentUser();
+        const currentColor = user.avatarColor || '#6366f1';
+        const currentEmoji = user.avatarEmoji || '';
+        
+        const colors = [
+            '#ef4444', '#f97316', '#f59e0b', '#eab308', '#84cc16', '#22c55e',
+            '#10b981', '#14b8a6', '#06b6d4', '#0ea5e9', '#3b82f6', '#6366f1',
+            '#8b5cf6', '#a855f7', '#d946ef', '#ec4899', '#f43f5e', '#6b7280'
+        ];
+        
+        const emojis = ['', '😀', '😎', '🤓', '🧑‍💻', '👨‍🎓', '👩‍🎓', '🦊', '🐱', '🐶', '🦁', '🐼', '🐨', '🦄', '🐉', '🎮', '🎯', '🚀', '⭐', '🔥'];
+        
+        Modal.show({
+            title: '🎨 Customize Avatar',
+            content: `
+                <div class="avatar-editor">
+                    <div class="avatar-preview">
+                        <div class="preview-avatar" id="avatar-preview" style="background: ${currentColor}">
+                            ${currentEmoji || user.username.charAt(0).toUpperCase()}
+                        </div>
                     </div>
-                    <div class="profile-stat">
-                        <span class="stat-value">${user.profile.xp.toLocaleString()}</span>
-                        <span class="stat-label">XP</span>
+                    
+                    <div class="editor-section">
+                        <h4>Color</h4>
+                        <div class="color-grid">
+                            ${colors.map(c => `
+                                <button class="color-btn ${c === currentColor ? 'selected' : ''}" 
+                                        style="background: ${c}"
+                                        onclick="App.selectAvatarColor('${c}')"></button>
+                            `).join('')}
+                        </div>
                     </div>
-                    <div class="profile-stat">
-                        <span class="stat-value">${user.profile.achievements.length}</span>
-                        <span class="stat-label">Achievements</span>
+                    
+                    <div class="editor-section">
+                        <h4>Icon (optional)</h4>
+                        <div class="emoji-grid">
+                            ${emojis.map(e => `
+                                <button class="emoji-btn ${e === currentEmoji ? 'selected' : ''}"
+                                        onclick="App.selectAvatarEmoji('${e}')">${e || '✕'}</button>
+                            `).join('')}
+                        </div>
                     </div>
                 </div>
-                
-                <div class="profile-details">
-                    <p><strong>Joined:</strong> ${joinDate}</p>
-                    <p><strong>Last Active:</strong> ${lastActive}</p>
-                    <p><strong>Questions Answered:</strong> ${user.profile.totalAnswered}</p>
-                    <p><strong>Correct Answers:</strong> ${user.profile.totalCorrect}</p>
+            `,
+            footer: `
+                <button class="btn btn-secondary" id="avatar-cancel">Cancel</button>
+                <button class="btn btn-primary" id="avatar-save">Save</button>
+            `
+        });
+        
+        App.tempAvatarColor = currentColor;
+        App.tempAvatarEmoji = currentEmoji;
+        
+        setTimeout(() => {
+            document.getElementById('avatar-cancel')?.addEventListener('click', () => {
+                Modal.close();
+                App.showProfile();
+            });
+            document.getElementById('avatar-save')?.addEventListener('click', () => {
+                App.saveAvatar();
+            });
+        }, 0);
+    };
+    
+    let tempAvatarColor = '#6366f1';
+    let tempAvatarEmoji = '';
+    
+    const selectAvatarColor = (color) => {
+        App.tempAvatarColor = color;
+        document.querySelectorAll('.color-btn').forEach(btn => {
+            btn.classList.toggle('selected', btn.style.background === color);
+        });
+        App.updateAvatarPreview();
+    };
+    
+    const selectAvatarEmoji = (emoji) => {
+        App.tempAvatarEmoji = emoji;
+        document.querySelectorAll('.emoji-btn').forEach(btn => {
+            btn.classList.toggle('selected', btn.textContent === (emoji || '✕'));
+        });
+        App.updateAvatarPreview();
+    };
+    
+    const updateAvatarPreview = () => {
+        const preview = document.getElementById('avatar-preview');
+        const user = Auth.getCurrentUser();
+        if (preview) {
+            preview.style.background = App.tempAvatarColor;
+            preview.textContent = App.tempAvatarEmoji || user.username.charAt(0).toUpperCase();
+        }
+    };
+    
+    const saveAvatar = () => {
+        const user = Auth.getCurrentUser();
+        Auth.updateUser(user.email, {
+            avatarColor: App.tempAvatarColor,
+            avatarEmoji: App.tempAvatarEmoji
+        });
+        Toast.show('Avatar updated!', 'success');
+        Modal.close();
+        App.showProfile();
+    };
+    
+    /**
+     * Show switch account type dialog
+     */
+    const showSwitchAccountType = () => {
+        const user = Auth.getCurrentUser();
+        const currentType = user.accountType || 'student';
+        const newType = currentType === 'teacher' ? 'student' : 'teacher';
+        
+        Modal.show({
+            title: '🔄 Switch Account Type',
+            content: `
+                <div class="switch-account-dialog">
+                    <p>You are currently a <strong>${currentType === 'teacher' ? '👩‍🏫 Teacher' : '🎒 Student'}</strong>.</p>
+                    <p>Switching to <strong>${newType === 'teacher' ? '👩‍🏫 Teacher' : '🎒 Student'}</strong> will:</p>
+                    <ul>
+                        ${newType === 'teacher' ? `
+                            <li>✅ Allow you to create classrooms</li>
+                            <li>✅ Allow you to create assignments</li>
+                            <li>✅ Allow you to host multiplayer games</li>
+                            <li>⚠️ You won't see student classroom features</li>
+                        ` : `
+                            <li>✅ Allow you to join classrooms</li>
+                            <li>✅ Allow you to take assignments</li>
+                            <li>✅ Allow you to join multiplayer games</li>
+                            <li>⚠️ You won't be able to create classrooms</li>
+                        `}
+                    </ul>
+                    <p class="switch-note">Your XP, achievements, and progress will be preserved.</p>
                 </div>
-                
-                <div class="profile-actions">
-                    <button class="btn btn-secondary" onclick="App.showChangePassword()">
-                        Change Password
-                    </button>
-                    <button class="btn btn-danger" onclick="App.showDeleteAccount()">
-                        Delete Account
-                    </button>
-                </div>
-            </div>
-        `);
+            `,
+            footer: `
+                <button class="btn btn-secondary" id="switch-cancel">Cancel</button>
+                <button class="btn btn-primary" id="switch-confirm">Switch to ${newType === 'teacher' ? 'Teacher' : 'Student'}</button>
+            `
+        });
+        
+        setTimeout(() => {
+            document.getElementById('switch-cancel')?.addEventListener('click', () => {
+                Modal.close();
+                App.showProfile();
+            });
+            document.getElementById('switch-confirm')?.addEventListener('click', () => {
+                App.confirmSwitchAccountType(newType);
+            });
+        }, 0);
+    };
+    
+    const confirmSwitchAccountType = (newType) => {
+        const user = Auth.getCurrentUser();
+        const session = Auth.getSession();
+        
+        // Update user
+        Auth.updateUser(user.email, {
+            accountType: newType,
+            // Initialize teacher/student specific fields
+            ...(newType === 'teacher' ? { classrooms: user.classrooms || [] } : {}),
+            ...(newType === 'student' ? { joinedClassrooms: user.joinedClassrooms || [] } : {})
+        });
+        
+        // Update session
+        session.accountType = newType;
+        localStorage.setItem(Auth.SESSION_KEY, JSON.stringify(session));
+        sessionStorage.setItem(Auth.SESSION_KEY, JSON.stringify(session));
+        
+        Toast.show(`Switched to ${newType} account!`, 'success');
+        Modal.close();
+        
+        // Refresh the page to update nav and features
+        setTimeout(() => window.location.reload(), 500);
     };
 
     /**
      * Show change password dialog
      */
     const showChangePassword = () => {
-        Modal.show('Change Password', `
-            <form class="change-password-form" onsubmit="App.handleChangePassword(event)">
-                <div class="form-field">
-                    <label>Current Password</label>
-                    <input type="password" name="currentPassword" required>
-                </div>
-                <div class="form-field">
-                    <label>New Password</label>
-                    <input type="password" name="newPassword" required minlength="6">
-                </div>
-                <div class="form-field">
-                    <label>Confirm New Password</label>
-                    <input type="password" name="confirmPassword" required minlength="6">
-                </div>
-                <div class="form-error hidden" id="change-pw-error"></div>
-                <button type="submit" class="btn btn-primary">Update Password</button>
-            </form>
-        `);
+        Modal.show({
+            title: '🔑 Change Password',
+            content: `
+                <form class="change-password-form" id="change-pw-form">
+                    <div class="form-field">
+                        <label>Current Password</label>
+                        <input type="password" name="currentPassword" required>
+                    </div>
+                    <div class="form-field">
+                        <label>New Password</label>
+                        <input type="password" name="newPassword" required minlength="6">
+                    </div>
+                    <div class="form-field">
+                        <label>Confirm New Password</label>
+                        <input type="password" name="confirmPassword" required minlength="6">
+                    </div>
+                    <div class="form-error hidden" id="change-pw-error"></div>
+                </form>
+            `,
+            footer: `
+                <button class="btn btn-secondary" id="pw-cancel">Cancel</button>
+                <button class="btn btn-primary" id="pw-submit">Update Password</button>
+            `
+        });
+        
+        setTimeout(() => {
+            document.getElementById('pw-cancel')?.addEventListener('click', () => {
+                Modal.close();
+                App.showProfile();
+            });
+            document.getElementById('pw-submit')?.addEventListener('click', () => {
+                const form = document.getElementById('change-pw-form');
+                App.handleChangePassword({ preventDefault: () => {}, target: form });
+            });
+        }, 0);
     };
 
     /**
@@ -205,7 +428,7 @@ const App = (() => {
 
         const result = Auth.changePassword(currentPassword, newPassword);
         if (result.success) {
-            Modal.hide();
+            Modal.close();
             Toast.show('Password updated successfully', 'success');
         } else {
             document.getElementById('change-pw-error').textContent = result.error;
@@ -217,20 +440,37 @@ const App = (() => {
      * Show delete account dialog
      */
     const showDeleteAccount = () => {
-        Modal.show('Delete Account', `
-            <div class="delete-account-warning">
-                <p>⚠️ <strong>Warning:</strong> This action cannot be undone!</p>
-                <p>All your progress, achievements, and data will be permanently deleted.</p>
-            </div>
-            <form class="delete-account-form" onsubmit="App.handleDeleteAccount(event)">
-                <div class="form-field">
-                    <label>Enter your password to confirm</label>
-                    <input type="password" name="password" required>
+        Modal.show({
+            title: '🗑️ Delete Account',
+            content: `
+                <div class="delete-account-warning">
+                    <p>⚠️ <strong>Warning:</strong> This action cannot be undone!</p>
+                    <p>All your progress, achievements, and data will be permanently deleted.</p>
                 </div>
-                <div class="form-error hidden" id="delete-error"></div>
-                <button type="submit" class="btn btn-danger">Delete My Account</button>
-            </form>
-        `);
+                <form class="delete-account-form" id="delete-account-form">
+                    <div class="form-field">
+                        <label>Enter your password to confirm</label>
+                        <input type="password" name="password" required>
+                    </div>
+                    <div class="form-error hidden" id="delete-error"></div>
+                </form>
+            `,
+            footer: `
+                <button class="btn btn-secondary" id="delete-cancel">Cancel</button>
+                <button class="btn btn-danger" id="delete-confirm">Delete My Account</button>
+            `
+        });
+        
+        setTimeout(() => {
+            document.getElementById('delete-cancel')?.addEventListener('click', () => {
+                Modal.close();
+                App.showProfile();
+            });
+            document.getElementById('delete-confirm')?.addEventListener('click', () => {
+                const form = document.getElementById('delete-account-form');
+                App.handleDeleteAccount({ preventDefault: () => {}, target: form });
+            });
+        }, 0);
     };
 
     /**
@@ -243,7 +483,7 @@ const App = (() => {
 
         const result = Auth.deleteAccount(password);
         if (result.success) {
-            Modal.hide();
+            Modal.close();
             Toast.show('Account deleted successfully', 'info');
             setTimeout(() => {
                 window.location.reload();
@@ -269,6 +509,15 @@ const App = (() => {
         handleChangePassword,
         showDeleteAccount,
         handleDeleteAccount,
-        updateTeacherNav
+        updateTeacherNav,
+        showAvatarEditor,
+        selectAvatarColor,
+        selectAvatarEmoji,
+        updateAvatarPreview,
+        saveAvatar,
+        showSwitchAccountType,
+        confirmSwitchAccountType,
+        tempAvatarColor,
+        tempAvatarEmoji
     };
 })();
