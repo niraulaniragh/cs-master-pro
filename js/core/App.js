@@ -10,6 +10,7 @@ const App = (() => {
         // Initialize modules in order
         Storage.init();
         Auth.init();
+        Classroom.init();
         
         // Check authentication
         const session = Auth.getSession();
@@ -32,7 +33,10 @@ const App = (() => {
                 // Update last active
                 Auth.updateProfile({ lastActive: new Date().toISOString() });
                 
-                console.log(`👤 Logged in as: ${user.username}`);
+                console.log(`👤 Logged in as: ${user.username} (${user.accountType || 'student'})`);
+                
+                // Add teacher link if teacher
+                App.updateTeacherNav();
             } else {
                 // Session exists but user not found - clear invalid session
                 console.log('⚠️ Invalid session, clearing...');
@@ -56,7 +60,37 @@ const App = (() => {
             hljs.highlightAll();
         }
         
+        // Cleanup old games
+        Classroom.cleanupGames();
+        
         console.log('✅ Application initialized successfully');
+    };
+    
+    /**
+     * Update navigation for teacher/student
+     */
+    const updateTeacherNav = () => {
+        const navLinks = document.querySelector('.nav-links');
+        const existingTeacherLink = document.querySelector('.nav-link[data-route="teacher"]');
+        
+        // Remove existing teacher link if present
+        if (existingTeacherLink) {
+            existingTeacherLink.remove();
+        }
+        
+        // Add teacher link if user is a teacher
+        if (Auth.isTeacher()) {
+            const teacherLink = document.createElement('a');
+            teacherLink.href = '#';
+            teacherLink.className = 'nav-link teacher-link';
+            teacherLink.dataset.route = 'teacher';
+            teacherLink.innerHTML = '<i class="fas fa-chalkboard-teacher"></i> <span>Dashboard</span>';
+            teacherLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                Router.navigate('teacher');
+            });
+            navLinks.appendChild(teacherLink);
+        }
     };
 
     /**

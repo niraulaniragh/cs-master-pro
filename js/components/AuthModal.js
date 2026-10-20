@@ -5,6 +5,7 @@
 const AuthModal = {
     isOpen: false,
     mode: 'login', // 'login' or 'signup'
+    selectedAccountType: 'student', // 'student' or 'teacher'
     
     /**
      * Show the auth modal
@@ -12,6 +13,7 @@ const AuthModal = {
     show: (mode = 'login') => {
         AuthModal.mode = mode;
         AuthModal.isOpen = true;
+        AuthModal.selectedAccountType = 'student';
         AuthModal.render();
         document.body.classList.add('modal-open');
     },
@@ -34,6 +36,16 @@ const AuthModal = {
     switchMode: (mode) => {
         AuthModal.mode = mode;
         AuthModal.render();
+    },
+    
+    /**
+     * Select account type
+     */
+    selectAccountType: (type) => {
+        AuthModal.selectedAccountType = type;
+        document.querySelectorAll('.account-type-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.type === type);
+        });
     },
 
     /**
@@ -68,6 +80,24 @@ const AuthModal = {
                     
                     <form class="auth-form" onsubmit="AuthModal.handleSubmit(event)">
                         ${AuthModal.mode === 'signup' ? `
+                            <div class="auth-field account-type-field">
+                                <label>I am a...</label>
+                                <div class="account-type-selector">
+                                    <button type="button" class="account-type-btn ${AuthModal.selectedAccountType === 'student' ? 'active' : ''}" 
+                                            data-type="student" onclick="AuthModal.selectAccountType('student')">
+                                        <span class="type-icon">🎒</span>
+                                        <span class="type-label">Student</span>
+                                        <span class="type-desc">Learn & practice</span>
+                                    </button>
+                                    <button type="button" class="account-type-btn ${AuthModal.selectedAccountType === 'teacher' ? 'active' : ''}"
+                                            data-type="teacher" onclick="AuthModal.selectAccountType('teacher')">
+                                        <span class="type-icon">👩‍🏫</span>
+                                        <span class="type-label">Teacher</span>
+                                        <span class="type-desc">Create classrooms & host games</span>
+                                    </button>
+                                </div>
+                            </div>
+                            
                             <div class="auth-field">
                                 <label for="auth-username">Username</label>
                                 <input type="text" id="auth-username" name="username" 
@@ -207,12 +237,15 @@ const AuthModal = {
                 return;
             }
 
-            // Attempt registration
-            const result = Auth.register(username, email, password);
+            // Attempt registration with account type
+            const result = Auth.register(username, email, password, AuthModal.selectedAccountType);
             
             if (result.success) {
                 AuthModal.hide();
-                Toast.show(`Welcome, ${result.user.username}! 🎉`, 'success');
+                const welcome = AuthModal.selectedAccountType === 'teacher' 
+                    ? `Welcome, ${result.user.username}! 👩‍🏫 You can now create classrooms!`
+                    : `Welcome, ${result.user.username}! 🎉`;
+                Toast.show(welcome, 'success');
                 // Reload app to show authenticated state
                 App.init();
             } else {

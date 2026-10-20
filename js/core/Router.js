@@ -10,7 +10,8 @@ const Router = (() => {
         practice: PracticeView,
         tools: ToolsView,
         playground: PlaygroundView,
-        games: GamesView
+        games: GamesView,
+        teacher: TeacherView
     };
 
     let currentView = null;

@@ -69,7 +69,7 @@ const Auth = {
     /**
      * Register a new user
      */
-    register: (username, email, password) => {
+    register: (username, email, password, accountType = 'student') => {
         // Validation
         if (!username || username.length < 3) {
             return { success: false, error: 'Username must be at least 3 characters' };
@@ -81,6 +81,10 @@ const Auth = {
         
         if (!Auth.isValidPassword(password)) {
             return { success: false, error: 'Password must be at least 6 characters' };
+        }
+        
+        if (!['student', 'teacher'].includes(accountType)) {
+            return { success: false, error: 'Invalid account type' };
         }
 
         const users = Auth.getUsers();
@@ -105,6 +109,7 @@ const Auth = {
             username: username.trim(),
             email: normalizedEmail,
             passwordHash: Auth.hashPassword(password),
+            accountType: accountType,
             createdAt: new Date().toISOString(),
             profile: {
                 xp: 0,
@@ -114,7 +119,16 @@ const Auth = {
                 achievements: [],
                 streak: 0,
                 lastActive: new Date().toISOString()
-            }
+            },
+            // Teacher-specific fields
+            ...(accountType === 'teacher' ? {
+                classrooms: [],
+                school: ''
+            } : {}),
+            // Student-specific fields
+            ...(accountType === 'student' ? {
+                joinedClassrooms: []
+            } : {})
         };
 
         users[normalizedEmail] = newUser;
@@ -164,6 +178,7 @@ const Auth = {
             userId: user.id,
             email: user.email,
             username: user.username,
+            accountType: user.accountType || 'student',
             loginTime: new Date().toISOString(),
             rememberMe: true
         };
@@ -321,5 +336,50 @@ const Auth = {
         Auth.saveUsers(users);
 
         return { success: true };
+    },
+    
+    /**
+     * Check if current user is a teacher
+     */
+    isTeacher: () => {
+        const session = Auth.getSession();
+        return session?.accountType === 'teacher';
+    },
+    
+    /**
+     * Check if current user is a student
+     */
+    isStudent: () => {
+        const session = Auth.getSession();
+        return session?.accountType === 'student';
+    },
+    
+    /**
+     * Get account type
+     */
+    getAccountType: () => {
+        const session = Auth.getSession();
+        return session?.accountType || 'student';
+    },
+    
+    /**
+     * Get user by ID
+     */
+    getUserById: (userId) => {
+        const users = Auth.getUsers();
+        return Object.values(users).find(u => u.id === userId) || null;
+    },
+    
+    /**
+     * Update user data directly
+     */
+    updateUser: (email, updates) => {
+        const users = Auth.getUsers();
+        if (users[email]) {
+            users[email] = { ...users[email], ...updates };
+            Auth.saveUsers(users);
+            return true;
+        }
+        return false;
     }
 };

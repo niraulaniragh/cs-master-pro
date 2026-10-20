@@ -133,6 +133,9 @@ const HomeView = {
                     </div>
                 </section>
 
+                <!-- Classroom Section (for students) -->
+                ${HomeView.renderClassroomSection()}
+
                 <!-- Topics Overview -->
                 <section class="topic-progress-section">
                     <div class="section-header-row">
@@ -207,5 +210,137 @@ const HomeView = {
         if (level >= 4) return { name: 'Intermediate', icon: '📈', color: '#22c55e' };
         if (level >= 2) return { name: 'Learner', icon: '📚', color: '#22d3ee' };
         return { name: 'Beginner', icon: '🌱', color: '#6b7280' };
+    },
+    
+    // Classroom section for students
+    renderClassroomSection: () => {
+        // Only show for students
+        if (!Auth.isStudent()) return '';
+        
+        const classrooms = Classroom.getStudentClassrooms();
+        const availableGames = Classroom.getAvailableGames();
+        
+        return `
+            <section class="classroom-section">
+                <div class="section-header-row">
+                    <h3>🏫 My Classrooms</h3>
+                    <button class="btn btn-small btn-primary" onclick="HomeView.showJoinClassroom()">
+                        + Join Classroom
+                    </button>
+                </div>
+                
+                ${classrooms.length === 0 ? `
+                    <div class="no-classrooms-card">
+                        <span class="no-classroom-icon">🏫</span>
+                        <p>You haven't joined any classrooms yet.</p>
+                        <p class="hint">Ask your teacher for a classroom code!</p>
+                    </div>
+                ` : `
+                    <div class="classrooms-row">
+                        ${classrooms.map(c => `
+                            <div class="student-classroom-card">
+                                <div class="classroom-info">
+                                    <h4>${c.name}</h4>
+                                    <p>Teacher: ${c.teacherName}</p>
+                                    <span class="student-count">${c.students.length} students</span>
+                                </div>
+                                <button class="btn btn-tiny btn-secondary" onclick="HomeView.leaveClassroom('${c.code}')">
+                                    Leave
+                                </button>
+                            </div>
+                        `).join('')}
+                    </div>
+                `}
+                
+                ${availableGames.length > 0 ? `
+                    <div class="live-games">
+                        <h4>🎮 Live Games</h4>
+                        <div class="live-games-list">
+                            ${availableGames.map(g => `
+                                <div class="live-game-card">
+                                    <span class="game-icon">${g.gameType === 'race' ? '🏎️' : '⚡'}</span>
+                                    <div class="game-details">
+                                        <span class="game-name">${g.gameType === 'race' ? 'Car Race' : 'Speed Run'}</span>
+                                        <span class="game-classroom">${g.classroomName}</span>
+                                        <span class="game-status-badge status-${g.status}">${g.status}</span>
+                                    </div>
+                                    <button class="btn btn-small btn-primary" onclick="HomeView.joinGame('${g.id}')">
+                                        ${g.status === 'waiting' ? 'Join' : 'Watch'}
+                                    </button>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+            </section>
+        `;
+    },
+    
+    showJoinClassroom: () => {
+        Modal.show({
+            title: '🏫 Join a Classroom',
+            content: `
+                <div class="join-classroom-form">
+                    <p>Enter the 6-character code from your teacher:</p>
+                    <div class="code-input-wrapper">
+                        <input type="text" id="classroom-code-input" 
+                               placeholder="e.g., ABC123" 
+                               maxlength="6"
+                               style="text-transform: uppercase; font-family: var(--font-mono); font-size: 1.5rem; text-align: center; letter-spacing: 0.3em;">
+                    </div>
+                </div>
+            `,
+            footer: `
+                <button class="btn btn-secondary" id="join-cancel">Cancel</button>
+                <button class="btn btn-primary" id="join-submit">Join Classroom</button>
+            `
+        });
+        
+        setTimeout(() => {
+            document.getElementById('classroom-code-input')?.focus();
+            document.getElementById('join-cancel')?.addEventListener('click', Modal.close);
+            document.getElementById('join-submit')?.addEventListener('click', () => {
+                const code = document.getElementById('classroom-code-input').value.trim().toUpperCase();
+                if (code.length !== 6) {
+                    Toast.show('Please enter a 6-character code', 'error');
+                    return;
+                }
+                
+                const result = Classroom.join(code);
+                if (result.success) {
+                    Modal.close();
+                    Toast.show(`Joined ${result.classroom.name}!`, 'success');
+                    // Refresh the page
+                    Router.navigate('home');
+                } else {
+                    Toast.show(result.error, 'error');
+                }
+            });
+        }, 0);
+    },
+    
+    leaveClassroom: (code) => {
+        const classroom = Classroom.get(code);
+        if (confirm(`Leave "${classroom?.name}"? You can rejoin later with the code.`)) {
+            const result = Classroom.leave(code);
+            if (result.success) {
+                Toast.show('Left classroom', 'info');
+                Router.navigate('home');
+            } else {
+                Toast.show(result.error, 'error');
+            }
+        }
+    },
+    
+    joinGame: (gameId) => {
+        const result = Classroom.joinGame(gameId);
+        if (result.success) {
+            const game = result.game;
+            if (game.gameType === 'race') {
+                CarRace.startAsPlayer(game);
+            }
+        } else {
+            Toast.show(result.error, 'error');
+        }
     }
 };
