@@ -451,17 +451,25 @@ const Millionaire = {
 
     endGame: (walkedAway, prize, isMillionaire = false) => {
         // Save stats
-        Millionaire.saveStats(Millionaire.currentQuestion, prize, isMillionaire);
+        Millionaire.saveStats(Millionaire.currentQuestion, prize || 0, isMillionaire);
         
         // Award XP
-        const xpEarned = Math.floor(prize / 100);
-        AppState.addXP(xpEarned);
+        const xpEarned = Math.floor((prize || 0) / 100);
+        if (xpEarned > 0) {
+            AppState.addXP(xpEarned);
+        }
         
         // Achievements
         if (isMillionaire) AppState.unlockAchievement('millionaire');
         if (Millionaire.currentQuestion >= 10) AppState.unlockAchievement('quiz_master');
         
         const container = document.querySelector('.millionaire-container');
+        if (!container) {
+            console.error('Millionaire container not found');
+            Millionaire.close();
+            return;
+        }
+        
         container.innerHTML = `
             <button class="game-close-btn" onclick="Millionaire.close()">✕</button>
             
@@ -471,7 +479,7 @@ const Millionaire = {
                 </div>
                 
                 <div class="mill-final-prize">
-                    <span class="mill-fp-value">${prize.toLocaleString()}</span>
+                    <span class="mill-fp-value">${(prize || 0).toLocaleString()}</span>
                     <span class="mill-fp-label">XP Won</span>
                 </div>
                 
