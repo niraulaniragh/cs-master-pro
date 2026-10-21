@@ -226,7 +226,10 @@ const Millionaire = {
         document.querySelectorAll('.mill-answer').forEach(btn => {
             btn.classList.remove('selected');
         });
-        document.querySelector(`.mill-answer[data-index="${index}"]`).classList.add('selected');
+        const selectedBtn = document.querySelector(`.mill-answer[data-index="${index}"]`);
+        if (selectedBtn) {
+            selectedBtn.classList.add('selected');
+        }
         
         // Show confirmation
         Millionaire.showConfirmation();
@@ -245,7 +248,10 @@ const Millionaire = {
         
         // Remove any existing confirm box
         document.querySelector('.mill-confirm-box')?.remove();
-        document.querySelector('.mill-main-area').appendChild(confirmBox);
+        const mainArea = document.querySelector('.mill-main-area');
+        if (mainArea) {
+            mainArea.appendChild(confirmBox);
+        }
     },
 
     lockAnswer: () => {
@@ -257,13 +263,20 @@ const Millionaire = {
         
         // Dramatic pause and reveal
         const selectedBtn = document.querySelector(`.mill-answer[data-index="${Millionaire.selectedAnswer}"]`);
+        if (!selectedBtn) {
+            console.error('Selected button not found');
+            return;
+        }
         selectedBtn.classList.add('thinking');
         
         setTimeout(() => {
             selectedBtn.classList.remove('thinking');
             
             // Show correct answer
-            document.querySelector(`.mill-answer[data-index="${question.correct}"]`).classList.add('correct');
+            const correctBtn = document.querySelector(`.mill-answer[data-index="${question.correct}"]`);
+            if (correctBtn) {
+                correctBtn.classList.add('correct');
+            }
             
             if (!isCorrect) {
                 selectedBtn.classList.add('wrong');
@@ -281,10 +294,16 @@ const Millionaire = {
 
     correctAnswer: () => {
         Millionaire.currentPrize = Millionaire.prizes[Millionaire.currentQuestion];
-        document.getElementById('mill-current-prize').textContent = Millionaire.currentPrize.toLocaleString() + ' XP';
+        const prizeEl = document.getElementById('mill-current-prize');
+        if (prizeEl) {
+            prizeEl.textContent = Millionaire.currentPrize.toLocaleString() + ' XP';
+        }
         
         // Update ladder
-        document.querySelector(`.mill-prize-row[data-level="${Millionaire.currentQuestion}"]`).classList.add('won');
+        const prizeRow = document.querySelector(`.mill-prize-row[data-level="${Millionaire.currentQuestion}"]`);
+        if (prizeRow) {
+            prizeRow.classList.add('won');
+        }
         
         Toast.show(`🎉 Correct! You've won ${Millionaire.currentPrize.toLocaleString()} XP!`, 'success');
         
@@ -327,7 +346,8 @@ const Millionaire = {
         if (!Millionaire.lifelines.fiftyFifty || Millionaire.isAnswerLocked) return;
         
         Millionaire.lifelines.fiftyFifty = false;
-        document.getElementById('ll-fifty').classList.add('used');
+        const fiftyBtn = document.getElementById('ll-fifty');
+        if (fiftyBtn) fiftyBtn.classList.add('used');
         
         const question = Millionaire.questions[Millionaire.currentQuestion];
         const wrongAnswers = [0, 1, 2, 3].filter(i => i !== question.correct);
@@ -335,8 +355,10 @@ const Millionaire = {
         
         toRemove.forEach(index => {
             const btn = document.querySelector(`.mill-answer[data-index="${index}"]`);
-            btn.classList.add('eliminated');
-            btn.disabled = true;
+            if (btn) {
+                btn.classList.add('eliminated');
+                btn.disabled = true;
+            }
         });
         
         Toast.show('50:50 used! Two wrong answers removed.', 'info');
@@ -346,7 +368,8 @@ const Millionaire = {
         if (!Millionaire.lifelines.askAudience || Millionaire.isAnswerLocked) return;
         
         Millionaire.lifelines.askAudience = false;
-        document.getElementById('ll-audience').classList.add('used');
+        const audienceBtn = document.getElementById('ll-audience');
+        if (audienceBtn) audienceBtn.classList.add('used');
         
         const question = Millionaire.questions[Millionaire.currentQuestion];
         
@@ -379,14 +402,16 @@ const Millionaire = {
         
         const resultsDiv = document.createElement('div');
         resultsDiv.innerHTML = resultsHtml;
-        document.querySelector('.mill-main-area').appendChild(resultsDiv.firstElementChild);
+        const mainArea = document.querySelector('.mill-main-area');
+        if (mainArea) mainArea.appendChild(resultsDiv.firstElementChild);
     },
 
     usePhoneFriend: () => {
         if (!Millionaire.lifelines.phoneFriend || Millionaire.isAnswerLocked) return;
         
         Millionaire.lifelines.phoneFriend = false;
-        document.getElementById('ll-phone').classList.add('used');
+        const phoneBtn = document.getElementById('ll-phone');
+        if (phoneBtn) phoneBtn.classList.add('used');
         
         const question = Millionaire.questions[Millionaire.currentQuestion];
         const letters = ['A', 'B', 'C', 'D'];
