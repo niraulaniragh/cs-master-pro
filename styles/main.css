@@ -12336,15 +12336,16 @@ textarea:focus {
     color: #cdd6f4;
     background: transparent;
     z-index: 1;
+    display: none; /* Disable syntax highlight overlay for now */
 }
 
 #code-editor {
-    color: transparent;
+    color: #cdd6f4 !important;
     caret-color: #f5e0dc;
-    background: transparent;
+    background: #1e1e2e !important;
     z-index: 2;
     outline: none;
-    -webkit-text-fill-color: transparent;
+    -webkit-text-fill-color: #cdd6f4 !important;
 }
 
 #code-editor::placeholder {
