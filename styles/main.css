@@ -3758,6 +3758,34 @@ label {
     font-size: 0.875rem;
 }
 
+.sandbox-actions {
+    margin-top: var(--space-5);
+    padding: var(--space-5);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    text-align: center;
+}
+
+.sandbox-actions p {
+    color: var(--text-muted);
+    margin-bottom: var(--space-4);
+    font-size: 0.9375rem;
+}
+
+.sandbox-actions .btn {
+    margin: 0 var(--space-2);
+    padding: var(--space-3) var(--space-5);
+}
+
+@media (max-width: 600px) {
+    .sandbox-actions .btn {
+        display: block;
+        width: 100%;
+        margin: var(--space-2) 0;
+    }
+}
+
 /* ==========================================
    Challenges Section
 ========================================== */

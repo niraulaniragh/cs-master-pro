@@ -83,7 +83,7 @@ for i in range(1, 6):
                 
                 <div class="output-section">
                     <div class="output-header">
-                        <span>📤 Expected Output</span>
+                        <span>📤 Example Output</span>
                     </div>
                     <div class="output-display" id="output-display">
                         <pre>Hello, World!
@@ -93,7 +93,16 @@ Count: 3
 Count: 4
 Count: 5</pre>
                     </div>
-                    <p class="sandbox-note">💡 Use the <strong>Challenges</strong> tab for interactive coding practice with automatic checking!</p>
+                    
+                    <div class="sandbox-actions">
+                        <p>Ready to practice? Try these:</p>
+                        <button class="btn btn-primary" onclick="PlaygroundView.goToChallenges()">
+                            🎯 Go to Challenges
+                        </button>
+                        <button class="btn btn-secondary" onclick="PlaygroundView.goToLearn()">
+                            📖 Learn Python
+                        </button>
+                    </div>
                 </div>
             </div>
         `;
@@ -107,8 +116,28 @@ Count: 5</pre>
     showMode: (mode, btn) => {
         document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
         document.querySelectorAll('.playground-mode').forEach(m => m.classList.remove('active'));
-        btn.classList.add('active');
+        if (btn) btn.classList.add('active');
         document.getElementById(`${mode}-mode`).classList.add('active');
+        
+        // Update tab button active state when called programmatically
+        if (!btn) {
+            const tabs = document.querySelectorAll('.mode-tab');
+            tabs.forEach(tab => {
+                if (tab.textContent.toLowerCase().includes(mode)) {
+                    tab.classList.add('active');
+                }
+            });
+        }
+    },
+    
+    goToChallenges: () => {
+        const challengesTab = document.querySelector('.mode-tab:nth-child(2)');
+        PlaygroundView.showMode('challenges', challengesTab);
+    },
+    
+    goToLearn: () => {
+        const learnTab = document.querySelector('.mode-tab:nth-child(3)');
+        PlaygroundView.showMode('learn', learnTab);
     },
 
     // ==========================================
