@@ -8,6 +8,11 @@ const Auth = {
     // Storage keys
     USERS_KEY: 'csmaster_users',
     SESSION_KEY: 'csmaster_session',
+    RATE_LIMIT_KEY: 'csmaster_rate_limit',
+    
+    // Rate limiting config
+    MAX_FAILED_ATTEMPTS: 5,
+    LOCKOUT_DURATION: 15 * 60 * 1000, // 15 minutes in milliseconds
     
     /**
      * Initialize auth module
@@ -39,18 +44,41 @@ const Auth = {
     },
 
     /**
-     * Hash password (simple hash for demo - use bcrypt in production)
+     * Generate a random salt for password hashing
      */
-    hashPassword: (password) => {
-        // Simple hash with salt - note: for demo only, use bcrypt in production
-        let hash = 0;
-        const str = password + 'CSMasterPro_2024';
-        for (let i = 0; i < str.length; i++) {
-            const char = str.charCodeAt(i);
-            hash = ((hash << 5) - hash) + char;
-            hash = hash & hash;
+    generateSalt: () => {
+        const array = new Uint8Array(16);
+        crypto.getRandomValues(array);
+        return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+    },
+
+    /**
+     * Hash password using SHA-256 with Web Crypto API
+     * @param {string} password - The password to hash
+     * @param {string} salt - The salt to use (generates new one if not provided)
+     * @returns {Promise<{hash: string, salt: string}>}
+     */
+    hashPassword: async (password, salt = null) => {
+        if (!salt) {
+            salt = Auth.generateSalt();
         }
-        return hash.toString(16);
+        const data = new TextEncoder().encode(password + salt);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hash = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
+        return { hash, salt };
+    },
+
+    /**
+     * Verify password against stored hash
+     * @param {string} password - The password to verify
+     * @param {string} storedHash - The stored hash
+     * @param {string} salt - The salt used for hashing
+     * @returns {Promise<boolean>}
+     */
+    verifyPassword: async (password, storedHash, salt) => {
+        const { hash } = await Auth.hashPassword(password, salt);
+        return hash === storedHash;
     },
 
     /**
@@ -62,19 +90,130 @@ const Auth = {
     },
 
     /**
-     * Validate password strength
+     * Validate password strength (min 8 chars, at least 1 number)
      */
     isValidPassword: (password) => {
-        return password.length >= 6;
+        if (password.length < 8) return false;
+        if (!/\d/.test(password)) return false;
+        return true;
+    },
+
+    /**
+     * Sanitize username (alphanumeric + underscore only, max 20 chars)
+     */
+    sanitizeUsername: (username) => {
+        if (!username) return '';
+        // Remove any characters that aren't alphanumeric or underscore
+        return username.replace(/[^a-zA-Z0-9_]/g, '').substring(0, 20);
+    },
+
+    /**
+     * Validate username format
+     */
+    isValidUsername: (username) => {
+        // Check length (3-20 characters)
+        if (username.length < 3 || username.length > 20) return false;
+        // Check format (alphanumeric + underscore only)
+        if (!/^[a-zA-Z0-9_]+$/.test(username)) return false;
+        return true;
+    },
+
+    /**
+     * Get rate limit data for an email
+     */
+    getRateLimitData: () => {
+        try {
+            return JSON.parse(localStorage.getItem(Auth.RATE_LIMIT_KEY)) || {};
+        } catch {
+            return {};
+        }
+    },
+
+    /**
+     * Save rate limit data
+     */
+    saveRateLimitData: (data) => {
+        localStorage.setItem(Auth.RATE_LIMIT_KEY, JSON.stringify(data));
+    },
+
+    /**
+     * Check if account is locked due to failed attempts
+     */
+    isAccountLocked: (email) => {
+        const data = Auth.getRateLimitData();
+        const normalizedEmail = email.toLowerCase().trim();
+        const record = data[normalizedEmail];
+        
+        if (!record) return false;
+        
+        // Check if lockout has expired
+        if (record.lockedUntil && Date.now() > record.lockedUntil) {
+            // Reset the record
+            delete data[normalizedEmail];
+            Auth.saveRateLimitData(data);
+            return false;
+        }
+        
+        return record.lockedUntil && Date.now() < record.lockedUntil;
+    },
+
+    /**
+     * Record a failed login attempt
+     */
+    recordFailedAttempt: (email) => {
+        const data = Auth.getRateLimitData();
+        const normalizedEmail = email.toLowerCase().trim();
+        
+        if (!data[normalizedEmail]) {
+            data[normalizedEmail] = { attempts: 0, lastAttempt: null, lockedUntil: null };
+        }
+        
+        data[normalizedEmail].attempts++;
+        data[normalizedEmail].lastAttempt = Date.now();
+        
+        // Lock account if too many attempts
+        if (data[normalizedEmail].attempts >= Auth.MAX_FAILED_ATTEMPTS) {
+            data[normalizedEmail].lockedUntil = Date.now() + Auth.LOCKOUT_DURATION;
+        }
+        
+        Auth.saveRateLimitData(data);
+        return data[normalizedEmail].attempts;
+    },
+
+    /**
+     * Clear failed attempts on successful login
+     */
+    clearFailedAttempts: (email) => {
+        const data = Auth.getRateLimitData();
+        const normalizedEmail = email.toLowerCase().trim();
+        delete data[normalizedEmail];
+        Auth.saveRateLimitData(data);
+    },
+
+    /**
+     * Get remaining lockout time in minutes
+     */
+    getRemainingLockoutTime: (email) => {
+        const data = Auth.getRateLimitData();
+        const normalizedEmail = email.toLowerCase().trim();
+        const record = data[normalizedEmail];
+        
+        if (!record || !record.lockedUntil) return 0;
+        
+        const remaining = record.lockedUntil - Date.now();
+        return Math.ceil(remaining / 60000); // Convert to minutes
     },
 
     /**
      * Register a new user
      */
-    register: (username, email, password, accountType = 'student') => {
+    register: async (username, email, password, accountType = 'student') => {
+        // Sanitize username
+        const sanitizedUsername = Auth.sanitizeUsername(username);
+        
         // Validation
-        if (!username || username.length < 3) {
-            return { success: false, error: 'Username must be at least 3 characters' };
+        if (!Auth.isValidUsername(sanitizedUsername)) {
+            return { success: false, error: 'Username must be 3-20 characters, alphanumeric and underscores only' };
         }
         
         if (!Auth.isValidEmail(email)) {
@@ -82,7 +221,7 @@ const Auth = {
         }
         
         if (!Auth.isValidPassword(password)) {
-            return { success: false, error: 'Password must be at least 6 characters' };
+            return { success: false, error: 'Password must be at least 8 characters with at least 1 number' };
         }
         
         if (!['student', 'teacher'].includes(accountType)) {
@@ -99,18 +238,22 @@ const Auth = {
 
         // Check if username is taken
         const usernameTaken = Object.values(users).some(u => 
-            u.username.toLowerCase() === username.toLowerCase()
+            u.username.toLowerCase() === sanitizedUsername.toLowerCase()
         );
         if (usernameTaken) {
             return { success: false, error: 'This username is already taken' };
         }
 
+        // Hash password with salt
+        const { hash, salt } = await Auth.hashPassword(password);
+
         // Create user
         const newUser = {
             id: Date.now().toString(36) + Math.random().toString(36).substring(2),
-            username: username.trim(),
+            username: sanitizedUsername,
             email: normalizedEmail,
-            passwordHash: Auth.hashPassword(password),
+            passwordHash: hash,
+            passwordSalt: salt,
             accountType: accountType,
             createdAt: new Date().toISOString(),
             profile: {
@@ -145,22 +288,42 @@ const Auth = {
     /**
      * Login user
      */
-    login: (email, password) => {
+    login: async (email, password) => {
         if (!email || !password) {
             return { success: false, error: 'Please enter email and password' };
         }
 
-        const users = Auth.getUsers();
         const normalizedEmail = email.toLowerCase().trim();
+
+        // Check rate limiting
+        if (Auth.isAccountLocked(normalizedEmail)) {
+            const remaining = Auth.getRemainingLockoutTime(normalizedEmail);
+            return { success: false, error: `Account temporarily locked. Try again in ${remaining} minute(s).` };
+        }
+
+        const users = Auth.getUsers();
         const user = users[normalizedEmail];
 
         if (!user) {
+            Auth.recordFailedAttempt(normalizedEmail);
             return { success: false, error: 'No account found with this email' };
         }
 
-        if (user.passwordHash !== Auth.hashPassword(password)) {
-            return { success: false, error: 'Incorrect password' };
+        // Verify password
+        const isValid = await Auth.verifyPassword(password, user.passwordHash, user.passwordSalt);
+        if (!isValid) {
+            const attempts = Auth.recordFailedAttempt(normalizedEmail);
+            const remaining = Auth.MAX_FAILED_ATTEMPTS - attempts;
+            if (remaining > 0) {
+                return { success: false, error: `Incorrect password. ${remaining} attempt(s) remaining.` };
+            } else {
+                const lockoutMins = Math.ceil(Auth.LOCKOUT_DURATION / 60000);
+                return { success: false, error: `Too many failed attempts. Account locked for ${lockoutMins} minutes.` };
+            }
         }
+
+        // Clear failed attempts on successful login
+        Auth.clearFailedAttempts(normalizedEmail);
 
         // Update last active
         user.profile.lastActive = new Date().toISOString();
@@ -184,9 +347,8 @@ const Auth = {
             loginTime: new Date().toISOString(),
             rememberMe: true
         };
-        // Store in both localStorage (persistent) and sessionStorage (backup)
+        // Store only in localStorage to prevent desync
         localStorage.setItem(Auth.SESSION_KEY, JSON.stringify(session));
-        sessionStorage.setItem(Auth.SESSION_KEY, JSON.stringify(session));
     },
 
     /**
@@ -194,15 +356,8 @@ const Auth = {
      */
     getSession: () => {
         try {
-            // Try localStorage first, then sessionStorage
-            let session = localStorage.getItem(Auth.SESSION_KEY);
-            if (!session) {
-                session = sessionStorage.getItem(Auth.SESSION_KEY);
-                // If found in session, copy to localStorage
-                if (session) {
-                    localStorage.setItem(Auth.SESSION_KEY, session);
-                }
-            }
+            // Only check localStorage to prevent desync issues
+            const session = localStorage.getItem(Auth.SESSION_KEY);
             return session ? JSON.parse(session) : null;
         } catch {
             return null;
@@ -294,7 +449,7 @@ const Auth = {
     /**
      * Delete account
      */
-    deleteAccount: (password) => {
+    deleteAccount: async (password) => {
         const session = Auth.getSession();
         if (!session) return { success: false, error: 'Not logged in' };
 
@@ -303,7 +458,8 @@ const Auth = {
 
         if (!user) return { success: false, error: 'User not found' };
 
-        if (user.passwordHash !== Auth.hashPassword(password)) {
+        const isValid = await Auth.verifyPassword(password, user.passwordHash, user.passwordSalt);
+        if (!isValid) {
             return { success: false, error: 'Incorrect password' };
         }
 
@@ -317,7 +473,7 @@ const Auth = {
     /**
      * Change password
      */
-    changePassword: (currentPassword, newPassword) => {
+    changePassword: async (currentPassword, newPassword) => {
         const session = Auth.getSession();
         if (!session) return { success: false, error: 'Not logged in' };
 
@@ -326,15 +482,19 @@ const Auth = {
 
         if (!user) return { success: false, error: 'User not found' };
 
-        if (user.passwordHash !== Auth.hashPassword(currentPassword)) {
+        const isValid = await Auth.verifyPassword(currentPassword, user.passwordHash, user.passwordSalt);
+        if (!isValid) {
             return { success: false, error: 'Current password is incorrect' };
         }
 
         if (!Auth.isValidPassword(newPassword)) {
-            return { success: false, error: 'New password must be at least 6 characters' };
+            return { success: false, error: 'New password must be at least 8 characters with at least 1 number' };
         }
 
-        user.passwordHash = Auth.hashPassword(newPassword);
+        // Hash new password with new salt
+        const { hash, salt } = await Auth.hashPassword(newPassword);
+        user.passwordHash = hash;
+        user.passwordSalt = salt;
         Auth.saveUsers(users);
 
         return { success: true };

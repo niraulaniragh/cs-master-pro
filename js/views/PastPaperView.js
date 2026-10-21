@@ -391,7 +391,7 @@ const PastPaperView = {
                                 
                                 <div class="pp-result-answer">
                                     <p><strong>Your Answer:</strong></p>
-                                    <pre class="pp-user-answer">${answer?.answer || '(No answer provided)'}</pre>
+                                    <pre class="pp-user-answer">${Helpers.escapeHtml(answer?.answer || '(No answer provided)')}</pre>
                                 </div>
                                 
                                 <div class="pp-mark-scheme">

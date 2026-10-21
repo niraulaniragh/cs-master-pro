@@ -382,5 +382,12 @@ const MemoryMatch = {
 
     getBestScores: () => {
         return JSON.parse(localStorage.getItem('csmaster_memory_best') || '{}');
+    },
+
+    cleanup: () => {
+        // Stop timer
+        MemoryMatch.stopTimer();
+        MemoryMatch.isLocked = false;
+        console.log('🃏 MemoryMatch cleanup');
     }
 };

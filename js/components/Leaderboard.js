@@ -88,24 +88,24 @@ const Leaderboard = {
                 <div class="leaderboard-podium">
                     ${rankings.length >= 2 ? `
                         <div class="podium-spot second">
-                            <div class="podium-avatar">${rankings[1].username.charAt(0).toUpperCase()}</div>
-                            <div class="podium-name">${rankings[1].username}</div>
+                            <div class="podium-avatar">${Helpers.escapeHtml(rankings[1].username.charAt(0).toUpperCase())}</div>
+                            <div class="podium-name">${Helpers.escapeHtml(rankings[1].username)}</div>
                             <div class="podium-xp">${rankings[1].xp.toLocaleString()} XP</div>
                             <div class="podium-rank">🥈</div>
                         </div>
                     ` : ''}
                     ${rankings.length >= 1 ? `
                         <div class="podium-spot first">
-                            <div class="podium-avatar gold">${rankings[0].username.charAt(0).toUpperCase()}</div>
-                            <div class="podium-name">${rankings[0].username}</div>
+                            <div class="podium-avatar gold">${Helpers.escapeHtml(rankings[0].username.charAt(0).toUpperCase())}</div>
+                            <div class="podium-name">${Helpers.escapeHtml(rankings[0].username)}</div>
                             <div class="podium-xp">${rankings[0].xp.toLocaleString()} XP</div>
                             <div class="podium-rank">🥇</div>
                         </div>
                     ` : ''}
                     ${rankings.length >= 3 ? `
                         <div class="podium-spot third">
-                            <div class="podium-avatar">${rankings[2].username.charAt(0).toUpperCase()}</div>
-                            <div class="podium-name">${rankings[2].username}</div>
+                            <div class="podium-avatar">${Helpers.escapeHtml(rankings[2].username.charAt(0).toUpperCase())}</div>
+                            <div class="podium-name">${Helpers.escapeHtml(rankings[2].username)}</div>
                             <div class="podium-xp">${rankings[2].xp.toLocaleString()} XP</div>
                             <div class="podium-rank">🥉</div>
                         </div>

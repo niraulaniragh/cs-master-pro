@@ -114,6 +114,11 @@ const AnalyticsView = {
     init: () => {
         console.log('📊 Analytics view initialized');
     },
+
+    cleanup: () => {
+        // No intervals or event listeners to clean up
+        console.log('📊 Analytics view cleanup');
+    },
     
     // Get study time statistics
     getStudyTimeStats: () => {

@@ -1,5 +1,6 @@
 /**
  * PracticeView.js - Quiz, Flashcard & Past Paper Study Mode
+ * With keyboard navigation and touch gesture support
  */
 
 const PracticeView = {
@@ -11,6 +12,7 @@ const PracticeView = {
     answers: [],
     selectedTopic: 'all',
     isActive: false,
+    hasAnswered: false,
     
     // Flashcard state
     flashcards: [],
@@ -25,6 +27,16 @@ const PracticeView = {
     showingMarkScheme: false,
     
     mode: 'quiz', // 'quiz', 'flashcards', or 'pastpaper'
+    
+    // Touch/swipe state
+    touchStartX: 0,
+    touchStartY: 0,
+    touchEndX: 0,
+    touchEndY: 0,
+    minSwipeDistance: 50,
+    
+    // Keyboard handler reference for cleanup
+    keyboardHandler: null,
 
     render: () => {
         return `
@@ -177,8 +189,8 @@ const PracticeView = {
                         </div>
                     </div>
                     
-                    <div class="flashcard-wrapper">
-                        <div class="flashcard" id="flashcard" onclick="PracticeView.flipCard()">
+                    <div class="flashcard-wrapper" id="flashcard-wrapper">
+                        <div class="flashcard" id="flashcard" onclick="PracticeView.flipCard()" tabindex="0" role="button" aria-label="Flashcard - click or press Space to flip">
                             <div class="flashcard-inner">
                                 <div class="flashcard-front">
                                     <span class="flip-hint">Click to reveal answer</span>
@@ -191,6 +203,16 @@ const PracticeView = {
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    
+                    <!-- Swipe indicator for mobile -->
+                    <div class="swipe-indicator">
+                        👈 Swipe left for Review • Swipe right for Got It 👉
+                    </div>
+                    
+                    <!-- Keyboard hints for desktop -->
+                    <div class="flashcard-keyboard-hint">
+                        <kbd>Space</kbd> or <kbd>F</kbd> to flip • <kbd>←</kbd><kbd>→</kbd> to navigate • <kbd>G</kbd> Got it • <kbd>R</kbd> Review
                     </div>
                     
                     <div class="flashcard-actions">
@@ -235,6 +257,10 @@ const PracticeView = {
         console.log('🎯 Practice view initialized');
         PracticeView.isActive = false;
         PracticeView.mode = 'quiz';
+        PracticeView.hasAnswered = false;
+        
+        // Set up keyboard navigation
+        PracticeView.setupKeyboardNavigation();
         
         // Update flashcard count based on topic
         setTimeout(() => {
@@ -244,9 +270,218 @@ const PracticeView = {
             }
         }, 100);
     },
+    
+    // Clean up when leaving the view
+    cleanup: () => {
+        PracticeView.removeKeyboardNavigation();
+        PracticeView.removeSwipeGestures();
+    },
+    
+    // ==================== KEYBOARD NAVIGATION ====================
+    setupKeyboardNavigation: () => {
+        // Remove existing handler if any
+        PracticeView.removeKeyboardNavigation();
+        
+        PracticeView.keyboardHandler = (e) => {
+            // Don't handle if typing in an input
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+                return;
+            }
+            
+            // Quiz mode keyboard shortcuts
+            if (PracticeView.mode === 'quiz' && PracticeView.isActive) {
+                PracticeView.handleQuizKeyboard(e);
+            }
+            
+            // Flashcard mode keyboard shortcuts
+            if (PracticeView.mode === 'flashcards' && !document.getElementById('flashcard-container').classList.contains('hidden')) {
+                PracticeView.handleFlashcardKeyboard(e);
+            }
+        };
+        
+        document.addEventListener('keydown', PracticeView.keyboardHandler);
+    },
+    
+    removeKeyboardNavigation: () => {
+        if (PracticeView.keyboardHandler) {
+            document.removeEventListener('keydown', PracticeView.keyboardHandler);
+            PracticeView.keyboardHandler = null;
+        }
+    },
+    
+    handleQuizKeyboard: (e) => {
+        const key = e.key.toLowerCase();
+        
+        // If already answered, Enter continues to next
+        if (PracticeView.hasAnswered) {
+            if (key === 'enter') {
+                e.preventDefault();
+                PracticeView.nextQuestion();
+                return;
+            }
+            return;
+        }
+        
+        // Number keys 1-4 or A-D to select answers
+        let answerIndex = -1;
+        
+        if (key >= '1' && key <= '4') {
+            answerIndex = parseInt(key) - 1;
+        } else if (key >= 'a' && key <= 'd') {
+            answerIndex = key.charCodeAt(0) - 97; // a=0, b=1, c=2, d=3
+        }
+        
+        if (answerIndex >= 0 && answerIndex < 4) {
+            e.preventDefault();
+            const optionBtns = document.querySelectorAll('.option-btn:not(:disabled)');
+            if (optionBtns[answerIndex]) {
+                optionBtns[answerIndex].click();
+            }
+        }
+    },
+    
+    handleFlashcardKeyboard: (e) => {
+        const key = e.key.toLowerCase();
+        
+        switch (key) {
+            case ' ':
+            case 'f':
+                e.preventDefault();
+                PracticeView.flipCard();
+                break;
+            case 'arrowleft':
+                e.preventDefault();
+                PracticeView.prevCard();
+                break;
+            case 'arrowright':
+                e.preventDefault();
+                PracticeView.nextCard();
+                break;
+            case 'g':
+                e.preventDefault();
+                PracticeView.markKnown();
+                break;
+            case 'r':
+                e.preventDefault();
+                PracticeView.markReview();
+                break;
+        }
+    },
+    
+    // ==================== SWIPE GESTURES ====================
+    setupSwipeGestures: () => {
+        const flashcardWrapper = document.getElementById('flashcard-wrapper');
+        if (!flashcardWrapper) return;
+        
+        flashcardWrapper.addEventListener('touchstart', PracticeView.handleTouchStart, { passive: true });
+        flashcardWrapper.addEventListener('touchmove', PracticeView.handleTouchMove, { passive: true });
+        flashcardWrapper.addEventListener('touchend', PracticeView.handleTouchEnd, { passive: true });
+    },
+    
+    removeSwipeGestures: () => {
+        const flashcardWrapper = document.getElementById('flashcard-wrapper');
+        if (!flashcardWrapper) return;
+        
+        flashcardWrapper.removeEventListener('touchstart', PracticeView.handleTouchStart);
+        flashcardWrapper.removeEventListener('touchmove', PracticeView.handleTouchMove);
+        flashcardWrapper.removeEventListener('touchend', PracticeView.handleTouchEnd);
+    },
+    
+    handleTouchStart: (e) => {
+        PracticeView.touchStartX = e.changedTouches[0].screenX;
+        PracticeView.touchStartY = e.changedTouches[0].screenY;
+    },
+    
+    handleTouchMove: (e) => {
+        if (!PracticeView.touchStartX) return;
+        
+        const currentX = e.changedTouches[0].screenX;
+        const diffX = currentX - PracticeView.touchStartX;
+        const flashcard = document.getElementById('flashcard');
+        
+        if (flashcard) {
+            // Add visual feedback during swipe
+            if (Math.abs(diffX) > 20) {
+                if (diffX > 0) {
+                    flashcard.classList.add('swiping-right');
+                    flashcard.classList.remove('swiping-left');
+                } else {
+                    flashcard.classList.add('swiping-left');
+                    flashcard.classList.remove('swiping-right');
+                }
+            } else {
+                flashcard.classList.remove('swiping-left', 'swiping-right');
+            }
+        }
+    },
+    
+    handleTouchEnd: (e) => {
+        PracticeView.touchEndX = e.changedTouches[0].screenX;
+        PracticeView.touchEndY = e.changedTouches[0].screenY;
+        
+        const flashcard = document.getElementById('flashcard');
+        if (flashcard) {
+            flashcard.classList.remove('swiping-left', 'swiping-right');
+        }
+        
+        PracticeView.handleSwipeGesture();
+    },
+    
+    handleSwipeGesture: () => {
+        const diffX = PracticeView.touchEndX - PracticeView.touchStartX;
+        const diffY = PracticeView.touchEndY - PracticeView.touchStartY;
+        
+        // Check if horizontal swipe is more significant than vertical
+        if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > PracticeView.minSwipeDistance) {
+            const flashcard = document.getElementById('flashcard');
+            
+            if (diffX > 0) {
+                // Swipe right - Mark as known
+                if (flashcard) {
+                    flashcard.classList.add('swipe-complete-right');
+                    setTimeout(() => {
+                        flashcard.classList.remove('swipe-complete-right');
+                        PracticeView.markKnown();
+                    }, 200);
+                } else {
+                    PracticeView.markKnown();
+                }
+            } else {
+                // Swipe left - Mark for review
+                if (flashcard) {
+                    flashcard.classList.add('swipe-complete-left');
+                    setTimeout(() => {
+                        flashcard.classList.remove('swipe-complete-left');
+                        PracticeView.markReview();
+                    }, 200);
+                } else {
+                    PracticeView.markReview();
+                }
+            }
+        }
+        
+        // Reset touch coordinates
+        PracticeView.touchStartX = 0;
+        PracticeView.touchStartY = 0;
+        PracticeView.touchEndX = 0;
+        PracticeView.touchEndY = 0;
+    },
+    
+    // ==================== SCREEN READER ANNOUNCEMENTS ====================
+    announce: (message) => {
+        const announcer = document.getElementById('sr-announcer');
+        if (announcer) {
+            announcer.textContent = '';
+            // Use setTimeout to ensure the change is detected by screen readers
+            setTimeout(() => {
+                announcer.textContent = message;
+            }, 100);
+        }
+    },
 
     switchMode: (mode) => {
         PracticeView.mode = mode;
+        PracticeView.hasAnswered = false;
         
         // Update tab buttons
         document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -260,6 +495,9 @@ const PracticeView = {
         document.getElementById('quiz-container').classList.add('hidden');
         document.getElementById('flashcard-container').classList.add('hidden');
         document.getElementById('pastpaper-container').classList.add('hidden');
+        
+        // Remove swipe gestures when not in flashcard mode
+        PracticeView.removeSwipeGestures();
         
         // Show appropriate setup
         if (mode === 'quiz') {
@@ -282,17 +520,20 @@ const PracticeView = {
         PracticeView.streak = 0;
         PracticeView.answers = [];
         PracticeView.isActive = true;
+        PracticeView.hasAnswered = false;
 
         document.getElementById('practice-setup').classList.add('hidden');
         document.getElementById('quiz-container').classList.remove('hidden');
 
         PracticeView.showQuestion();
+        PracticeView.announce(`Quiz started. Question 1 of ${count}.`);
     },
 
     showQuestion: () => {
         const q = PracticeView.questions[PracticeView.currentIndex];
         const total = PracticeView.questions.length;
         const progress = ((PracticeView.currentIndex + 1) / total) * 100;
+        PracticeView.hasAnswered = false;
 
         document.getElementById('quiz-progress-text').textContent = `${PracticeView.currentIndex + 1} / ${total}`;
         document.getElementById('quiz-progress-bar').style.width = `${progress}%`;
@@ -306,18 +547,24 @@ const PracticeView = {
                 ${topic?.icon || '📝'} ${topic?.name || 'General'}
             </div>
             <h3 class="question-text">${q.question}</h3>
-            <div class="options-list">
+            <div class="options-list" role="group" aria-label="Answer options">
                 ${shuffledOptions.map((opt, i) => `
-                    <button class="option-btn" onclick="PracticeView.selectAnswer(${opt.originalIndex}, this)">
+                    <button class="option-btn" onclick="PracticeView.selectAnswer(${opt.originalIndex}, this)" aria-label="Option ${String.fromCharCode(65 + i)}: ${opt.text}">
                         <span class="option-letter">${String.fromCharCode(65 + i)}</span>
                         <span class="option-text">${opt.text}</span>
                     </button>
                 `).join('')}
             </div>
+            <div class="quiz-keyboard-hint">
+                Press <kbd>1</kbd>-<kbd>4</kbd> or <kbd>A</kbd>-<kbd>D</kbd> to select • <kbd>Enter</kbd> to continue
+            </div>
         `;
     },
 
     selectAnswer: (answerIndex, buttonEl) => {
+        if (PracticeView.hasAnswered) return;
+        PracticeView.hasAnswered = true;
+        
         const q = PracticeView.questions[PracticeView.currentIndex];
         const isCorrect = answerIndex === q.answer;
 
@@ -342,11 +589,17 @@ const PracticeView = {
             document.getElementById('correct-count').textContent = PracticeView.score;
             document.getElementById('streak-count').textContent = PracticeView.streak;
             
+            // Announce correct answer
+            PracticeView.announce(`Correct! Your score is now ${PracticeView.score}.`);
+            
             if (PracticeView.streak >= 5) AppState.unlockAchievement('streak_5');
             if (PracticeView.streak >= 10) AppState.unlockAchievement('streak_10');
         } else {
             PracticeView.streak = 0;
             document.getElementById('streak-count').textContent = 0;
+            
+            // Announce incorrect with correct answer
+            PracticeView.announce(`Incorrect. The correct answer was ${q.options[q.answer]}.`);
         }
 
         PracticeView.answers.push({ question: q, answer: answerIndex, correct: isCorrect });
@@ -366,7 +619,7 @@ const PracticeView = {
 
         const card = document.getElementById('question-card');
         card.innerHTML += `
-            <div class="explanation ${isCorrect ? 'correct' : 'incorrect'}">
+            <div class="explanation ${isCorrect ? 'correct' : 'incorrect'}" role="alert">
                 <p><strong>${isCorrect ? '✅ Correct!' : '❌ Incorrect'}</strong></p>
                 <p>${q.explanation}</p>
             </div>
@@ -378,11 +631,13 @@ const PracticeView = {
 
     nextQuestion: () => {
         PracticeView.currentIndex++;
+        PracticeView.hasAnswered = false;
         
         if (PracticeView.currentIndex >= PracticeView.questions.length) {
             PracticeView.showResults();
         } else {
             PracticeView.showQuestion();
+            PracticeView.announce(`Question ${PracticeView.currentIndex + 1} of ${PracticeView.questions.length}.`);
         }
     },
 
@@ -390,6 +645,7 @@ const PracticeView = {
         const total = PracticeView.questions.length;
         const percentage = Math.round((PracticeView.score / total) * 100);
         const xpEarned = PracticeView.score * 10 + (percentage === 100 ? 50 : 0);
+        PracticeView.isActive = false;
 
         AppState.addXP(xpEarned);
         
@@ -405,8 +661,11 @@ const PracticeView = {
                       percentage >= 70 ? 'B' : percentage >= 60 ? 'C' :
                       percentage >= 50 ? 'D' : percentage >= 40 ? 'E' : 'U';
 
+        // Announce results
+        PracticeView.announce(`Quiz complete! You scored ${PracticeView.score} out of ${total}, ${percentage} percent. Grade ${grade}. You earned ${xpEarned} XP.`);
+
         document.getElementById('quiz-container').innerHTML = `
-            <div class="results-card">
+            <div class="results-card" role="region" aria-label="Quiz Results">
                 <h2>🎉 Quiz Complete!</h2>
                 <div class="result-grade">${grade}</div>
                 <div class="result-score">${PracticeView.score} / ${total}</div>
@@ -433,6 +692,7 @@ const PracticeView = {
 
     resetQuiz: () => {
         PracticeView.isActive = false;
+        PracticeView.hasAnswered = false;
         document.getElementById('quiz-container').classList.add('hidden');
         document.getElementById('quiz-container').innerHTML = `
             <div class="quiz-header">
@@ -464,7 +724,11 @@ const PracticeView = {
         document.getElementById('flashcard-setup').classList.add('hidden');
         document.getElementById('flashcard-container').classList.remove('hidden');
 
+        // Set up swipe gestures for flashcards
+        PracticeView.setupSwipeGestures();
+
         PracticeView.showFlashcard();
+        PracticeView.announce(`Flashcard study started. Card 1 of ${PracticeView.flashcards.length}.`);
     },
 
     showFlashcard: () => {
@@ -482,7 +746,9 @@ const PracticeView = {
         document.getElementById('flashcard-question').textContent = card.front;
         document.getElementById('flashcard-answer').textContent = card.back;
 
-        document.getElementById('flashcard').classList.remove('flipped');
+        const flashcardEl = document.getElementById('flashcard');
+        flashcardEl.classList.remove('flipped');
+        flashcardEl.setAttribute('aria-label', `Flashcard ${PracticeView.flashcardIndex + 1} of ${total}. Question: ${card.front}. Click or press Space to reveal answer.`);
 
         document.getElementById('prev-card-btn').disabled = PracticeView.flashcardIndex === 0;
         document.getElementById('next-card-btn').textContent = 
@@ -494,8 +760,16 @@ const PracticeView = {
 
     flipCard: () => {
         const flashcard = document.getElementById('flashcard');
-        flashcard.classList.toggle('flipped');
+        const isFlipped = flashcard.classList.toggle('flipped');
         PracticeView.flippedCards.add(PracticeView.flashcardIndex);
+        
+        const card = PracticeView.flashcards[PracticeView.flashcardIndex];
+        if (isFlipped) {
+            flashcard.setAttribute('aria-label', `Answer: ${card.back}. Click or press Space to see question again.`);
+            PracticeView.announce(`Answer: ${card.back}`);
+        } else {
+            flashcard.setAttribute('aria-label', `Question: ${card.front}. Click or press Space to reveal answer.`);
+        }
     },
 
     markKnown: () => {
@@ -506,6 +780,7 @@ const PracticeView = {
         
         AppState.addXP(5);
         Toast.show('✅ Great! Card marked as known (+5 XP)', 'success');
+        PracticeView.announce('Card marked as known. Plus 5 XP.');
         
         setTimeout(() => PracticeView.nextCard(), 500);
     },
@@ -517,6 +792,7 @@ const PracticeView = {
         document.getElementById('review-count').textContent = PracticeView.reviewCards.size;
         
         Toast.show('🔄 Card marked for review', 'info');
+        PracticeView.announce('Card marked for review.');
         
         setTimeout(() => PracticeView.nextCard(), 500);
     },
@@ -525,6 +801,7 @@ const PracticeView = {
         if (PracticeView.flashcardIndex > 0) {
             PracticeView.flashcardIndex--;
             PracticeView.showFlashcard();
+            PracticeView.announce(`Card ${PracticeView.flashcardIndex + 1} of ${PracticeView.flashcards.length}.`);
         }
     },
 
@@ -532,6 +809,7 @@ const PracticeView = {
         if (PracticeView.flashcardIndex < PracticeView.flashcards.length - 1) {
             PracticeView.flashcardIndex++;
             PracticeView.showFlashcard();
+            PracticeView.announce(`Card ${PracticeView.flashcardIndex + 1} of ${PracticeView.flashcards.length}.`);
         } else {
             PracticeView.showFlashcardResults();
         }
@@ -546,11 +824,17 @@ const PracticeView = {
         const xpEarned = knownCount * 5;
 
         AppState.addXP(20);
+        
+        // Remove swipe gestures
+        PracticeView.removeSwipeGestures();
+        
+        // Announce results
+        PracticeView.announce(`Study session complete! ${knownCount} cards known, ${reviewCount} need review. ${percentage} percent mastery. Plus ${xpEarned + 20} XP.`);
 
         if (percentage === 100) AppState.unlockAchievement('flashcard_master');
 
         document.getElementById('flashcard-container').innerHTML = `
-            <div class="results-card">
+            <div class="results-card" role="region" aria-label="Flashcard Study Results">
                 <h2>📚 Study Session Complete!</h2>
                 
                 <div class="flashcard-results">
@@ -614,8 +898,8 @@ const PracticeView = {
                 </div>
             </div>
             
-            <div class="flashcard-wrapper">
-                <div class="flashcard" id="flashcard" onclick="PracticeView.flipCard()">
+            <div class="flashcard-wrapper" id="flashcard-wrapper">
+                <div class="flashcard" id="flashcard" onclick="PracticeView.flipCard()" tabindex="0" role="button" aria-label="Flashcard - click or press Space to flip">
                     <div class="flashcard-inner">
                         <div class="flashcard-front">
                             <span class="flip-hint">Click to reveal answer</span>
@@ -630,6 +914,14 @@ const PracticeView = {
                 </div>
             </div>
             
+            <div class="swipe-indicator">
+                👈 Swipe left for Review • Swipe right for Got It 👉
+            </div>
+            
+            <div class="flashcard-keyboard-hint">
+                <kbd>Space</kbd> or <kbd>F</kbd> to flip • <kbd>←</kbd><kbd>→</kbd> to navigate • <kbd>G</kbd> Got it • <kbd>R</kbd> Review
+            </div>
+            
             <div class="flashcard-actions">
                 <button class="btn btn-review" onclick="PracticeView.markReview()">🔄 Review Again</button>
                 <button class="btn btn-known" onclick="PracticeView.markKnown()">✅ Got It!</button>
@@ -641,10 +933,13 @@ const PracticeView = {
             </div>
         `;
 
+        // Re-setup swipe gestures
+        PracticeView.setupSwipeGestures();
         PracticeView.showFlashcard();
     },
 
     resetFlashcards: () => {
+        PracticeView.removeSwipeGestures();
         document.getElementById('flashcard-container').classList.add('hidden');
         document.getElementById('flashcard-container').innerHTML = `
             <div class="flashcard-header">
@@ -660,8 +955,8 @@ const PracticeView = {
                 </div>
             </div>
             
-            <div class="flashcard-wrapper">
-                <div class="flashcard" id="flashcard" onclick="PracticeView.flipCard()">
+            <div class="flashcard-wrapper" id="flashcard-wrapper">
+                <div class="flashcard" id="flashcard" onclick="PracticeView.flipCard()" tabindex="0" role="button" aria-label="Flashcard - click or press Space to flip">
                     <div class="flashcard-inner">
                         <div class="flashcard-front">
                             <span class="flip-hint">Click to reveal answer</span>
@@ -674,6 +969,14 @@ const PracticeView = {
                         </div>
                     </div>
                 </div>
+            </div>
+            
+            <div class="swipe-indicator">
+                👈 Swipe left for Review • Swipe right for Got It 👉
+            </div>
+            
+            <div class="flashcard-keyboard-hint">
+                <kbd>Space</kbd> or <kbd>F</kbd> to flip • <kbd>←</kbd><kbd>→</kbd> to navigate • <kbd>G</kbd> Got it • <kbd>R</kbd> Review
             </div>
             
             <div class="flashcard-actions">
@@ -723,8 +1026,9 @@ const PracticeView = {
                 </div>
                 
                 <div class="pp-answer-area">
-                    <label>Your Answer:</label>
-                    <textarea id="pp-user-answer" placeholder="Write your answer here. Think about what points the mark scheme would include..." rows="8"></textarea>
+                    <label for="pp-user-answer">Your Answer:</label>
+                    <textarea id="pp-user-answer" placeholder="Write your answer here. Think about what points the mark scheme would include..." rows="8" aria-describedby="pp-answer-hint"></textarea>
+                    <span id="pp-answer-hint" class="sr-only">Write your full response as you would in an exam</span>
                 </div>
                 
                 <div class="pp-actions">
@@ -762,7 +1066,7 @@ const PracticeView = {
                     </div>
                 ` : ''}
                 
-                <div class="pp-mark-scheme">
+                <div class="pp-mark-scheme" role="region" aria-label="Mark scheme points">
                     <h4>✅ Mark Scheme Points:</h4>
                     <ul>
                         ${q.markScheme.map(point => `<li>${point}</li>`).join('')}
@@ -776,9 +1080,9 @@ const PracticeView = {
                 
                 <div class="pp-self-assess">
                     <h4>How many marks would you give yourself?</h4>
-                    <div class="pp-marks-buttons">
+                    <div class="pp-marks-buttons" role="group" aria-label="Self assessment marks">
                         ${Array.from({length: q.marks + 1}, (_, i) => 
-                            `<button class="mark-btn" onclick="PracticeView.selfAssess(${i}, ${q.marks})">${i}</button>`
+                            `<button class="mark-btn" onclick="PracticeView.selfAssess(${i}, ${q.marks})" aria-label="${i} out of ${q.marks} marks">${i}</button>`
                         ).join('')}
                     </div>
                 </div>
@@ -804,6 +1108,7 @@ const PracticeView = {
         }
 
         Toast.show(feedback, percentage >= 60 ? 'success' : 'info');
+        PracticeView.announce(`You gave yourself ${marks} out of ${maxMarks} marks. ${feedback}`);
 
         // Show navigation
         const total = PracticeView.pastPaperQuestions.length;
@@ -811,7 +1116,7 @@ const PracticeView = {
 
         const actionsDiv = document.querySelector('.pp-self-assess');
         actionsDiv.innerHTML = `
-            <div class="pp-feedback">
+            <div class="pp-feedback" role="alert">
                 <p>${feedback}</p>
                 <p>You gave yourself <strong>${marks}/${maxMarks}</strong> marks</p>
             </div>
@@ -845,7 +1150,7 @@ const PracticeView = {
         AppState.addXP(30); // Bonus for completing
 
         document.getElementById('pastpaper-question').innerHTML = `
-            <div class="results-card">
+            <div class="results-card" role="region" aria-label="Past Paper Practice Results">
                 <h2>📄 Practice Complete!</h2>
                 <p>You practiced ${total} exam-style questions!</p>
                 <div class="result-xp">+XP earned for practice!</div>
@@ -866,6 +1171,8 @@ const PracticeView = {
                 </div>
             </div>
         `;
+        
+        PracticeView.announce(`Practice complete! You practiced ${total} exam-style questions.`);
     },
 
     exitPastPaper: () => {

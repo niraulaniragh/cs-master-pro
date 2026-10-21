@@ -44,7 +44,11 @@ const Router = (() => {
 
         // Cleanup previous view
         if (currentView && typeof currentView.cleanup === 'function') {
-            currentView.cleanup();
+            try {
+                currentView.cleanup();
+            } catch (e) {
+                console.warn('View cleanup error:', e);
+            }
         }
 
         // Render new view

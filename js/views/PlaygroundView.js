@@ -112,6 +112,13 @@ Count: 5</pre>
         console.log('🐍 Python Playground initialized');
         setTimeout(() => PlaygroundView.updateLineNumbers(), 100);
     },
+
+    cleanup: () => {
+        // Reset current states
+        PlaygroundView.currentLessonSections = [];
+        PlaygroundView.currentChallenge = null;
+        console.log('🐍 Python Playground cleanup');
+    },
     
     showMode: (mode, btn) => {
         document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));

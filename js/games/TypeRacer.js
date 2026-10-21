@@ -419,5 +419,11 @@ const TypeRacer = {
 
     getStats: () => {
         return JSON.parse(localStorage.getItem('csmaster_typeracer_stats') || '{}');
+    },
+
+    cleanup: () => {
+        // Stop game and clear timer
+        TypeRacer.stopGame();
+        console.log('⌨️ TypeRacer cleanup');
     }
 };

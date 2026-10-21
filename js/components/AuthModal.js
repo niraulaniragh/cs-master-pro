@@ -219,7 +219,7 @@ const AuthModal = {
     /**
      * Handle form submission
      */
-    handleSubmit: (event) => {
+    handleSubmit: async (event) => {
         event.preventDefault();
         AuthModal.hideError();
 
@@ -238,13 +238,13 @@ const AuthModal = {
             }
 
             // Attempt registration with account type
-            const result = Auth.register(username, email, password, AuthModal.selectedAccountType);
+            const result = await Auth.register(username, email, password, AuthModal.selectedAccountType);
             
             if (result.success) {
                 AuthModal.hide();
                 const welcome = AuthModal.selectedAccountType === 'teacher' 
-                    ? `Welcome, ${result.user.username}! 👩‍🏫 You can now create classrooms!`
-                    : `Welcome, ${result.user.username}! 🎉`;
+                    ? `Welcome, ${Helpers.escapeHtml(result.user.username)}! 👩‍🏫 You can now create classrooms!`
+                    : `Welcome, ${Helpers.escapeHtml(result.user.username)}! 🎉`;
                 Toast.show(welcome, 'success');
                 // Reload app to show authenticated state
                 App.init();
@@ -253,11 +253,11 @@ const AuthModal = {
             }
         } else {
             // Attempt login
-            const result = Auth.login(email, password);
+            const result = await Auth.login(email, password);
             
             if (result.success) {
                 AuthModal.hide();
-                Toast.show(`Welcome back, ${result.user.username}! 👋`, 'success');
+                Toast.show(`Welcome back, ${Helpers.escapeHtml(result.user.username)}! 👋`, 'success');
                 // Reload app with user's progress
                 App.init();
             } else {

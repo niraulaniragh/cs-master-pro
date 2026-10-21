@@ -49,6 +49,11 @@ const LearnView = {
         }
     },
 
+    cleanup: () => {
+        // No intervals or event listeners to clean up
+        console.log('📚 Learn view cleanup');
+    },
+
     selectTopic: (topicId) => {
         LearnView.currentTopic = topicId;
         LearnView.currentSubtopic = null;

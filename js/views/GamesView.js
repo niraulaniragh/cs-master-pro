@@ -182,6 +182,11 @@ const GamesView = {
         console.log('🎮 Games view initialized');
     },
 
+    cleanup: () => {
+        // No intervals or event listeners to clean up
+        console.log('🎮 Games view cleanup');
+    },
+
     getTotalGamesPlayed: () => {
         let total = 0;
         
@@ -258,7 +263,7 @@ const GamesView = {
                     ${top5.map((entry, i) => `
                         <tr>
                             <td>${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1}</td>
-                            <td>${entry.username}</td>
+                            <td>${Helpers.escapeHtml(entry.username)}</td>
                             <td>${entry.score.toLocaleString()}</td>
                             <td>Speed Run</td>
                         </tr>

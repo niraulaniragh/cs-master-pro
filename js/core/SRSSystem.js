@@ -128,11 +128,36 @@ const SRSSystem = {
         const data = SRSSystem.getData();
         const now = Date.now();
         
-        return questions.filter(q => {
+        // If no questions provided, try to use global QUESTIONS
+        const questionList = questions || (typeof QUESTIONS !== 'undefined' ? QUESTIONS : []);
+        
+        return questionList.filter(q => {
             const card = data[q.id];
-            if (!card) return true; // New card
+            if (!card) return true; // New card - always due
             return !card.nextReview || card.nextReview <= now;
         });
+    },
+    
+    // Get count of due cards without needing full question list
+    getDueCount: () => {
+        const data = SRSSystem.getData();
+        const now = Date.now();
+        let dueCount = 0;
+        
+        Object.values(data).forEach(card => {
+            if (!card.nextReview || card.nextReview <= now) {
+                dueCount++;
+            }
+        });
+        
+        return dueCount;
+    },
+    
+    // Check if a specific question is due for review
+    isDue: (questionId) => {
+        const card = SRSSystem.getCard(questionId);
+        if (card.totalReviews === 0) return true; // New card
+        return !card.nextReview || card.nextReview <= Date.now();
     },
     
     // Get questions that need review (weak areas)

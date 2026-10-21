@@ -127,13 +127,13 @@ const App = (() => {
                     <div class="profile-header">
                         <div class="profile-avatar-wrapper">
                             <div class="profile-avatar" style="background: ${avatarColor}" onclick="App.showAvatarEditor()">
-                                ${avatarEmoji || user.username.charAt(0).toUpperCase()}
+                                ${avatarEmoji || Helpers.escapeHtml(user.username.charAt(0).toUpperCase())}
                             </div>
                             <button class="avatar-edit-btn" onclick="App.showAvatarEditor()">✏️</button>
                         </div>
                         <div class="profile-info">
-                            <h3>${user.username}</h3>
-                            <p>${user.email}</p>
+                            <h3>${Helpers.escapeHtml(user.username)}</h3>
+                            <p>${Helpers.escapeHtml(user.email)}</p>
                             <span class="account-type-badge ${accountType}">${accountType === 'teacher' ? '👩‍🏫 Teacher' : '🎒 Student'}</span>
                         </div>
                     </div>
@@ -213,7 +213,7 @@ const App = (() => {
                 <div class="avatar-editor">
                     <div class="avatar-preview">
                         <div class="preview-avatar" id="avatar-preview" style="background: ${currentColor}">
-                            ${currentEmoji || user.username.charAt(0).toUpperCase()}
+                            ${currentEmoji || Helpers.escapeHtml(user.username.charAt(0).toUpperCase())}
                         </div>
                     </div>
                     
@@ -413,7 +413,7 @@ const App = (() => {
     /**
      * Handle change password
      */
-    const handleChangePassword = (event) => {
+    const handleChangePassword = async (event) => {
         event.preventDefault();
         const form = event.target;
         const currentPassword = form.currentPassword.value;
@@ -426,7 +426,7 @@ const App = (() => {
             return;
         }
 
-        const result = Auth.changePassword(currentPassword, newPassword);
+        const result = await Auth.changePassword(currentPassword, newPassword);
         if (result.success) {
             Modal.close();
             Toast.show('Password updated successfully', 'success');
@@ -476,12 +476,12 @@ const App = (() => {
     /**
      * Handle delete account
      */
-    const handleDeleteAccount = (event) => {
+    const handleDeleteAccount = async (event) => {
         event.preventDefault();
         const form = event.target;
         const password = form.password.value;
 
-        const result = Auth.deleteAccount(password);
+        const result = await Auth.deleteAccount(password);
         if (result.success) {
             Modal.close();
             Toast.show('Account deleted successfully', 'info');

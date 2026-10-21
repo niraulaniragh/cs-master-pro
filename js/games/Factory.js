@@ -353,5 +353,11 @@ const Factory = {
     },
     
     getStats: () => { try { return JSON.parse(localStorage.getItem('csmaster_factory') || '{}'); } catch (e) { return {}; } },
-    saveStats: (stats) => { localStorage.setItem('csmaster_factory', JSON.stringify(stats)); }
+    saveStats: (stats) => { localStorage.setItem('csmaster_factory', JSON.stringify(stats)); },
+
+    cleanup: () => {
+        // Stop game
+        Factory.isPlaying = false;
+        console.log('🏭 Factory cleanup');
+    }
 };

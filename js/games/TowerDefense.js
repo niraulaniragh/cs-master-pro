@@ -433,5 +433,13 @@ const TowerDefense = {
     },
     
     getStats: () => { try { return JSON.parse(localStorage.getItem('csmaster_td') || '{}'); } catch (e) { return {}; } },
-    saveStats: (stats) => { localStorage.setItem('csmaster_td', JSON.stringify(stats)); }
+    saveStats: (stats) => { localStorage.setItem('csmaster_td', JSON.stringify(stats)); },
+
+    cleanup: () => {
+        // Stop game
+        TowerDefense.isPlaying = false;
+        TowerDefense.waveInProgress = false;
+        TowerDefense.questionActive = false;
+        console.log('🏰 TowerDefense cleanup');
+    }
 };

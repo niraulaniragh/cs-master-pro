@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     
-    <!-- Content Security Policy - allows inline scripts, external CDNs, and Pyodide WebAssembly -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; img-src 'self' data: blob:; connect-src 'self' https://cdn.jsdelivr.net; worker-src 'self' blob:;">
+    <!-- Content Security Policy - strengthened with strict-dynamic for safer script loading -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'strict-dynamic' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; img-src 'self' data: blob:; connect-src 'self' https://cdn.jsdelivr.net; worker-src 'self' blob:;">
     
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -65,10 +65,20 @@
     <link rel="stylesheet" href="styles/games.css?v=20261021182350">
 </head>
 <body>
+    <!-- Skip Link for Accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
     <div id="app">
         <!-- Navigation -->
-        <nav class="main-nav" id="main-nav">
-            <div class="nav-brand" onclick="Router.navigate('home')" style="cursor: pointer;">
+        <nav class="main-nav" id="main-nav" role="navigation" aria-label="Main navigation">
+            <!-- Mobile Hamburger Menu Button -->
+            <button class="hamburger-menu" id="hamburger-menu" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="nav-links">
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+                <span class="hamburger-line"></span>
+            </button>
+            
+            <div class="nav-brand" onclick="Router.navigate('home')" style="cursor: pointer;" role="button" tabindex="0" aria-label="CS Master Pro Home">
                 <div class="brand-logo">
                     <svg viewBox="0 0 44 44" width="44" height="44">
                         <defs>
@@ -100,7 +110,7 @@
                 <span class="brand-text">CS Master</span>
                 <span class="brand-badge">PRO</span>
             </div>
-            <div class="nav-links">
+            <div class="nav-links" id="nav-links" role="menubar">
                 <a href="#" class="nav-link active" data-route="home">
                     <i class="fas fa-home"></i> <span>Home</span>
                 </a>
@@ -121,7 +131,7 @@
                 </a>
             </div>
             <div class="nav-stats">
-                <button class="sound-toggle" onclick="SoundFX.toggle()" title="Toggle Sound">
+                <button class="sound-toggle" onclick="SoundFX.toggle()" title="Toggle Sound" aria-label="Toggle sound effects">
                     🔊
                 </button>
                 <div class="stat-item" title="Experience Points">
@@ -139,7 +149,7 @@
         </nav>
 
         <!-- Main Content Area -->
-        <main class="main-content" id="main-content">
+        <main class="main-content" id="main-content" role="main">
             <!-- Dynamic content loaded here by router -->
         </main>
 
@@ -150,10 +160,13 @@
     </div>
 
     <!-- Toast Notifications -->
-    <div class="toast-container" id="toast-container"></div>
+    <div class="toast-container" id="toast-container" role="alert" aria-live="polite"></div>
+
+    <!-- Screen Reader Announcer (hidden, for dynamic announcements) -->
+    <div id="sr-announcer" class="sr-only" aria-live="polite" aria-atomic="true"></div>
 
     <!-- Modal Container -->
-    <div class="modal-overlay" id="modal-overlay">
+    <div class="modal-overlay" id="modal-overlay" role="dialog" aria-modal="true" aria-hidden="true">
         <div class="modal-content" id="modal-content"></div>
     </div>
 
@@ -206,6 +219,7 @@
     <script src="js/games/GoldQuest.js?v=20261021182350"></script>
     
     <!-- Core (must be last) -->
+    <script src="js/core/EventBus.js?v=20261021182350"></script>
     <script src="js/core/Classroom.js?v=20261021182350"></script>
     <script src="js/core/Assignment.js?v=20261021182350"></script>
     <script src="js/core/Auth.js?v=20261021182350"></script>
@@ -224,6 +238,61 @@
                     .catch(err => console.log('❌ SW registration failed:', err));
             });
         }
+        
+        // Hamburger Menu Toggle for Mobile
+        document.addEventListener('DOMContentLoaded', () => {
+            const hamburger = document.getElementById('hamburger-menu');
+            const navLinks = document.getElementById('nav-links');
+            
+            if (hamburger && navLinks) {
+                hamburger.addEventListener('click', () => {
+                    const isExpanded = hamburger.getAttribute('aria-expanded') === 'true';
+                    hamburger.setAttribute('aria-expanded', !isExpanded);
+                    navLinks.classList.toggle('mobile-open');
+                });
+                
+                // Close menu when clicking a nav link
+                navLinks.querySelectorAll('.nav-link').forEach(link => {
+                    link.addEventListener('click', () => {
+                        hamburger.setAttribute('aria-expanded', 'false');
+                        navLinks.classList.remove('mobile-open');
+                    });
+                });
+                
+                // Close menu when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (!hamburger.contains(e.target) && !navLinks.contains(e.target)) {
+                        hamburger.setAttribute('aria-expanded', 'false');
+                        navLinks.classList.remove('mobile-open');
+                    }
+                });
+                
+                // Handle keyboard navigation for nav brand
+                const navBrand = document.querySelector('.nav-brand');
+                if (navBrand) {
+                    navBrand.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            Router.navigate('home');
+                        }
+                    });
+                }
+            }
+            
+            // Update modal aria-hidden state when shown/hidden
+            const modalOverlay = document.getElementById('modal-overlay');
+            if (modalOverlay) {
+                const observer = new MutationObserver((mutations) => {
+                    mutations.forEach((mutation) => {
+                        if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                            const isVisible = modalOverlay.classList.contains('show');
+                            modalOverlay.setAttribute('aria-hidden', !isVisible);
+                        }
+                    });
+                });
+                observer.observe(modalOverlay, { attributes: true });
+            }
+        });
     </script>
 </body>
 </html>

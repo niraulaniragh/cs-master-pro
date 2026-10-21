@@ -528,5 +528,11 @@ _____ age >= 18`,
 
     getStats: () => {
         return JSON.parse(localStorage.getItem('csmaster_fillcode_stats') || '{}');
+    },
+
+    cleanup: () => {
+        // Stop game
+        FillCode.isPlaying = false;
+        console.log('📝 FillCode cleanup');
     }
 };

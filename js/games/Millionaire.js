@@ -513,5 +513,11 @@ const Millionaire = {
 
     getStats: () => {
         return JSON.parse(localStorage.getItem('csmaster_millionaire_stats') || '{}');
+    },
+
+    cleanup: () => {
+        // Stop game
+        Millionaire.isPlaying = false;
+        console.log('💰 Millionaire cleanup');
     }
 };

@@ -91,7 +91,7 @@ const SpeedRun = {
                             ${topScores.length > 0 ? topScores.slice(0, 5).map((entry, i) => `
                                 <div class="sr-lb-entry ${i < 3 ? 'top-' + (i + 1) : ''}">
                                     <span class="sr-lb-rank">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1)}</span>
-                                    <span class="sr-lb-name">${entry.username}</span>
+                                    <span class="sr-lb-name">${Helpers.escapeHtml(entry.username)}</span>
                                     <span class="sr-lb-score">${entry.score}</span>
                                 </div>
                             `).join('') : '<p class="no-scores">No scores yet. Be the first!</p>'}
@@ -449,6 +449,14 @@ const SpeedRun = {
     isNewPersonalBest: () => {
         const personalBest = SpeedRun.getPersonalBest();
         return SpeedRun.score > (personalBest.score || 0);
+    },
+
+    cleanup: () => {
+        // Remove keydown listener
+        document.removeEventListener('keydown', SpeedRun.keyHandler);
+        // Clear timer
+        SpeedRun.stopGame();
+        console.log('⚡ SpeedRun cleanup');
     }
 };
 

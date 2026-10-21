@@ -83,7 +83,8 @@ const AppState = (() => {
     };
 
     // Save user progress - syncs with Auth if logged in
-    const saveUserProgress = () => {
+    // Use debounced version to prevent race conditions when answering questions rapidly
+    const saveUserProgressImmediate = () => {
         Storage.save('user', state.user);
         
         // If logged in, also save to user profile
@@ -91,6 +92,11 @@ const AppState = (() => {
             Auth.saveProgress(state.user);
         }
     };
+    
+    // Debounced version (500ms delay) to prevent data loss during rapid updates
+    const saveUserProgress = typeof Helpers !== 'undefined' && Helpers.debounce 
+        ? Helpers.debounce(saveUserProgressImmediate, 500)
+        : saveUserProgressImmediate;
 
     // Update state (merge objects)
     const updateState = (path, updates) => {
@@ -187,11 +193,12 @@ const AppState = (() => {
 
         if (typeof Auth !== 'undefined' && Auth.isLoggedIn()) {
             const session = Auth.getSession();
+            const safeUsername = Helpers.escapeHtml(session.username);
             navUser.innerHTML = `
                 <div class="user-menu">
                     <button class="user-menu-btn" onclick="AppState.toggleUserMenu()">
-                        <span class="user-avatar">${session.username.charAt(0).toUpperCase()}</span>
-                        <span class="user-name">${session.username}</span>
+                        <span class="user-avatar">${Helpers.escapeHtml(session.username.charAt(0).toUpperCase())}</span>
+                        <span class="user-name">${safeUsername}</span>
                         <i class="fas fa-chevron-down"></i>
                     </button>
                     <div class="user-dropdown" id="user-dropdown">

@@ -154,7 +154,7 @@ const BattleMode = {
                 <div class="battle-arena">
                     <div class="battle-player player-left">
                         <div class="bp-avatar">👤</div>
-                        <div class="bp-name">${username}</div>
+                        <div class="bp-name">${Helpers.escapeHtml(username)}</div>
                         <div class="bp-hp-bar">
                             <div class="bp-hp-fill" id="player-hp" style="width: 100%"></div>
                             <span class="bp-hp-text" id="player-hp-text">100</span>
@@ -531,6 +531,12 @@ const BattleMode = {
 
     getStats: () => {
         return JSON.parse(localStorage.getItem('csmaster_battle_stats') || '{}');
+    },
+
+    cleanup: () => {
+        // Stop game and clear timers
+        BattleMode.stopGame();
+        console.log('⚔️ BattleMode cleanup');
     }
 };
 

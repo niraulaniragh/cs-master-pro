@@ -365,7 +365,7 @@ const CryptoHack = {
                         ${sortedPlayers.slice(0, 10).map((p, i) => `
                             <div class="leaderboard-item ${p.id === Auth.getCurrentUser()?.id ? 'is-you' : ''}">
                                 <span class="lb-rank">${i + 1}</span>
-                                <span class="lb-name">${p.username}</span>
+                                <span class="lb-name">${Helpers.escapeHtml(p.username)}</span>
                                 <span class="lb-score">${p.score} 💰</span>
                             </div>
                         `).join('')}
@@ -390,7 +390,7 @@ const CryptoHack = {
         return sorted.map((p, i) => `
             <div class="lb-row">
                 <span class="lb-position">${i + 1}</span>
-                <span class="lb-player">${p.username}</span>
+                <span class="lb-player">${Helpers.escapeHtml(p.username)}</span>
                 <span class="lb-crypto">${p.score || 0} 💰</span>
             </div>
         `).join('');
@@ -408,7 +408,7 @@ const CryptoHack = {
             ${top3.map((p, i) => `
                 <div class="mini-lb-row">
                     <span class="mini-rank">${['🥇', '🥈', '🥉'][i]}</span>
-                    <span class="mini-name">${p.username}</span>
+                    <span class="mini-name">${Helpers.escapeHtml(p.username)}</span>
                     <span class="mini-score">${p.score || 0}💰</span>
                 </div>
             `).join('')}
@@ -474,21 +474,21 @@ const CryptoHack = {
                         ${sorted.length > 1 ? `
                             <div class="podium-place second">
                                 <span class="podium-avatar">🥈</span>
-                                <span class="podium-name">${sorted[1]?.username || '-'}</span>
+                                <span class="podium-name">${Helpers.escapeHtml(sorted[1]?.username || '-')}</span>
                                 <span class="podium-score">${sorted[1]?.score || 0} 💰</span>
                             </div>
                         ` : ''}
                         ${sorted.length > 0 ? `
                             <div class="podium-place first">
                                 <span class="podium-avatar">🥇</span>
-                                <span class="podium-name">${sorted[0]?.username || '-'}</span>
+                                <span class="podium-name">${Helpers.escapeHtml(sorted[0]?.username || '-')}</span>
                                 <span class="podium-score">${sorted[0]?.score || 0} 💰</span>
                             </div>
                         ` : ''}
                         ${sorted.length > 2 ? `
                             <div class="podium-place third">
                                 <span class="podium-avatar">🥉</span>
-                                <span class="podium-name">${sorted[2]?.username || '-'}</span>
+                                <span class="podium-name">${Helpers.escapeHtml(sorted[2]?.username || '-')}</span>
                                 <span class="podium-score">${sorted[2]?.score || 0} 💰</span>
                             </div>
                         ` : ''}
@@ -510,5 +510,15 @@ const CryptoHack = {
                 </div>
             `;
         }
+    },
+
+    cleanup: () => {
+        // Clear update interval
+        if (CryptoHack.updateInterval) {
+            clearInterval(CryptoHack.updateInterval);
+            CryptoHack.updateInterval = null;
+        }
+        CryptoHack.game = null;
+        console.log('🔐 CryptoHack cleanup');
     }
 };

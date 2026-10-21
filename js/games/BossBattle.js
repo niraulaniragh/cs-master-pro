@@ -239,7 +239,7 @@ const BossBattle = {
                 <div class="boss-arena">
                     <div class="boss-player player-side">
                         <div class="boss-avatar player-avatar">👤</div>
-                        <div class="boss-name">${username}</div>
+                        <div class="boss-name">${Helpers.escapeHtml(username)}</div>
                         <div class="boss-hp-container">
                             <div class="boss-hp-bar">
                                 <div class="boss-hp-fill player-hp" id="player-hp"></div>
@@ -575,6 +575,13 @@ const BossBattle = {
 
     getStats: () => {
         return JSON.parse(localStorage.getItem('csmaster_boss_stats') || '{}');
+    },
+
+    cleanup: () => {
+        // Remove keydown listener and stop game
+        document.removeEventListener('keydown', BossBattle.keyHandler);
+        BossBattle.isPlaying = false;
+        console.log('🐉 BossBattle cleanup');
     }
 };
 

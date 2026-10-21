@@ -258,7 +258,7 @@ const TeacherView = {
                             <div class="students-list">
                                 ${classroom.students.map(s => `
                                     <div class="student-item">
-                                        <span class="student-name">${s.username}</span>
+                                        <span class="student-name">${Helpers.escapeHtml(s.username)}</span>
                                         <span class="student-stats">${s.stats.correctAnswers}/${s.stats.totalAnswers} correct</span>
                                         <button class="btn btn-tiny btn-danger" onclick="TeacherView.removeStudent('${code}', '${s.id}')">
                                             Remove
@@ -446,7 +446,7 @@ const TeacherView = {
                     </div>
                     
                     <div class="joined-players" id="joined-players-list">
-                        ${game.players.map(p => `<span class="player-tag">${p.username}</span>`).join('')}
+                        ${game.players.map(p => `<span class="player-tag">${Helpers.escapeHtml(p.username)}</span>`).join('')}
                     </div>
                 </div>
             `,
@@ -500,7 +500,7 @@ const TeacherView = {
         }
         
         if (listEl) {
-            listEl.innerHTML = game.players.map(p => `<span class="player-tag">${p.username}</span>`).join('');
+            listEl.innerHTML = game.players.map(p => `<span class="player-tag">${Helpers.escapeHtml(p.username)}</span>`).join('');
         }
         
         if (startBtn) {
@@ -589,5 +589,14 @@ const TeacherView = {
     
     init: () => {
         console.log('👩‍🏫 Teacher view initialized');
+    },
+
+    cleanup: () => {
+        // Clear lobby poll interval to prevent memory leaks
+        if (TeacherView.lobbyPollInterval) {
+            clearInterval(TeacherView.lobbyPollInterval);
+            TeacherView.lobbyPollInterval = null;
+        }
+        console.log('👩‍🏫 Teacher view cleanup');
     }
 };

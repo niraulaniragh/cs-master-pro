@@ -281,5 +281,11 @@ const GoldQuest = {
     },
     
     getStats: () => { try { return JSON.parse(localStorage.getItem('csmaster_goldquest') || '{}'); } catch (e) { return {}; } },
-    saveStats: (stats) => { localStorage.setItem('csmaster_goldquest', JSON.stringify(stats)); }
+    saveStats: (stats) => { localStorage.setItem('csmaster_goldquest', JSON.stringify(stats)); },
+
+    cleanup: () => {
+        // Stop game
+        GoldQuest.isPlaying = false;
+        console.log('⛏️ GoldQuest cleanup');
+    }
 };

@@ -69,6 +69,13 @@ const ToolsView = {
         console.log('🔧 Tools view initialized');
     },
 
+    cleanup: () => {
+        // Stop any running visualizations
+        ToolsView.vizRunning = false;
+        ToolsView.activeTool = null;
+        console.log('🔧 Tools view cleanup');
+    },
+
     openTool: (toolId, event) => {
         ToolsView.activeTool = toolId;
         const workspace = document.getElementById('tool-workspace');

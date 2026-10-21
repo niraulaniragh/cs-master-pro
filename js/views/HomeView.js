@@ -1,10 +1,30 @@
 /**
  * HomeView.js - Enhanced Home/Dashboard View
  * New Modern Design - Clean, Professional
+ * Includes Onboarding Flow and Daily Goals Widget
  */
 
 const HomeView = {
+    // Daily Goals Configuration
+    DAILY_GOALS: {
+        questions: { target: 20, icon: '📝', label: 'Questions Answered' },
+        correct: { target: 15, icon: '✅', label: 'Correct Answers' },
+        topics: { target: 3, icon: '📚', label: 'Topics Studied' },
+        games: { target: 2, icon: '🎮', label: 'Games Played' }
+    },
+    
+    ONBOARDING_KEY: 'csmaster_onboarding_complete',
+    PREFERENCES_KEY: 'csmaster_user_preferences',
+    DAILY_GOALS_KEY: 'csmaster_daily_goals',
+    
     render: () => {
+        // Check for onboarding
+        const hasCompletedOnboarding = localStorage.getItem(HomeView.ONBOARDING_KEY) === 'true';
+        
+        // Schedule onboarding check after render
+        if (!hasCompletedOnboarding) {
+            setTimeout(() => HomeView.showOnboarding(), 500);
+        }
         const user = AppState.getState('user') || {};
         const level = user.level || 1;
         const xp = user.xp || 0;
@@ -26,7 +46,7 @@ const HomeView = {
                 <section class="hero-new">
                     <div class="hero-left">
                         <span class="hero-greeting">Welcome back</span>
-                        <h1 class="hero-name">${username}</h1>
+                        <h1 class="hero-name">${Helpers.escapeHtml(username)}</h1>
                         <p class="hero-tagline">Continue your Computer Science journey</p>
                         <div class="hero-tags">
                             <span class="hero-tag">Edexcel 4CP0</span>
@@ -139,6 +159,9 @@ const HomeView = {
                 <section class="main-grid">
                     <!-- Left Column -->
                     <div class="main-left">
+                        <!-- Daily Goals Widget -->
+                        ${HomeView.renderDailyGoals()}
+                        
                         <!-- Streak Widget -->
                         <div class="card-new streak-card">
                             ${typeof StreakSystem !== 'undefined' ? StreakSystem.renderWidget() : '<p>Loading streaks...</p>'}
@@ -266,7 +289,7 @@ const HomeView = {
             return leaders.map((p, i) => `
                 <div class="lb-item ${p.isCurrentUser ? 'is-me' : ''}">
                     <span class="lb-rank ${i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : ''}">${i + 1}</span>
-                    <span class="lb-name">${p.username || 'Anonymous'}</span>
+                    <span class="lb-name">${Helpers.escapeHtml(p.username || 'Anonymous')}</span>
                     <span class="lb-xp">${(p.xp || 0).toLocaleString()} XP</span>
                 </div>
             `).join('');
@@ -291,6 +314,11 @@ const HomeView = {
 
     init: () => {
         console.log('🏠 Home view initialized');
+    },
+
+    cleanup: () => {
+        // No intervals or event listeners to clean up
+        console.log('🏠 Home view cleanup');
     },
 
     getXPForLevel: (level) => {
@@ -519,5 +547,324 @@ const HomeView = {
                 }
             });
         }, 0);
+    },
+    
+    // ==========================================
+    // ONBOARDING FLOW
+    // ==========================================
+    
+    showOnboarding: () => {
+        const preferences = HomeView.getUserPreferences();
+        
+        Modal.show({
+            title: '👋 Welcome to CS Master Pro!',
+            content: `
+                <div class="onboarding-form">
+                    <p class="onboarding-intro">Let's personalize your learning experience. This only takes a minute!</p>
+                    
+                    <div class="onboarding-section">
+                        <label class="onboarding-label">📅 When is your exam?</label>
+                        <input type="date" id="onboarding-exam-date" class="onboarding-input" 
+                               value="${preferences.examDate || ''}"
+                               min="${new Date().toISOString().split('T')[0]}">
+                        <span class="onboarding-hint">We'll help you stay on track!</span>
+                    </div>
+                    
+                    <div class="onboarding-section">
+                        <label class="onboarding-label">📊 What's your current skill level?</label>
+                        <div class="skill-level-options">
+                            <button type="button" class="skill-btn ${preferences.skillLevel === 'beginner' ? 'selected' : ''}" data-level="beginner">
+                                🌱 Beginner
+                                <span>Just starting out</span>
+                            </button>
+                            <button type="button" class="skill-btn ${preferences.skillLevel === 'intermediate' ? 'selected' : ''}" data-level="intermediate">
+                                📈 Intermediate
+                                <span>Know the basics</span>
+                            </button>
+                            <button type="button" class="skill-btn ${preferences.skillLevel === 'advanced' ? 'selected' : ''}" data-level="advanced">
+                                🚀 Advanced
+                                <span>Preparing for exam</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="onboarding-section">
+                        <label class="onboarding-label">🎯 Which topics do you find challenging? (Select any)</label>
+                        <div class="weak-topics-grid">
+                            ${(TOPICS || []).map(topic => `
+                                <label class="topic-checkbox ${(preferences.weakTopics || []).includes(topic.id) ? 'selected' : ''}">
+                                    <input type="checkbox" value="${topic.id}" ${(preferences.weakTopics || []).includes(topic.id) ? 'checked' : ''}>
+                                    <span class="topic-icon" style="background: ${topic.color}20; color: ${topic.color};">${topic.icon}</span>
+                                    <span class="topic-name">${topic.name}</span>
+                                </label>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+                
+                <style>
+                    .onboarding-form { max-width: 500px; margin: 0 auto; }
+                    .onboarding-intro { text-align: center; color: var(--text-secondary); margin-bottom: 1.5rem; }
+                    .onboarding-section { margin-bottom: 1.5rem; }
+                    .onboarding-label { display: block; font-weight: 600; margin-bottom: 0.5rem; }
+                    .onboarding-input { width: 100%; padding: 0.75rem; border: 2px solid var(--border); border-radius: 8px; background: var(--bg-secondary); color: var(--text-primary); font-size: 1rem; }
+                    .onboarding-hint { display: block; font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem; }
+                    .skill-level-options { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+                    .skill-btn { flex: 1; min-width: 120px; padding: 1rem; border: 2px solid var(--border); border-radius: 12px; background: var(--bg-secondary); cursor: pointer; text-align: center; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 0.25rem; }
+                    .skill-btn span { font-size: 0.8rem; color: var(--text-muted); }
+                    .skill-btn:hover { border-color: var(--primary); }
+                    .skill-btn.selected { border-color: var(--primary); background: var(--primary-light); }
+                    .weak-topics-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.5rem; max-height: 200px; overflow-y: auto; padding: 0.5rem; }
+                    .topic-checkbox { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; border: 2px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 0.2s; }
+                    .topic-checkbox:hover { border-color: var(--primary); }
+                    .topic-checkbox.selected { border-color: var(--primary); background: var(--primary-light); }
+                    .topic-checkbox input { display: none; }
+                    .topic-icon { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+                    .topic-name { font-size: 0.85rem; flex: 1; }
+                </style>
+            `,
+            footer: `
+                <button class="btn btn-secondary" id="onboarding-skip">Skip for now</button>
+                <button class="btn btn-primary" id="onboarding-save">Let's Go! 🚀</button>
+            `
+        });
+        
+        setTimeout(() => {
+            // Skill level selection
+            document.querySelectorAll('.skill-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.skill-btn').forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                });
+            });
+            
+            // Topic checkbox selection
+            document.querySelectorAll('.topic-checkbox').forEach(label => {
+                label.addEventListener('click', (e) => {
+                    if (e.target.tagName !== 'INPUT') {
+                        const checkbox = label.querySelector('input');
+                        checkbox.checked = !checkbox.checked;
+                    }
+                    label.classList.toggle('selected', label.querySelector('input').checked);
+                });
+            });
+            
+            // Skip button
+            document.getElementById('onboarding-skip')?.addEventListener('click', () => {
+                localStorage.setItem(HomeView.ONBOARDING_KEY, 'true');
+                Modal.close();
+            });
+            
+            // Save button
+            document.getElementById('onboarding-save')?.addEventListener('click', () => {
+                const examDate = document.getElementById('onboarding-exam-date')?.value || '';
+                const skillLevel = document.querySelector('.skill-btn.selected')?.dataset.level || 'beginner';
+                const weakTopics = Array.from(document.querySelectorAll('.topic-checkbox input:checked')).map(cb => cb.value);
+                
+                const preferences = {
+                    examDate,
+                    skillLevel,
+                    weakTopics,
+                    onboardingCompletedAt: new Date().toISOString()
+                };
+                
+                HomeView.saveUserPreferences(preferences);
+                localStorage.setItem(HomeView.ONBOARDING_KEY, 'true');
+                
+                Modal.close();
+                Toast.show('Welcome! Your preferences have been saved 🎉', 'success');
+                
+                // Emit event for other components
+                if (typeof EventBus !== 'undefined') {
+                    EventBus.emit(EventBus.Events?.USER_PREFERENCES_SAVED || 'user:preferences_saved', preferences);
+                }
+                
+                // Refresh home view to show personalized content
+                Router.navigate('home');
+            });
+        }, 0);
+    },
+    
+    getUserPreferences: () => {
+        try {
+            const stored = localStorage.getItem(HomeView.PREFERENCES_KEY);
+            return stored ? JSON.parse(stored) : {};
+        } catch (e) {
+            return {};
+        }
+    },
+    
+    saveUserPreferences: (preferences) => {
+        try {
+            localStorage.setItem(HomeView.PREFERENCES_KEY, JSON.stringify(preferences));
+        } catch (e) {
+            console.error('Failed to save preferences:', e);
+        }
+    },
+    
+    // ==========================================
+    // DAILY GOALS SYSTEM
+    // ==========================================
+    
+    getDailyGoalsData: () => {
+        try {
+            const stored = localStorage.getItem(HomeView.DAILY_GOALS_KEY);
+            const data = stored ? JSON.parse(stored) : {};
+            
+            // Check if it's a new day - reset if needed
+            const today = new Date().toDateString();
+            if (data.date !== today) {
+                return {
+                    date: today,
+                    questions: 0,
+                    correct: 0,
+                    topics: [],
+                    games: 0
+                };
+            }
+            
+            return data;
+        } catch (e) {
+            return {
+                date: new Date().toDateString(),
+                questions: 0,
+                correct: 0,
+                topics: [],
+                games: 0
+            };
+        }
+    },
+    
+    saveDailyGoalsData: (data) => {
+        try {
+            data.date = new Date().toDateString();
+            localStorage.setItem(HomeView.DAILY_GOALS_KEY, JSON.stringify(data));
+        } catch (e) {
+            console.error('Failed to save daily goals:', e);
+        }
+    },
+    
+    trackQuestion: (isCorrect, topicId = null) => {
+        const data = HomeView.getDailyGoalsData();
+        data.questions++;
+        if (isCorrect) data.correct++;
+        
+        if (topicId && !data.topics.includes(topicId)) {
+            data.topics.push(topicId);
+        }
+        
+        HomeView.saveDailyGoalsData(data);
+        
+        // Emit event
+        if (typeof EventBus !== 'undefined') {
+            EventBus.emit(EventBus.Events?.GOAL_PROGRESS || 'goal:progress', data);
+        }
+        
+        // Check for goal completion
+        HomeView.checkGoalCompletion(data);
+    },
+    
+    trackGame: () => {
+        const data = HomeView.getDailyGoalsData();
+        data.games++;
+        HomeView.saveDailyGoalsData(data);
+        
+        if (typeof EventBus !== 'undefined') {
+            EventBus.emit(EventBus.Events?.GOAL_PROGRESS || 'goal:progress', data);
+        }
+        
+        HomeView.checkGoalCompletion(data);
+    },
+    
+    trackTopic: (topicId) => {
+        const data = HomeView.getDailyGoalsData();
+        if (!data.topics.includes(topicId)) {
+            data.topics.push(topicId);
+            HomeView.saveDailyGoalsData(data);
+            
+            if (typeof EventBus !== 'undefined') {
+                EventBus.emit(EventBus.Events?.GOAL_PROGRESS || 'goal:progress', data);
+            }
+            
+            HomeView.checkGoalCompletion(data);
+        }
+    },
+    
+    checkGoalCompletion: (data) => {
+        const goals = HomeView.DAILY_GOALS;
+        
+        if (data.questions >= goals.questions.target && 
+            data.correct >= goals.correct.target && 
+            data.topics.length >= goals.topics.target && 
+            data.games >= goals.games.target) {
+            
+            // All goals complete!
+            if (!data.allGoalsCompleteShown) {
+                data.allGoalsCompleteShown = true;
+                HomeView.saveDailyGoalsData(data);
+                Toast.show('🎉 Amazing! All daily goals completed!', 'success');
+                
+                if (typeof EventBus !== 'undefined') {
+                    EventBus.emit(EventBus.Events?.GOAL_COMPLETE || 'goal:complete', data);
+                }
+            }
+        }
+    },
+    
+    renderDailyGoals: () => {
+        const data = HomeView.getDailyGoalsData();
+        const goals = HomeView.DAILY_GOALS;
+        
+        const renderGoalBar = (current, target, icon, label) => {
+            const percent = Math.min(100, (current / target) * 100);
+            const isComplete = current >= target;
+            
+            return `
+                <div class="daily-goal-item ${isComplete ? 'complete' : ''}">
+                    <div class="goal-header">
+                        <span class="goal-icon">${icon}</span>
+                        <span class="goal-label">${label}</span>
+                        <span class="goal-count">${current}/${target}</span>
+                    </div>
+                    <div class="goal-bar-bg">
+                        <div class="goal-bar-fill ${isComplete ? 'complete' : ''}" style="width: ${percent}%"></div>
+                    </div>
+                </div>
+            `;
+        };
+        
+        const topicsCount = Array.isArray(data.topics) ? data.topics.length : 0;
+        
+        return `
+            <div class="card-new daily-goals-card">
+                <div class="card-header">
+                    <h2>🎯 Daily Goals</h2>
+                    <span class="goals-reset-time">Resets at midnight</span>
+                </div>
+                <div class="daily-goals-content">
+                    ${renderGoalBar(data.questions, goals.questions.target, goals.questions.icon, goals.questions.label)}
+                    ${renderGoalBar(data.correct, goals.correct.target, goals.correct.icon, goals.correct.label)}
+                    ${renderGoalBar(topicsCount, goals.topics.target, goals.topics.icon, goals.topics.label)}
+                    ${renderGoalBar(data.games, goals.games.target, goals.games.icon, goals.games.label)}
+                </div>
+            </div>
+            
+            <style>
+                .daily-goals-card { margin-bottom: 1rem; }
+                .goals-reset-time { font-size: 0.75rem; color: var(--text-muted); }
+                .daily-goals-content { display: flex; flex-direction: column; gap: 0.75rem; }
+                .daily-goal-item { padding: 0.5rem 0; }
+                .daily-goal-item.complete .goal-icon { animation: bounce 0.5s ease; }
+                .goal-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem; }
+                .goal-icon { font-size: 1.1rem; }
+                .goal-label { flex: 1; font-size: 0.9rem; color: var(--text-secondary); }
+                .goal-count { font-size: 0.85rem; font-weight: 600; color: var(--text-primary); }
+                .goal-bar-bg { height: 8px; background: var(--bg-tertiary); border-radius: 4px; overflow: hidden; }
+                .goal-bar-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--primary-light)); border-radius: 4px; transition: width 0.3s ease; }
+                .goal-bar-fill.complete { background: linear-gradient(90deg, #10b981, #34d399); }
+                @keyframes bounce { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
+            </style>
+        `;
     }
+
 };

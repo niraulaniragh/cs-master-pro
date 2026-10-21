@@ -162,10 +162,10 @@ const CarRace = {
                             .filter(p => p.position === i)
                             .map((p, idx) => `
                                 <span class="car-icon ${p.id === Auth.getCurrentUser()?.id ? 'my-car' : ''}" 
-                                      title="${p.username}"
+                                      title="${Helpers.escapeHtml(p.username)}"
                                       style="transform: translateX(${idx * 15}px)">
                                     ${CarRace.carEmojis[0]}
-                                    <span class="car-label">${p.username.substring(0, 3)}</span>
+                                    <span class="car-label">${Helpers.escapeHtml(p.username.substring(0, 3))}</span>
                                 </span>
                             `).join('')
                         }
@@ -199,7 +199,7 @@ const CarRace = {
                             players.map((p, i) => `
                                 <div class="player-item">
                                     <span class="player-car">${CarRace.carEmojis[0]}</span>
-                                    <span class="player-name">${p.username}</span>
+                                    <span class="player-name">${Helpers.escapeHtml(p.username)}</span>
                                     ${p.ready ? '<span class="ready-badge">Ready</span>' : ''}
                                 </div>
                             `).join('')
@@ -292,7 +292,7 @@ const CarRace = {
                         <div class="standing-row ${p.position >= CarRace.raceTrackLength ? 'finished' : ''}">
                             <span class="standing-pos">${i + 1}</span>
                             <span class="standing-car">${CarRace.carEmojis[0]}</span>
-                            <span class="standing-name">${p.username}</span>
+                            <span class="standing-name">${Helpers.escapeHtml(p.username)}</span>
                             <span class="standing-progress">${p.position}/${CarRace.raceTrackLength}</span>
                             ${p.position >= CarRace.raceTrackLength ? '<span class="finish-flag">🏁</span>' : ''}
                         </div>
@@ -334,7 +334,7 @@ const CarRace = {
                         <div class="podium-place place-${i + 1}">
                             <span class="place-medal">${i === 0 ? '🥇' : i === 1 ? '🥈' : '🥉'}</span>
                             <span class="place-car">${CarRace.carEmojis[0]}</span>
-                            <span class="place-name">${p.username}</span>
+                            <span class="place-name">${Helpers.escapeHtml(p.username)}</span>
                             <span class="place-stats">${p.correctAnswers} correct</span>
                         </div>
                     `).join('')}
@@ -344,7 +344,7 @@ const CarRace = {
                     ${results.slice(3).map((p, i) => `
                         <div class="result-row">
                             <span class="result-pos">${i + 4}</span>
-                            <span class="result-name">${p.username}</span>
+                            <span class="result-name">${Helpers.escapeHtml(p.username)}</span>
                             <span class="result-stats">${p.correctAnswers}/${p.correctAnswers + p.wrongAnswers}</span>
                         </div>
                     `).join('')}
@@ -645,5 +645,20 @@ const CarRace = {
     
     init: () => {
         console.log('🏎️ Car Race game initialized');
+    },
+
+    cleanup: () => {
+        // Stop polling and update intervals
+        CarRace.stopPolling();
+        if (CarRace.updateInterval) {
+            clearInterval(CarRace.updateInterval);
+            CarRace.updateInterval = null;
+        }
+        if (CarRace.penaltyTimer) {
+            clearInterval(CarRace.penaltyTimer);
+            CarRace.penaltyTimer = null;
+        }
+        CarRace.game = null;
+        console.log('🏎️ CarRace cleanup');
     }
 };

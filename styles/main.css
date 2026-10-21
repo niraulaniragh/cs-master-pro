@@ -15050,3 +15050,493 @@ textarea:focus {
         text-align: center;
     }
 }
+
+
+/* =====================================================
+   ACCESSIBILITY IMPROVEMENTS
+   ===================================================== */
+
+/* Skip Link - Visually hidden until focused */
+.skip-link {
+    position: absolute;
+    top: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--primary);
+    color: white;
+    padding: var(--space-3) var(--space-5);
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: 1rem;
+    z-index: 10000;
+    text-decoration: none;
+    transition: top 0.3s ease;
+}
+
+.skip-link:focus {
+    top: var(--space-3);
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+}
+
+/* Screen Reader Only - Hidden visually but accessible */
+.sr-only {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+/* Enhanced Focus Styles for All Interactive Elements */
+:focus-visible {
+    outline: 3px solid var(--primary);
+    outline-offset: 2px;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+    outline: 3px solid var(--primary);
+    outline-offset: 2px;
+}
+
+.btn:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 6px rgba(6, 182, 212, 0.2);
+}
+
+.nav-link:focus-visible {
+    outline: 3px solid var(--primary);
+    outline-offset: 2px;
+    background: var(--bg-hover);
+}
+
+.option-btn:focus-visible {
+    outline: 3px solid var(--primary);
+    outline-offset: 2px;
+    border-color: var(--primary);
+}
+
+.flashcard:focus-visible {
+    outline: 3px solid var(--primary);
+    outline-offset: 4px;
+}
+
+/* Touch Target Minimum Sizes (48px for mobile) */
+@media (pointer: coarse) {
+    button,
+    .btn,
+    .nav-link,
+    .option-btn,
+    .tab-btn,
+    .topic-item,
+    .action-card,
+    .tool-card,
+    .game-card,
+    .challenge-item,
+    input[type="checkbox"],
+    input[type="radio"],
+    select {
+        min-height: 48px;
+        min-width: 48px;
+    }
+    
+    .nav-link {
+        padding: var(--space-3) var(--space-4);
+    }
+    
+    .option-btn {
+        padding: var(--space-4) var(--space-5);
+    }
+    
+    .tab-btn {
+        padding: var(--space-3) var(--space-5);
+    }
+    
+    .sound-toggle {
+        width: 48px;
+        height: 48px;
+    }
+    
+    .mark-btn {
+        width: 52px;
+        height: 52px;
+    }
+}
+
+/* =====================================================
+   HAMBURGER MENU STYLES
+   ===================================================== */
+
+.hamburger-menu {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 44px;
+    height: 44px;
+    padding: var(--space-2);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    z-index: 1001;
+    transition: all 0.2s ease;
+}
+
+.hamburger-menu:hover,
+.hamburger-menu:focus-visible {
+    border-color: var(--primary);
+    background: var(--bg-hover);
+}
+
+.hamburger-line {
+    width: 24px;
+    height: 2px;
+    background: var(--text-primary);
+    border-radius: 2px;
+    transition: all 0.3s ease;
+    margin: 3px 0;
+}
+
+.hamburger-menu[aria-expanded="true"] .hamburger-line:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+}
+
+.hamburger-menu[aria-expanded="true"] .hamburger-line:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger-menu[aria-expanded="true"] .hamburger-line:nth-child(3) {
+    transform: rotate(-45deg) translate(7px, -6px);
+}
+
+/* =====================================================
+   MOBILE NAVIGATION COLLAPSE STYLES
+   ===================================================== */
+
+@media (max-width: 768px) {
+    .hamburger-menu {
+        display: flex;
+    }
+    
+    .main-nav {
+        flex-wrap: wrap;
+        padding: var(--space-3);
+        gap: var(--space-2);
+        position: relative;
+    }
+    
+    .nav-brand {
+        order: 1;
+        flex: 1;
+    }
+    
+    .hamburger-menu {
+        order: 2;
+    }
+    
+    .nav-stats {
+        order: 3;
+        display: flex;
+        gap: var(--space-2);
+    }
+    
+    .nav-user {
+        order: 4;
+    }
+    
+    .nav-links {
+        order: 5;
+        width: 100%;
+        flex-direction: column;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: var(--space-2);
+        margin-top: var(--space-3);
+        gap: var(--space-1);
+        
+        /* Hidden by default on mobile */
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        visibility: hidden;
+        transition: max-height 0.3s ease, opacity 0.3s ease, visibility 0.3s ease, padding 0.3s ease;
+        padding: 0;
+        margin: 0;
+        border: none;
+    }
+    
+    .nav-links.mobile-open {
+        max-height: 400px;
+        opacity: 1;
+        visibility: visible;
+        padding: var(--space-2);
+        margin-top: var(--space-3);
+        border: 1px solid var(--border);
+    }
+    
+    .nav-link {
+        width: 100%;
+        justify-content: flex-start;
+        padding: var(--space-3) var(--space-4);
+        border-radius: var(--radius-md);
+    }
+    
+    .nav-link span {
+        display: inline;
+    }
+    
+    .nav-link i {
+        width: 24px;
+        text-align: center;
+    }
+    
+    /* Stats compact view on mobile */
+    .nav-stats .stat-item span:not(i):not(:first-child) {
+        display: none;
+    }
+    
+    .stat-item {
+        font-size: 0.8rem;
+    }
+}
+
+/* =====================================================
+   KEYBOARD NAVIGATION HINTS
+   ===================================================== */
+
+.keyboard-hint {
+    display: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .keyboard-hint {
+        display: inline-block;
+        padding: 2px 6px;
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        font-size: 0.7rem;
+        font-family: var(--font-mono);
+        color: var(--text-dim);
+        margin-left: var(--space-2);
+    }
+}
+
+/* Flashcard keyboard navigation indicator */
+.flashcard-keyboard-hint {
+    text-align: center;
+    padding: var(--space-2);
+    color: var(--text-dim);
+    font-size: 0.8rem;
+}
+
+.flashcard-keyboard-hint kbd {
+    display: inline-block;
+    padding: 2px 8px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    margin: 0 2px;
+}
+
+/* Quiz keyboard navigation indicator */
+.quiz-keyboard-hint {
+    text-align: center;
+    padding: var(--space-3);
+    color: var(--text-dim);
+    font-size: 0.8rem;
+    border-top: 1px solid var(--border);
+    margin-top: var(--space-4);
+}
+
+.quiz-keyboard-hint kbd {
+    display: inline-block;
+    padding: 2px 8px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    margin: 0 2px;
+}
+
+/* =====================================================
+   SWIPE GESTURE INDICATOR FOR FLASHCARDS
+   ===================================================== */
+
+.swipe-indicator {
+    display: none;
+    text-align: center;
+    padding: var(--space-2);
+    color: var(--text-dim);
+    font-size: 0.8rem;
+}
+
+@media (pointer: coarse) {
+    .swipe-indicator {
+        display: block;
+    }
+    
+    .flashcard-keyboard-hint {
+        display: none;
+    }
+}
+
+/* Flashcard swipe animation feedback */
+.flashcard.swiping-left {
+    transform: translateX(-20px) rotate(-5deg);
+    opacity: 0.8;
+}
+
+.flashcard.swiping-right {
+    transform: translateX(20px) rotate(5deg);
+    opacity: 0.8;
+}
+
+.flashcard.swipe-complete-left {
+    animation: swipeOutLeft 0.3s ease forwards;
+}
+
+.flashcard.swipe-complete-right {
+    animation: swipeOutRight 0.3s ease forwards;
+}
+
+@keyframes swipeOutLeft {
+    to {
+        transform: translateX(-100%) rotate(-15deg);
+        opacity: 0;
+    }
+}
+
+@keyframes swipeOutRight {
+    to {
+        transform: translateX(100%) rotate(15deg);
+        opacity: 0;
+    }
+}
+
+/* =====================================================
+   ADDITIONAL MOBILE IMPROVEMENTS
+   ===================================================== */
+
+/* Better mobile spacing */
+@media (max-width: 480px) {
+    .main-content {
+        padding: var(--space-3);
+    }
+    
+    .practice-setup,
+    .flashcard-setup,
+    .pastpaper-setup {
+        padding: var(--space-4);
+    }
+    
+    .practice-setup h2,
+    .flashcard-setup h2,
+    .pastpaper-setup h2 {
+        font-size: 1.25rem;
+    }
+    
+    .setup-options {
+        flex-direction: column;
+        gap: var(--space-3);
+    }
+    
+    .option-group {
+        width: 100%;
+    }
+    
+    .option-group select {
+        width: 100%;
+    }
+    
+    .flashcard {
+        height: 260px;
+    }
+    
+    .flashcard-question {
+        font-size: 1.2rem;
+    }
+    
+    .flashcard-answer {
+        font-size: 1rem;
+    }
+    
+    .flashcard-actions {
+        flex-direction: row;
+        gap: var(--space-2);
+    }
+    
+    .btn-known,
+    .btn-review {
+        flex: 1;
+        padding: var(--space-3);
+    }
+    
+    .flashcard-nav {
+        gap: var(--space-2);
+    }
+    
+    .flashcard-nav .btn {
+        flex: 1;
+    }
+}
+
+/* Improved touch feedback */
+@media (pointer: coarse) {
+    .btn:active,
+    .option-btn:active,
+    .nav-link:active,
+    .flashcard:active {
+        transform: scale(0.98);
+    }
+    
+    .flashcard {
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    :focus-visible {
+        outline: 4px solid currentColor;
+        outline-offset: 3px;
+    }
+    
+    .skip-link:focus {
+        outline: 4px solid white;
+    }
+}
+
+/* Reduced motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+    .flashcard,
+    .flashcard.swiping-left,
+    .flashcard.swiping-right {
+        transition: none;
+        animation: none;
+    }
+    
+    .hamburger-line {
+        transition: none;
+    }
+    
+    .nav-links {
+        transition: none;
+    }
+}
