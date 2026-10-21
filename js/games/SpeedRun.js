@@ -31,6 +31,7 @@ const SpeedRun = {
     },
 
     close: () => {
+        document.removeEventListener('keydown', SpeedRun.keyHandler);
         const modal = document.getElementById('speed-run-modal');
         if (modal) {
             modal.classList.remove('active');
@@ -208,7 +209,7 @@ const SpeedRun = {
         if (!SpeedRun.isPlaying) return;
         
         const question = SpeedRun.questions[SpeedRun.currentIndex];
-        const isCorrect = index === question.correct;
+        const isCorrect = index === question.answer;
         const answerTime = (Date.now() - SpeedRun.questionStartTime) / 1000;
         
         // Calculate points
@@ -451,8 +452,8 @@ const SpeedRun = {
     }
 };
 
-// Keyboard shortcuts for Speed Run
-document.addEventListener('keydown', (e) => {
+// Keyboard shortcuts handler for Speed Run
+SpeedRun.keyHandler = (e) => {
     if (!SpeedRun.isPlaying) return;
     
     const key = e.key.toUpperCase();
@@ -462,4 +463,5 @@ document.addEventListener('keydown', (e) => {
         e.preventDefault();
         SpeedRun.answer(keyMap[key]);
     }
-});
+};
+document.addEventListener('keydown', SpeedRun.keyHandler);

@@ -12,43 +12,43 @@ const ToolsView = {
                 <p>Practice with these interactive tools to reinforce your learning</p>
                 
                 <div class="tools-grid">
-                    <button class="tool-card" onclick="ToolsView.openTool('binary')">
+                    <button class="tool-card" onclick="ToolsView.openTool('binary', event)">
                         <span class="tool-icon">🔢</span>
                         <h3>Number Base Converter</h3>
                         <p>Convert between binary, denary, hex with visual breakdowns</p>
                     </button>
                     
-                    <button class="tool-card" onclick="ToolsView.openTool('logic')">
+                    <button class="tool-card" onclick="ToolsView.openTool('logic', event)">
                         <span class="tool-icon">⚡</span>
                         <h3>Logic Gates</h3>
                         <p>Build and test logic gate circuits</p>
                     </button>
                     
-                    <button class="tool-card" onclick="ToolsView.openTool('algorithm')">
+                    <button class="tool-card" onclick="ToolsView.openTool('algorithm', event)">
                         <span class="tool-icon">📊</span>
                         <h3>Algorithm Visualizer</h3>
                         <p>Watch sorting and searching algorithms in action</p>
                     </button>
                     
-                    <button class="tool-card" onclick="ToolsView.openTool('ascii')">
+                    <button class="tool-card" onclick="ToolsView.openTool('ascii', event)">
                         <span class="tool-icon">📝</span>
                         <h3>ASCII Table</h3>
                         <p>Look up ASCII codes and characters</p>
                     </button>
                     
-                    <button class="tool-card" onclick="ToolsView.openTool('filesize')">
+                    <button class="tool-card" onclick="ToolsView.openTool('filesize', event)">
                         <span class="tool-icon">📁</span>
                         <h3>File Size Calculator</h3>
                         <p>Calculate image and sound file sizes</p>
                     </button>
                     
-                    <button class="tool-card" onclick="ToolsView.openTool('cipher')">
+                    <button class="tool-card" onclick="ToolsView.openTool('cipher', event)">
                         <span class="tool-icon">🔐</span>
                         <h3>Cipher Tool</h3>
                         <p>Practice Caesar and Vigenère ciphers</p>
                     </button>
                     
-                    <button class="tool-card" onclick="ToolsView.openTool('tracetable')">
+                    <button class="tool-card" onclick="ToolsView.openTool('tracetable', event)">
                         <span class="tool-icon">📋</span>
                         <h3>Trace Table Creator</h3>
                         <p>Create and practice trace tables</p>
@@ -69,14 +69,17 @@ const ToolsView = {
         console.log('🔧 Tools view initialized');
     },
 
-    openTool: (toolId) => {
+    openTool: (toolId, event) => {
         ToolsView.activeTool = toolId;
         const workspace = document.getElementById('tool-workspace');
+        if (!workspace) return;
         
         document.querySelectorAll('.tool-card').forEach(card => {
             card.classList.remove('active');
         });
-        event.currentTarget.classList.add('active');
+        if (event && event.currentTarget) {
+            event.currentTarget.classList.add('active');
+        }
 
         switch(toolId) {
             case 'binary':

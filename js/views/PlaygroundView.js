@@ -1625,6 +1625,9 @@ for i in range(1, 6):
         const lesson = PlaygroundView.lessons[topicId];
         if (!lesson) return;
         
+        // Store lesson code for safe retrieval
+        PlaygroundView.currentLessonSections = lesson.sections;
+        
         document.getElementById('learn-content').innerHTML = `
             <div class="lesson-content">
                 <h3>${lesson.title}</h3>
@@ -1633,19 +1636,33 @@ for i in range(1, 6):
                         <h4>${i + 1}. ${s.title}</h4>
                         <p>${s.content}</p>
                         <div class="lesson-code">
-                            <pre><code>${s.code}</code></pre>
-                            <button class="btn btn-small btn-primary" onclick="PlaygroundView.tryCode(\`${s.code.replace(/`/g, '\\`')}\`)">▶ Try It</button>
+                            <pre><code>${s.code.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</code></pre>
+                            <button class="btn btn-small btn-primary" onclick="PlaygroundView.tryLessonCode(${i})">▶ Try It</button>
                         </div>
                     </div>
                 `).join('')}
             </div>
         `;
     },
+    
+    currentLessonSections: [],
+    
+    tryLessonCode: (index) => {
+        if (PlaygroundView.currentLessonSections[index]) {
+            PlaygroundView.tryCode(PlaygroundView.currentLessonSections[index].code);
+        }
+    },
 
     tryCode: (code) => {
-        PlaygroundView.showMode('sandbox', document.querySelector('.mode-tab'));
-        document.getElementById('code-editor').value = code;
-        PlaygroundView.updateLineNumbers();
+        const modeTab = document.querySelector('.mode-tab');
+        if (modeTab) {
+            PlaygroundView.showMode('sandbox', modeTab);
+        }
+        const editor = document.getElementById('code-editor');
+        if (editor) {
+            editor.value = code;
+            PlaygroundView.handleInput();
+        }
         PlaygroundView.runCode();
     },
 

@@ -42,9 +42,11 @@ const Auth = {
      * Hash password (simple hash for demo - use bcrypt in production)
      */
     hashPassword: (password) => {
+        // Simple hash with salt - note: for demo only, use bcrypt in production
         let hash = 0;
-        for (let i = 0; i < password.length; i++) {
-            const char = password.charCodeAt(i);
+        const str = password + 'CSMasterPro_2024';
+        for (let i = 0; i < str.length; i++) {
+            const char = str.charCodeAt(i);
             hash = ((hash << 5) - hash) + char;
             hash = hash & hash;
         }
@@ -105,7 +107,7 @@ const Auth = {
 
         // Create user
         const newUser = {
-            id: Date.now().toString(36) + Math.random().toString(36).substr(2),
+            id: Date.now().toString(36) + Math.random().toString(36).substring(2),
             username: username.trim(),
             email: normalizedEmail,
             passwordHash: Auth.hashPassword(password),

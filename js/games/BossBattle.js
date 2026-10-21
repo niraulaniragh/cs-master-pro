@@ -128,6 +128,8 @@ const BossBattle = {
     },
 
     close: () => {
+        BossBattle.isPlaying = false;
+        document.removeEventListener('keydown', BossBattle.keyHandler);
         const modal = document.getElementById('boss-battle-modal');
         if (modal) {
             modal.classList.remove('active');
@@ -333,13 +335,13 @@ const BossBattle = {
         if (!BossBattle.isPlaying) return;
         
         const question = BossBattle.questions[BossBattle.currentIndex];
-        const isCorrect = index === question.correct;
+        const isCorrect = index === question.answer;
         const boss = BossBattle.currentBoss;
         
         // Disable all options
         document.querySelectorAll('.boss-option').forEach((btn, i) => {
             btn.disabled = true;
-            if (i === question.correct) btn.classList.add('correct');
+            if (i === question.answer) btn.classList.add('correct');
             else if (i === index) btn.classList.add('wrong');
         });
         
@@ -576,8 +578,8 @@ const BossBattle = {
     }
 };
 
-// Keyboard shortcuts
-document.addEventListener('keydown', (e) => {
+// Keyboard shortcuts handler
+BossBattle.keyHandler = (e) => {
     if (!BossBattle.isPlaying) return;
     
     const key = e.key.toUpperCase();
@@ -587,4 +589,5 @@ document.addEventListener('keydown', (e) => {
         e.preventDefault();
         BossBattle.answer(keyMap[key]);
     }
-});
+};
+document.addEventListener('keydown', BossBattle.keyHandler);

@@ -5,15 +5,20 @@
 
 const HomeView = {
     render: () => {
-        const user = AppState.getState('user');
-        const xpForNext = HomeView.getXPForNextLevel(user.level);
-        const currentLevelXP = HomeView.getXPForLevel(user.level);
-        const progress = Math.min(100, ((user.xp - currentLevelXP) / (xpForNext - currentLevelXP)) * 100) || 0;
-        const accuracy = user.totalAnswered > 0 ? Math.round((user.totalCorrect / user.totalAnswered) * 100) : 0;
-        const rank = HomeView.getRank(user.level);
+        const user = AppState.getState('user') || {};
+        const level = user.level || 1;
+        const xp = user.xp || 0;
+        const totalCorrect = user.totalCorrect || 0;
+        const totalAnswered = user.totalAnswered || 0;
+        
+        const xpForNext = HomeView.getXPForNextLevel(level);
+        const currentLevelXP = HomeView.getXPForLevel(level);
+        const progress = Math.min(100, ((xp - currentLevelXP) / (xpForNext - currentLevelXP)) * 100) || 0;
+        const accuracy = totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0;
+        const rank = HomeView.getRank(level);
         const isLoggedIn = typeof Auth !== 'undefined' && Auth.isLoggedIn();
         const username = isLoggedIn ? (Auth.getSession()?.username || 'Student') : 'Student';
-        const totalQuestions = QUESTIONS?.length || 0;
+        const totalQuestions = (typeof QUESTIONS !== 'undefined' && QUESTIONS?.length) || 0;
 
         return `
             <div class="home-view-new">
@@ -29,7 +34,7 @@ const HomeView = {
                         </div>
                     </div>
                     <div class="hero-right">
-                        <button class="search-box" onclick="SearchNotes.open()">
+                        <button class="search-box" onclick="typeof SearchNotes !== 'undefined' && SearchNotes.open()">
                             <i class="fas fa-search"></i>
                             <span>Search topics, notes...</span>
                             <kbd>⌘K</kbd>
@@ -41,7 +46,7 @@ const HomeView = {
                 <section class="stats-overview">
                     <div class="stat-card primary">
                         <div class="stat-icon-wrap">
-                            <span class="stat-icon-inner">${user.level}</span>
+                            <span class="stat-icon-inner">${level}</span>
                         </div>
                         <div class="stat-content">
                             <span class="stat-value">${rank.name}</span>
@@ -53,7 +58,7 @@ const HomeView = {
                             <i class="fas fa-bolt"></i>
                         </div>
                         <div class="stat-content">
-                            <span class="stat-value">${user.xp.toLocaleString()}</span>
+                            <span class="stat-value">${xp.toLocaleString()}</span>
                             <span class="stat-desc">Total XP</span>
                         </div>
                     </div>
@@ -62,7 +67,7 @@ const HomeView = {
                             <i class="fas fa-check"></i>
                         </div>
                         <div class="stat-content">
-                            <span class="stat-value">${user.totalCorrect}</span>
+                            <span class="stat-value">${totalCorrect}</span>
                             <span class="stat-desc">Correct</span>
                         </div>
                     </div>
@@ -141,7 +146,7 @@ const HomeView = {
                             </div>
                             <div class="progress-content-new">
                                 <div class="level-badge-large">
-                                    <span class="level-num-lg">${user.level}</span>
+                                    <span class="level-num-lg">${level}</span>
                                     <span class="level-label-sm">LEVEL</span>
                                 </div>
                                 <div class="progress-info">
@@ -150,18 +155,18 @@ const HomeView = {
                                         <div class="progress-bar-bg">
                                             <div class="progress-bar-fill" style="width: ${progress}%"></div>
                                         </div>
-                                        <span class="progress-text">${user.xp} / ${xpForNext} XP</span>
+                                        <span class="progress-text">${xp} / ${xpForNext} XP</span>
                                     </div>
                                     <p class="progress-next">${(xpForNext - user.xp).toLocaleString()} XP until Level ${user.level + 1}</p>
                                 </div>
                             </div>
                             <div class="progress-stats">
                                 <div class="p-stat">
-                                    <span class="p-stat-val">${user.totalAnswered}</span>
+                                    <span class="p-stat-val">${totalAnswered}</span>
                                     <span class="p-stat-lbl">Answered</span>
                                 </div>
                                 <div class="p-stat">
-                                    <span class="p-stat-val">${user.totalCorrect}</span>
+                                    <span class="p-stat-val">${totalCorrect}</span>
                                     <span class="p-stat-lbl">Correct</span>
                                 </div>
                                 <div class="p-stat">

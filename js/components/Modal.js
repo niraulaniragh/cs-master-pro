@@ -8,6 +8,7 @@ const Modal = (() => {
     let onCloseCallback = null;
     let confirmCallback = null;
     let cancelCallback = null;
+    let escapeHandler = null;
 
     const create = () => {
         if (modalElement) return;
@@ -35,12 +36,13 @@ const Modal = (() => {
         // Close button
         modalElement.querySelector('.modal-close').addEventListener('click', close);
 
-        // Escape key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && modalElement.classList.contains('show')) {
+        // Escape key - create named handler for cleanup
+        escapeHandler = (e) => {
+            if (e.key === 'Escape' && modalElement && modalElement.classList.contains('show')) {
                 close();
             }
-        });
+        };
+        document.addEventListener('keydown', escapeHandler);
     };
 
     const show = (options = {}) => {
@@ -79,6 +81,24 @@ const Modal = (() => {
             onCloseCallback();
             onCloseCallback = null;
         }
+        
+        // Clear callbacks to prevent memory leaks
+        confirmCallback = null;
+        cancelCallback = null;
+    };
+    
+    const destroy = () => {
+        if (escapeHandler) {
+            document.removeEventListener('keydown', escapeHandler);
+            escapeHandler = null;
+        }
+        if (modalElement) {
+            modalElement.remove();
+            modalElement = null;
+        }
+        onCloseCallback = null;
+        confirmCallback = null;
+        cancelCallback = null;
     };
     
     // Handle confirm button click
@@ -167,5 +187,5 @@ const Modal = (() => {
         }, 0);
     };
 
-    return { show, close, confirm, alert, quiz };
+    return { show, close, destroy, confirm, alert, quiz };
 })();

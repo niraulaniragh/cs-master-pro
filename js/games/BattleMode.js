@@ -301,12 +301,12 @@ const BattleMode = {
         clearTimeout(BattleMode.opponentTimeout);
         
         const question = BattleMode.questions[BattleMode.currentIndex];
-        const isCorrect = index === question.correct;
+        const isCorrect = index === question.answer;
         
         // Highlight answers
         document.querySelectorAll('.bq-option').forEach((btn, i) => {
             btn.disabled = true;
-            if (i === question.correct) {
+            if (i === question.answer) {
                 btn.classList.add('correct');
             } else if (i === index && !isCorrect) {
                 btn.classList.add('wrong');
@@ -351,7 +351,7 @@ const BattleMode = {
         const question = BattleMode.questions[BattleMode.currentIndex];
         document.querySelectorAll('.bq-option').forEach((btn, i) => {
             btn.disabled = true;
-            if (i === question.correct) {
+            if (i === question.answer) {
                 btn.classList.add('correct');
             }
         });
