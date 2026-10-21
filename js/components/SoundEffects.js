@@ -8,6 +8,7 @@ const SoundFX = {
     volume: 0.4,
     audioContext: null,
     initialized: false,
+    userInteracted: false,
 
     init: () => {
         // Load preference
@@ -16,14 +17,25 @@ const SoundFX = {
             SoundFX.enabled = saved === 'true';
         }
         
-        // Try to create audio context immediately
-        SoundFX.ensureContext();
+        // Don't create AudioContext here - wait for user interaction
+        // Add one-time listener for user interaction
+        const initOnInteraction = () => {
+            if (!SoundFX.userInteracted) {
+                SoundFX.userInteracted = true;
+                SoundFX.ensureContext();
+            }
+        };
         
-        console.log('🔊 Sound effects initialized');
+        // Listen for first user interaction
+        document.addEventListener('click', initOnInteraction, { once: true });
+        document.addEventListener('keydown', initOnInteraction, { once: true });
+        document.addEventListener('touchstart', initOnInteraction, { once: true });
+        
+        console.log('🔊 Sound effects initialized (waiting for user interaction)');
     },
 
     ensureContext: () => {
-        if (!SoundFX.audioContext) {
+        if (!SoundFX.audioContext && SoundFX.userInteracted) {
             try {
                 SoundFX.audioContext = new (window.AudioContext || window.webkitAudioContext)();
                 SoundFX.initialized = true;

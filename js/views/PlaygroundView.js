@@ -243,7 +243,10 @@ for i in range(1, 6):
 
     init: () => {
         console.log('💻 Playground view initialized');
-        PlaygroundView.updateLineNumbers();
+        // Initialize syntax highlighting after DOM is ready
+        setTimeout(() => {
+            PlaygroundView.handleInput();
+        }, 50);
     },
 
     showMode: (mode, btn) => {
@@ -1845,19 +1848,5 @@ for i in range(1, 6):
             editor.selectionStart = editor.selectionEnd = start + 4;
             PlaygroundView.handleInput();
         }
-    },
-    
-    init: () => {
-        // Initialize syntax highlighting on load
-        setTimeout(() => {
-            PlaygroundView.handleInput();
-        }, 100);
     }
 };
-
-// Initialize on page load
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => PlaygroundView.init());
-} else {
-    PlaygroundView.init();
-}
