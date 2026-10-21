@@ -14106,3 +14106,266 @@ textarea:focus {
         grid-template-columns: 1fr;
     }
 }
+
+
+/* =====================================================
+   PYTHON PLAYGROUND - PYODIDE
+   ===================================================== */
+
+.pyodide-status {
+    font-size: 11px;
+    padding: 4px 8px;
+    border-radius: 12px;
+    margin-left: 10px;
+}
+
+.pyodide-status.loading {
+    background: rgba(251, 191, 36, 0.2);
+    color: #fbbf24;
+    animation: pulse 1.5s infinite;
+}
+
+.pyodide-status.ready {
+    background: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+}
+
+.pyodide-status.error {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+
+.code-controls {
+    display: flex;
+    gap: 10px;
+    padding: 15px;
+    background: var(--bg-tertiary);
+    border-top: 1px solid var(--border);
+}
+
+.btn-run {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.input-area {
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    background: var(--bg-tertiary);
+    border-top: 1px solid var(--border);
+}
+
+.input-area input {
+    flex: 1;
+    padding: 10px 15px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-family: 'JetBrains Mono', monospace;
+}
+
+.input-area input:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.output-info {
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+.output-error {
+    color: #ef4444;
+}
+
+.output-input {
+    color: #3b82f6;
+}
+
+/* Challenges */
+.challenges-container {
+    padding: 20px;
+}
+
+.challenges-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.challenge-card {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.challenge-card:hover {
+    border-color: var(--primary);
+    transform: translateY(-2px);
+}
+
+.challenge-diff {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.challenge-diff.easy {
+    background: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+}
+
+.challenge-diff.medium {
+    background: rgba(251, 191, 36, 0.2);
+    color: #fbbf24;
+}
+
+.challenge-diff.hard {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+
+.challenge-card h4 {
+    margin: 0 0 8px 0;
+}
+
+.challenge-card p {
+    margin: 0;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+/* Learn Mode */
+.learn-container {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 20px;
+    padding: 20px;
+    height: 100%;
+}
+
+.learn-topics {
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-lg);
+    padding: 15px;
+}
+
+.topic-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 15px;
+}
+
+.topic-btn {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 10px 15px;
+    color: var(--text-primary);
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s;
+}
+
+.topic-btn:hover {
+    border-color: var(--primary);
+    background: rgba(16, 185, 129, 0.1);
+}
+
+.learn-content {
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.lesson-placeholder {
+    text-align: center;
+    padding: 60px;
+    color: var(--text-secondary);
+}
+
+.lesson-placeholder span {
+    font-size: 48px;
+    display: block;
+    margin-bottom: 15px;
+}
+
+.lesson-content h3 {
+    margin-bottom: 20px;
+    color: var(--primary);
+}
+
+.lesson-section {
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+}
+
+.lesson-section:last-child {
+    border-bottom: none;
+}
+
+.lesson-section h4 {
+    margin-bottom: 8px;
+}
+
+.lesson-section p {
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+}
+
+.lesson-code {
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.lesson-code pre {
+    padding: 15px;
+    margin: 0;
+    overflow-x: auto;
+}
+
+.lesson-code code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: #cdd6f4;
+}
+
+.lesson-code button {
+    margin: 10px;
+}
+
+@media (max-width: 768px) {
+    .learn-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .learn-topics {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .topic-list {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    
+    .topic-btn {
+        flex: 1;
+        min-width: 100px;
+        text-align: center;
+    }
+}
