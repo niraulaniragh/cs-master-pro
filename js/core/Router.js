@@ -12,7 +12,8 @@ const Router = (() => {
         playground: PlaygroundView,
         games: GamesView,
         teacher: TeacherView,
-        analytics: AnalyticsView
+        analytics: AnalyticsView,
+        pastpapers: PastPaperView
     };
 
     let currentView = null;

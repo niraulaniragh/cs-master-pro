@@ -737,3 +737,131 @@ const NEW_FLASHCARDS = [
 
 // Append new flashcards
 FLASHCARDS.push(...NEW_FLASHCARDS);
+
+
+// ==================== ADDITIONAL 100+ QUESTIONS ====================
+
+const EXTRA_QUESTIONS = [
+    // MORE PROBLEM SOLVING
+    { id: 200, topic: 'problem-solving', question: 'What is the main advantage of merge sort over bubble sort?', options: ['Uses less code', 'More efficient for large datasets O(n log n) vs O(n²)', 'Easier to understand', 'Works on unsorted data only'], answer: 1, explanation: 'Merge sort has O(n log n) time complexity, much better than bubble sort\'s O(n²) for large datasets.' },
+    { id: 201, topic: 'problem-solving', question: 'In a trace table, what do rows represent?', options: ['Variables', 'Each step/iteration of execution', 'Outputs only', 'Input values'], answer: 1, explanation: 'Each row in a trace table represents one step or iteration of the program execution.' },
+    { id: 202, topic: 'problem-solving', question: 'What is the best case time complexity of bubble sort?', options: ['O(1)', 'O(n)', 'O(n log n)', 'O(n²)'], answer: 1, explanation: 'Best case is O(n) when data is already sorted - only one pass needed.' },
+    { id: 203, topic: 'problem-solving', question: 'Which sorting algorithm is stable?', options: ['Quick sort', 'Heap sort', 'Merge sort', 'Selection sort'], answer: 2, explanation: 'Merge sort is stable - it preserves the relative order of equal elements.' },
+    { id: 204, topic: 'problem-solving', question: 'What is the space complexity of merge sort?', options: ['O(1)', 'O(log n)', 'O(n)', 'O(n²)'], answer: 2, explanation: 'Merge sort requires O(n) additional space for the temporary arrays during merging.' },
+    
+    // MORE DATA REPRESENTATION
+    { id: 210, topic: 'data-representation', question: 'What is the maximum unsigned value for 8 bits?', options: ['127', '128', '255', '256'], answer: 2, explanation: '8 bits can represent 2^8 = 256 values, from 0 to 255 (255 is the maximum).' },
+    { id: 211, topic: 'data-representation', question: 'Convert hexadecimal FF to denary:', options: ['15', '16', '255', '256'], answer: 2, explanation: 'FF in hex = 15×16 + 15 = 240 + 15 = 255.' },
+    { id: 212, topic: 'data-representation', question: 'What is the range of signed 8-bit two\'s complement?', options: ['0 to 255', '-127 to 128', '-128 to 127', '-256 to 255'], answer: 2, explanation: 'Two\'s complement 8-bit ranges from -128 to +127 (-2^7 to 2^7-1).' },
+    { id: 213, topic: 'data-representation', question: 'How many bits are in a nibble?', options: ['2', '4', '8', '16'], answer: 1, explanation: 'A nibble is 4 bits, half a byte. One hex digit represents one nibble.' },
+    { id: 214, topic: 'data-representation', question: 'What does lossy compression mean?', options: ['No data is lost', 'Some data is permanently removed', 'File size increases', 'Cannot be undone but all data kept'], answer: 1, explanation: 'Lossy compression permanently removes some data to achieve smaller file sizes.' },
+    { id: 215, topic: 'data-representation', question: 'Which is an example of lossy compression?', options: ['ZIP', 'PNG', 'MP3', 'GIF'], answer: 2, explanation: 'MP3 is lossy audio compression. ZIP and PNG are lossless.' },
+    { id: 216, topic: 'data-representation', question: 'What is RLE compression?', options: ['Removes colors', 'Replaces runs of identical data with count', 'Encrypts data', 'Splits files'], answer: 1, explanation: 'Run Length Encoding replaces sequences of identical data with the value and a count.' },
+    { id: 217, topic: 'data-representation', question: 'Calculate 1010 AND 1100:', options: ['1000', '1110', '0110', '1010'], answer: 0, explanation: 'AND: both bits must be 1. Position by position: 1&1=1, 0&1=0, 1&0=0, 0&0=0 = 1000.' },
+    { id: 218, topic: 'data-representation', question: 'Calculate 1010 OR 1100:', options: ['1000', '1110', '0110', '1010'], answer: 1, explanation: 'OR: either bit can be 1. Position by position: 1|1=1, 0|1=1, 1|0=1, 0|0=0 = 1110.' },
+    { id: 219, topic: 'data-representation', question: 'What is a check digit used for?', options: ['Encryption', 'Detecting transcription errors', 'Compression', 'Authentication'], answer: 1, explanation: 'Check digits detect errors when data is entered or transmitted (like ISBN, barcodes).' },
+    
+    // MORE HARDWARE
+    { id: 220, topic: 'hardware', question: 'What does volatile memory mean?', options: ['Explodes easily', 'Loses data when power is off', 'Is very fast', 'Cannot be written to'], answer: 1, explanation: 'Volatile memory (like RAM) loses all stored data when power is turned off.' },
+    { id: 221, topic: 'hardware', question: 'Which register holds the address of the next instruction?', options: ['MAR', 'MDR', 'Program Counter', 'Accumulator'], answer: 2, explanation: 'The Program Counter (PC) holds the memory address of the next instruction to fetch.' },
+    { id: 222, topic: 'hardware', question: 'What is the function of the ALU?', options: ['Store data', 'Perform calculations and logic', 'Fetch instructions', 'Decode instructions'], answer: 1, explanation: 'The Arithmetic Logic Unit performs mathematical operations and logical comparisons.' },
+    { id: 223, topic: 'hardware', question: 'What is clock speed measured in?', options: ['Bytes', 'Hertz (Hz)', 'Bits per second', 'Watts'], answer: 1, explanation: 'Clock speed is measured in Hertz (Hz) - cycles per second. Modern CPUs use GHz.' },
+    { id: 224, topic: 'hardware', question: 'What does increasing core count allow?', options: ['Faster single tasks', 'Parallel processing of multiple tasks', 'More storage', 'Better graphics'], answer: 1, explanation: 'Multiple cores allow parallel processing - running several tasks simultaneously.' },
+    { id: 225, topic: 'hardware', question: 'What is an SSD?', options: ['Spinning disk storage', 'Solid State Drive with flash memory', 'A type of RAM', 'A processor'], answer: 1, explanation: 'SSDs use flash memory with no moving parts - faster and more reliable than HDDs.' },
+    { id: 226, topic: 'hardware', question: 'What is the purpose of the control unit?', options: ['Perform calculations', 'Coordinate and manage CPU operations', 'Store programs', 'Connect peripherals'], answer: 1, explanation: 'The Control Unit coordinates all CPU activities, managing fetch-decode-execute cycle.' },
+    { id: 227, topic: 'hardware', question: 'What is cache memory used for?', options: ['Long-term storage', 'Storing frequently accessed data for fast access', 'Boot instructions', 'Graphics processing'], answer: 1, explanation: 'Cache stores frequently used data/instructions for faster CPU access than main RAM.' },
+    { id: 228, topic: 'hardware', question: 'Which has the fastest access time?', options: ['HDD', 'SSD', 'RAM', 'Cache'], answer: 3, explanation: 'Cache is fastest, then RAM, then SSD, then HDD (slowest).' },
+    { id: 229, topic: 'hardware', question: 'What is embedded system?', options: ['Computer inside another device', 'A gaming PC', 'Cloud computing', 'A type of virus'], answer: 0, explanation: 'Embedded systems are computers built into devices like washing machines, cars, ATMs.' },
+    
+    // MORE NETWORKS
+    { id: 230, topic: 'networks', question: 'What layer of TCP/IP handles routing?', options: ['Application', 'Transport', 'Internet', 'Link'], answer: 2, explanation: 'The Internet layer (IP) handles addressing and routing packets across networks.' },
+    { id: 231, topic: 'networks', question: 'What port does HTTPS use?', options: ['80', '443', '21', '25'], answer: 1, explanation: 'HTTPS (secure web) uses port 443. HTTP uses port 80.' },
+    { id: 232, topic: 'networks', question: 'What is a MAC address?', options: ['Internet Protocol address', 'Unique hardware address for NIC', 'Website URL', 'Email address'], answer: 1, explanation: 'MAC (Media Access Control) address is a unique identifier burned into network hardware.' },
+    { id: 233, topic: 'networks', question: 'Which protocol sends email?', options: ['POP3', 'IMAP', 'SMTP', 'HTTP'], answer: 2, explanation: 'SMTP (Simple Mail Transfer Protocol) sends emails. POP3/IMAP receive them.' },
+    { id: 234, topic: 'networks', question: 'What is the purpose of DNS?', options: ['Block malware', 'Translate domain names to IP addresses', 'Encrypt data', 'Assign IP addresses'], answer: 1, explanation: 'DNS (Domain Name System) converts human-readable domains to IP addresses.' },
+    { id: 235, topic: 'networks', question: 'What topology has a single point of failure at the center?', options: ['Bus', 'Ring', 'Star', 'Mesh'], answer: 2, explanation: 'Star topology relies on central hub/switch - if it fails, whole network fails.' },
+    { id: 236, topic: 'networks', question: 'What is bandwidth?', options: ['Physical width of cable', 'Maximum data transfer rate', 'Number of users', 'Type of signal'], answer: 1, explanation: 'Bandwidth is the maximum amount of data that can be transmitted per second.' },
+    { id: 237, topic: 'networks', question: 'What does NAT do?', options: ['Blocks viruses', 'Translates private to public IP addresses', 'Encrypts traffic', 'Speeds up internet'], answer: 1, explanation: 'NAT (Network Address Translation) allows multiple devices to share one public IP.' },
+    { id: 238, topic: 'networks', question: 'Which is more secure: HTTP or HTTPS?', options: ['HTTP', 'HTTPS', 'Both equal', 'Neither is secure'], answer: 1, explanation: 'HTTPS uses SSL/TLS encryption to secure data in transit. HTTP is unencrypted.' },
+    { id: 239, topic: 'networks', question: 'What is a packet?', options: ['Physical envelope', 'Small unit of data with header info', 'Type of cable', 'Network device'], answer: 1, explanation: 'A packet is a small chunk of data with headers containing source, destination, etc.' },
+    
+    // MORE SECURITY
+    { id: 240, topic: 'security', question: 'What is phishing?', options: ['Catching fish online', 'Tricking users to reveal sensitive info', 'A firewall type', 'Encryption method'], answer: 1, explanation: 'Phishing uses fake emails/websites to trick users into revealing passwords, etc.' },
+    { id: 241, topic: 'security', question: 'What is two-factor authentication (2FA)?', options: ['Two passwords', 'Using two different login methods', 'Double encryption', 'Dual monitors'], answer: 1, explanation: '2FA requires two different verification methods (password + phone code, etc.).' },
+    { id: 242, topic: 'security', question: 'What is ransomware?', options: ['Antivirus software', 'Malware that encrypts files and demands payment', 'A type of firewall', 'Spam filter'], answer: 1, explanation: 'Ransomware encrypts victim\'s files and demands payment for the decryption key.' },
+    { id: 243, topic: 'security', question: 'What is a brute force attack?', options: ['Physical break-in', 'Trying all possible password combinations', 'Social engineering', 'Network flooding'], answer: 1, explanation: 'Brute force systematically tries all possible combinations until finding correct password.' },
+    { id: 244, topic: 'security', question: 'What is the purpose of a firewall?', options: ['Cool down computer', 'Filter network traffic based on rules', 'Store passwords', 'Speed up internet'], answer: 1, explanation: 'Firewalls monitor and filter incoming/outgoing network traffic based on security rules.' },
+    { id: 245, topic: 'security', question: 'What is social engineering?', options: ['Building social networks', 'Manipulating people to reveal information', 'Programming social apps', 'Network design'], answer: 1, explanation: 'Social engineering manipulates people psychologically to divulge confidential information.' },
+    { id: 246, topic: 'security', question: 'What is a DDoS attack?', options: ['Data theft', 'Overwhelming a server with traffic', 'Password cracking', 'Phishing'], answer: 1, explanation: 'DDoS (Distributed Denial of Service) floods servers with requests to make them unavailable.' },
+    { id: 247, topic: 'security', question: 'Why use different passwords for different accounts?', options: ['To remember them easily', 'If one is compromised, others stay safe', 'It\'s the law', 'For fun'], answer: 1, explanation: 'If one site is breached, unique passwords prevent attackers accessing your other accounts.' },
+    { id: 248, topic: 'security', question: 'What makes a strong password?', options: ['Short and simple', 'Long with mixed characters, numbers, symbols', 'Your birthday', 'Common words'], answer: 1, explanation: 'Strong passwords are long (12+), use mixed case, numbers, symbols, and avoid dictionary words.' },
+    { id: 249, topic: 'security', question: 'What is biometric authentication?', options: ['Using passwords', 'Using physical characteristics (fingerprint, face)', 'Using security questions', 'Using PINs'], answer: 1, explanation: 'Biometrics use unique physical traits like fingerprints, face, iris, or voice for authentication.' },
+    
+    // MORE PROGRAMMING
+    { id: 250, topic: 'programming', question: 'What is a local variable?', options: ['Available everywhere', 'Only accessible within its function/procedure', 'Stored on disk', 'A constant'], answer: 1, explanation: 'Local variables exist only within the block where they\'re declared.' },
+    { id: 251, topic: 'programming', question: 'What is a global variable?', options: ['On the internet', 'Accessible from anywhere in the program', 'Only in main()', 'A parameter'], answer: 1, explanation: 'Global variables can be accessed from any part of the program.' },
+    { id: 252, topic: 'programming', question: 'What is recursion?', options: ['A loop type', 'A function calling itself', 'An error', 'A data type'], answer: 1, explanation: 'Recursion is when a function calls itself to solve smaller instances of a problem.' },
+    { id: 253, topic: 'programming', question: 'What is a parameter?', options: ['A variable type', 'Value passed to a function', 'A loop counter', 'An output'], answer: 1, explanation: 'Parameters are values passed into functions/procedures for them to work with.' },
+    { id: 254, topic: 'programming', question: 'What is the difference between == and = ?', options: ['No difference', '== compares, = assigns', '= compares, == assigns', 'Both compare'], answer: 1, explanation: '== is comparison (equals), = is assignment (store value in variable).' },
+    { id: 255, topic: 'programming', question: 'What is debugging?', options: ['Adding bugs', 'Finding and fixing errors', 'Removing features', 'Writing documentation'], answer: 1, explanation: 'Debugging is the process of finding, understanding, and fixing errors (bugs) in code.' },
+    { id: 256, topic: 'programming', question: 'What is a syntax error?', options: ['Logic mistake', 'Violation of language rules', 'Runtime crash', 'User error'], answer: 1, explanation: 'Syntax errors violate the grammar rules of the programming language.' },
+    { id: 257, topic: 'programming', question: 'What is a logic error?', options: ['Syntax mistake', 'Code runs but produces wrong results', 'Won\'t compile', 'Crashes computer'], answer: 1, explanation: 'Logic errors mean the code runs but doesn\'t do what was intended.' },
+    { id: 258, topic: 'programming', question: 'What is file handling used for?', options: ['Organizing folders', 'Reading from and writing to files', 'Compressing files', 'Deleting files only'], answer: 1, explanation: 'File handling allows programs to read, write, and manipulate data in files.' },
+    { id: 259, topic: 'programming', question: 'What does APPEND mode do?', options: ['Deletes file content', 'Adds data to end without deleting existing', 'Creates new file', 'Reads only'], answer: 1, explanation: 'APPEND mode adds new data to the end of a file without removing existing content.' },
+    
+    // MORE SOFTWARE & OS
+    { id: 260, topic: 'software', question: 'What is multitasking?', options: ['One task at a time', 'Running multiple programs simultaneously', 'Multiple users', 'Batch processing'], answer: 1, explanation: 'Multitasking allows the OS to run multiple programs at the same time (or appear to).' },
+    { id: 261, topic: 'software', question: 'What is virtual memory?', options: ['Cloud storage', 'Using disk space as extra RAM', 'Fast RAM', 'GPU memory'], answer: 1, explanation: 'Virtual memory uses hard drive space to extend available RAM when physical RAM is full.' },
+    { id: 262, topic: 'software', question: 'What is a device driver?', options: ['A mechanic', 'Software enabling OS to communicate with hardware', 'A USB stick', 'A peripheral'], answer: 1, explanation: 'Device drivers are software that let the OS communicate with hardware devices.' },
+    { id: 263, topic: 'software', question: 'What is defragmentation?', options: ['Breaking files', 'Reorganizing files for faster access', 'Deleting files', 'Compressing files'], answer: 1, explanation: 'Defragmentation reorganizes fragmented file data on HDDs to improve read speed.' },
+    { id: 264, topic: 'software', question: 'What type of software is a word processor?', options: ['System software', 'Application software', 'Utility software', 'Firmware'], answer: 1, explanation: 'Word processors are application software - programs users interact with directly.' },
+    { id: 265, topic: 'software', question: 'What is open source software?', options: ['Free to download', 'Source code available for anyone to view/modify', 'Made by Google', 'Shareware'], answer: 1, explanation: 'Open source means the source code is freely available to view, modify, and distribute.' },
+    { id: 266, topic: 'software', question: 'What is the purpose of an interpreter?', options: ['Translate entire program before running', 'Translate and execute code line by line', 'Write code', 'Debug code'], answer: 1, explanation: 'Interpreters translate and execute source code one line at a time.' },
+    { id: 267, topic: 'software', question: 'What is the purpose of a compiler?', options: ['Run code line by line', 'Translate entire program to machine code first', 'Fix errors', 'Store programs'], answer: 1, explanation: 'Compilers translate the entire source code to machine code before execution.' },
+    { id: 268, topic: 'software', question: 'What is utility software?', options: ['Games', 'Programs that maintain and optimize the system', 'Word processors', 'Web browsers'], answer: 1, explanation: 'Utility software performs maintenance tasks like antivirus, disk cleanup, backup.' },
+    { id: 269, topic: 'software', question: 'What is firmware?', options: ['Software stored in ROM/flash', 'Cloud software', 'Application', 'A virus'], answer: 0, explanation: 'Firmware is software permanently stored in hardware (ROM/flash) like BIOS.' },
+    
+    // DATABASES
+    { id: 270, topic: 'databases', question: 'What is a primary key?', options: ['The first column', 'Unique identifier for each record', 'The largest value', 'A password'], answer: 1, explanation: 'A primary key uniquely identifies each record in a table - no duplicates allowed.' },
+    { id: 271, topic: 'databases', question: 'What is a foreign key?', options: ['Key from another country', 'Links to primary key in another table', 'Backup key', 'Encrypted key'], answer: 1, explanation: 'A foreign key is a field that references the primary key in another table.' },
+    { id: 272, topic: 'databases', question: 'What does SQL stand for?', options: ['Structured Query Language', 'Simple Question Language', 'System Quality Level', 'Standard Query Logic'], answer: 0, explanation: 'SQL = Structured Query Language, used to manage and query databases.' },
+    { id: 273, topic: 'databases', question: 'What does SELECT do in SQL?', options: ['Deletes data', 'Retrieves data from database', 'Updates records', 'Creates tables'], answer: 1, explanation: 'SELECT retrieves (queries) data from one or more database tables.' },
+    { id: 274, topic: 'databases', question: 'What is a database record?', options: ['A column', 'A single row containing related data', 'The whole table', 'A query'], answer: 1, explanation: 'A record (row) contains all the data about one item in the table.' },
+    { id: 275, topic: 'databases', question: 'What is a database field?', options: ['A row', 'A single piece of data / column', 'The whole database', 'A report'], answer: 1, explanation: 'A field (column) holds one specific piece of information for all records.' },
+    { id: 276, topic: 'databases', question: 'What SQL command adds new records?', options: ['SELECT', 'UPDATE', 'INSERT', 'DELETE'], answer: 2, explanation: 'INSERT INTO adds new records to a database table.' },
+    { id: 277, topic: 'databases', question: 'What SQL command modifies existing data?', options: ['SELECT', 'UPDATE', 'INSERT', 'CREATE'], answer: 1, explanation: 'UPDATE modifies existing records in a table.' },
+    { id: 278, topic: 'databases', question: 'What does WHERE clause do?', options: ['Sorts results', 'Filters results based on conditions', 'Counts records', 'Joins tables'], answer: 1, explanation: 'WHERE filters the results to show only records matching specified conditions.' },
+    { id: 279, topic: 'databases', question: 'What is data redundancy?', options: ['Backup data', 'Same data stored multiple times unnecessarily', 'Missing data', 'Encrypted data'], answer: 1, explanation: 'Data redundancy is unnecessary duplication of data, wasting space and causing inconsistencies.' }
+];
+
+// Add extra questions to main QUESTIONS array
+QUESTIONS.push(...EXTRA_QUESTIONS);
+
+// More flashcards for comprehensive coverage
+const MORE_FLASHCARDS = [
+    { id: 101, topic: 'problem-solving', front: 'Insertion Sort', back: 'Builds sorted array one item at a time. Takes each element and inserts into correct position. O(n²) worst case, O(n) best case (nearly sorted). Good for small or nearly sorted datasets.' },
+    { id: 102, topic: 'problem-solving', front: 'Quick Sort', back: 'Divide and conquer. Pick pivot, partition array (smaller left, larger right), recursively sort. O(n log n) average, O(n²) worst (bad pivot). In-place, not stable.' },
+    { id: 103, topic: 'data-representation', front: 'Sample Rate', back: 'Number of samples taken per second when digitizing audio. Measured in Hz. Higher rate = better quality but larger file. CD quality = 44,100 Hz.' },
+    { id: 104, topic: 'data-representation', front: 'Bit Depth', back: 'Number of bits per sample in digital audio. More bits = more amplitude levels = better quality. 16-bit = 65,536 levels. CD quality = 16-bit.' },
+    { id: 105, topic: 'data-representation', front: 'Color Depth', back: 'Number of bits used per pixel. More bits = more colors. 1-bit = 2 colors, 8-bit = 256 colors, 24-bit = 16.7 million colors (true color).' },
+    { id: 106, topic: 'data-representation', front: 'Image Resolution', back: 'Number of pixels in an image (width × height). Higher resolution = more detail but larger file size. E.g., 1920×1080 = 2,073,600 pixels.' },
+    { id: 107, topic: 'hardware', front: 'Von Neumann Architecture', back: 'CPU and memory are separate. Instructions and data share same memory and bus. Fetch-decode-execute cycle. Single bus can be bottleneck.' },
+    { id: 108, topic: 'hardware', front: 'Harvard Architecture', back: 'Separate memory and buses for instructions and data. Can fetch instruction while accessing data (faster). Used in embedded systems, DSPs.' },
+    { id: 109, topic: 'networks', front: 'Client-Server Model', back: 'Server provides services/resources, clients request them. Centralized control, easier security/backup. Examples: web servers, email servers.' },
+    { id: 110, topic: 'networks', front: 'Peer-to-Peer (P2P)', back: 'All computers equal - can be both client and server. No central server. Good for sharing files. Examples: BitTorrent, some games.' },
+    { id: 111, topic: 'networks', front: 'Cloud Computing', back: 'Services over internet: IaaS (infrastructure), PaaS (platform), SaaS (software). Benefits: scalable, pay-per-use, accessible anywhere.' },
+    { id: 112, topic: 'security', front: 'Symmetric Encryption', back: 'Same key encrypts and decrypts. Fast but key distribution problem. Examples: AES, DES. Used for bulk data encryption.' },
+    { id: 113, topic: 'security', front: 'Asymmetric Encryption', back: 'Public key encrypts, private key decrypts (or vice versa). Slower but solves key distribution. Examples: RSA. Used for key exchange, digital signatures.' },
+    { id: 114, topic: 'security', front: 'Digital Certificate', back: 'Issued by Certificate Authority (CA). Contains public key and identity info. Verifies website/entity identity. Enables HTTPS.' },
+    { id: 115, topic: 'programming', front: 'IDE Features', back: 'Integrated Development Environment: code editor, compiler/interpreter, debugger, auto-complete, syntax highlighting, version control, project management.' },
+    { id: 116, topic: 'programming', front: 'Testing Types', back: 'Normal data (expected input), Boundary data (edge of valid range), Erroneous data (invalid/wrong type). Ensures program handles all cases.' },
+    { id: 117, topic: 'databases', front: 'ACID Properties', back: 'Atomicity (all or nothing), Consistency (valid state), Isolation (transactions independent), Durability (committed data persists). Ensures reliable transactions.' },
+    { id: 118, topic: 'databases', front: 'SQL Wildcards', back: '% matches any sequence of characters. _ matches single character. Used with LIKE. Example: WHERE name LIKE "A%" finds names starting with A.' },
+    { id: 119, topic: 'bigger-picture', front: 'Digital Divide', back: 'Gap between those with access to technology and those without. Causes: cost, infrastructure, education. Effects: economic/educational inequality.' },
+    { id: 120, topic: 'bigger-picture', front: 'Automation Impact', back: 'Pros: efficiency, consistency, dangerous job replacement. Cons: job losses, skill gaps, initial cost. Society must adapt with retraining.' }
+];
+
+// Add more flashcards
+FLASHCARDS.push(...MORE_FLASHCARDS);
+
+console.log('📚 Content expanded: ' + QUESTIONS.length + ' questions, ' + FLASHCARDS.length + ' flashcards loaded.');

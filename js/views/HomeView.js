@@ -124,11 +124,11 @@ const HomeView = {
                                     <span class="quick-desc">Converters</span>
                                 </div>
                             </button>
-                            <button class="quick-btn-new" onclick="Router.navigate('analytics')">
-                                <div class="quick-icon-lg" style="background: linear-gradient(135deg, #ec4899, #f472b6);">📊</div>
+                            <button class="quick-btn-new" onclick="Router.navigate('pastpapers')">
+                                <div class="quick-icon-lg" style="background: linear-gradient(135deg, #ec4899, #f472b6);">📝</div>
                                 <div class="quick-info">
-                                    <span class="quick-title">Analytics</span>
-                                    <span class="quick-desc">Your stats</span>
+                                    <span class="quick-title">Past Papers</span>
+                                    <span class="quick-desc">Exam practice</span>
                                 </div>
                             </button>
                         </div>
