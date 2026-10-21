@@ -259,7 +259,7 @@ const Millionaire = {
         Millionaire.isAnswerLocked = true;
         
         const question = Millionaire.questions[Millionaire.currentQuestion];
-        const isCorrect = Millionaire.selectedAnswer === question.correct;
+        const isCorrect = Millionaire.selectedAnswer === question.answer;
         
         // Dramatic pause and reveal
         const selectedBtn = document.querySelector(`.mill-answer[data-index="${Millionaire.selectedAnswer}"]`);
@@ -273,7 +273,7 @@ const Millionaire = {
             selectedBtn.classList.remove('thinking');
             
             // Show correct answer
-            const correctBtn = document.querySelector(`.mill-answer[data-index="${question.correct}"]`);
+            const correctBtn = document.querySelector(`.mill-answer[data-index="${question.answer}"]`);
             if (correctBtn) {
                 correctBtn.classList.add('correct');
             }
@@ -350,7 +350,7 @@ const Millionaire = {
         if (fiftyBtn) fiftyBtn.classList.add('used');
         
         const question = Millionaire.questions[Millionaire.currentQuestion];
-        const wrongAnswers = [0, 1, 2, 3].filter(i => i !== question.correct);
+        const wrongAnswers = [0, 1, 2, 3].filter(i => i !== question.answer);
         const toRemove = shuffleArray(wrongAnswers).slice(0, 2);
         
         toRemove.forEach(index => {
@@ -381,7 +381,7 @@ const Millionaire = {
         // Adjust to total 100
         const total = percentages.reduce((a, b) => a + b, 0);
         percentages = percentages.map(p => Math.round(p / total * (100 - correctPercent)));
-        percentages[question.correct] = correctPercent;
+        percentages[question.answer] = correctPercent;
         
         // Show results
         const resultsHtml = `
@@ -414,21 +414,29 @@ const Millionaire = {
         if (phoneBtn) phoneBtn.classList.add('used');
         
         const question = Millionaire.questions[Millionaire.currentQuestion];
+        if (!question) return;
+        
         const letters = ['A', 'B', 'C', 'D'];
         
         // Friend is 80% likely to give correct answer
         const isCorrect = Math.random() < 0.8;
-        const suggestedAnswer = isCorrect ? question.correct : shuffleArray([0,1,2,3].filter(i => i !== question.correct))[0];
+        const correctIndex = question.answer;
+        const wrongIndices = [0, 1, 2, 3].filter(i => i !== correctIndex);
+        const suggestedIndex = isCorrect ? correctIndex : shuffleArray(wrongIndices)[0];
         const confidence = isCorrect ? (70 + Math.floor(Math.random() * 25)) : (30 + Math.floor(Math.random() * 40));
         
         const friendNames = ['Alex', 'Sam', 'Jordan', 'Casey', 'Morgan'];
         const friendName = shuffleArray(friendNames)[0];
         
+        // Get the actual answer text
+        const suggestedLetter = letters[suggestedIndex];
+        const suggestedText = question.options[suggestedIndex] || 'that one';
+        
         const dialogHtml = `
             <div class="mill-phone-dialog">
                 <h4>📞 Calling ${friendName}...</h4>
                 <p class="phone-message">
-                    "Hmm, I think the answer is <strong>${letters[suggestedAnswer]}</strong>. 
+                    "Hmm, I think it's <strong>${suggestedLetter}: ${suggestedText}</strong>. 
                     I'm about ${confidence}% sure about that."
                 </p>
                 <button class="btn btn-secondary" onclick="this.parentElement.remove()">Thanks!</button>
@@ -437,7 +445,8 @@ const Millionaire = {
         
         const dialogDiv = document.createElement('div');
         dialogDiv.innerHTML = dialogHtml;
-        document.querySelector('.mill-main-area').appendChild(dialogDiv.firstElementChild);
+        const mainArea = document.querySelector('.mill-main-area');
+        if (mainArea) mainArea.appendChild(dialogDiv.firstElementChild);
     },
 
     endGame: (walkedAway, prize, isMillionaire = false) => {
