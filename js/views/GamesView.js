@@ -77,6 +77,36 @@ const GamesView = {
                 difficulty: 'Hard'
             },
             {
+                id: 'gold-quest',
+                name: 'Gold Quest',
+                icon: '⛏️',
+                color: '#fbbf24',
+                description: 'Mine for gold by answering questions!',
+                features: ['Upgradeable equipment', 'Streak bonuses', 'Gem discoveries'],
+                action: 'GoldQuest.open()',
+                difficulty: 'Medium'
+            },
+            {
+                id: 'factory',
+                name: 'Code Factory',
+                icon: '🏭',
+                color: '#64748b',
+                description: 'Build products by powering your factory with knowledge!',
+                features: ['Hire workers', 'Upgrade machines', 'Production bonuses'],
+                action: 'Factory.open()',
+                difficulty: 'Medium'
+            },
+            {
+                id: 'tower-defense',
+                name: 'Tower Defense',
+                icon: '🏰',
+                color: '#1e3a5f',
+                description: 'Defend your base from bugs and viruses!',
+                features: ['Build towers', 'Wave system', 'Boss battles'],
+                action: 'TowerDefense.open()',
+                difficulty: 'Hard'
+            },
+            {
                 id: 'daily-challenge',
                 name: 'Daily Challenge',
                 icon: '📅',

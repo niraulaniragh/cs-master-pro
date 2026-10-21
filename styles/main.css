@@ -12475,3 +12475,1057 @@ textarea:focus {
         min-height: 250px;
     }
 }
+
+
+/* =====================================================
+   STREAK SYSTEM STYLES
+   ===================================================== */
+
+.streak-widget {
+    background: linear-gradient(135deg, var(--bg-card), rgba(16, 185, 129, 0.1));
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+}
+
+.streak-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.streak-flame {
+    font-size: 40px;
+    opacity: 0.5;
+    transition: all 0.3s;
+}
+
+.streak-flame.active {
+    opacity: 1;
+    animation: flame 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes flame {
+    from { transform: scale(1) rotate(-5deg); }
+    to { transform: scale(1.1) rotate(5deg); }
+}
+
+.streak-info {
+    flex: 1;
+}
+
+.streak-number {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--primary);
+    display: block;
+}
+
+.streak-text {
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.streak-freezes {
+    background: rgba(6, 182, 212, 0.2);
+    padding: 8px 12px;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    cursor: help;
+}
+
+.daily-goal-progress {
+    margin-bottom: 20px;
+}
+
+.goal-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.goal-header .completed {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.goal-bar {
+    height: 12px;
+    background: var(--bg-tertiary);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.goal-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    border-radius: 6px;
+    transition: width 0.5s ease;
+}
+
+.goal-fill.complete {
+    background: linear-gradient(90deg, #10b981, #34d399);
+}
+
+.goal-details {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.next-milestone {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    background: rgba(249, 226, 175, 0.1);
+    border-radius: var(--radius-md);
+    margin-bottom: 15px;
+}
+
+.milestone-badge {
+    font-size: 24px;
+}
+
+.milestone-text {
+    font-size: 13px;
+    color: #f9e2af;
+}
+
+.streak-stats {
+    display: flex;
+    gap: 20px;
+}
+
+.streak-stats .stat {
+    flex: 1;
+    text-align: center;
+}
+
+.streak-stats .stat-value {
+    display: block;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.streak-stats .stat-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+/* Streak Celebration Modal */
+.streak-celebration {
+    text-align: center;
+    padding: 20px;
+}
+
+.streak-fire {
+    font-size: 60px;
+    animation: flame 0.5s ease-in-out infinite alternate;
+}
+
+.streak-count {
+    font-size: 72px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #f97316, #ef4444);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1;
+}
+
+.streak-label {
+    font-size: 24px;
+    color: var(--text-secondary);
+    margin-bottom: 15px;
+}
+
+.streak-bonus {
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.streak-reward-unlock {
+    background: rgba(249, 226, 175, 0.1);
+    border: 1px solid rgba(249, 226, 175, 0.3);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    margin: 20px 0;
+}
+
+.reward-badge {
+    font-size: 48px;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.reward-xp {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.streak-encourage {
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+/* =====================================================
+   ANALYTICS DASHBOARD STYLES
+   ===================================================== */
+
+.analytics-view {
+    padding: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.analytics-header {
+    margin-bottom: 30px;
+}
+
+.analytics-header h1 {
+    font-size: 28px;
+    margin-bottom: 5px;
+}
+
+.analytics-header p {
+    color: var(--text-secondary);
+}
+
+.analytics-overview {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.analytics-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.analytics-card.primary {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(6, 182, 212, 0.1));
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+.analytics-card .card-icon {
+    font-size: 32px;
+}
+
+.analytics-card .card-value {
+    font-size: 28px;
+    font-weight: 700;
+    display: block;
+}
+
+.analytics-card .card-label {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.analytics-section {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+}
+
+.analytics-section h2 {
+    font-size: 18px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Bar Chart */
+.bar-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    height: 200px;
+    padding: 10px 0;
+}
+
+.bar-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+}
+
+.bar-wrapper {
+    flex: 1;
+    width: 100%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.bar {
+    width: 80%;
+    background: linear-gradient(to top, var(--primary), var(--accent));
+    border-radius: 4px 4px 0 0;
+    min-height: 4px;
+    position: relative;
+    transition: height 0.3s ease;
+}
+
+.bar-value {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.bar-label {
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-top: 8px;
+}
+
+.bar-accuracy {
+    font-size: 10px;
+    color: var(--primary);
+}
+
+.chart-legend {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 15px;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.chart-empty {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-secondary);
+}
+
+.chart-empty span {
+    font-size: 48px;
+    display: block;
+    margin-bottom: 10px;
+    opacity: 0.5;
+}
+
+/* Mastery Grid */
+.mastery-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.mastery-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    background: rgba(var(--heat-color), 0.1);
+    border-radius: var(--radius-md);
+    border-left: 3px solid var(--heat-color, var(--border));
+}
+
+.mastery-icon {
+    font-size: 20px;
+}
+
+.mastery-info {
+    flex: 1;
+}
+
+.mastery-name {
+    font-size: 14px;
+    font-weight: 500;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.mastery-bar-mini {
+    height: 6px;
+    background: var(--bg-tertiary);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.mastery-fill {
+    height: 100%;
+    background: var(--primary);
+    border-radius: 3px;
+}
+
+.mastery-value {
+    font-weight: 600;
+    color: var(--primary);
+}
+
+/* Time Chart */
+.time-bars {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-end;
+    height: 150px;
+    padding: 10px;
+}
+
+.time-bar-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 40px;
+}
+
+.time-bar-wrapper {
+    height: 100px;
+    width: 100%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.time-bar {
+    width: 70%;
+    background: var(--accent);
+    border-radius: 4px 4px 0 0;
+    min-height: 2px;
+}
+
+.time-day {
+    font-size: 11px;
+    margin-top: 5px;
+    color: var(--text-secondary);
+}
+
+.time-value {
+    font-size: 10px;
+    color: var(--accent);
+}
+
+.time-summary {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+/* Weak Areas */
+.weak-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.weak-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px;
+    background: rgba(239, 68, 68, 0.1);
+    border-radius: var(--radius-md);
+    border-left: 3px solid #ef4444;
+}
+
+.weak-topic {
+    flex: 1;
+    font-weight: 500;
+}
+
+.weak-count {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+/* Activity Calendar */
+.calendar-grid {
+    display: flex;
+    gap: 3px;
+    overflow-x: auto;
+    padding: 10px 0;
+}
+
+.calendar-week {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.calendar-day {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    background: var(--bg-tertiary);
+}
+
+.calendar-day.level-1 { background: rgba(16, 185, 129, 0.3); }
+.calendar-day.level-2 { background: rgba(16, 185, 129, 0.5); }
+.calendar-day.level-3 { background: rgba(16, 185, 129, 0.7); }
+.calendar-day.level-4 { background: #10b981; }
+
+.calendar-legend {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 5px;
+    margin-top: 10px;
+    font-size: 11px;
+    color: var(--text-secondary);
+}
+
+.calendar-legend .calendar-day {
+    width: 12px;
+    height: 12px;
+}
+
+/* Achievement Progress */
+.achievement-progress {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.achievement-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-md);
+    opacity: 0.7;
+}
+
+.achievement-item.completed {
+    opacity: 1;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.achievement-icon {
+    font-size: 24px;
+}
+
+.achievement-info {
+    flex: 1;
+}
+
+.achievement-name {
+    font-weight: 600;
+    display: block;
+}
+
+.achievement-desc {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.achievement-bar {
+    height: 4px;
+    background: var(--bg-primary);
+    border-radius: 2px;
+    margin-top: 6px;
+    overflow: hidden;
+}
+
+.achievement-fill {
+    height: 100%;
+    background: var(--primary);
+}
+
+.achievement-progress-text {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+/* Recommendations */
+.analytics-recommendations {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+}
+
+.analytics-recommendations h2 {
+    margin-bottom: 20px;
+}
+
+.recommendations-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 15px;
+}
+
+.recommendation-card {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-md);
+}
+
+.rec-icon {
+    font-size: 28px;
+}
+
+.rec-content {
+    flex: 1;
+}
+
+.rec-content h4 {
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.rec-content p {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+/* =====================================================
+   GAME STYLES (GoldQuest, Factory, TowerDefense)
+   ===================================================== */
+
+/* Common Game Modal */
+.game-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s;
+}
+
+.game-modal.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.game-container {
+    background: var(--bg-card);
+    border-radius: var(--radius-xl);
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid var(--border);
+}
+
+.game-header h2 {
+    margin: 0;
+    font-size: 20px;
+}
+
+/* GoldQuest */
+.goldquest-menu, .gq-mining, .gq-results {
+    padding: 20px;
+}
+
+.gq-hero, .factory-hero, .td-hero {
+    text-align: center;
+    padding: 30px;
+}
+
+.gq-mine-graphic, .factory-graphic, .td-graphic {
+    font-size: 60px;
+    margin-bottom: 15px;
+}
+
+.gq-stats, .factory-stats, .td-stats {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin: 20px 0;
+}
+
+.gq-stat, .f-stat, .td-stat {
+    text-align: center;
+}
+
+.gq-stat span:first-child, .f-stat span:first-child, .td-stat span:first-child {
+    font-size: 24px;
+    display: block;
+}
+
+.gq-stat span:nth-child(2), .f-stat span:nth-child(2), .td-stat span:nth-child(2) {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--primary);
+    display: block;
+}
+
+.gq-stat span:last-child, .f-stat span:last-child, .td-stat span:last-child {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.difficulty-options, .shift-options, .td-difficulties {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.diff-btn, .shift-btn, .td-diff-btn {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+    min-width: 150px;
+}
+
+.diff-btn:hover, .shift-btn:hover, .td-diff-btn:hover {
+    border-color: var(--primary);
+    transform: translateY(-2px);
+}
+
+.diff-icon, .shift-icon {
+    font-size: 24px;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.diff-name, .shift-name {
+    font-weight: 600;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.diff-desc, .shift-desc {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+/* Game HUD */
+.gq-hud, .factory-hud, .td-hud {
+    display: flex;
+    justify-content: space-around;
+    padding: 15px;
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-md);
+    margin-bottom: 20px;
+}
+
+.hud-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+}
+
+/* Mine Shaft */
+.mine-shaft {
+    height: 100px;
+    background: linear-gradient(to bottom, #44403c, #292524, #1c1917);
+    border-radius: var(--radius-md);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.miner {
+    position: absolute;
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 32px;
+    animation: mineAction 1s ease-in-out infinite;
+}
+
+@keyframes mineAction {
+    0%, 100% { transform: translateY(-50%) rotate(0); }
+    50% { transform: translateY(-50%) rotate(-20deg); }
+}
+
+.gold-popup {
+    position: absolute;
+    right: 20%;
+    top: 30%;
+    color: #fbbf24;
+    font-weight: 700;
+    animation: goldFloat 1s ease-out forwards;
+}
+
+@keyframes goldFloat {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(-30px); }
+}
+
+/* Question Styles */
+.gq-question, .f-question, .td-question-card {
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-md);
+    padding: 20px;
+}
+
+.question-text {
+    font-size: 16px;
+    margin-bottom: 15px;
+}
+
+.gq-options, .f-options, .td-options {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.gq-option, .f-option, .td-option {
+    padding: 12px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+}
+
+.gq-option:hover, .f-option:hover, .td-option:hover {
+    border-color: var(--primary);
+}
+
+.gq-option.correct, .f-option.correct, .td-option.correct {
+    background: rgba(16, 185, 129, 0.2);
+    border-color: #10b981;
+}
+
+.gq-option.incorrect, .f-option.incorrect, .td-option.incorrect {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: #ef4444;
+}
+
+/* Results */
+.gq-results, .factory-results, .td-results {
+    text-align: center;
+    padding: 30px;
+}
+
+.results-graphic {
+    margin-bottom: 20px;
+}
+
+.big-icon {
+    font-size: 64px;
+}
+
+.results-stats {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin: 20px 0;
+}
+
+.result-item {
+    text-align: center;
+}
+
+.result-item span:first-child {
+    display: block;
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 5px;
+}
+
+.result-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.results-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+/* Tower Defense Specific */
+.td-battlefield {
+    background: linear-gradient(to bottom, #1e3a5f, #0f172a);
+    border-radius: var(--radius-md);
+    padding: 20px;
+    margin-bottom: 20px;
+    min-height: 200px;
+    position: relative;
+}
+
+.td-path {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 30px;
+    padding: 0 20px;
+    position: relative;
+}
+
+.td-spawn, .td-base {
+    font-size: 32px;
+}
+
+.td-track {
+    position: absolute;
+    left: 60px;
+    right: 60px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.td-enemy {
+    position: absolute;
+    transition: left 0.1s linear;
+}
+
+.enemy-sprite {
+    font-size: 24px;
+}
+
+.enemy-health {
+    position: absolute;
+    top: -5px;
+    left: 0;
+    height: 3px;
+    background: #ef4444;
+    border-radius: 2px;
+}
+
+.td-towers {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+}
+
+.td-tower {
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    padding: 10px 15px;
+    text-align: center;
+    border: 2px solid var(--tower-color, var(--border));
+}
+
+.tower-sprite {
+    font-size: 24px;
+    display: block;
+}
+
+.tower-name {
+    font-size: 11px;
+    color: var(--text-secondary);
+}
+
+.td-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.td-shop {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.shop-label {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.tower-btn {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 8px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    transition: all 0.2s;
+}
+
+.tower-btn:hover {
+    border-color: var(--primary);
+}
+
+.tower-btn .tower-icon {
+    font-size: 20px;
+}
+
+.tower-btn .tower-cost {
+    font-size: 10px;
+    color: #fbbf24;
+}
+
+.td-question-area {
+    margin-top: 20px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .analytics-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .gq-options, .f-options, .td-options {
+        grid-template-columns: 1fr;
+    }
+    
+    .game-container {
+        width: 95%;
+        max-height: 95vh;
+    }
+}

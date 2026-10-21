@@ -124,11 +124,11 @@ const HomeView = {
                                     <span class="quick-desc">Converters</span>
                                 </div>
                             </button>
-                            <button class="quick-btn-new" onclick="DailyChallenge.start()">
-                                <div class="quick-icon-lg" style="background: linear-gradient(135deg, #ef4444, #f87171);">⚡</div>
+                            <button class="quick-btn-new" onclick="Router.navigate('analytics')">
+                                <div class="quick-icon-lg" style="background: linear-gradient(135deg, #ec4899, #f472b6);">📊</div>
                                 <div class="quick-info">
-                                    <span class="quick-title">Challenge</span>
-                                    <span class="quick-desc">Daily quest</span>
+                                    <span class="quick-title">Analytics</span>
+                                    <span class="quick-desc">Your stats</span>
                                 </div>
                             </button>
                         </div>
@@ -139,6 +139,11 @@ const HomeView = {
                 <section class="main-grid">
                     <!-- Left Column -->
                     <div class="main-left">
+                        <!-- Streak Widget -->
+                        <div class="card-new streak-card">
+                            ${typeof StreakSystem !== 'undefined' ? StreakSystem.renderWidget() : '<p>Loading streaks...</p>'}
+                        </div>
+                        
                         <!-- Progress Card -->
                         <div class="card-new">
                             <div class="card-header">

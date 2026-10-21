@@ -350,6 +350,19 @@ const PracticeView = {
         }
 
         PracticeView.answers.push({ question: q, answer: answerIndex, correct: isCorrect });
+        
+        // Track with SRS system
+        if (typeof SRSSystem !== 'undefined') {
+            SRSSystem.recordAnswer(q.id, isCorrect);
+        }
+        
+        // Track with Streak system
+        if (typeof StreakSystem !== 'undefined') {
+            StreakSystem.recordActivity('question');
+            if (isCorrect) {
+                StreakSystem.recordActivity('correct');
+            }
+        }
 
         const card = document.getElementById('question-card');
         card.innerHTML += `
