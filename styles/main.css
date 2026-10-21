@@ -12279,3 +12279,198 @@ textarea:focus {
         font-size: 1.5rem;
     }
 }
+
+
+/* =====================================================
+   PYTHON SYNTAX HIGHLIGHTING
+   ===================================================== */
+
+.code-editor-container {
+    display: flex;
+    background: #1e1e2e;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.line-numbers {
+    padding: 16px 12px;
+    background: #181825;
+    color: #6c7086;
+    text-align: right;
+    user-select: none;
+    min-width: 45px;
+    border-right: 1px solid #313244;
+    overflow: hidden;
+}
+
+.editor-wrapper {
+    position: relative;
+    flex: 1;
+    overflow: hidden;
+}
+
+.syntax-highlight,
+#code-editor {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    padding: 16px;
+    margin: 0;
+    border: none;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    white-space: pre;
+    overflow: auto;
+    resize: none;
+}
+
+.syntax-highlight {
+    pointer-events: none;
+    color: #cdd6f4;
+    background: transparent;
+    z-index: 1;
+}
+
+#code-editor {
+    color: transparent;
+    caret-color: #f5e0dc;
+    background: transparent;
+    z-index: 2;
+    outline: none;
+    -webkit-text-fill-color: transparent;
+}
+
+#code-editor::placeholder {
+    color: #6c7086;
+    -webkit-text-fill-color: #6c7086;
+}
+
+/* Catppuccin Mocha-inspired syntax colors */
+.py-keyword {
+    color: #cba6f7; /* Mauve - purple for keywords */
+    font-weight: 600;
+}
+
+.py-string {
+    color: #a6e3a1; /* Green for strings */
+}
+
+.py-fstring {
+    color: #f9e2af; /* Yellow for f-string prefix */
+}
+
+.py-comment {
+    color: #6c7086; /* Overlay0 - gray for comments */
+    font-style: italic;
+}
+
+.py-builtin {
+    color: #89b4fa; /* Blue for built-in functions */
+}
+
+.py-function {
+    color: #89dceb; /* Sky - cyan for function names */
+}
+
+.py-class {
+    color: #f9e2af; /* Yellow for class names */
+}
+
+.py-number {
+    color: #fab387; /* Peach - orange for numbers */
+}
+
+.py-boolean {
+    color: #fab387; /* Peach for True/False/None */
+    font-weight: 600;
+}
+
+.py-operator {
+    color: #89dceb; /* Sky for operators */
+}
+
+/* Code editor wrapper adjustments */
+.code-editor-wrapper {
+    display: none; /* Hide old wrapper */
+}
+
+.code-section .code-editor-container {
+    min-height: 350px;
+    max-height: 500px;
+}
+
+.code-section .editor-wrapper {
+    min-height: 350px;
+}
+
+/* Scrollbar styling for code editor */
+.editor-wrapper ::-webkit-scrollbar,
+.code-editor-container ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+.editor-wrapper ::-webkit-scrollbar-track,
+.code-editor-container ::-webkit-scrollbar-track {
+    background: #181825;
+}
+
+.editor-wrapper ::-webkit-scrollbar-thumb,
+.code-editor-container ::-webkit-scrollbar-thumb {
+    background: #45475a;
+    border-radius: 5px;
+}
+
+.editor-wrapper ::-webkit-scrollbar-thumb:hover,
+.code-editor-container ::-webkit-scrollbar-thumb:hover {
+    background: #585b70;
+}
+
+/* Output styling improvements */
+.output-display {
+    background: #1e1e2e;
+    color: #cdd6f4;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    padding: 16px;
+    border-radius: var(--radius-md);
+    min-height: 200px;
+    overflow: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.output-display .output-error {
+    color: #f38ba8;
+}
+
+.output-display .output-success {
+    color: #a6e3a1;
+}
+
+.output-display .output-input {
+    color: #89b4fa;
+}
+
+/* Python icon */
+.python-icon {
+    font-size: 1.25rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .code-editor-container {
+        font-size: 12px;
+    }
+    
+    .code-section .code-editor-container {
+        min-height: 250px;
+    }
+}

@@ -59,6 +59,7 @@ const PlaygroundView = {
                                     <option value="hello">Hello World</option>
                                     <option value="variables">Variables & Types</option>
                                     <option value="arithmetic">Arithmetic</option>
+                                    <option value="input">Input/Output</option>
                                 </optgroup>
                                 <optgroup label="Control Flow">
                                     <option value="if">If Statements</option>
@@ -67,10 +68,12 @@ const PlaygroundView = {
                                 </optgroup>
                                 <optgroup label="Data Structures">
                                     <option value="list">Lists</option>
+                                    <option value="dictionary">Dictionaries</option>
                                 </optgroup>
                                 <optgroup label="Algorithms">
                                     <option value="factorial">Factorial</option>
                                     <option value="fizzbuzz">FizzBuzz</option>
+                                    <option value="bubblesort">Bubble Sort</option>
                                 </optgroup>
                             </select>
                             <button class="btn btn-small btn-secondary" onclick="PlaygroundView.clearCode()">
@@ -78,20 +81,28 @@ const PlaygroundView = {
                             </button>
                         </div>
                     </div>
-                    <div class="code-editor-wrapper">
+                    <div class="code-editor-container">
                         <div class="line-numbers" id="line-numbers">1</div>
-                        <textarea id="code-editor" spellcheck="false" 
-                            oninput="PlaygroundView.updateLineNumbers()"
-                            onkeydown="PlaygroundView.handleTab(event)"
-                            onscroll="PlaygroundView.syncScroll()"
-                            placeholder="# Write your Python code here"># Welcome to Python Playground!
+                        <div class="editor-wrapper">
+                            <pre class="syntax-highlight" id="syntax-highlight"></pre>
+                            <textarea id="code-editor" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"
+                                oninput="PlaygroundView.handleInput()"
+                                onkeydown="PlaygroundView.handleTab(event)"
+                                onscroll="PlaygroundView.syncScroll()"
+                                placeholder="# Write your Python code here"># Welcome to Python Playground!
 
-total = 0
+name = input("What is your name? ")
+age = int(input("How old are you? "))
+
+if age >= 18:
+    print(f"Hello {name}, you are an adult!")
+else:
+    print(f"Hello {name}, you are {18 - age} years from adulthood")
+
+# Loop example
 for i in range(1, 6):
-    total = total + i
-    print(f"Added {i}, total is {total}")
-
-print(f"Sum of 1-5 = {total}")</textarea>
+    print(f"Count: {i}")</textarea>
+                        </div>
                     </div>
                     <div class="execution-controls">
                         <button class="btn btn-primary" onclick="PlaygroundView.runCode()">
@@ -1718,6 +1729,67 @@ print(f"Sum of 1-5 = {total}")</textarea>
         }
     },
 
+    // Syntax highlighting for Python
+    highlightPython: (code) => {
+        if (!code) return '';
+        
+        // Escape HTML first
+        let html = code
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+        
+        // Order matters - do strings first to avoid highlighting inside strings
+        
+        // Multi-line strings (triple quotes)
+        html = html.replace(/("""[\s\S]*?"""|'''[\s\S]*?''')/g, '<span class="py-string">$1</span>');
+        
+        // Single/double quoted strings
+        html = html.replace(/("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')/g, '<span class="py-string">$1</span>');
+        
+        // Comments (must come after strings)
+        html = html.replace(/(#.*$)/gm, '<span class="py-comment">$1</span>');
+        
+        // f-strings - highlight the f
+        html = html.replace(/\bf(<span class="py-string">)/g, '<span class="py-fstring">f</span>$1');
+        
+        // Keywords
+        const keywords = ['and', 'as', 'assert', 'async', 'await', 'break', 'class', 'continue', 'def', 'del', 'elif', 'else', 'except', 'finally', 'for', 'from', 'global', 'if', 'import', 'in', 'is', 'lambda', 'not', 'or', 'pass', 'raise', 'return', 'try', 'while', 'with', 'yield'];
+        keywords.forEach(kw => {
+            const regex = new RegExp(`\\b(${kw})\\b(?![^<]*>)`, 'g');
+            html = html.replace(regex, '<span class="py-keyword">$1</span>');
+        });
+        
+        // Built-in functions
+        const builtins = ['print', 'input', 'len', 'range', 'int', 'str', 'float', 'bool', 'list', 'dict', 'set', 'tuple', 'type', 'abs', 'max', 'min', 'sum', 'round', 'sorted', 'reversed', 'enumerate', 'zip', 'map', 'filter', 'open', 'append', 'extend', 'insert', 'remove', 'pop', 'clear', 'index', 'count', 'sort', 'reverse', 'copy', 'split', 'join', 'strip', 'replace', 'upper', 'lower', 'format'];
+        builtins.forEach(fn => {
+            const regex = new RegExp(`\\b(${fn})\\s*(?=\\()(?![^<]*>)`, 'g');
+            html = html.replace(regex, '<span class="py-builtin">$1</span>');
+        });
+        
+        // Boolean and None
+        html = html.replace(/\b(True|False|None)\b(?![^<]*>)/g, '<span class="py-boolean">$1</span>');
+        
+        // Numbers (integers and floats)
+        html = html.replace(/\b(\d+\.?\d*)\b(?![^<]*>)/g, '<span class="py-number">$1</span>');
+        
+        // Function definitions
+        html = html.replace(/(<span class="py-keyword">def<\/span>\s+)(\w+)/g, '$1<span class="py-function">$2</span>');
+        
+        // Class definitions
+        html = html.replace(/(<span class="py-keyword">class<\/span>\s+)(\w+)/g, '$1<span class="py-class">$2</span>');
+        
+        // Operators
+        html = html.replace(/(\+|-|\*|\/|%|==|!=|&lt;=|&gt;=|&lt;|&gt;|=|\+=|-=|\*=|\/=)(?![^<]*>)/g, '<span class="py-operator">$1</span>');
+        
+        return html;
+    },
+    
+    handleInput: () => {
+        PlaygroundView.updateLineNumbers();
+        PlaygroundView.updateSyntaxHighlight();
+    },
+
     updateLineNumbers: () => {
         const editor = document.getElementById('code-editor');
         const lineNumbers = document.getElementById('line-numbers');
@@ -1725,11 +1797,26 @@ print(f"Sum of 1-5 = {total}")</textarea>
         const lines = editor.value.split('\n').length;
         lineNumbers.innerHTML = Array.from({ length: lines }, (_, i) => i + 1).join('<br>');
     },
+    
+    updateSyntaxHighlight: () => {
+        const editor = document.getElementById('code-editor');
+        const highlight = document.getElementById('syntax-highlight');
+        if (!editor || !highlight) return;
+        
+        // Add a trailing newline to match textarea behavior
+        const code = editor.value + (editor.value.endsWith('\n') ? ' ' : '\n');
+        highlight.innerHTML = PlaygroundView.highlightPython(code);
+    },
 
     syncScroll: () => {
         const editor = document.getElementById('code-editor');
         const lineNumbers = document.getElementById('line-numbers');
+        const highlight = document.getElementById('syntax-highlight');
         if (lineNumbers) lineNumbers.scrollTop = editor.scrollTop;
+        if (highlight) {
+            highlight.scrollTop = editor.scrollTop;
+            highlight.scrollLeft = editor.scrollLeft;
+        }
     },
 
     handleTab: (e) => {
@@ -1739,8 +1826,21 @@ print(f"Sum of 1-5 = {total}")</textarea>
             const start = editor.selectionStart;
             editor.value = editor.value.substring(0, start) + '    ' + editor.value.substring(editor.selectionEnd);
             editor.selectionStart = editor.selectionEnd = start + 4;
-            PlaygroundView.updateLineNumbers();
+            PlaygroundView.handleInput();
         }
+    },
+    
+    init: () => {
+        // Initialize syntax highlighting on load
+        setTimeout(() => {
+            PlaygroundView.handleInput();
+        }, 100);
     }
 };
-// Build: Tue Oct 20 18:07:28 CEST 2026
+
+// Initialize on page load
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => PlaygroundView.init());
+} else {
+    PlaygroundView.init();
+}
