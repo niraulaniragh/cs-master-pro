@@ -83,7 +83,7 @@ const GamesView = {
                 color: '#10b981',
                 description: 'Complete 5 questions daily for streak bonuses!',
                 features: ['Streak rewards', 'Perfect bonuses', 'Daily reset'],
-                action: 'DailyChallenge.open()',
+                action: 'DailyChallenge.start()',
                 difficulty: 'Easy'
             }
         ];
