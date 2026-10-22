@@ -82,6 +82,21 @@ const Auth = {
     },
 
     /**
+     * Legacy hash function for backward compatibility with old accounts
+     * DO NOT USE FOR NEW PASSWORDS - use hashPassword() instead
+     */
+    legacyHashPassword: (password) => {
+        let hash = 0;
+        const str = password + 'CSMasterPro_2024';
+        for (let i = 0; i < str.length; i++) {
+            const char = str.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash;
+        }
+        return hash.toString(16);
+    },
+
+    /**
      * Validate email format
      */
     isValidEmail: (email) => {
@@ -309,8 +324,27 @@ const Auth = {
             return { success: false, error: 'No account found with this email' };
         }
 
-        // Verify password
-        const isValid = await Auth.verifyPassword(password, user.passwordHash, user.passwordSalt);
+        // Verify password - support both old and new hash formats
+        let isValid = false;
+        
+        if (user.passwordSalt) {
+            // New format with SHA-256 and salt
+            isValid = await Auth.verifyPassword(password, user.passwordHash, user.passwordSalt);
+        } else {
+            // Old format - simple hash (for backward compatibility)
+            const oldHash = Auth.legacyHashPassword(password);
+            isValid = (oldHash === user.passwordHash);
+            
+            // If valid, upgrade to new hash format
+            if (isValid) {
+                const { hash, salt } = await Auth.hashPassword(password);
+                user.passwordHash = hash;
+                user.passwordSalt = salt;
+                Auth.saveUsers(users);
+                console.log('🔐 Password upgraded to new secure format');
+            }
+        }
+        
         if (!isValid) {
             const attempts = Auth.recordFailedAttempt(normalizedEmail);
             const remaining = Auth.MAX_FAILED_ATTEMPTS - attempts;
