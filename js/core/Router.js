@@ -65,9 +65,13 @@ const Router = (() => {
             history.pushState({ route, params }, '', `#${route}`);
         }
         
-        // Small delay for smooth transition
+        // Add page exit class for smooth transition
+        container.classList.add('page-exit');
+        
+        // Small delay for smooth transition (300ms for exit animation)
         setTimeout(() => {
             try {
+                container.classList.remove('page-exit');
                 currentView = View;
                 container.innerHTML = View.render(params);
                 
@@ -89,7 +93,7 @@ const Router = (() => {
                     </div>
                 `;
             }
-        }, 50);
+        }, 300);
     };
 
     // Initialize router

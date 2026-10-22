@@ -78,7 +78,7 @@ const HomeView = {
                             <i class="fas fa-bolt"></i>
                         </div>
                         <div class="stat-content">
-                            <span class="stat-value">${xp.toLocaleString()}</span>
+                            <span class="stat-value" data-counter="xp" data-value="${xp}">0</span>
                             <span class="stat-desc">Total XP</span>
                         </div>
                     </div>
@@ -87,7 +87,7 @@ const HomeView = {
                             <i class="fas fa-check"></i>
                         </div>
                         <div class="stat-content">
-                            <span class="stat-value">${totalCorrect}</span>
+                            <span class="stat-value" data-counter="correct" data-value="${totalCorrect}">0</span>
                             <span class="stat-desc">Correct</span>
                         </div>
                     </div>
@@ -96,7 +96,7 @@ const HomeView = {
                             <i class="fas fa-percent"></i>
                         </div>
                         <div class="stat-content">
-                            <span class="stat-value">${accuracy}%</span>
+                            <span class="stat-value" data-counter="accuracy" data-value="${accuracy}">0</span>
                             <span class="stat-desc">Accuracy</span>
                         </div>
                     </div>
@@ -314,6 +314,26 @@ const HomeView = {
 
     init: () => {
         console.log('🏠 Home view initialized');
+        
+        // After render, animate the counters
+        setTimeout(() => {
+            const xpEl = document.querySelector('.stat-value[data-counter="xp"]');
+            const correctEl = document.querySelector('.stat-value[data-counter="correct"]');
+            const accuracyEl = document.querySelector('.stat-value[data-counter="accuracy"]');
+            
+            if (xpEl) {
+                const xpValue = parseInt(xpEl.getAttribute('data-value')) || 0;
+                Helpers.animateCounter(xpEl, 0, xpValue, 1500);
+            }
+            if (correctEl) {
+                const correctValue = parseInt(correctEl.getAttribute('data-value')) || 0;
+                Helpers.animateCounter(correctEl, 0, correctValue, 1200);
+            }
+            if (accuracyEl) {
+                const accuracyValue = parseInt(accuracyEl.getAttribute('data-value')) || 0;
+                Helpers.animateCounter(accuracyEl, 0, accuracyValue, 1000, '%');
+            }
+        }, 100);
     },
 
     cleanup: () => {

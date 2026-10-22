@@ -384,3 +384,75 @@ if (typeof window !== 'undefined') {
     window.getRankForLevel = getRankForLevel;
     window.getLevelFromXP = getLevelFromXP;
 }
+
+// ===========================================
+// ANIMATION UTILITIES
+// ===========================================
+
+// Animated counter
+Helpers.animateCounter = (element, start, end, duration = 1000, suffix = '') => {
+    if (!element) return;
+    const startTime = performance.now();
+    const update = (currentTime) => {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        // Ease out cubic
+        const easeProgress = 1 - Math.pow(1 - progress, 3);
+        const current = Math.floor(start + (end - start) * easeProgress);
+        element.textContent = current.toLocaleString() + suffix;
+        if (progress < 1) requestAnimationFrame(update);
+    };
+    requestAnimationFrame(update);
+};
+
+// Confetti effect
+Helpers.confetti = (options = {}) => {
+    const defaults = { particleCount: 100, spread: 70, origin: { x: 0.5, y: 0.5 }, colors: ['#10b981', '#06b6d4', '#3b82f6', '#f59e0b', '#ef4444'] };
+    const config = { ...defaults, ...options };
+    const container = document.createElement('div');
+    container.className = 'confetti-container';
+    container.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;overflow:hidden;';
+    document.body.appendChild(container);
+    
+    for (let i = 0; i < config.particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'confetti-particle';
+        const color = config.colors[Math.floor(Math.random() * config.colors.length)];
+        const size = Math.random() * 10 + 5;
+        const left = config.origin.x * 100 + (Math.random() - 0.5) * config.spread;
+        const rotation = Math.random() * 360;
+        const duration = Math.random() * 2 + 2;
+        const delay = Math.random() * 0.5;
+        particle.style.cssText = `
+            position:absolute;left:${left}%;top:${config.origin.y * 100}%;
+            width:${size}px;height:${size}px;background:${color};
+            transform:rotate(${rotation}deg);
+            animation:confettiFall ${duration}s ease-out ${delay}s forwards;
+        `;
+        if (Math.random() > 0.5) particle.style.borderRadius = '50%';
+        container.appendChild(particle);
+    }
+    setTimeout(() => container.remove(), 5000);
+};
+
+// Button ripple effect
+Helpers.addRipple = (event) => {
+    const button = event.currentTarget;
+    const ripple = document.createElement('span');
+    const rect = button.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height);
+    const x = event.clientX - rect.left - size / 2;
+    const y = event.clientY - rect.top - size / 2;
+    ripple.className = 'btn-ripple';
+    ripple.style.width = ripple.style.height = size + 'px';
+    ripple.style.left = x + 'px';
+    ripple.style.top = y + 'px';
+    button.appendChild(ripple);
+    setTimeout(() => ripple.remove(), 600);
+};
+
+// Auto-attach ripple to all buttons
+document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.btn');
+    if (btn) Helpers.addRipple(e);
+});

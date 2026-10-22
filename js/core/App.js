@@ -5,6 +5,11 @@
 
 const App = (() => {
     const init = () => {
+        // Check for demo mode
+        if (typeof DemoMode !== 'undefined') {
+            DemoMode.init();
+        }
+        
         console.log('🚀 CS Master Pro - Starting...');
         
         // Initialize modules in order
@@ -64,6 +69,15 @@ const App = (() => {
         Classroom.cleanupGames();
         
         console.log('✅ Application initialized successfully');
+
+        // Dismiss loading screen
+        setTimeout(() => {
+            const loadingScreen = document.getElementById('loading-screen');
+            if (loadingScreen) {
+                loadingScreen.classList.add('fade-out');
+                setTimeout(() => loadingScreen.remove(), 500);
+            }
+        }, 2000);
     };
     
     /**

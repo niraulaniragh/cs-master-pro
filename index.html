@@ -65,6 +65,30 @@
     <link rel="stylesheet" href="styles/games.css?v=20261021182350">
 </head>
 <body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="loading-screen">
+        <div class="loader-content">
+            <div class="loader-logo">
+                <svg viewBox="0 0 100 100" class="loader-svg">
+                    <defs>
+                        <linearGradient id="loaderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#10b981"/>
+                            <stop offset="50%" stop-color="#06b6d4"/>
+                            <stop offset="100%" stop-color="#3b82f6"/>
+                        </linearGradient>
+                    </defs>
+                    <polygon class="hex-outline" points="50,5 93,27.5 93,72.5 50,95 7,72.5 7,27.5" fill="none" stroke="url(#loaderGrad)" stroke-width="2" stroke-dasharray="300" stroke-dashoffset="300"/>
+                    <rect class="terminal-box" x="35" y="38" width="30" height="24" rx="3" fill="none" stroke="url(#loaderGrad)" stroke-width="2" opacity="0"/>
+                    <text class="cursor-blink" x="50" y="56" text-anchor="middle" font-family="monospace" font-size="16" font-weight="bold" fill="url(#loaderGrad)" opacity="0">_</text>
+                </svg>
+            </div>
+            <div class="loader-text">CS Master Pro</div>
+            <div class="loader-progress">
+                <div class="loader-progress-bar"></div>
+            </div>
+        </div>
+    </div>
+
     <!-- Skip Link for Accessibility -->
     <a href="#main-content" class="skip-link">Skip to main content</a>
     
@@ -227,6 +251,7 @@
     <script src="js/core/StreakSystem.js?v=20261021182350"></script>
     <script src="js/core/SRSSystem.js?v=20261021182350"></script>
     <script src="js/core/Router.js?v=20261021182350"></script>
+    <script src="js/core/DemoMode.js?v=20261022171800"></script>
     <script src="js/core/App.js?v=20261021182350"></script>
     
     <!-- Register Service Worker for PWA -->

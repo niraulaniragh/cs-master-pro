@@ -249,6 +249,11 @@ const AppState = (() => {
             setState('user.level', newLevel);
             Toast.show(`🎉 Level Up! You're now Level ${newLevel}!`, 'success');
             
+            // Confetti celebration on level up
+            if (typeof Helpers !== 'undefined' && Helpers.confetti) {
+                Helpers.confetti({ particleCount: 150, spread: 90 });
+            }
+            
             // Check level achievements
             if (newLevel >= 5) unlockAchievement('level_5');
             if (newLevel >= 10) unlockAchievement('level_10');
