@@ -83,12 +83,14 @@ const PWAUtils = (function() {
         const indicator = document.createElement('div');
         indicator.id = 'offline-indicator';
         indicator.className = 'offline-indicator';
+        indicator.setAttribute('aria-live', 'polite');
+        indicator.setAttribute('aria-hidden', 'true');
         indicator.innerHTML = `
             <span class="offline-indicator-icon">📡</span>
             <span class="offline-indicator-text">Offline Mode</span>
         `;
         
-        // Add styles
+        // Add styles - HIDDEN by default (no .visible class)
         const style = document.createElement('style');
         style.id = 'offline-indicator-styles';
         style.textContent = `
@@ -110,10 +112,14 @@ const PWAUtils = (function() {
                 transition: transform 0.3s ease;
                 box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
                 pointer-events: none;
+                opacity: 0;
+                visibility: hidden;
             }
             
             .offline-indicator.visible {
                 transform: translateX(-50%) translateY(0);
+                opacity: 1;
+                visibility: visible;
             }
             
             .offline-indicator-icon {
@@ -131,29 +137,28 @@ const PWAUtils = (function() {
         }
         document.body.appendChild(indicator);
         
-        // Show/hide based on online status - only show when ACTUALLY offline
-        function updateIndicator() {
-            const isOffline = !navigator.onLine;
-            indicator.classList.toggle('visible', isOffline);
-            document.body.classList.toggle('offline', isOffline);
-            
-            // Double-check with a fetch to be sure
-            if (!isOffline) {
-                indicator.classList.remove('visible');
-                document.body.classList.remove('offline');
-            }
+        // Show/hide based on online status - ONLY show when actually offline
+        function showOffline() {
+            indicator.classList.add('visible');
+            indicator.setAttribute('aria-hidden', 'false');
+            document.body.classList.add('offline');
         }
         
-        window.addEventListener('online', () => {
+        function hideOffline() {
             indicator.classList.remove('visible');
+            indicator.setAttribute('aria-hidden', 'true');
             document.body.classList.remove('offline');
-        });
-        window.addEventListener('offline', updateIndicator);
-        
-        // Initial check - default to online, only show offline if confirmed
-        if (!navigator.onLine) {
-            updateIndicator();
         }
+        
+        window.addEventListener('online', hideOffline);
+        window.addEventListener('offline', showOffline);
+        
+        // Initial state: only show if navigator.onLine is false
+        // Default to HIDDEN - assume online until proven otherwise
+        if (navigator.onLine === false) {
+            showOffline();
+        }
+        // No else needed - it's hidden by default via CSS
     }
     
     /**
