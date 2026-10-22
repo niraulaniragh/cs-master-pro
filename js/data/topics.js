@@ -5,6 +5,21 @@
 
 const TOPICS = [
     {
+        id: 'introduction',
+        name: 'Introduction to CS',
+        icon: '🎯',
+        color: '#6366f1',
+        paper: 'Foundation',
+        description: 'What is Computer Science? Core concepts, history, and why it matters',
+        subtopics: [
+            'What is Computer Science?',
+            'Key Terminology',
+            'History of Computing',
+            'Why Study Computer Science?',
+            'The Computing Cycle'
+        ]
+    },
+    {
         id: 'problem-solving',
         name: 'Problem Solving',
         icon: '🧩',

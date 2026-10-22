@@ -76,7 +76,7 @@ const LandingView = {
                                 <span class="metric-label">Flashcards</span>
                             </div>
                             <div class="metric">
-                                <span class="metric-value" data-count="10">0</span>
+                                <span class="metric-value" data-count="11">0</span>
                                 <span class="metric-label">Topics</span>
                             </div>
                         </div>
@@ -176,6 +176,7 @@ const LandingView = {
                     </div>
                     
                     <div class="topics-list">
+                        <div class="topic-pill" style="--c: #6366f1"><span>🎯</span> Introduction to CS</div>
                         <div class="topic-pill" style="--c: #f59e0b"><span>💾</span> Data Representation</div>
                         <div class="topic-pill" style="--c: #10b981"><span>💻</span> Computer Systems</div>
                         <div class="topic-pill" style="--c: #3b82f6"><span>🌐</span> Networks</div>
@@ -184,7 +185,7 @@ const LandingView = {
                         <div class="topic-pill" style="--c: #06b6d4"><span>🐍</span> Programming</div>
                         <div class="topic-pill" style="--c: #f97316"><span>🗄️</span> Databases</div>
                         <div class="topic-pill" style="--c: #14b8a6"><span>🤖</span> Emerging Tech</div>
-                        <div class="topic-pill" style="--c: #6366f1"><span>⚙️</span> Problem Solving</div>
+                        <div class="topic-pill" style="--c: #ef4444"><span>⚙️</span> Problem Solving</div>
                         <div class="topic-pill" style="--c: #84cc16"><span>⚖️</span> Ethics</div>
                     </div>
                 </section>

@@ -3,6 +3,367 @@
  */
 
 const NOTES = {
+    'introduction': {
+        'What is Computer Science?': {
+            content: `
+<h2>What is Computer Science?</h2>
+<div class="definition-box">
+    <strong>Computer Science:</strong> The study of computers and computational systems. It involves understanding how computers work, how to solve problems using computers, and how to create software and systems that help people.
+</div>
+
+<p>Computer Science is NOT just about using computers - it's about understanding the <strong>principles</strong> behind how they work and using that knowledge to solve real-world problems.</p>
+
+<h3>The Three Pillars of Computer Science</h3>
+<div class="info-box">
+    <ol>
+        <li><strong>Hardware</strong> - The physical components (CPU, memory, storage, etc.)</li>
+        <li><strong>Software</strong> - The programs and applications that run on hardware</li>
+        <li><strong>Data</strong> - The information that computers process and store</li>
+    </ol>
+</div>
+
+<h3>What Do Computer Scientists Do?</h3>
+<ul>
+    <li><strong>Problem Solving:</strong> Breaking down complex problems into smaller, manageable steps</li>
+    <li><strong>Algorithm Design:</strong> Creating step-by-step instructions to solve problems</li>
+    <li><strong>Programming:</strong> Writing code to implement algorithms</li>
+    <li><strong>System Design:</strong> Planning how hardware and software work together</li>
+    <li><strong>Data Analysis:</strong> Processing and understanding information</li>
+</ul>
+
+<h3>Computer Science vs IT vs ICT</h3>
+<table class="notes-table">
+    <tr><th>Field</th><th>Focus</th><th>Example Activities</th></tr>
+    <tr><td><strong>Computer Science</strong></td><td>Creating technology</td><td>Programming, algorithm design, building software</td></tr>
+    <tr><td><strong>IT (Information Technology)</strong></td><td>Using and managing technology</td><td>Network setup, tech support, system administration</td></tr>
+    <tr><td><strong>ICT (Information & Communication Technology)</strong></td><td>Using technology for communication</td><td>Using apps, digital communication, presentations</td></tr>
+</table>
+
+<div class="tip-box">
+    <strong>💡 Think of it this way:</strong> Computer Scientists BUILD the tools, IT professionals MANAGE the tools, and everyone USES ICT tools!
+</div>
+
+<h3>Real-World Applications</h3>
+<p>Computer Science is everywhere in modern life:</p>
+<ul>
+    <li>🏥 <strong>Healthcare:</strong> MRI scanners, patient records, drug discovery</li>
+    <li>🎮 <strong>Entertainment:</strong> Video games, streaming services, special effects</li>
+    <li>🚗 <strong>Transport:</strong> GPS navigation, self-driving cars, traffic systems</li>
+    <li>💰 <strong>Finance:</strong> Online banking, fraud detection, cryptocurrency</li>
+    <li>📱 <strong>Communication:</strong> Social media, video calls, messaging apps</li>
+    <li>🔬 <strong>Science:</strong> Simulations, data analysis, space exploration</li>
+</ul>
+            `,
+            keyPoints: [
+                'Computer Science is the study of computers and computational systems',
+                'It involves hardware, software, and data',
+                'Computer Scientists solve problems and create technology',
+                'Different from IT (managing) and ICT (using)'
+            ]
+        },
+        'Key Terminology': {
+            content: `
+<h2>Essential Computer Science Terms</h2>
+<p>Before diving deeper, you need to understand these fundamental terms that appear throughout the IGCSE course.</p>
+
+<h3>Basic Terms</h3>
+<table class="notes-table">
+    <tr><th>Term</th><th>Definition</th><th>Example</th></tr>
+    <tr><td><strong>Computer</strong></td><td>An electronic device that processes data according to instructions</td><td>Desktop PC, laptop, smartphone</td></tr>
+    <tr><td><strong>Hardware</strong></td><td>Physical components you can touch</td><td>Keyboard, monitor, CPU, RAM</td></tr>
+    <tr><td><strong>Software</strong></td><td>Programs and applications (instructions for hardware)</td><td>Windows, Chrome, games</td></tr>
+    <tr><td><strong>Data</strong></td><td>Raw facts and figures without context</td><td>42, "John", 15.5</td></tr>
+    <tr><td><strong>Information</strong></td><td>Data that has been processed to have meaning</td><td>"John is 42 years old"</td></tr>
+    <tr><td><strong>Program</strong></td><td>A set of instructions that tells a computer what to do</td><td>A game, a calculator app</td></tr>
+    <tr><td><strong>Algorithm</strong></td><td>A step-by-step procedure to solve a problem</td><td>Recipe, directions</td></tr>
+</table>
+
+<h3>Data vs Information</h3>
+<div class="example-box">
+    <h4>Understanding the Difference</h4>
+    <p><strong>Data:</strong> 25, 30, 22, 28, 35</p>
+    <p><strong>Information:</strong> "The temperatures this week ranged from 22°C to 35°C, with an average of 28°C"</p>
+    <p>Data becomes information when it's <strong>processed, organized, and given context</strong>!</p>
+</div>
+
+<h3>Types of Software</h3>
+<div class="info-box">
+    <h4>System Software</h4>
+    <p>Software that manages the computer itself:</p>
+    <ul>
+        <li><strong>Operating System (OS):</strong> Windows, macOS, Linux, Android, iOS</li>
+        <li><strong>Utility Software:</strong> Antivirus, disk cleanup, backup tools</li>
+        <li><strong>Device Drivers:</strong> Software that helps hardware communicate with the OS</li>
+    </ul>
+    
+    <h4>Application Software</h4>
+    <p>Software that helps users perform tasks:</p>
+    <ul>
+        <li><strong>Productivity:</strong> Word processors, spreadsheets, presentations</li>
+        <li><strong>Communication:</strong> Email, messaging, video conferencing</li>
+        <li><strong>Creative:</strong> Photo editors, music production, video editing</li>
+        <li><strong>Entertainment:</strong> Games, media players, streaming apps</li>
+    </ul>
+</div>
+
+<h3>Input, Process, Output (IPO)</h3>
+<div class="definition-box">
+    All computers follow this basic cycle:
+    <ol>
+        <li><strong>Input:</strong> Data goes IN (keyboard, mouse, microphone)</li>
+        <li><strong>Process:</strong> Data is processed by the CPU</li>
+        <li><strong>Output:</strong> Results come OUT (screen, speakers, printer)</li>
+    </ol>
+</div>
+
+<pre><code>    INPUT → PROCESS → OUTPUT
+    
+    Example: Calculator
+    INPUT:   5 + 3 (typed on keyboard)
+    PROCESS: CPU calculates 5 + 3
+    OUTPUT:  8 (displayed on screen)</code></pre>
+            `,
+            keyPoints: [
+                'Hardware = physical, Software = programs',
+                'Data = raw facts, Information = processed data with meaning',
+                'System software manages the computer, Application software helps users',
+                'All computers follow: Input → Process → Output'
+            ]
+        },
+        'History of Computing': {
+            content: `
+<h2>A Brief History of Computing</h2>
+<p>Understanding where computers came from helps us appreciate how far we've come!</p>
+
+<h3>Timeline of Key Developments</h3>
+<table class="notes-table">
+    <tr><th>Year</th><th>Development</th><th>Significance</th></tr>
+    <tr><td>1837</td><td><strong>Analytical Engine</strong> (Charles Babbage)</td><td>First design for a general-purpose computer</td></tr>
+    <tr><td>1843</td><td><strong>First Program</strong> (Ada Lovelace)</td><td>Wrote the first computer algorithm</td></tr>
+    <tr><td>1936</td><td><strong>Turing Machine</strong> (Alan Turing)</td><td>Theoretical foundation of computing</td></tr>
+    <tr><td>1943</td><td><strong>Colossus</strong></td><td>First electronic programmable computer (code-breaking)</td></tr>
+    <tr><td>1945</td><td><strong>ENIAC</strong></td><td>First general-purpose electronic computer</td></tr>
+    <tr><td>1971</td><td><strong>First Microprocessor</strong> (Intel 4004)</td><td>CPU on a single chip - enabled personal computers</td></tr>
+    <tr><td>1976</td><td><strong>Apple I</strong></td><td>First commercially successful personal computer</td></tr>
+    <tr><td>1981</td><td><strong>IBM PC</strong></td><td>Set the standard for personal computers</td></tr>
+    <tr><td>1989</td><td><strong>World Wide Web</strong> (Tim Berners-Lee)</td><td>Invented the web - transformed the internet</td></tr>
+    <tr><td>2007</td><td><strong>iPhone</strong></td><td>Began the smartphone revolution</td></tr>
+</table>
+
+<h3>Key Figures in Computing</h3>
+<div class="info-box">
+    <h4>🧑‍💻 Charles Babbage (1791-1871)</h4>
+    <p>"Father of the Computer" - Designed the Analytical Engine, a mechanical general-purpose computer.</p>
+    
+    <h4>👩‍💻 Ada Lovelace (1815-1852)</h4>
+    <p>"First Computer Programmer" - Wrote algorithms for Babbage's machine. The Ada programming language is named after her.</p>
+    
+    <h4>🧑‍💻 Alan Turing (1912-1954)</h4>
+    <p>"Father of Computer Science" - Created the theoretical Turing Machine, broke the Enigma code in WWII, and pioneered artificial intelligence.</p>
+    
+    <h4>🧑‍💻 Tim Berners-Lee (1955-)</h4>
+    <p>"Inventor of the World Wide Web" - Created HTML, URLs, and HTTP while working at CERN.</p>
+</div>
+
+<h3>Generations of Computers</h3>
+<table class="notes-table">
+    <tr><th>Generation</th><th>Years</th><th>Technology</th><th>Characteristics</th></tr>
+    <tr><td>1st</td><td>1940-1956</td><td>Vacuum Tubes</td><td>Room-sized, very hot, unreliable</td></tr>
+    <tr><td>2nd</td><td>1956-1963</td><td>Transistors</td><td>Smaller, faster, more reliable</td></tr>
+    <tr><td>3rd</td><td>1964-1971</td><td>Integrated Circuits</td><td>Even smaller, keyboards and monitors</td></tr>
+    <tr><td>4th</td><td>1971-Present</td><td>Microprocessors</td><td>Personal computers, internet</td></tr>
+    <tr><td>5th</td><td>Present-Future</td><td>AI & Quantum</td><td>Artificial intelligence, parallel processing</td></tr>
+</table>
+
+<div class="tip-box">
+    <strong>💡 Fun Fact:</strong> The computer that guided Apollo 11 to the moon had less processing power than a modern calculator! Today's smartphones are millions of times more powerful than the computers that filled entire rooms in the 1960s.
+</div>
+            `,
+            keyPoints: [
+                'Babbage designed the first general-purpose computer concept',
+                'Ada Lovelace wrote the first computer program',
+                'Alan Turing laid the theoretical foundations of computing',
+                'Tim Berners-Lee invented the World Wide Web',
+                'Computers evolved from room-sized machines to pocket devices'
+            ]
+        },
+        'Why Study Computer Science?': {
+            content: `
+<h2>Why Study Computer Science?</h2>
+<p>Computer Science is one of the most valuable subjects you can study. Here's why:</p>
+
+<h3>1. Problem-Solving Skills</h3>
+<div class="info-box">
+    <p>Computer Science teaches you <strong>computational thinking</strong> - a powerful approach to problem-solving that applies everywhere:</p>
+    <ul>
+        <li><strong>Decomposition:</strong> Breaking big problems into smaller parts</li>
+        <li><strong>Pattern Recognition:</strong> Finding similarities and trends</li>
+        <li><strong>Abstraction:</strong> Focusing on what's important, ignoring irrelevant details</li>
+        <li><strong>Algorithm Design:</strong> Creating step-by-step solutions</li>
+    </ul>
+    <p>These skills help in <em>every</em> subject and career!</p>
+</div>
+
+<h3>2. Career Opportunities</h3>
+<p>Computer Science opens doors to many exciting careers:</p>
+<table class="notes-table">
+    <tr><th>Career</th><th>What You Do</th><th>Average Salary (UK)</th></tr>
+    <tr><td>Software Developer</td><td>Build apps and programs</td><td>£40,000 - £70,000</td></tr>
+    <tr><td>Data Scientist</td><td>Analyze data to find insights</td><td>£50,000 - £80,000</td></tr>
+    <tr><td>Cybersecurity Analyst</td><td>Protect systems from hackers</td><td>£45,000 - £75,000</td></tr>
+    <tr><td>Game Developer</td><td>Create video games</td><td>£30,000 - £60,000</td></tr>
+    <tr><td>AI/ML Engineer</td><td>Build intelligent systems</td><td>£60,000 - £100,000+</td></tr>
+    <tr><td>Web Developer</td><td>Build websites and web apps</td><td>£35,000 - £60,000</td></tr>
+</table>
+
+<h3>3. Future-Proof Skills</h3>
+<div class="tip-box">
+    <strong>💡 Important:</strong> Technology is in EVERYTHING now. Even if you don't become a programmer, understanding how technology works will help you in any career - from medicine to music, finance to farming!
+</div>
+
+<h3>4. Creativity and Innovation</h3>
+<p>Computer Science isn't just about logic - it's incredibly creative:</p>
+<ul>
+    <li>🎮 Design and build your own games</li>
+    <li>🎨 Create digital art and animations</li>
+    <li>🎵 Make music with code</li>
+    <li>🤖 Build robots and intelligent systems</li>
+    <li>📱 Develop apps that millions of people use</li>
+    <li>🌐 Create websites and online experiences</li>
+</ul>
+
+<h3>5. Understanding the Digital World</h3>
+<p>We live in a digital age. Understanding Computer Science helps you:</p>
+<ul>
+    <li>Stay safe online (understand threats and security)</li>
+    <li>Make informed decisions about technology</li>
+    <li>Not be fooled by tech myths and misinformation</li>
+    <li>Understand how social media, AI, and other technologies affect society</li>
+    <li>Be a creator, not just a consumer of technology</li>
+</ul>
+
+<div class="example-box">
+    <h4>🎯 The Bottom Line</h4>
+    <p>Whether you want to be a doctor, artist, entrepreneur, or anything else - understanding Computer Science will give you an advantage. It's not about becoming a "computer person" - it's about understanding how the modern world works!</p>
+</div>
+            `,
+            keyPoints: [
+                'Develops computational thinking - useful in all areas of life',
+                'Opens doors to high-paying, in-demand careers',
+                'Technology skills are needed in every industry',
+                'Combines creativity with logic',
+                'Helps you understand and navigate the digital world safely'
+            ]
+        },
+        'The Computing Cycle': {
+            content: `
+<h2>The Computing Cycle</h2>
+<p>Every computer operation follows a fundamental cycle. Understanding this helps you grasp how all computing works!</p>
+
+<h3>Input → Process → Output → Storage</h3>
+<div class="definition-box">
+    <strong>The Computing Cycle (IPOS):</strong> The basic model that describes how all computers work - data is Input, Processed, Output, and optionally Stored.
+</div>
+
+<pre><code>
+    ┌─────────┐      ┌─────────┐      ┌──────────┐
+    │  INPUT  │  →   │ PROCESS │  →   │  OUTPUT  │
+    └─────────┘      └─────────┘      └──────────┘
+                          ↓↑
+                    ┌───────────┐
+                    │  STORAGE  │
+                    └───────────┘
+</code></pre>
+
+<h3>1. Input</h3>
+<div class="info-box">
+    <p><strong>Input</strong> is how data enters the computer system.</p>
+    <h4>Input Devices:</h4>
+    <ul>
+        <li>⌨️ <strong>Keyboard:</strong> Text and commands</li>
+        <li>🖱️ <strong>Mouse/Touchpad:</strong> Pointing and clicking</li>
+        <li>📷 <strong>Camera/Webcam:</strong> Images and video</li>
+        <li>🎤 <strong>Microphone:</strong> Sound and voice</li>
+        <li>📱 <strong>Touchscreen:</strong> Touch input</li>
+        <li>🎮 <strong>Game Controller:</strong> Gaming input</li>
+        <li>📄 <strong>Scanner:</strong> Digitizing documents</li>
+        <li>👆 <strong>Fingerprint Reader:</strong> Biometric input</li>
+    </ul>
+</div>
+
+<h3>2. Process</h3>
+<div class="info-box">
+    <p><strong>Processing</strong> is where the CPU (Central Processing Unit) performs operations on the data.</p>
+    <h4>What happens during processing:</h4>
+    <ul>
+        <li>Calculations (arithmetic operations)</li>
+        <li>Comparisons (logical operations)</li>
+        <li>Data manipulation (sorting, searching)</li>
+        <li>Running program instructions</li>
+    </ul>
+    <p>The CPU is the "brain" of the computer - it follows instructions from programs to process data.</p>
+</div>
+
+<h3>3. Output</h3>
+<div class="info-box">
+    <p><strong>Output</strong> is how the computer presents results to the user.</p>
+    <h4>Output Devices:</h4>
+    <ul>
+        <li>🖥️ <strong>Monitor/Screen:</strong> Visual display</li>
+        <li>🔊 <strong>Speakers/Headphones:</strong> Audio output</li>
+        <li>🖨️ <strong>Printer:</strong> Physical documents</li>
+        <li>📽️ <strong>Projector:</strong> Large display</li>
+        <li>💡 <strong>LEDs/Lights:</strong> Status indicators</li>
+    </ul>
+</div>
+
+<h3>4. Storage</h3>
+<div class="info-box">
+    <p><strong>Storage</strong> keeps data for later use (even when power is off).</p>
+    <h4>Storage Types:</h4>
+    <ul>
+        <li>💾 <strong>Hard Drive (HDD):</strong> Large capacity, mechanical</li>
+        <li>⚡ <strong>Solid State Drive (SSD):</strong> Faster, no moving parts</li>
+        <li>💿 <strong>Optical Discs:</strong> CDs, DVDs, Blu-rays</li>
+        <li>🔌 <strong>USB Flash Drive:</strong> Portable storage</li>
+        <li>☁️ <strong>Cloud Storage:</strong> Online storage (Google Drive, iCloud)</li>
+    </ul>
+</div>
+
+<h3>Example: Writing a Document</h3>
+<div class="example-box">
+    <table class="notes-table">
+        <tr><th>Stage</th><th>What Happens</th><th>Device/Component</th></tr>
+        <tr><td>INPUT</td><td>You type words on the keyboard</td><td>Keyboard</td></tr>
+        <tr><td>PROCESS</td><td>CPU processes keystrokes, word processor formats text</td><td>CPU + RAM</td></tr>
+        <tr><td>OUTPUT</td><td>Text appears on screen</td><td>Monitor</td></tr>
+        <tr><td>STORAGE</td><td>You save the document</td><td>Hard Drive/SSD</td></tr>
+    </table>
+</div>
+
+<h3>RAM vs Storage</h3>
+<table class="notes-table">
+    <tr><th>RAM (Primary Storage)</th><th>Storage (Secondary Storage)</th></tr>
+    <tr><td>Temporary - loses data when power off</td><td>Permanent - keeps data when power off</td></tr>
+    <tr><td>Very fast</td><td>Slower (but SSD is fast)</td></tr>
+    <tr><td>Small capacity (8-32 GB typical)</td><td>Large capacity (256 GB - 4+ TB)</td></tr>
+    <tr><td>Holds currently running programs</td><td>Holds saved files and installed programs</td></tr>
+</table>
+
+<div class="tip-box">
+    <strong>💡 Analogy:</strong> Think of RAM as your desk (where you work on things NOW) and storage as your filing cabinet (where you keep things for LATER). You need both!
+</div>
+            `,
+            keyPoints: [
+                'IPOS: Input → Process → Output → Storage',
+                'Input devices bring data IN (keyboard, mouse, microphone)',
+                'The CPU processes data according to program instructions',
+                'Output devices present results (screen, speakers, printer)',
+                'Storage saves data permanently (HDD, SSD, cloud)',
+                'RAM is temporary (fast), Storage is permanent (larger)'
+            ]
+        }
+    },
     'problem-solving': {
         'Algorithms & Flowcharts': {
             content: `
