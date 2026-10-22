@@ -635,7 +635,9 @@
             
             // Setup background sync
             function setupBackgroundSync() {
-                // Check for background sync support
+                // Check for service worker registration and background sync support
+                if (!swRegistration) return;
+                
                 if ('sync' in swRegistration) {
                     // Register periodic sync for content updates
                     if ('periodicSync' in swRegistration) {

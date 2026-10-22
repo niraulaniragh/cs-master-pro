@@ -144,8 +144,9 @@
         "preferred_width": 400
     },
     "share_target": {
-        "action": "/cs-master-pro/share",
+        "action": "/cs-master-pro/",
         "method": "GET",
+        "enctype": "application/x-www-form-urlencoded",
         "params": {
             "title": "title",
             "text": "text",
