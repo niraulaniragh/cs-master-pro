@@ -153,13 +153,13 @@ const App = (() => {
         // The landing page has login/register buttons
         
         // Add guest mode badge to nav
-        App.showGuestModeBadge();
+        showGuestModeBadge();
     };
     
     /**
      * Show guest mode badge in navigation
      */
-    App.showGuestModeBadge = () => {
+    const showGuestModeBadge = () => {
         const navRight = document.querySelector('.nav-right');
         if (navRight && !document.getElementById('guest-mode-badge')) {
             const badge = document.createElement('div');
@@ -176,7 +176,7 @@ const App = (() => {
     /**
      * Remove guest mode badge (called after login)
      */
-    App.hideGuestModeBadge = () => {
+    const hideGuestModeBadge = () => {
         const badge = document.getElementById('guest-mode-badge');
         if (badge) badge.remove();
     };
@@ -867,6 +867,8 @@ const App = (() => {
         saveAvatar,
         showSwitchAccountType,
         confirmSwitchAccountType,
+        showGuestModeBadge,
+        hideGuestModeBadge,
         get tempAvatarColor() { return tempAvatarColor; },
         set tempAvatarColor(val) { tempAvatarColor = val; },
         get tempAvatarEmoji() { return tempAvatarEmoji; },

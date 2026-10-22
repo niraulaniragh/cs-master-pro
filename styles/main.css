@@ -16752,3 +16752,26 @@ textarea:focus-visible,
         font-size: 2rem;
     }
 }
+
+
+/* Exam info badge */
+.pp-exam-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.pp-exam-badge {
+    background: linear-gradient(135deg, #7c3aed, #a855f7);
+    color: white;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.pp-exam-detail {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}

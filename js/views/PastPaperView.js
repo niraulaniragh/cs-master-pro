@@ -264,7 +264,11 @@ const PastPaperView = {
                 <div class="past-paper-view">
                     <div class="pp-header">
                         <h1>📝 Past Paper Practice</h1>
-                        <p>Practice with real IGCSE-style exam questions</p>
+                        <p>Practice with Pearson Edexcel IGCSE Computer Science (4CP0) style exam questions</p>
+                        <div class="pp-exam-info">
+                            <span class="pp-exam-badge">Edexcel 4CP0</span>
+                            <span class="pp-exam-detail">International GCSE</span>
+                        </div>
                     </div>
                     
                     <div class="pp-content">
@@ -321,8 +325,8 @@ const PastPaperView = {
                         <div class="pp-paper-type-header paper1">
                             <span class="pp-paper-type-icon">📖</span>
                             <div class="pp-paper-type-info">
-                                <h3>Paper 1 - Theory</h3>
-                                <p>Written paper covering all theory topics • 1hr 30min • 50%</p>
+                                <h3>Paper 1 - Principles of Computer Science</h3>
+                                <p>Written exam covering all theory topics • 1hr 30min • 50% of IGCSE</p>
                             </div>
                         </div>
                         <div class="pp-papers-list">
@@ -350,8 +354,8 @@ const PastPaperView = {
                         <div class="pp-paper-type-header paper2">
                             <span class="pp-paper-type-icon">💻</span>
                             <div class="pp-paper-type-info">
-                                <h3>Paper 2 - Problem Solving & Programming</h3>
-                                <p>Practical paper with algorithms, pseudocode & programming • 1hr 30min • 50%</p>
+                                <h3>Paper 2 - Application of Computational Thinking</h3>
+                                <p>Problem solving, algorithms & programming • 1hr 30min • 50% of IGCSE</p>
                             </div>
                         </div>
                         <div class="pp-papers-list">
