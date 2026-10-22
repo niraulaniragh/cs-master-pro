@@ -51,7 +51,7 @@ const LandingView = {
                         </p>
                         
                         <div class="hero-actions">
-                            <button class="btn-hero-primary" onclick="AuthModal.show('register')">
+                            <button class="btn-hero-primary" onclick="AuthModal.show('signup')">
                                 Start Free
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                                     <path d="M5 12h14M12 5l7 7-7 7"/>
@@ -217,7 +217,7 @@ const LandingView = {
                     <div class="cta-box">
                         <h2>Ready to start?</h2>
                         <p>Join students who are mastering Computer Science the smart way.</p>
-                        <button class="btn-cta" onclick="AuthModal.show('register')">
+                        <button class="btn-cta" onclick="AuthModal.show('signup')">
                             Create Free Account
                         </button>
                         <span class="cta-note">No credit card needed • Free forever</span>
