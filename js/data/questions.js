@@ -176,47 +176,47 @@ const QUESTIONS = [
 
 // Flashcards for study mode
 const FLASHCARDS = [
-    { id: 1, topic: 'problem-solving', front: 'What is an algorithm?', back: 'A step-by-step set of instructions to solve a problem. Must be finite, precise, and produce an output.' },
-    { id: 2, topic: 'problem-solving', front: 'What is decomposition?', back: 'Breaking a complex problem into smaller, manageable sub-problems that can be solved individually.' },
-    { id: 3, topic: 'problem-solving', front: 'What is abstraction?', back: 'Hiding unnecessary details to focus on the essential features of a problem.' },
-    { id: 4, topic: 'problem-solving', front: 'Binary Search requirement?', back: 'Data MUST be sorted. Divides search space in half each time. O(log n) complexity.' },
-    { id: 5, topic: 'problem-solving', front: 'Bubble Sort - how it works?', back: 'Compares adjacent pairs, swaps if in wrong order. Largest values "bubble" to the end. O(n²) complexity.' },
-    { id: 6, topic: 'problem-solving', front: 'Merge Sort - how it works?', back: 'Divide and conquer: split list in half repeatedly until single elements, then merge back in sorted order. O(n log n).' },
-    { id: 7, topic: 'programming', front: 'Five main data types?', back: 'Integer (whole numbers), Real/Float (decimals), Boolean (True/False), Character (single char), String (text)' },
-    { id: 8, topic: 'programming', front: 'Difference: Variable vs Constant?', back: 'Variable: value CAN change during execution. Constant: value CANNOT change once set.' },
-    { id: 9, topic: 'programming', front: 'Three types of loops?', back: 'FOR (count-controlled), WHILE (pre-test condition), REPEAT-UNTIL (post-test, runs at least once)' },
-    { id: 10, topic: 'programming', front: 'Function vs Procedure?', back: 'Function: RETURNS a value. Procedure: performs action but does NOT return a value.' },
-    { id: 11, topic: 'programming', front: 'What is validation?', back: 'Checking that input data is reasonable and within acceptable limits. Types: range, type, length, presence, format.' },
-    { id: 12, topic: 'programming', front: 'Three types of test data?', back: 'Normal (typical valid data), Boundary (edge values), Erroneous (invalid data that should be rejected)' },
-    { id: 13, topic: 'data', front: 'Binary to Denary conversion?', back: 'Add place values where there is a 1. Place values: 128, 64, 32, 16, 8, 4, 2, 1' },
-    { id: 14, topic: 'data', front: 'Hexadecimal digits?', back: '0-9, then A=10, B=11, C=12, D=13, E=14, F=15. Each hex digit = 4 bits.' },
-    { id: 15, topic: 'data', front: 'Binary left shift effect?', back: 'Multiplies by 2 for each position shifted. Bits fall off the left, zeros added on right.' },
-    { id: 16, topic: 'data', front: 'Binary right shift effect?', back: 'Divides by 2 for each position shifted (integer division). Bits fall off the right.' },
-    { id: 17, topic: 'data', front: 'Lossy vs Lossless compression?', back: 'Lossy: permanently removes data (smaller files, quality loss). Lossless: no data lost (can restore original).' },
-    { id: 18, topic: 'data', front: 'Image file size formula?', back: 'Width × Height × Color Depth (bits per pixel). Result in bits, divide by 8 for bytes.' },
-    { id: 19, topic: 'data', front: 'Sound file size formula?', back: 'Sample rate × Bit depth × Channels × Duration (seconds). Result in bits.' },
-    { id: 20, topic: 'data', front: 'ASCII vs Unicode?', back: 'ASCII: 7-bit, 128 characters, English only. Unicode: up to 32-bit, 143,000+ characters, all languages.' },
-    { id: 21, topic: 'computers', front: 'CPU components?', back: 'ALU (calculations), Control Unit (fetches/decodes), Registers (fast storage), Cache (frequently used data)' },
-    { id: 22, topic: 'computers', front: 'FDE Cycle stages?', back: 'Fetch (get instruction), Decode (interpret it), Execute (perform it). Repeats continuously.' },
-    { id: 23, topic: 'computers', front: 'Key registers?', back: 'PC (next instruction address), MAR (address being accessed), MDR (data being transferred), CIR (current instruction), ACC (results)' },
-    { id: 24, topic: 'computers', front: 'RAM vs ROM?', back: 'RAM: volatile (loses data when off), read/write, stores running programs. ROM: non-volatile, read-only, stores boot instructions.' },
-    { id: 25, topic: 'computers', front: 'Compiler vs Interpreter?', back: 'Compiler: translates entire program at once, creates executable, fast to run. Interpreter: line by line, no executable, slower but easier to debug.' },
-    { id: 26, topic: 'computers', front: 'Logic gates: AND, OR, NOT?', back: 'AND: output 1 only if ALL inputs are 1. OR: output 1 if ANY input is 1. NOT: inverts input.' },
-    { id: 27, topic: 'networks', front: 'LAN vs WAN?', back: 'LAN: small area (building), fast, private. WAN: large area (countries), slower, often public infrastructure.' },
-    { id: 28, topic: 'networks', front: 'Star topology pros/cons?', back: 'Pros: one failure doesn\'t affect others, easy to add devices. Cons: central switch is single point of failure.' },
-    { id: 29, topic: 'networks', front: 'Switch vs Router?', back: 'Switch: connects devices in a LAN, uses MAC addresses. Router: connects different networks, uses IP addresses.' },
-    { id: 30, topic: 'networks', front: 'Common malware types?', back: 'Virus (attaches to files), Worm (self-replicates), Trojan (disguised), Ransomware (encrypts files), Spyware (monitors user)' },
-    { id: 31, topic: 'databases', front: 'Primary Key rules?', back: 'Must be UNIQUE (no duplicates), NOT NULL (must have value), should not change.' },
-    { id: 32, topic: 'databases', front: 'What is a Foreign Key?', back: 'A field that links to the primary key of another table, creating a relationship between tables.' },
-    { id: 33, topic: 'databases', front: 'SQL SELECT syntax?', back: 'SELECT columns FROM table WHERE condition ORDER BY column ASC/DESC' },
-    { id: 34, topic: 'bigger-picture', front: 'What is e-waste?', back: 'Discarded electronic equipment. Contains toxic materials, environmental concern, should be recycled properly.' },
-    { id: 35, topic: 'bigger-picture', front: 'Open source vs Proprietary?', back: 'Open source: code freely available to view/modify. Proprietary: code is closed, company controls it, usually paid.' }
+    { id: 1001, topic: 'problem-solving', front: 'What is an algorithm?', back: 'A step-by-step set of instructions to solve a problem. Must be finite, precise, and produce an output.' },
+    { id: 1002, topic: 'problem-solving', front: 'What is decomposition?', back: 'Breaking a complex problem into smaller, manageable sub-problems that can be solved individually.' },
+    { id: 1003, topic: 'problem-solving', front: 'What is abstraction?', back: 'Hiding unnecessary details to focus on the essential features of a problem.' },
+    { id: 1004, topic: 'problem-solving', front: 'Binary Search requirement?', back: 'Data MUST be sorted. Divides search space in half each time. O(log n) complexity.' },
+    { id: 1005, topic: 'problem-solving', front: 'Bubble Sort - how it works?', back: 'Compares adjacent pairs, swaps if in wrong order. Largest values "bubble" to the end. O(n²) complexity.' },
+    { id: 1006, topic: 'problem-solving', front: 'Merge Sort - how it works?', back: 'Divide and conquer: split list in half repeatedly until single elements, then merge back in sorted order. O(n log n).' },
+    { id: 1007, topic: 'programming', front: 'Five main data types?', back: 'Integer (whole numbers), Real/Float (decimals), Boolean (True/False), Character (single char), String (text)' },
+    { id: 1008, topic: 'programming', front: 'Difference: Variable vs Constant?', back: 'Variable: value CAN change during execution. Constant: value CANNOT change once set.' },
+    { id: 1009, topic: 'programming', front: 'Three types of loops?', back: 'FOR (count-controlled), WHILE (pre-test condition), REPEAT-UNTIL (post-test, runs at least once)' },
+    { id: 10010, topic: 'programming', front: 'Function vs Procedure?', back: 'Function: RETURNS a value. Procedure: performs action but does NOT return a value.' },
+    { id: 10011, topic: 'programming', front: 'What is validation?', back: 'Checking that input data is reasonable and within acceptable limits. Types: range, type, length, presence, format.' },
+    { id: 10012, topic: 'programming', front: 'Three types of test data?', back: 'Normal (typical valid data), Boundary (edge values), Erroneous (invalid data that should be rejected)' },
+    { id: 10013, topic: 'data', front: 'Binary to Denary conversion?', back: 'Add place values where there is a 1. Place values: 128, 64, 32, 16, 8, 4, 2, 1' },
+    { id: 10014, topic: 'data', front: 'Hexadecimal digits?', back: '0-9, then A=10, B=11, C=12, D=13, E=14, F=15. Each hex digit = 4 bits.' },
+    { id: 10015, topic: 'data', front: 'Binary left shift effect?', back: 'Multiplies by 2 for each position shifted. Bits fall off the left, zeros added on right.' },
+    { id: 10016, topic: 'data', front: 'Binary right shift effect?', back: 'Divides by 2 for each position shifted (integer division). Bits fall off the right.' },
+    { id: 10017, topic: 'data', front: 'Lossy vs Lossless compression?', back: 'Lossy: permanently removes data (smaller files, quality loss). Lossless: no data lost (can restore original).' },
+    { id: 10018, topic: 'data', front: 'Image file size formula?', back: 'Width × Height × Color Depth (bits per pixel). Result in bits, divide by 8 for bytes.' },
+    { id: 10019, topic: 'data', front: 'Sound file size formula?', back: 'Sample rate × Bit depth × Channels × Duration (seconds). Result in bits.' },
+    { id: 10020, topic: 'data', front: 'ASCII vs Unicode?', back: 'ASCII: 7-bit, 128 characters, English only. Unicode: up to 32-bit, 143,000+ characters, all languages.' },
+    { id: 10021, topic: 'computers', front: 'CPU components?', back: 'ALU (calculations), Control Unit (fetches/decodes), Registers (fast storage), Cache (frequently used data)' },
+    { id: 10022, topic: 'computers', front: 'FDE Cycle stages?', back: 'Fetch (get instruction), Decode (interpret it), Execute (perform it). Repeats continuously.' },
+    { id: 10023, topic: 'computers', front: 'Key registers?', back: 'PC (next instruction address), MAR (address being accessed), MDR (data being transferred), CIR (current instruction), ACC (results)' },
+    { id: 10024, topic: 'computers', front: 'RAM vs ROM?', back: 'RAM: volatile (loses data when off), read/write, stores running programs. ROM: non-volatile, read-only, stores boot instructions.' },
+    { id: 10025, topic: 'computers', front: 'Compiler vs Interpreter?', back: 'Compiler: translates entire program at once, creates executable, fast to run. Interpreter: line by line, no executable, slower but easier to debug.' },
+    { id: 10026, topic: 'computers', front: 'Logic gates: AND, OR, NOT?', back: 'AND: output 1 only if ALL inputs are 1. OR: output 1 if ANY input is 1. NOT: inverts input.' },
+    { id: 10027, topic: 'networks', front: 'LAN vs WAN?', back: 'LAN: small area (building), fast, private. WAN: large area (countries), slower, often public infrastructure.' },
+    { id: 10028, topic: 'networks', front: 'Star topology pros/cons?', back: 'Pros: one failure doesn\'t affect others, easy to add devices. Cons: central switch is single point of failure.' },
+    { id: 10029, topic: 'networks', front: 'Switch vs Router?', back: 'Switch: connects devices in a LAN, uses MAC addresses. Router: connects different networks, uses IP addresses.' },
+    { id: 10030, topic: 'networks', front: 'Common malware types?', back: 'Virus (attaches to files), Worm (self-replicates), Trojan (disguised), Ransomware (encrypts files), Spyware (monitors user)' },
+    { id: 10031, topic: 'databases', front: 'Primary Key rules?', back: 'Must be UNIQUE (no duplicates), NOT NULL (must have value), should not change.' },
+    { id: 10032, topic: 'databases', front: 'What is a Foreign Key?', back: 'A field that links to the primary key of another table, creating a relationship between tables.' },
+    { id: 10033, topic: 'databases', front: 'SQL SELECT syntax?', back: 'SELECT columns FROM table WHERE condition ORDER BY column ASC/DESC' },
+    { id: 10034, topic: 'bigger-picture', front: 'What is e-waste?', back: 'Discarded electronic equipment. Contains toxic materials, environmental concern, should be recycled properly.' },
+    { id: 10035, topic: 'bigger-picture', front: 'Open source vs Proprietary?', back: 'Open source: code freely available to view/modify. Proprietary: code is closed, company controls it, usually paid.' }
 ];
 
 // Past Paper Style Questions (Extended Response)
 const PAST_PAPER_QUESTIONS = [
     {
-        id: 1,
+        id: 2001,
         topic: 'problem-solving',
         marks: 4,
         question: 'Explain why binary search is more efficient than linear search when searching a large sorted dataset.',
@@ -229,7 +229,7 @@ const PAST_PAPER_QUESTIONS = [
         sampleAnswer: 'Binary search is more efficient because it eliminates half of the remaining data with each comparison, rather than checking items one at a time. This gives it a time complexity of O(log n), meaning for 1000 items it only needs approximately 10 comparisons. In contrast, linear search has O(n) complexity and might need to check all 1000 items. However, binary search can only be used if the data is already sorted.'
     },
     {
-        id: 2,
+        id: 2002,
         topic: 'problem-solving',
         marks: 6,
         question: 'A company stores customer data that needs to be sorted alphabetically. Compare bubble sort and merge sort, and recommend which algorithm the company should use. Justify your recommendation.',
@@ -244,7 +244,7 @@ const PAST_PAPER_QUESTIONS = [
         sampleAnswer: 'Bubble sort works by comparing adjacent pairs and swapping them if they are in the wrong order, repeating until no swaps are needed. It has O(n²) time complexity, making it slow for large datasets. Merge sort uses divide and conquer - it repeatedly splits the list in half until single elements remain, then merges them back in sorted order. It has O(n log n) complexity. For a company with many customers, I recommend merge sort because it scales much better. With 1000 customers, bubble sort might need up to 1,000,000 operations while merge sort needs only about 10,000.'
     },
     {
-        id: 3,
+        id: 2003,
         topic: 'programming',
         marks: 3,
         question: 'Explain the difference between validation and verification. Give one example of each.',
@@ -257,7 +257,7 @@ const PAST_PAPER_QUESTIONS = [
         sampleAnswer: 'Validation checks whether data is sensible and within acceptable bounds, while verification checks whether the data was entered correctly. For example, a range check (validation) ensures an age entered is between 0 and 120. Double entry (verification) asks the user to enter their email twice to confirm it matches.'
     },
     {
-        id: 4,
+        id: 2004,
         topic: 'programming',
         marks: 4,
         question: 'Describe three different types of test data and explain why each type is important when testing a program.',
@@ -272,7 +272,7 @@ const PAST_PAPER_QUESTIONS = [
         sampleAnswer: 'Normal (typical) data tests that the program works correctly for everyday valid inputs - this ensures basic functionality works. Boundary data tests values at the edge of acceptable ranges (e.g., if accepting 1-100, test 1, 100, 0, and 101) because bugs often occur at boundaries. Erroneous (invalid) data tests that the program correctly rejects invalid input and handles errors gracefully, ensuring validation and error handling work properly.'
     },
     {
-        id: 5,
+        id: 2005,
         topic: 'data',
         marks: 4,
         question: 'A bitmap image has dimensions of 800 × 600 pixels and uses a colour depth of 24 bits. Calculate the file size in megabytes. Show your working.',
@@ -286,7 +286,7 @@ const PAST_PAPER_QUESTIONS = [
         sampleAnswer: 'Total pixels = 800 × 600 = 480,000 pixels\nFile size in bits = 480,000 × 24 = 11,520,000 bits\nFile size in bytes = 11,520,000 ÷ 8 = 1,440,000 bytes\nFile size in megabytes = 1,440,000 ÷ 1,000,000 = 1.44 MB'
     },
     {
-        id: 6,
+        id: 2006,
         topic: 'data',
         marks: 5,
         question: 'Explain the difference between lossy and lossless compression. For each type, give an example of a file format that uses it and explain why that type is appropriate.',
@@ -301,7 +301,7 @@ const PAST_PAPER_QUESTIONS = [
         sampleAnswer: 'Lossy compression permanently removes data that is considered less important, resulting in smaller files but some quality loss. JPEG uses lossy compression for images because small colour changes are not noticeable to the human eye, and smaller file sizes are useful for web images. Lossless compression reduces file size but can be fully restored to the original with no data loss. PNG uses lossless compression, which is appropriate when exact image quality must be preserved, such as for logos or images that will be edited further.'
     },
     {
-        id: 7,
+        id: 2007,
         topic: 'computers',
         marks: 4,
         question: 'Describe the three stages of the Fetch-Decode-Execute cycle.',
@@ -314,7 +314,7 @@ const PAST_PAPER_QUESTIONS = [
         sampleAnswer: 'Fetch: The CPU retrieves the next instruction from main memory. The Program Counter holds the address of the instruction, which is loaded into the MAR to access the memory location. Decode: The Control Unit interprets the instruction to determine what action is required and what data is needed. Execute: The instruction is carried out - this might involve the ALU performing calculations, or data being moved between registers.'
     },
     {
-        id: 8,
+        id: 2008,
         topic: 'computers',
         marks: 6,
         question: 'Compare a compiler and an interpreter. Discuss the advantages and disadvantages of each.',
@@ -330,7 +330,7 @@ const PAST_PAPER_QUESTIONS = [
         sampleAnswer: 'A compiler translates the entire source code into machine code at once, producing an executable file. Advantages: programs run faster since no translation is needed at runtime; the compiler is not needed to run the finished program. Disadvantages: must recompile entire program after changes; harder to debug. An interpreter translates and executes code one line at a time. Advantages: easier to debug as errors are found immediately; good for development and testing. Disadvantages: programs run slower as translation happens during execution; the interpreter must be present to run the program.'
     },
     {
-        id: 9,
+        id: 2009,
         topic: 'networks',
         marks: 5,
         question: 'A school is setting up a new computer network. Describe the star network topology and explain two advantages and one disadvantage of using this topology.',
@@ -346,7 +346,7 @@ const PAST_PAPER_QUESTIONS = [
         sampleAnswer: 'In a star topology, all devices connect to a central switch or hub. Data sent between devices must pass through this central point. Advantages: If one computer fails or a cable breaks, only that device is affected - all other devices continue working normally. It is also easy to add new devices by simply connecting them to the switch. Disadvantage: The central switch is a single point of failure - if it breaks, the entire network goes down and no devices can communicate.'
     },
     {
-        id: 10,
+        id: 20010,
         topic: 'networks',
         marks: 6,
         question: 'Describe three different types of malware and explain how each can harm a computer system. For each type, suggest one method of prevention.',
@@ -364,7 +364,7 @@ const PAST_PAPER_QUESTIONS = [
         sampleAnswer: 'Virus: A program that attaches itself to legitimate files and spreads when those files are shared. It can corrupt or delete files and slow down the system. Prevention: Use up-to-date antivirus software and avoid opening email attachments from unknown sources. Worm: Self-replicating malware that spreads across networks without user interaction. It consumes network bandwidth and may carry other malicious payloads. Prevention: Use a firewall and keep operating system updated with security patches. Ransomware: Encrypts the victim\'s files and demands payment for the decryption key. It causes loss of access to important data and potential financial loss. Prevention: Maintain regular offline backups so data can be restored without paying.'
     },
     {
-        id: 11,
+        id: 20011,
         topic: 'databases',
         marks: 4,
         question: 'Explain what a primary key is and why it is important in a database. Give an example of a suitable primary key for a table storing student records.',
@@ -378,7 +378,7 @@ const PAST_PAPER_QUESTIONS = [
         sampleAnswer: 'A primary key is a field (or combination of fields) that uniquely identifies each record in a database table. It is important because it ensures every record can be distinguished from others - no duplicates are allowed and every record must have a primary key value (not NULL). Primary keys are also used to create relationships between tables through foreign keys. For a student records table, a suitable primary key would be StudentID - a unique number assigned to each student - rather than a name, which might not be unique.'
     },
     {
-        id: 12,
+        id: 20012,
         topic: 'bigger-picture',
         marks: 6,
         question: 'Discuss the environmental impact of computer technology. Include both positive and negative impacts in your answer.',
@@ -559,7 +559,7 @@ QUESTIONS.push(...NEW_QUESTIONS);
 
 const NEW_PAST_PAPER_QUESTIONS = [
     {
-        id: 13,
+        id: 20013,
         topic: 'problem-solving',
         marks: 5,
         question: 'A program uses the following algorithm:\ncount ← 0\nFOR i ← 1 TO 5\n    IF i MOD 2 = 0 THEN\n        count ← count + i\n    ENDIF\nENDFOR\nOUTPUT count\n\n(a) Complete a trace table showing the values of i and count. [3]\n(b) State the final output. [1]\n(c) Describe what the algorithm does. [1]',
@@ -573,7 +573,7 @@ const NEW_PAST_PAPER_QUESTIONS = [
         sampleAnswer: '(a) Trace table:\ni: 1, count: 0 (1 MOD 2 ≠ 0)\ni: 2, count: 2 (2 MOD 2 = 0, so count = 0+2)\ni: 3, count: 2 (3 MOD 2 ≠ 0)\ni: 4, count: 6 (4 MOD 2 = 0, so count = 2+4)\ni: 5, count: 6 (5 MOD 2 ≠ 0)\n\n(b) Output: 6\n\n(c) The algorithm calculates the sum of all even numbers between 1 and 5 (which is 2 + 4 = 6).'
     },
     {
-        id: 14,
+        id: 20014,
         topic: 'data',
         marks: 6,
         question: 'Explain how two\'s complement is used to represent negative numbers in binary. Show the two\'s complement representation of -25 using 8 bits.',
@@ -588,7 +588,7 @@ const NEW_PAST_PAPER_QUESTIONS = [
         sampleAnswer: 'Two\'s complement is a method for representing negative numbers in binary. The most significant bit (MSB) indicates the sign: 0 for positive, 1 for negative.\n\nTo find -25 in two\'s complement:\n1. Write +25 in binary: 00011001\n2. Invert all bits: 11100110\n3. Add 1: 11100110 + 1 = 11100111\n\nTherefore, -25 in 8-bit two\'s complement is 11100111.'
     },
     {
-        id: 15,
+        id: 20015,
         topic: 'computers',
         marks: 5,
         question: 'Describe the purpose of each of the following CPU registers:\n(a) Program Counter (PC) [1]\n(b) Memory Address Register (MAR) [1]\n(c) Memory Data Register (MDR) [1]\n(d) Current Instruction Register (CIR) [1]\n(e) Accumulator (ACC) [1]',
@@ -602,7 +602,7 @@ const NEW_PAST_PAPER_QUESTIONS = [
         sampleAnswer: '(a) Program Counter (PC): Stores the memory address of the next instruction to be fetched from memory.\n\n(b) Memory Address Register (MAR): Holds the memory address that the CPU wants to read from or write to.\n\n(c) Memory Data Register (MDR): Acts as a buffer, holding data that has been fetched from memory or data waiting to be written to memory.\n\n(d) Current Instruction Register (CIR): Stores the instruction that is currently being decoded and executed.\n\n(e) Accumulator (ACC): Stores intermediate results from arithmetic and logical operations performed by the ALU.'
     },
     {
-        id: 16,
+        id: 20016,
         topic: 'networks',
         marks: 6,
         question: 'A school is concerned about network security.\n(a) Describe what phishing is and how it works. [2]\n(b) Explain two methods the school could use to protect against phishing attacks. [4]',
@@ -618,7 +618,7 @@ const NEW_PAST_PAPER_QUESTIONS = [
         sampleAnswer: '(a) Phishing is a type of social engineering attack where criminals send fraudulent emails or create fake websites that appear to be from legitimate organizations. The goal is to trick users into revealing sensitive information such as passwords, credit card numbers, or personal details by making them believe they are interacting with a trusted source.\n\n(b) Method 1: Conduct regular cybersecurity awareness training for staff and students. This educates users about how to recognize phishing attempts, such as checking sender addresses, hovering over links before clicking, and being suspicious of urgent requests for personal information.\n\nMethod 2: Implement email filtering software that scans incoming messages for known phishing signatures, suspicious links, and malicious attachments. This blocks many phishing emails before they reach users\' inboxes, reducing the risk of someone falling victim to an attack.'
     },
     {
-        id: 17,
+        id: 20017,
         topic: 'databases',
         marks: 5,
         question: 'A library database has the following tables:\nBooks (BookID, Title, AuthorID, Genre, Price)\nAuthors (AuthorID, FirstName, LastName)\n\nWrite SQL queries to:\n(a) Display the title and price of all books that cost more than £10, sorted by price [2]\n(b) Display the titles of all books written by authors whose last name is "Smith" [3]',
@@ -632,7 +632,7 @@ const NEW_PAST_PAPER_QUESTIONS = [
         sampleAnswer: '(a) SELECT Title, Price\nFROM Books\nWHERE Price > 10\nORDER BY Price ASC;\n\n(b) SELECT Books.Title\nFROM Books\nJOIN Authors ON Books.AuthorID = Authors.AuthorID\nWHERE Authors.LastName = \'Smith\';\n\nAlternative using subquery:\nSELECT Title\nFROM Books\nWHERE AuthorID IN (\n    SELECT AuthorID\n    FROM Authors\n    WHERE LastName = \'Smith\'\n);'
     },
     {
-        id: 18,
+        id: 20018,
         topic: 'programming',
         marks: 5,
         question: 'A 2D array stores a seating plan for a cinema with 5 rows and 8 columns. Each element contains "X" if booked or "O" if available.\n\n(a) Declare the array. [1]\n(b) Write pseudocode to count and output the total number of available seats. [4]',
@@ -646,7 +646,7 @@ const NEW_PAST_PAPER_QUESTIONS = [
         sampleAnswer: '(a) DECLARE seats: ARRAY[0:4, 0:7] OF CHAR\n\n(b) available ← 0\nFOR row ← 0 TO 4\n    FOR col ← 0 TO 7\n        IF seats[row][col] = "O" THEN\n            available ← available + 1\n        ENDIF\n    ENDFOR\nENDFOR\nOUTPUT "Available seats: ", available'
     },
     {
-        id: 19,
+        id: 20019,
         topic: 'data',
         marks: 4,
         question: 'The Vigenère cipher uses a keyword to encrypt messages.\n(a) Explain how the Vigenère cipher works. [2]\n(b) Using the keyword "KEY", encrypt the plaintext "HELLO". Show your working. [2]',
@@ -659,7 +659,7 @@ const NEW_PAST_PAPER_QUESTIONS = [
         sampleAnswer: '(a) The Vigenère cipher uses a keyword where each letter determines a different shift amount. The keyword is repeated to match the length of the plaintext. Each plaintext letter is shifted by the corresponding keyword letter\'s position (A=0, B=1, etc.).\n\n(b) Plaintext: H E L L O\nKeyword:   K E Y K E\n\nK=10, E=4, Y=24, K=10, E=4\n\nH(7) + K(10) = 17 → R\nE(4) + E(4) = 8 → I\nL(11) + Y(24) = 35 mod 26 = 9 → J\nL(11) + K(10) = 21 → V\nO(14) + E(4) = 18 → S\n\nEncrypted message: RIJVS'
     },
     {
-        id: 20,
+        id: 20020,
         topic: 'computers',
         marks: 4,
         question: 'Draw a logic circuit for the Boolean expression: Q = (A AND B) OR (NOT C)\nComplete a truth table for all possible inputs.',
@@ -672,7 +672,7 @@ const NEW_PAST_PAPER_QUESTIONS = [
         sampleAnswer: 'Logic circuit:\n- A and B connect to an AND gate\n- C connects to a NOT gate\n- Output of AND gate and NOT gate connect to an OR gate\n- Output of OR gate is Q\n\nTruth table:\nA | B | C | A AND B | NOT C | Q\n0 | 0 | 0 |    0    |   1   | 1\n0 | 0 | 1 |    0    |   0   | 0\n0 | 1 | 0 |    0    |   1   | 1\n0 | 1 | 1 |    0    |   0   | 0\n1 | 0 | 0 |    0    |   1   | 1\n1 | 0 | 1 |    0    |   0   | 0\n1 | 1 | 0 |    1    |   1   | 1\n1 | 1 | 1 |    1    |   0   | 1'
     },
     {
-        id: 21,
+        id: 20021,
         topic: 'bigger-picture',
         marks: 6,
         question: 'Artificial Intelligence (AI) is increasingly being used in healthcare.\n(a) Describe two ways AI is being used in healthcare. [4]\n(b) Discuss one ethical concern about using AI in healthcare decisions. [2]',
@@ -687,7 +687,7 @@ const NEW_PAST_PAPER_QUESTIONS = [
         sampleAnswer: '(a) Use 1: AI systems analyze medical images such as X-rays, MRIs, and CT scans to detect diseases like cancer, tumors, or diabetic retinopathy. The benefit is that AI can process images faster than radiologists and may detect subtle abnormalities humans might miss, leading to earlier diagnosis.\n\nUse 2: AI is used in drug discovery and predicting which treatments will be most effective for individual patients. Machine learning algorithms analyze genetic data and patient history to recommend personalized treatment plans, potentially reducing trial-and-error prescribing.\n\n(b) An ethical concern is accountability when AI makes errors. If an AI system misdiagnoses a patient or recommends incorrect treatment, it is unclear who is responsible - the doctor, the hospital, or the AI developer. This could lead to patients receiving inadequate care without clear recourse, and raises questions about whether patients should be informed that AI was involved in their diagnosis.'
     },
     {
-        id: 22,
+        id: 20022,
         topic: 'programming',
         marks: 5,
         question: 'A password validation system must check that:\n- The password is at least 8 characters long\n- The password contains at least one digit\n\nWrite pseudocode for a function that returns TRUE if the password is valid and FALSE otherwise.',

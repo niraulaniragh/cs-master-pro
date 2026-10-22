@@ -76,6 +76,9 @@ const PWAUtils = (function() {
      * Setup offline indicator in UI
      */
     function setupOfflineIndicator() {
+        // Only create if not already exists
+        if (document.getElementById('offline-indicator')) return;
+        
         // Create offline indicator element
         const indicator = document.createElement('div');
         indicator.id = 'offline-indicator';
@@ -87,6 +90,7 @@ const PWAUtils = (function() {
         
         // Add styles
         const style = document.createElement('style');
+        style.id = 'offline-indicator-styles';
         style.textContent = `
             .offline-indicator {
                 position: fixed;
@@ -105,6 +109,7 @@ const PWAUtils = (function() {
                 z-index: 9998;
                 transition: transform 0.3s ease;
                 box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+                pointer-events: none;
             }
             
             .offline-indicator.visible {
@@ -119,23 +124,36 @@ const PWAUtils = (function() {
                 0%, 100% { opacity: 1; }
                 50% { opacity: 0.5; }
             }
-            
-            body.offline .nav-stats,
-            body.offline .nav-user {
-                opacity: 0.6;
-            }
         `;
-        document.head.appendChild(style);
+        
+        if (!document.getElementById('offline-indicator-styles')) {
+            document.head.appendChild(style);
+        }
         document.body.appendChild(indicator);
         
-        // Show/hide based on online status
+        // Show/hide based on online status - only show when ACTUALLY offline
         function updateIndicator() {
-            indicator.classList.toggle('visible', !navigator.onLine);
+            const isOffline = !navigator.onLine;
+            indicator.classList.toggle('visible', isOffline);
+            document.body.classList.toggle('offline', isOffline);
+            
+            // Double-check with a fetch to be sure
+            if (!isOffline) {
+                indicator.classList.remove('visible');
+                document.body.classList.remove('offline');
+            }
         }
         
-        window.addEventListener('online', updateIndicator);
+        window.addEventListener('online', () => {
+            indicator.classList.remove('visible');
+            document.body.classList.remove('offline');
+        });
         window.addEventListener('offline', updateIndicator);
-        updateIndicator();
+        
+        // Initial check - default to online, only show offline if confirmed
+        if (!navigator.onLine) {
+            updateIndicator();
+        }
     }
     
     /**
