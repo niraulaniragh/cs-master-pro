@@ -6,6 +6,7 @@
 const Router = (() => {
     // Route configuration - lazy-loaded for undefined views
     const routes = {
+        landing: () => typeof LandingView !== 'undefined' ? LandingView : null,
         home: () => typeof HomeView !== 'undefined' ? HomeView : null,
         learn: () => typeof LearnView !== 'undefined' ? LearnView : null,
         practice: () => typeof PracticeView !== 'undefined' ? PracticeView : null,
@@ -204,7 +205,24 @@ const Router = (() => {
 
             // Check for initial hash route
             const hash = window.location.hash.slice(1);
-            const initialRoute = hash && routes[hash] ? hash : 'home';
+            
+            // Determine initial route based on login status
+            const isLoggedIn = typeof Auth !== 'undefined' && Auth.isLoggedIn && Auth.isLoggedIn();
+            let initialRoute;
+            
+            if (hash && routes[hash]) {
+                // If user navigated to a specific hash, respect it (but landing for guests on protected routes)
+                if (!isLoggedIn && hash !== 'landing') {
+                    // Guest trying to access app - show landing
+                    initialRoute = 'landing';
+                } else {
+                    initialRoute = hash;
+                }
+            } else {
+                // No hash - show landing for guests, home for logged in users
+                initialRoute = isLoggedIn ? 'home' : 'landing';
+            }
+            
             navigate(initialRoute, {}, false);
             
             console.log('🚦 Router initialized');

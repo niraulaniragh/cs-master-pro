@@ -149,11 +149,8 @@ const App = (() => {
         if (typeof AppState !== 'undefined' && typeof AppState.init === 'function') {
             AppState.init();
         }
-        setTimeout(() => {
-            if (typeof AuthModal !== 'undefined' && typeof AuthModal.show === 'function') {
-                AuthModal.show('login');
-            }
-        }, 100);
+        // Show landing page for guests instead of login modal
+        // The landing page has login/register buttons
     };
 
     /**
