@@ -15980,3 +15980,92 @@ textarea:focus-visible,
 .practice-view { animation: pageEnter 0.4s ease; }
 .games-hub { animation: pageEnter 0.4s ease; }
 .learn-view { animation: pageEnter 0.4s ease; }
+
+
+/* ==================== FOOTER LINKS ==================== */
+.footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+}
+
+.footer-links a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: color 0.2s ease;
+}
+
+.footer-links a:hover {
+    color: var(--primary);
+    text-decoration: underline;
+}
+
+.footer-divider {
+    color: var(--text-muted);
+    opacity: 0.5;
+}
+
+.footer-copyright {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    opacity: 0.7;
+    margin-top: 8px;
+}
+
+/* ==================== COOKIE CONSENT BANNER ==================== */
+.cookie-consent {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border);
+    padding: 16px 20px;
+    z-index: 10000;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+    transition: opacity 0.3s ease;
+}
+
+.cookie-consent-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.cookie-consent-content p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    flex: 1;
+    min-width: 250px;
+}
+
+.cookie-consent-content a {
+    color: var(--primary);
+    text-decoration: underline;
+}
+
+.cookie-consent-buttons {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+@media (max-width: 600px) {
+    .cookie-consent-content {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .cookie-consent-buttons {
+        width: 100%;
+        justify-content: center;
+    }
+}

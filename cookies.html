@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cookie Policy - CS Master Pro</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <style>
+        .legal-page {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            color: var(--text-primary);
+            line-height: 1.8;
+        }
+        .legal-page h1 {
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        .legal-page .last-updated {
+            color: var(--text-muted);
+            margin-bottom: 40px;
+        }
+        .legal-page h2 {
+            color: var(--text-primary);
+            margin-top: 40px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+        .legal-page h3 {
+            color: var(--text-primary);
+            margin-top: 25px;
+            margin-bottom: 10px;
+        }
+        .legal-page p, .legal-page li {
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+        }
+        .legal-page ul {
+            padding-left: 25px;
+        }
+        .legal-page a {
+            color: var(--primary);
+        }
+        .legal-page table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        .legal-page th, .legal-page td {
+            border: 1px solid var(--border);
+            padding: 12px;
+            text-align: left;
+        }
+        .legal-page th {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+        .legal-page td {
+            color: var(--text-secondary);
+        }
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--primary);
+            text-decoration: none;
+            margin-bottom: 30px;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="legal-page">
+        <a href="/" class="back-link">← Back to CS Master Pro</a>
+        
+        <h1>Cookie Policy</h1>
+        <p class="last-updated">Last updated: October 22, 2026</p>
+
+        <h2>1. What Are Cookies?</h2>
+        <p>Cookies are small text files that are stored on your device when you visit a website. They are widely used to make websites work more efficiently and provide information to website owners.</p>
+        <p>CS Master Pro uses browser storage technologies (localStorage and IndexedDB) rather than traditional cookies. These technologies serve similar purposes but store data locally on your device.</p>
+
+        <h2>2. How We Use Browser Storage</h2>
+        <p>We use browser storage for the following purposes:</p>
+
+        <h3>Essential Storage (Required)</h3>
+        <p>These are necessary for the application to function properly:</p>
+        <table>
+            <tr>
+                <th>Storage Key</th>
+                <th>Purpose</th>
+                <th>Duration</th>
+            </tr>
+            <tr>
+                <td>csmaster_session</td>
+                <td>Keeps you logged in</td>
+                <td>Until logout</td>
+            </tr>
+            <tr>
+                <td>csmaster_users</td>
+                <td>Stores encrypted account data</td>
+                <td>Persistent</td>
+            </tr>
+            <tr>
+                <td>csmaster_user</td>
+                <td>Your current progress and settings</td>
+                <td>Persistent</td>
+            </tr>
+        </table>
+
+        <h3>Functionality Storage</h3>
+        <p>These enhance your experience:</p>
+        <table>
+            <tr>
+                <th>Storage Key</th>
+                <th>Purpose</th>
+                <th>Duration</th>
+            </tr>
+            <tr>
+                <td>csmaster_daily_goals</td>
+                <td>Tracks your daily learning goals</td>
+                <td>24 hours</td>
+            </tr>
+            <tr>
+                <td>csmaster_streak</td>
+                <td>Maintains your study streak</td>
+                <td>Persistent</td>
+            </tr>
+            <tr>
+                <td>csmaster_srs_*</td>
+                <td>Spaced repetition flashcard data</td>
+                <td>Persistent</td>
+            </tr>
+            <tr>
+                <td>csmaster_bookmarks</td>
+                <td>Your saved bookmarks</td>
+                <td>Persistent</td>
+            </tr>
+            <tr>
+                <td>csmaster_speedrun_pb_*</td>
+                <td>Game high scores</td>
+                <td>Persistent</td>
+            </tr>
+        </table>
+
+        <h3>Preference Storage</h3>
+        <p>These remember your preferences:</p>
+        <table>
+            <tr>
+                <th>Storage Key</th>
+                <th>Purpose</th>
+                <th>Duration</th>
+            </tr>
+            <tr>
+                <td>csmaster_onboarding_complete</td>
+                <td>Remember if you've completed setup</td>
+                <td>Persistent</td>
+            </tr>
+            <tr>
+                <td>csmaster_user_preferences</td>
+                <td>Your exam date and topic preferences</td>
+                <td>Persistent</td>
+            </tr>
+            <tr>
+                <td>csmaster_cookie_consent</td>
+                <td>Your cookie consent choice</td>
+                <td>1 year</td>
+            </tr>
+        </table>
+
+        <h2>3. Service Worker Cache</h2>
+        <p>We use a Service Worker to cache application files for offline use. This cache:</p>
+        <ul>
+            <li>Stores copies of web pages and resources</li>
+            <li>Allows the app to work without internet connection</li>
+            <li>Automatically updates when new versions are available</li>
+            <li>Does not contain personal information</li>
+        </ul>
+
+        <h2>4. Third-Party Storage</h2>
+        <p>We do not use third-party cookies or tracking technologies. External resources we use (Google Fonts, Font Awesome, cdnjs) are loaded directly without setting cookies.</p>
+
+        <h2>5. Managing Browser Storage</h2>
+        <p>You can manage browser storage in several ways:</p>
+
+        <h3>Clear All Site Data</h3>
+        <p>In most browsers:</p>
+        <ul>
+            <li>Open Developer Tools (F12 or right-click → Inspect)</li>
+            <li>Go to Application tab</li>
+            <li>Click "Clear site data" in the Storage section</li>
+        </ul>
+        <p><strong>Note:</strong> This will log you out and delete all your progress.</p>
+
+        <h3>Clear Specific Data</h3>
+        <p>In your browser settings, you can typically find options to clear:</p>
+        <ul>
+            <li>Cookies and site data</li>
+            <li>Cached images and files</li>
+            <li>Local storage data</li>
+        </ul>
+
+        <h3>In-App Options</h3>
+        <p>Within CS Master Pro, you can:</p>
+        <ul>
+            <li>Delete your account (removes all your data)</li>
+            <li>Reset progress from the settings menu</li>
+        </ul>
+
+        <h2>6. Your Consent</h2>
+        <p>By using CS Master Pro, you consent to our use of essential browser storage. We will ask for your consent before using any non-essential storage technologies.</p>
+        <p>You can withdraw consent at any time by clearing your browser data, though this will affect your ability to use the application.</p>
+
+        <h2>7. Changes to This Policy</h2>
+        <p>We may update this Cookie Policy from time to time. We will notify you of any changes by posting the new policy on this page.</p>
+
+        <h2>8. Contact Us</h2>
+        <p>If you have questions about this Cookie Policy, please contact us at:</p>
+        <p>Email: privacy@csmasterpro.com</p>
+
+        <p style="margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border);">
+            <a href="/">← Back to CS Master Pro</a> | 
+            <a href="privacy.html">Privacy Policy</a> | 
+            <a href="terms.html">Terms of Service</a>
+        </p>
+    </div>
+</body>
+</html>

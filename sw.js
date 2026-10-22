@@ -12,7 +12,7 @@
  */
 
 // Version management - update this on each deploy
-const BUILD_TIMESTAMP = '20261022181100';
+const BUILD_TIMESTAMP = '20261022181500';
 const CACHE_NAME = `csmaster-v${BUILD_TIMESTAMP}`;
 const OFFLINE_URL = '/cs-master-pro/offline.html';
 
@@ -110,8 +110,9 @@ self.addEventListener('install', (event) => {
                 return results;
             })
             .then(() => {
-                // Don't skip waiting automatically - let the page control updates
-                console.log('[SW] Installation complete, waiting for activation signal');
+                // Force the new service worker to activate immediately
+                console.log('[SW] Installation complete, activating immediately');
+                return self.skipWaiting();
             })
             .catch((err) => {
                 console.error('[SW] Precaching failed:', err);

@@ -180,7 +180,26 @@
         <!-- Footer -->
         <footer class="main-footer">
             <p>Edexcel IGCSE Computer Science (4CP0) - Paper 1: Principles of Computer Science</p>
+            <div class="footer-links">
+                <a href="privacy.html">Privacy Policy</a>
+                <span class="footer-divider">•</span>
+                <a href="terms.html">Terms of Service</a>
+                <span class="footer-divider">•</span>
+                <a href="cookies.html">Cookie Policy</a>
+            </div>
+            <p class="footer-copyright">© 2026 CS Master Pro. All rights reserved.</p>
         </footer>
+    </div>
+
+    <!-- Cookie Consent Banner -->
+    <div id="cookie-consent" class="cookie-consent" style="display: none;">
+        <div class="cookie-consent-content">
+            <p>🍪 We use browser storage to save your progress and preferences. By continuing to use this site, you agree to our <a href="cookies.html">Cookie Policy</a>.</p>
+            <div class="cookie-consent-buttons">
+                <button class="btn btn-small btn-secondary" onclick="CookieConsent.decline()">Decline</button>
+                <button class="btn btn-small btn-primary" onclick="CookieConsent.accept()">Accept</button>
+            </div>
+        </div>
     </div>
 
     <!-- Toast Notifications -->
@@ -759,6 +778,68 @@
                 observer.observe(modalOverlay, { attributes: true });
             }
         });
+    </script>
+    
+    <!-- Cookie Consent Manager -->
+    <script>
+        const CookieConsent = {
+            CONSENT_KEY: 'csmaster_cookie_consent',
+            
+            init: function() {
+                const consent = localStorage.getItem(this.CONSENT_KEY);
+                if (!consent) {
+                    // Show banner after a short delay
+                    setTimeout(() => {
+                        const banner = document.getElementById('cookie-consent');
+                        if (banner) banner.style.display = 'block';
+                    }, 1500);
+                }
+            },
+            
+            accept: function() {
+                localStorage.setItem(this.CONSENT_KEY, JSON.stringify({
+                    accepted: true,
+                    timestamp: new Date().toISOString()
+                }));
+                this.hideBanner();
+            },
+            
+            decline: function() {
+                localStorage.setItem(this.CONSENT_KEY, JSON.stringify({
+                    accepted: false,
+                    timestamp: new Date().toISOString()
+                }));
+                this.hideBanner();
+                // Clear non-essential storage
+                const essentialKeys = ['csmaster_session', 'csmaster_users', 'csmaster_cookie_consent'];
+                Object.keys(localStorage).forEach(key => {
+                    if (key.startsWith('csmaster_') && !essentialKeys.includes(key)) {
+                        localStorage.removeItem(key);
+                    }
+                });
+            },
+            
+            hideBanner: function() {
+                const banner = document.getElementById('cookie-consent');
+                if (banner) {
+                    banner.style.opacity = '0';
+                    setTimeout(() => banner.style.display = 'none', 300);
+                }
+            },
+            
+            hasConsent: function() {
+                const consent = localStorage.getItem(this.CONSENT_KEY);
+                if (!consent) return null;
+                try {
+                    return JSON.parse(consent).accepted;
+                } catch {
+                    return null;
+                }
+            }
+        };
+        
+        // Initialize cookie consent on load
+        document.addEventListener('DOMContentLoaded', () => CookieConsent.init());
     </script>
 </body>
 </html>
