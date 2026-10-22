@@ -79,6 +79,17 @@ const LearnView = {
         try {
             if (!topicId) return;
             
+            // Check guest limits for topic access
+            if (typeof GuestLimiter !== 'undefined') {
+                const canView = GuestLimiter.canViewTopic(topicId);
+                if (!canView.allowed) {
+                    GuestLimiter.showSignupPrompt(canView.reason, 'learn');
+                    return;
+                }
+                // Record this topic for guest tracking
+                GuestLimiter.recordTopic(topicId);
+            }
+            
             LearnView.currentTopic = topicId;
             LearnView.currentSubtopic = null;
 

@@ -94,6 +94,17 @@ const ToolsView = {
 
     openTool: (toolId, event) => {
         try {
+            // Check guest limits for tool access
+            if (typeof GuestLimiter !== 'undefined') {
+                const canUse = GuestLimiter.canUseTool(toolId);
+                if (!canUse.allowed) {
+                    GuestLimiter.showSignupPrompt(canUse.reason, 'tools');
+                    return;
+                }
+                // Record this tool for guest tracking
+                GuestLimiter.recordTool(toolId);
+            }
+            
             ToolsView.activeTool = toolId;
             const workspace = document.getElementById('tool-workspace');
             if (!workspace) return;

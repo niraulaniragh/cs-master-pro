@@ -155,7 +155,7 @@ const GamesView = {
                             <ul class="game-card-features">
                                 ${game.features.map(f => `<li>✓ ${f}</li>`).join('')}
                             </ul>
-                            <button class="btn btn-primary game-play-btn" onclick="${game.action}">
+                            <button class="btn btn-primary game-play-btn" onclick="GamesView.launchGame('${game.id}', '${game.action}')">
                                 Play Now
                             </button>
                         </div>
@@ -198,6 +198,32 @@ const GamesView = {
 
     cleanup: () => {
         console.log('🎮 Games view cleanup');
+    },
+    
+    /**
+     * Launch a game with guest limit checking
+     */
+    launchGame: (gameId, gameAction) => {
+        // Check guest limits
+        if (typeof GuestLimiter !== 'undefined') {
+            const canPlay = GuestLimiter.canPlayGame(gameId);
+            if (!canPlay.allowed) {
+                GuestLimiter.showSignupPrompt(canPlay.reason, 'games');
+                return;
+            }
+            // Record this game for guest tracking
+            GuestLimiter.recordGame(gameId);
+        }
+        
+        // Launch the game
+        try {
+            eval(gameAction);
+        } catch (e) {
+            console.error('Failed to launch game:', e);
+            if (typeof Toast !== 'undefined') {
+                Toast.show('Failed to launch game', 'error');
+            }
+        }
     },
 
     getTotalGamesPlayed: () => {

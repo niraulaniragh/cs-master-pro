@@ -151,6 +151,34 @@ const App = (() => {
         }
         // Show landing page for guests instead of login modal
         // The landing page has login/register buttons
+        
+        // Add guest mode badge to nav
+        App.showGuestModeBadge();
+    };
+    
+    /**
+     * Show guest mode badge in navigation
+     */
+    App.showGuestModeBadge = () => {
+        const navRight = document.querySelector('.nav-right');
+        if (navRight && !document.getElementById('guest-mode-badge')) {
+            const badge = document.createElement('div');
+            badge.id = 'guest-mode-badge';
+            badge.className = 'guest-mode-badge';
+            badge.innerHTML = `
+                <span>👤 Guest</span>
+                <button class="btn btn-small btn-primary" onclick="AuthModal.show('login')">Sign In</button>
+            `;
+            navRight.insertBefore(badge, navRight.firstChild);
+        }
+    };
+    
+    /**
+     * Remove guest mode badge (called after login)
+     */
+    App.hideGuestModeBadge = () => {
+        const badge = document.getElementById('guest-mode-badge');
+        if (badge) badge.remove();
     };
 
     /**

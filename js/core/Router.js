@@ -62,6 +62,15 @@ const Router = (() => {
             route = 'home';
         }
         
+        // Check guest access restrictions
+        if (typeof GuestLimiter !== 'undefined') {
+            const access = GuestLimiter.canAccessRoute(route);
+            if (!access.allowed) {
+                GuestLimiter.showSignupPrompt(access.reason, route);
+                return;
+            }
+        }
+        
         // Prevent double navigation
         if (isNavigating) {
             console.warn('Navigation in progress, ignoring request');

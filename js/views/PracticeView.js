@@ -628,6 +628,18 @@ const PracticeView = {
 
     selectAnswer: (answerIndex, buttonEl) => {
         if (PracticeView.hasAnswered) return;
+        
+        // Check guest limits before allowing answer
+        if (typeof GuestLimiter !== 'undefined') {
+            const canAnswer = GuestLimiter.canAnswerQuestion();
+            if (!canAnswer.allowed) {
+                GuestLimiter.showSignupPrompt(canAnswer.reason, 'practice');
+                return;
+            }
+            // Record this question for guest tracking
+            GuestLimiter.recordQuestion();
+        }
+        
         PracticeView.hasAnswered = true;
         
         const q = PracticeView.questions[PracticeView.currentIndex];

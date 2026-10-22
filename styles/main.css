@@ -16421,3 +16421,214 @@ textarea:focus-visible,
         transform: translateY(0);
     }
 }
+
+
+/* ==================== GUEST LIMITER ==================== */
+.guest-limit-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    padding: 20px;
+}
+
+.guest-limit-overlay.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.guest-limit-modal {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 40px;
+    max-width: 480px;
+    width: 100%;
+    text-align: center;
+    position: relative;
+    transform: scale(0.9) translateY(20px);
+    transition: transform 0.3s ease;
+}
+
+.guest-limit-overlay.visible .guest-limit-modal {
+    transform: scale(1) translateY(0);
+}
+
+.guest-limit-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+}
+
+.guest-limit-modal h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+    color: var(--text-primary);
+}
+
+.guest-limit-message {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    margin-bottom: 25px;
+    line-height: 1.6;
+}
+
+.guest-limit-benefits {
+    background: var(--bg-primary);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 25px;
+    text-align: left;
+}
+
+.guest-limit-benefits h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: var(--text-primary);
+}
+
+.guest-limit-benefits ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.guest-limit-benefits li {
+    padding: 8px 0;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+.guest-limit-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.guest-limit-actions .btn-large {
+    padding: 16px 32px;
+    font-size: 1.1rem;
+}
+
+.guest-limit-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 5px;
+    line-height: 1;
+    transition: color 0.2s ease;
+}
+
+.guest-limit-close:hover {
+    color: var(--text-primary);
+}
+
+/* Guest Limit Banner (inline) */
+.guest-limit-banner {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(234, 88, 12, 0.15));
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.guest-limit-banner-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.guest-limit-banner-icon {
+    font-size: 1.5rem;
+}
+
+.guest-limit-banner-text {
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+/* Locked item overlay */
+.guest-locked-item {
+    position: relative;
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.guest-locked-item::after {
+    content: '🔒';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2rem;
+    z-index: 10;
+}
+
+/* Guest mode indicator */
+.guest-mode-badge {
+    background: linear-gradient(135deg, #f59e0b, #ea580c);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+#guest-mode-badge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-right: 15px;
+    padding: 6px 12px;
+    background: rgba(245, 158, 11, 0.15);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    border-radius: 20px;
+}
+
+#guest-mode-badge span {
+    color: #f59e0b;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+#guest-mode-badge .btn {
+    padding: 4px 12px;
+    font-size: 0.75rem;
+}
+
+@media (max-width: 600px) {
+    .guest-limit-modal {
+        padding: 30px 20px;
+    }
+    
+    .guest-limit-modal h2 {
+        font-size: 1.5rem;
+    }
+    
+    .guest-limit-banner {
+        flex-direction: column;
+        text-align: center;
+    }
+}
