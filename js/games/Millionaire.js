@@ -108,22 +108,44 @@ const Millionaire = {
     },
 
     startGame: () => {
-        // Get questions sorted by difficulty
-        const allQuestions = shuffleArray([...QUESTIONS]);
-        
-        // Try to pick questions of increasing difficulty
-        // For now, just shuffle and pick 15
-        Millionaire.questions = allQuestions.slice(0, 15);
-        Millionaire.currentQuestion = 0;
-        Millionaire.currentPrize = 0;
-        Millionaire.lifelines = { fiftyFifty: true, askAudience: true, phoneFriend: true };
-        Millionaire.isPlaying = true;
-        Millionaire.isAnswerLocked = false;
-        
-        const container = document.querySelector('.millionaire-container');
-        container.innerHTML = Millionaire.renderGame();
-        
-        Millionaire.showQuestion();
+        try {
+            // Validate QUESTIONS exists
+            if (typeof QUESTIONS === 'undefined' || !Array.isArray(QUESTIONS) || QUESTIONS.length < 15) {
+                Toast?.show?.('Not enough questions available (need at least 15)', 'error');
+                return;
+            }
+            
+            // Get questions sorted by difficulty
+            const allQuestions = shuffleArray([...QUESTIONS]);
+            
+            // Try to pick questions of increasing difficulty
+            // For now, just shuffle and pick 15
+            Millionaire.questions = allQuestions.slice(0, 15);
+            
+            if (Millionaire.questions.length < 15) {
+                Toast?.show?.('Not enough questions available', 'error');
+                return;
+            }
+            
+            Millionaire.currentQuestion = 0;
+            Millionaire.currentPrize = 0;
+            Millionaire.lifelines = { fiftyFifty: true, askAudience: true, phoneFriend: true };
+            Millionaire.isPlaying = true;
+            Millionaire.isAnswerLocked = false;
+            Millionaire.selectedAnswer = null;
+            
+            const container = document.querySelector('.millionaire-container');
+            if (!container) {
+                console.error('Millionaire container not found');
+                return;
+            }
+            container.innerHTML = Millionaire.renderGame();
+            
+            Millionaire.showQuestion();
+        } catch (error) {
+            console.error('Millionaire.startGame error:', error);
+            Toast?.show?.('Failed to start game', 'error');
+        }
     },
 
     renderGame: () => {
@@ -414,29 +436,36 @@ const Millionaire = {
         if (phoneBtn) phoneBtn.classList.add('used');
         
         const question = Millionaire.questions[Millionaire.currentQuestion];
-        if (!question) return;
+        if (!question || !question.options) return;
         
         const letters = ['A', 'B', 'C', 'D'];
         
         // Friend is 80% likely to give correct answer
         const isCorrect = Math.random() < 0.8;
         const correctIndex = question.answer;
-        const wrongIndices = [0, 1, 2, 3].filter(i => i !== correctIndex);
-        const suggestedIndex = isCorrect ? correctIndex : shuffleArray(wrongIndices)[0];
+        const wrongIndices = [0, 1, 2, 3].filter(i => i !== correctIndex && i < question.options.length);
+        
+        // Handle edge case where there might not be wrong answers
+        if (wrongIndices.length === 0 || isCorrect) {
+            var suggestedIndex = correctIndex;
+        } else {
+            var suggestedIndex = shuffleArray(wrongIndices)[0];
+        }
+        
         const confidence = isCorrect ? (70 + Math.floor(Math.random() * 25)) : (30 + Math.floor(Math.random() * 40));
         
         const friendNames = ['Alex', 'Sam', 'Jordan', 'Casey', 'Morgan'];
         const friendName = shuffleArray(friendNames)[0];
         
-        // Get the actual answer text
-        const suggestedLetter = letters[suggestedIndex];
-        const suggestedText = question.options[suggestedIndex] || 'that one';
+        // Get the actual answer text with bounds checking
+        const suggestedLetter = letters[suggestedIndex] || 'A';
+        const suggestedText = question.options[suggestedIndex] || 'that option';
         
         const dialogHtml = `
             <div class="mill-phone-dialog">
                 <h4>📞 Calling ${friendName}...</h4>
                 <p class="phone-message">
-                    "Hmm, I think it's <strong>${suggestedLetter}: ${suggestedText}</strong>. 
+                    "Hmm, I think it's <strong>${suggestedLetter}: ${Helpers?.escapeHtml?.(suggestedText) || suggestedText}</strong>. 
                     I'm about ${confidence}% sure about that."
                 </p>
                 <button class="btn btn-secondary" onclick="this.parentElement.remove()">Thanks!</button>
@@ -518,6 +547,9 @@ const Millionaire = {
     cleanup: () => {
         // Stop game
         Millionaire.isPlaying = false;
+        Millionaire.isAnswerLocked = false;
+        Millionaire.selectedAnswer = null;
+        Millionaire.questions = [];
         console.log('💰 Millionaire cleanup');
     }
 };

@@ -5,7 +5,8 @@
 
 const GamesView = {
     render: () => {
-        const games = [
+        try {
+            const games = [
             {
                 id: 'speed-run',
                 name: 'Speed Run',
@@ -176,6 +177,19 @@ const GamesView = {
                 </div>
             </div>
         `;
+        } catch (error) {
+            console.error('GamesView render error:', error);
+            return `
+                <div class="games-view">
+                    <div class="error-state">
+                        <span class="error-icon">⚠️</span>
+                        <h2>Unable to load Games</h2>
+                        <p>Please try refreshing the page.</p>
+                        <button class="btn btn-primary" onclick="location.reload()">Refresh</button>
+                    </div>
+                </div>
+            `;
+        }
     },
 
     init: () => {
@@ -183,94 +197,117 @@ const GamesView = {
     },
 
     cleanup: () => {
-        // No intervals or event listeners to clean up
         console.log('🎮 Games view cleanup');
     },
 
     getTotalGamesPlayed: () => {
-        let total = 0;
-        
-        // Speed Run
-        const srStats = JSON.parse(localStorage.getItem('csmaster_speedrun_pb_' + (Auth.getCurrentUser()?.username || 'Guest')) || '{}');
-        total += srStats.gamesPlayed || 0;
-        
-        // Battle Mode
-        const battleStats = JSON.parse(localStorage.getItem('csmaster_battle_stats') || '{}');
-        total += battleStats.totalGames || 0;
-        
-        // Millionaire
-        const millStats = JSON.parse(localStorage.getItem('csmaster_millionaire_stats') || '{}');
-        total += millStats.gamesPlayed || 0;
-        
-        // Type Racer
-        const trStats = JSON.parse(localStorage.getItem('csmaster_typeracer_stats') || '{}');
-        total += trStats.racesCompleted || 0;
-        
-        // Boss Battle
-        const bossStats = JSON.parse(localStorage.getItem('csmaster_boss_stats') || '{}');
-        total += bossStats.battlesPlayed || 0;
-        
-        return total;
+        try {
+            let total = 0;
+            
+            // Speed Run
+            const username = typeof Auth !== 'undefined' && Auth.getCurrentUser ? Auth.getCurrentUser()?.username : 'Guest';
+            const srStats = JSON.parse(localStorage.getItem('csmaster_speedrun_pb_' + (username || 'Guest')) || '{}');
+            total += parseInt(srStats.gamesPlayed) || 0;
+            
+            // Battle Mode
+            const battleStats = JSON.parse(localStorage.getItem('csmaster_battle_stats') || '{}');
+            total += parseInt(battleStats.totalGames) || 0;
+            
+            // Millionaire
+            const millStats = JSON.parse(localStorage.getItem('csmaster_millionaire_stats') || '{}');
+            total += parseInt(millStats.gamesPlayed) || 0;
+            
+            // Type Racer
+            const trStats = JSON.parse(localStorage.getItem('csmaster_typeracer_stats') || '{}');
+            total += parseInt(trStats.racesCompleted) || 0;
+            
+            // Boss Battle
+            const bossStats = JSON.parse(localStorage.getItem('csmaster_boss_stats') || '{}');
+            total += parseInt(bossStats.battlesPlayed) || 0;
+            
+            return total;
+        } catch (error) {
+            console.error('Error getting games played:', error);
+            return 0;
+        }
     },
 
     getTotalXPFromGames: () => {
-        // Estimate based on stored stats
-        let total = 0;
-        
-        const millStats = JSON.parse(localStorage.getItem('csmaster_millionaire_stats') || '{}');
-        total += millStats.totalXP || 0;
-        
-        const srLB = JSON.parse(localStorage.getItem('csmaster_speedrun_lb') || '[]');
-        const username = Auth.getCurrentUser()?.username || 'Guest';
-        const userScores = srLB.filter(s => s.username === username);
-        total += userScores.reduce((sum, s) => sum + Math.floor(s.score / 10), 0);
-        
-        return total;
+        try {
+            // Estimate based on stored stats
+            let total = 0;
+            
+            const millStats = JSON.parse(localStorage.getItem('csmaster_millionaire_stats') || '{}');
+            total += parseInt(millStats.totalXP) || 0;
+            
+            const username = typeof Auth !== 'undefined' && Auth.getCurrentUser ? Auth.getCurrentUser()?.username : 'Guest';
+            const srLB = JSON.parse(localStorage.getItem('csmaster_speedrun_lb') || '[]');
+            const userScores = Array.isArray(srLB) ? srLB.filter(s => s.username === username) : [];
+            total += userScores.reduce((sum, s) => sum + Math.floor((parseInt(s.score) || 0) / 10), 0);
+            
+            return total;
+        } catch (error) {
+            console.error('Error getting XP from games:', error);
+            return 0;
+        }
     },
 
     getAchievementsCount: () => {
-        const gameAchievements = ['speed_demon', 'speed_master', 'battle_veteran', 'undefeated', 
-                                   'speed_typist', 'perfect_accuracy', 'millionaire', 'quiz_master',
-                                   'boss_slayer', 'champion', 'flawless'];
         try {
-            const user = AppState.getState('user') || {};
-            const unlocked = user.achievements || [];
+            const gameAchievements = ['speed_demon', 'speed_master', 'battle_veteran', 'undefeated', 
+                                       'speed_typist', 'perfect_accuracy', 'millionaire', 'quiz_master',
+                                       'boss_slayer', 'champion', 'flawless'];
+            const user = typeof AppState !== 'undefined' ? AppState.getState('user') : null;
+            const unlocked = (user && Array.isArray(user.achievements)) ? user.achievements : [];
             return gameAchievements.filter(a => unlocked.includes(a)).length;
         } catch (e) {
+            console.error('Error getting achievements count:', e);
             return 0;
         }
     },
 
     renderMiniLeaderboard: () => {
-        const srLB = JSON.parse(localStorage.getItem('csmaster_speedrun_lb') || '[]');
-        const top5 = srLB.slice(0, 5);
-        
-        if (top5.length === 0) {
-            return '<p class="no-data">No scores yet. Be the first to play!</p>';
-        }
-        
-        return `
-            <table class="mini-lb-table">
-                <thead>
-                    <tr>
-                        <th>Rank</th>
-                        <th>Player</th>
-                        <th>Score</th>
-                        <th>Game</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${top5.map((entry, i) => `
+        try {
+            const srLB = JSON.parse(localStorage.getItem('csmaster_speedrun_lb') || '[]');
+            const top5 = Array.isArray(srLB) ? srLB.slice(0, 5) : [];
+            
+            if (top5.length === 0) {
+                return '<p class="no-data">No scores yet. Be the first to play!</p>';
+            }
+            
+            const escapeHtml = (str) => {
+                if (typeof Helpers !== 'undefined' && Helpers.escapeHtml) {
+                    return Helpers.escapeHtml(str);
+                }
+                return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+            };
+            
+            return `
+                <table class="mini-lb-table">
+                    <thead>
                         <tr>
-                            <td>${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1}</td>
-                            <td>${Helpers.escapeHtml(entry.username)}</td>
-                            <td>${entry.score.toLocaleString()}</td>
-                            <td>Speed Run</td>
+                            <th>Rank</th>
+                            <th>Player</th>
+                            <th>Score</th>
+                            <th>Game</th>
                         </tr>
-                    `).join('')}
-                </tbody>
-            </table>
-        `;
+                    </thead>
+                    <tbody>
+                        ${top5.map((entry, i) => `
+                            <tr>
+                                <td>${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1}</td>
+                                <td>${escapeHtml(entry?.username || 'Anonymous')}</td>
+                                <td>${(parseInt(entry?.score) || 0).toLocaleString()}</td>
+                                <td>Speed Run</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        } catch (error) {
+            console.error('Error rendering leaderboard:', error);
+            return '<p class="no-data">Could not load leaderboard</p>';
+        }
     },
 
     renderGameAchievements: () => {

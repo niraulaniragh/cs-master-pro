@@ -1,12 +1,14 @@
 {
     "name": "CS Master Pro - IGCSE Computer Science",
     "short_name": "CS Master",
-    "description": "Interactive IGCSE Computer Science learning platform with games, quizzes, and study tools",
+    "description": "Interactive IGCSE Computer Science learning platform with games, quizzes, and study tools. Perfect for Edexcel 4CP0 revision.",
     "start_url": "/cs-master-pro/",
+    "id": "/cs-master-pro/",
     "display": "standalone",
+    "display_override": ["window-controls-overlay", "standalone", "minimal-ui", "browser"],
     "background_color": "#0d1117",
     "theme_color": "#10b981",
-    "orientation": "portrait-primary",
+    "orientation": "any",
     "scope": "/cs-master-pro/",
     "icons": [
         {
@@ -20,23 +22,147 @@
             "sizes": "any",
             "type": "image/svg+xml",
             "purpose": "maskable"
+        },
+        {
+            "src": "icons/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "icons/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "icons/icon-maskable-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "icons/icon-maskable-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
         }
     ],
-    "categories": ["education", "games"],
+    "screenshots": [
+        {
+            "src": "screenshots/home-wide.png",
+            "sizes": "1280x720",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label": "Home screen with learning dashboard"
+        },
+        {
+            "src": "screenshots/quiz-wide.png",
+            "sizes": "1280x720",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label": "Interactive quiz mode"
+        },
+        {
+            "src": "screenshots/home-narrow.png",
+            "sizes": "750x1334",
+            "type": "image/png",
+            "form_factor": "narrow",
+            "label": "Mobile home screen"
+        },
+        {
+            "src": "screenshots/quiz-narrow.png",
+            "sizes": "750x1334",
+            "type": "image/png",
+            "form_factor": "narrow",
+            "label": "Mobile quiz experience"
+        }
+    ],
+    "categories": ["education", "games", "productivity"],
     "lang": "en",
     "dir": "ltr",
+    "prefer_related_applications": false,
     "shortcuts": [
         {
             "name": "Practice Quiz",
             "short_name": "Practice",
-            "description": "Start a practice quiz",
-            "url": "/cs-master-pro/#practice"
+            "description": "Start a practice quiz on any topic",
+            "url": "/cs-master-pro/#practice",
+            "icons": [
+                {
+                    "src": "icons/shortcut-quiz.svg",
+                    "sizes": "96x96",
+                    "type": "image/svg+xml"
+                }
+            ]
         },
         {
             "name": "Play Games",
             "short_name": "Games",
-            "description": "Open the games hub",
-            "url": "/cs-master-pro/#games"
+            "description": "Open the educational games hub",
+            "url": "/cs-master-pro/#games",
+            "icons": [
+                {
+                    "src": "icons/shortcut-games.svg",
+                    "sizes": "96x96",
+                    "type": "image/svg+xml"
+                }
+            ]
+        },
+        {
+            "name": "Study Notes",
+            "short_name": "Learn",
+            "description": "Access study materials and notes",
+            "url": "/cs-master-pro/#learn",
+            "icons": [
+                {
+                    "src": "icons/shortcut-learn.svg",
+                    "sizes": "96x96",
+                    "type": "image/svg+xml"
+                }
+            ]
+        },
+        {
+            "name": "Code Playground",
+            "short_name": "Code",
+            "description": "Practice coding in the playground",
+            "url": "/cs-master-pro/#playground",
+            "icons": [
+                {
+                    "src": "icons/shortcut-code.svg",
+                    "sizes": "96x96",
+                    "type": "image/svg+xml"
+                }
+            ]
         }
-    ]
+    ],
+    "handle_links": "preferred",
+    "launch_handler": {
+        "client_mode": ["navigate-existing", "auto"]
+    },
+    "edge_side_panel": {
+        "preferred_width": 400
+    },
+    "share_target": {
+        "action": "/cs-master-pro/share",
+        "method": "GET",
+        "params": {
+            "title": "title",
+            "text": "text",
+            "url": "url"
+        }
+    },
+    "protocol_handlers": [
+        {
+            "protocol": "web+csmaster",
+            "url": "/cs-master-pro/?action=%s"
+        }
+    ],
+    "related_applications": [],
+    "iarc_rating_id": "",
+    "serviceworker": {
+        "src": "sw.js",
+        "scope": "/cs-master-pro/",
+        "update_via_cache": "none"
+    }
 }

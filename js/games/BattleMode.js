@@ -38,12 +38,12 @@ const BattleMode = {
     },
 
     close: () => {
+        BattleMode.cleanup();
         const modal = document.getElementById('battle-mode-modal');
         if (modal) {
             modal.classList.remove('active');
             setTimeout(() => modal.remove(), 300);
         }
-        BattleMode.stopGame();
     },
 
     renderMenu: () => {
@@ -116,33 +116,64 @@ const BattleMode = {
         `;
     },
 
-    selectDifficulty: (diff) => {
+    selectDifficulty: (diff, evt) => {
         BattleMode.difficulty = diff;
         BattleMode.opponentName = BattleMode.difficulties[diff].name;
         
         document.querySelectorAll('.difficulty-btn').forEach(btn => {
             btn.classList.remove('selected');
         });
-        event.target.closest('.difficulty-btn').classList.add('selected');
+        
+        // Use evt parameter or fallback to find button by diff
+        const targetBtn = evt?.target?.closest('.difficulty-btn') || 
+                         document.querySelector(`.difficulty-btn[onclick*="'${diff}'"]`);
+        if (targetBtn) {
+            targetBtn.classList.add('selected');
+        }
     },
 
     startGame: () => {
-        BattleMode.questions = shuffleArray([...QUESTIONS]).slice(0, BattleMode.maxRounds);
-        BattleMode.currentIndex = 0;
-        BattleMode.playerScore = 0;
-        BattleMode.opponentScore = 0;
-        BattleMode.playerHP = 100;
-        BattleMode.opponentHP = 100;
-        BattleMode.round = 0;
-        BattleMode.powerUps = { doublePoints: 1, skipQuestion: 1, timeFreeze: 1 };
-        BattleMode.isPlaying = true;
-        
-        SoundFX.play('start');
-        
-        const container = document.querySelector('.battle-container');
-        container.innerHTML = BattleMode.renderGame();
-        
-        BattleMode.showQuestion();
+        try {
+            // Validate QUESTIONS exists
+            if (typeof QUESTIONS === 'undefined' || !Array.isArray(QUESTIONS) || QUESTIONS.length === 0) {
+                Toast?.show?.('No questions available', 'error');
+                return;
+            }
+            
+            BattleMode.questions = shuffleArray([...QUESTIONS]).slice(0, BattleMode.maxRounds);
+            
+            if (BattleMode.questions.length === 0) {
+                Toast?.show?.('Not enough questions available', 'error');
+                return;
+            }
+            
+            BattleMode.currentIndex = 0;
+            BattleMode.playerScore = 0;
+            BattleMode.opponentScore = 0;
+            BattleMode.playerHP = 100;
+            BattleMode.opponentHP = 100;
+            BattleMode.round = 0;
+            BattleMode.powerUps = { doublePoints: 1, skipQuestion: 1, timeFreeze: 1 };
+            BattleMode.isPlaying = true;
+            BattleMode.activeDoublePoints = false;
+            
+            SoundFX?.play?.('start');
+            
+            const container = document.querySelector('.battle-container');
+            if (!container) {
+                console.error('Battle container not found');
+                return;
+            }
+            container.innerHTML = BattleMode.renderGame();
+            
+            // Register keyboard handler
+            document.addEventListener('keydown', BattleMode.keyHandler);
+            
+            BattleMode.showQuestion();
+        } catch (error) {
+            console.error('BattleMode.startGame error:', error);
+            Toast?.show?.('Failed to start game', 'error');
+        }
     },
 
     renderGame: () => {
@@ -451,9 +482,9 @@ const BattleMode = {
         
         // Play sound
         if (playerWon) {
-            SoundFX.play('victory');
+            SoundFX?.play?.('victory');
         } else if (!isDraw) {
-            SoundFX.play('defeat');
+            SoundFX?.play?.('defeat');
         }
         
         // Save stats
@@ -462,9 +493,14 @@ const BattleMode = {
         // Award XP
         let xpEarned = playerWon ? 100 : 25;
         if (playerWon && BattleMode.difficulty === 'expert') xpEarned = 200;
-        AppState.addXP(xpEarned);
+        AppState?.addXP?.(xpEarned);
         
         const container = document.querySelector('.battle-container');
+        if (!container) {
+            console.error('Battle container not found');
+            return;
+        }
+        
         container.innerHTML = `
             <button class="game-close-btn" onclick="BattleMode.close()">✕</button>
             
@@ -504,8 +540,23 @@ const BattleMode = {
     },
 
     renderMenuAgain: () => {
-        const container = document.querySelector('.battle-container');
-        container.outerHTML = BattleMode.renderMenu().match(/<div class="game-container.*?<\/div>\s*$/s)[0];
+        try {
+            const container = document.querySelector('.battle-container');
+            if (container) {
+                // Re-render the entire container with menu
+                const menuHtml = BattleMode.renderMenu();
+                // Extract just the inner content
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = menuHtml;
+                const newContainer = tempDiv.querySelector('.battle-container');
+                if (newContainer) {
+                    container.innerHTML = newContainer.innerHTML;
+                }
+            }
+        } catch (error) {
+            console.error('BattleMode.renderMenuAgain error:', error);
+            BattleMode.close();
+        }
     },
 
     saveStats: (won, draw) => {
@@ -534,14 +585,19 @@ const BattleMode = {
     },
 
     cleanup: () => {
+        // Remove keyboard listener
+        document.removeEventListener('keydown', BattleMode.keyHandler);
         // Stop game and clear timers
         BattleMode.stopGame();
+        // Reset state
+        BattleMode.questions = [];
+        BattleMode.currentIndex = 0;
         console.log('⚔️ BattleMode cleanup');
     }
 };
 
-// Keyboard shortcuts for Battle Mode
-document.addEventListener('keydown', (e) => {
+// Keyboard shortcuts handler (defined but not auto-registered)
+BattleMode.keyHandler = (e) => {
     if (!BattleMode.isPlaying) return;
     
     const key = e.key.toUpperCase();
@@ -551,4 +607,5 @@ document.addEventListener('keydown', (e) => {
         e.preventDefault();
         BattleMode.answer(keyMap[key]);
     }
-});
+};
+// Note: Keyboard handler is now registered in startGame() and removed in cleanup()

@@ -109,7 +109,7 @@ const MemoryMatch = {
                         <div class="mm-diff-buttons">
                             ${Object.entries(MemoryMatch.difficulties).map(([key, d]) => `
                                 <button class="mm-diff-btn ${MemoryMatch.difficulty === key ? 'selected' : ''}"
-                                        onclick="MemoryMatch.selectDifficulty('${key}')">
+                                        onclick="MemoryMatch.selectDifficulty('${key}', event)">
                                     ${d.name}
                                 </button>
                             `).join('')}
@@ -125,28 +125,53 @@ const MemoryMatch = {
         `;
     },
 
-    selectDifficulty: (diff) => {
+    selectDifficulty: (diff, evt) => {
         MemoryMatch.difficulty = diff;
         document.querySelectorAll('.mm-diff-btn').forEach(btn => btn.classList.remove('selected'));
-        event.target.classList.add('selected');
+        
+        // Use evt parameter or find by diff
+        const targetBtn = evt?.target || document.querySelector(`.mm-diff-btn[onclick*="'${diff}'"]`);
+        if (targetBtn) {
+            targetBtn.classList.add('selected');
+        }
     },
 
     startGame: () => {
-        const settings = MemoryMatch.difficulties[MemoryMatch.difficulty];
-        MemoryMatch.totalPairs = settings.pairs;
-        MemoryMatch.matchedPairs = 0;
-        MemoryMatch.moves = 0;
-        MemoryMatch.elapsedTime = 0;
-        MemoryMatch.flippedCards = [];
-        MemoryMatch.isLocked = false;
-        
-        // Create cards
-        MemoryMatch.cards = MemoryMatch.createCards(settings.pairs);
-        
-        const container = document.querySelector('.memory-container');
-        container.innerHTML = MemoryMatch.renderGame(settings.gridCols);
-        
-        MemoryMatch.startTimer();
+        try {
+            const settings = MemoryMatch.difficulties[MemoryMatch.difficulty];
+            if (!settings) {
+                Toast?.show?.('Invalid difficulty selected', 'error');
+                return;
+            }
+            
+            // Validate we have enough term pairs
+            if (MemoryMatch.termPairs.length < settings.pairs) {
+                Toast?.show?.('Not enough term pairs for this difficulty', 'error');
+                return;
+            }
+            
+            MemoryMatch.totalPairs = settings.pairs;
+            MemoryMatch.matchedPairs = 0;
+            MemoryMatch.moves = 0;
+            MemoryMatch.elapsedTime = 0;
+            MemoryMatch.flippedCards = [];
+            MemoryMatch.isLocked = false;
+            
+            // Create cards
+            MemoryMatch.cards = MemoryMatch.createCards(settings.pairs);
+            
+            const container = document.querySelector('.memory-container');
+            if (!container) {
+                console.error('MemoryMatch container not found');
+                return;
+            }
+            container.innerHTML = MemoryMatch.renderGame(settings.gridCols);
+            
+            MemoryMatch.startTimer();
+        } catch (error) {
+            console.error('MemoryMatch.startGame error:', error);
+            Toast?.show?.('Failed to start game', 'error');
+        }
     },
 
     createCards: (pairCount) => {
@@ -387,7 +412,11 @@ const MemoryMatch = {
     cleanup: () => {
         // Stop timer
         MemoryMatch.stopTimer();
+        // Reset state
         MemoryMatch.isLocked = false;
+        MemoryMatch.flippedCards = [];
+        MemoryMatch.cards = [];
+        MemoryMatch.matchedPairs = 0;
         console.log('🃏 MemoryMatch cleanup');
     }
 };

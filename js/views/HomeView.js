@@ -17,29 +17,36 @@ const HomeView = {
     PREFERENCES_KEY: 'csmaster_user_preferences',
     DAILY_GOALS_KEY: 'csmaster_daily_goals',
     
+    // State for cleanup
+    _onboardingTimeout: null,
+    _counterAnimationTimeouts: [],
+    
     render: () => {
-        // Check for onboarding (skip if demo mode is active)
-        const hasCompletedOnboarding = localStorage.getItem(HomeView.ONBOARDING_KEY) === 'true';
-        const isDemoMode = typeof DemoMode !== 'undefined' && DemoMode.isActive();
-        
-        // Schedule onboarding check after render (skip in demo mode)
-        if (!hasCompletedOnboarding && !isDemoMode) {
-            setTimeout(() => HomeView.showOnboarding(), 500);
-        }
-        const user = AppState.getState('user') || {};
-        const level = user.level || 1;
-        const xp = user.xp || 0;
-        const totalCorrect = user.totalCorrect || 0;
-        const totalAnswered = user.totalAnswered || 0;
-        
-        const xpForNext = HomeView.getXPForNextLevel(level);
-        const currentLevelXP = HomeView.getXPForLevel(level);
-        const progress = Math.min(100, ((xp - currentLevelXP) / (xpForNext - currentLevelXP)) * 100) || 0;
-        const accuracy = totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0;
-        const rank = HomeView.getRank(level);
-        const isLoggedIn = typeof Auth !== 'undefined' && Auth.isLoggedIn();
-        const username = isLoggedIn ? (Auth.getSession()?.username || 'Student') : 'Student';
-        const totalQuestions = (typeof QUESTIONS !== 'undefined' && QUESTIONS?.length) || 0;
+        try {
+            // Check for onboarding (skip if demo mode is active)
+            const hasCompletedOnboarding = localStorage.getItem(HomeView.ONBOARDING_KEY) === 'true';
+            const isDemoMode = typeof DemoMode !== 'undefined' && DemoMode.isActive();
+            
+            // Schedule onboarding check after render (skip in demo mode)
+            if (!hasCompletedOnboarding && !isDemoMode) {
+                HomeView._onboardingTimeout = setTimeout(() => HomeView.showOnboarding(), 500);
+            }
+            
+            const user = AppState.getState('user') || {};
+            const level = Math.max(1, parseInt(user.level) || 1);
+            const xp = Math.max(0, parseInt(user.xp) || 0);
+            const totalCorrect = Math.max(0, parseInt(user.totalCorrect) || 0);
+            const totalAnswered = Math.max(0, parseInt(user.totalAnswered) || 0);
+            
+            const xpForNext = HomeView.getXPForNextLevel(level);
+            const currentLevelXP = HomeView.getXPForLevel(level);
+            const progressDenom = xpForNext - currentLevelXP;
+            const progress = progressDenom > 0 ? Math.min(100, Math.max(0, ((xp - currentLevelXP) / progressDenom) * 100)) : 0;
+            const accuracy = totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0;
+            const rank = HomeView.getRank(level);
+            const isLoggedIn = typeof Auth !== 'undefined' && Auth.isLoggedIn();
+            const username = isLoggedIn ? (Auth.getSession()?.username || 'Student') : 'Student';
+            const totalQuestions = (typeof QUESTIONS !== 'undefined' && Array.isArray(QUESTIONS) && QUESTIONS.length) || 0;
 
         return `
             <div class="home-view-new">
@@ -276,6 +283,19 @@ const HomeView = {
                 ${HomeView.renderClassroomSection()}
             </div>
         `;
+        } catch (error) {
+            console.error('HomeView render error:', error);
+            return `
+                <div class="home-view-new">
+                    <div class="error-state">
+                        <span class="error-icon">⚠️</span>
+                        <h2>Something went wrong</h2>
+                        <p>We couldn't load the home page. Please try refreshing.</p>
+                        <button class="btn btn-primary" onclick="location.reload()">Refresh Page</button>
+                    </div>
+                </div>
+            `;
+        }
     },
     
     renderLeaderboard: () => {
@@ -316,29 +336,48 @@ const HomeView = {
     init: () => {
         console.log('🏠 Home view initialized');
         
+        // Clear any existing timeouts
+        HomeView._counterAnimationTimeouts.forEach(t => clearTimeout(t));
+        HomeView._counterAnimationTimeouts = [];
+        
         // After render, animate the counters
-        setTimeout(() => {
-            const xpEl = document.querySelector('.stat-value[data-counter="xp"]');
-            const correctEl = document.querySelector('.stat-value[data-counter="correct"]');
-            const accuracyEl = document.querySelector('.stat-value[data-counter="accuracy"]');
-            
-            if (xpEl) {
-                const xpValue = parseInt(xpEl.getAttribute('data-value')) || 0;
-                Helpers.animateCounter(xpEl, 0, xpValue, 1500);
-            }
-            if (correctEl) {
-                const correctValue = parseInt(correctEl.getAttribute('data-value')) || 0;
-                Helpers.animateCounter(correctEl, 0, correctValue, 1200);
-            }
-            if (accuracyEl) {
-                const accuracyValue = parseInt(accuracyEl.getAttribute('data-value')) || 0;
-                Helpers.animateCounter(accuracyEl, 0, accuracyValue, 1000, '%');
+        const animationTimeout = setTimeout(() => {
+            try {
+                const xpEl = document.querySelector('.stat-value[data-counter="xp"]');
+                const correctEl = document.querySelector('.stat-value[data-counter="correct"]');
+                const accuracyEl = document.querySelector('.stat-value[data-counter="accuracy"]');
+                
+                if (xpEl && typeof Helpers !== 'undefined' && Helpers.animateCounter) {
+                    const xpValue = parseInt(xpEl.getAttribute('data-value')) || 0;
+                    Helpers.animateCounter(xpEl, 0, xpValue, 1500);
+                }
+                if (correctEl && typeof Helpers !== 'undefined' && Helpers.animateCounter) {
+                    const correctValue = parseInt(correctEl.getAttribute('data-value')) || 0;
+                    Helpers.animateCounter(correctEl, 0, correctValue, 1200);
+                }
+                if (accuracyEl && typeof Helpers !== 'undefined' && Helpers.animateCounter) {
+                    const accuracyValue = parseInt(accuracyEl.getAttribute('data-value')) || 0;
+                    Helpers.animateCounter(accuracyEl, 0, accuracyValue, 1000, '%');
+                }
+            } catch (error) {
+                console.error('Counter animation error:', error);
             }
         }, 100);
+        
+        HomeView._counterAnimationTimeouts.push(animationTimeout);
     },
 
     cleanup: () => {
-        // No intervals or event listeners to clean up
+        // Clear onboarding timeout
+        if (HomeView._onboardingTimeout) {
+            clearTimeout(HomeView._onboardingTimeout);
+            HomeView._onboardingTimeout = null;
+        }
+        
+        // Clear all counter animation timeouts
+        HomeView._counterAnimationTimeouts.forEach(t => clearTimeout(t));
+        HomeView._counterAnimationTimeouts = [];
+        
         console.log('🏠 Home view cleanup');
     },
 
@@ -363,13 +402,14 @@ const HomeView = {
     
     // Classroom section for students
     renderClassroomSection: () => {
-        // Only show for students
-        if (!Auth.isStudent()) return '';
-        
-        const classrooms = Classroom.getStudentClassrooms();
-        const availableGames = Classroom.getAvailableGames();
-        
-        return `
+        try {
+            // Only show for students
+            if (typeof Auth === 'undefined' || !Auth.isStudent()) return '';
+            
+            const classrooms = typeof Classroom !== 'undefined' ? Classroom.getStudentClassrooms() : [];
+            const availableGames = typeof Classroom !== 'undefined' ? Classroom.getAvailableGames() : [];
+            
+            return `
             <section class="classroom-section">
                 <div class="section-header-row">
                     <h3>🏫 My Classrooms</h3>
@@ -427,10 +467,10 @@ const HomeView = {
                                     <span class="game-icon">${g.gameType === 'race' ? '🏎️' : '⚡'}</span>
                                     <div class="game-details">
                                         <span class="game-name">${g.gameType === 'race' ? 'Car Race' : 'Speed Run'}</span>
-                                        <span class="game-classroom">${g.classroomName}</span>
+                                        <span class="game-classroom">${Helpers.escapeHtml(g.classroomName)}</span>
                                         <span class="game-status-badge status-${g.status}">${g.status}</span>
                                     </div>
-                                    <button class="btn btn-small btn-primary" onclick="HomeView.joinGame('${g.id}')">
+                                    <button class="btn btn-small btn-primary" onclick="HomeView.joinGame('${Helpers.escapeHtml(g.id)}')">
                                         ${g.status === 'waiting' ? 'Join' : 'Watch'}
                                     </button>
                                 </div>
@@ -440,6 +480,10 @@ const HomeView = {
                 ` : ''}
             </section>
         `;
+        } catch (error) {
+            console.error('Classroom section render error:', error);
+            return '';
+        }
     },
     
     showJoinClassroom: () => {

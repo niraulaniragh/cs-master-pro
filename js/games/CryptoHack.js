@@ -56,18 +56,29 @@ const CryptoHack = {
     },
     
     loadQuestions: () => {
-        const topic = CryptoHack.game.settings.topic;
-        const count = CryptoHack.game.settings.questionCount || 15;
-        
-        let pool = [...QUESTIONS];
-        if (topic && topic !== 'all') {
-            pool = pool.filter(q => q.topic === topic);
+        try {
+            const topic = CryptoHack.game?.settings?.topic;
+            const count = CryptoHack.game?.settings?.questionCount || 15;
+            
+            let pool = typeof QUESTIONS !== 'undefined' && Array.isArray(QUESTIONS) ? [...QUESTIONS] : [];
+            
+            if (pool.length === 0) {
+                console.warn('No questions available for CryptoHack');
+                return;
+            }
+            
+            if (topic && topic !== 'all') {
+                pool = pool.filter(q => q.topic === topic);
+            }
+            
+            // Shuffle and take required number
+            CryptoHack.questions = pool
+                .sort(() => Math.random() - 0.5)
+                .slice(0, count);
+        } catch (error) {
+            console.error('CryptoHack.loadQuestions error:', error);
+            CryptoHack.questions = [];
         }
-        
-        // Shuffle and take required number
-        CryptoHack.questions = pool
-            .sort(() => Math.random() - 0.5)
-            .slice(0, count);
     },
     
     renderHostView: () => {
@@ -159,7 +170,14 @@ const CryptoHack = {
         }
         
         const q = CryptoHack.questions[CryptoHack.currentQuestionIndex];
-        const shuffledOptions = [...q.options].sort(() => Math.random() - 0.5);
+        if (!q || !q.options) {
+            console.error('Invalid question data');
+            return '<div class="error">Error loading question</div>';
+        }
+        
+        // Create shuffled options with their original indices
+        const optionsWithIndices = q.options.map((opt, idx) => ({ text: opt, originalIndex: idx }));
+        const shuffledOptions = [...optionsWithIndices].sort(() => Math.random() - 0.5);
         
         return `
             <div class="crypto-question-card">
@@ -172,9 +190,9 @@ const CryptoHack = {
                 
                 <div class="crypto-options">
                     ${shuffledOptions.map((opt, i) => `
-                        <button class="crypto-option" onclick="CryptoHack.submitAnswer('${opt.replace(/'/g, "\\'")}', this)">
+                        <button class="crypto-option" onclick="CryptoHack.submitAnswer(${opt.originalIndex}, this)">
                             <span class="option-letter">${String.fromCharCode(65 + i)}</span>
-                            <span class="option-text">${opt}</span>
+                            <span class="option-text">${opt.text}</span>
                         </button>
                     `).join('')}
                 </div>
@@ -187,14 +205,22 @@ const CryptoHack = {
         return topic ? topic.name : 'General';
     },
     
-    submitAnswer: (answer, btn) => {
+    submitAnswer: (answerIndex, btn) => {
         const q = CryptoHack.questions[CryptoHack.currentQuestionIndex];
-        const isCorrect = answer === q.answer;
+        if (!q) {
+            console.error('No current question found');
+            return;
+        }
         
-        // Disable all buttons
-        document.querySelectorAll('.crypto-option').forEach(b => {
+        const isCorrect = answerIndex === q.answer;
+        
+        // Disable all buttons and highlight correct one
+        document.querySelectorAll('.crypto-option').forEach((b, i) => {
             b.disabled = true;
-            if (b.querySelector('.option-text').textContent === q.answer) {
+            // Find the button with the correct original index
+            const btnOnclick = b.getAttribute('onclick') || '';
+            const match = btnOnclick.match(/submitAnswer\((\d+)/);
+            if (match && parseInt(match[1]) === q.answer) {
                 b.classList.add('correct');
             }
         });
@@ -518,7 +544,13 @@ const CryptoHack = {
             clearInterval(CryptoHack.updateInterval);
             CryptoHack.updateInterval = null;
         }
+        // Reset state
         CryptoHack.game = null;
+        CryptoHack.questions = [];
+        CryptoHack.currentQuestionIndex = 0;
+        CryptoHack.crypto = 0;
+        CryptoHack.shield = false;
+        CryptoHack.shieldTurns = 0;
         console.log('🔐 CryptoHack cleanup');
     }
 };

@@ -8,30 +8,32 @@
 // ===========================================
 
 // XP thresholds for each level (index = level, value = XP needed to reach that level)
-const XP_THRESHOLDS = [0, 0, 100, 250, 500, 1000, 2000, 3500, 5500, 8000, 12000, 20000, 30000, 45000, 65000, 100000];
+const XP_THRESHOLDS = Object.freeze([0, 0, 100, 250, 500, 1000, 2000, 3500, 5500, 8000, 12000, 20000, 30000, 45000, 65000, 100000]);
 
 // Rank definitions based on level
-const RANKS = [
+const RANKS = Object.freeze([
     { minLevel: 1, name: 'Beginner', icon: '🌱', color: '#6b7280' },
     { minLevel: 2, name: 'Learner', icon: '📚', color: '#22d3ee' },
     { minLevel: 4, name: 'Intermediate', icon: '📈', color: '#22c55e' },
     { minLevel: 6, name: 'Advanced', icon: '🌟', color: '#3b82f6' },
     { minLevel: 8, name: 'Expert', icon: '💎', color: '#10b981' },
     { minLevel: 10, name: 'Master', icon: '👑', color: '#fbbf24' }
-];
-
-// Export for modules if needed
-if (typeof window !== 'undefined') {
-    window.XP_THRESHOLDS = XP_THRESHOLDS;
-    window.RANKS = RANKS;
-}
+]);
 
 // ===========================================
 // GLOBAL UTILITY FUNCTIONS
 // ===========================================
 
-// Global shuffleArray function (used by games)
+/**
+ * Shuffle array using Fisher-Yates algorithm
+ * @param {Array} array - Array to shuffle
+ * @returns {Array} New shuffled array (does not mutate original)
+ */
 function shuffleArray(array) {
+    if (!Array.isArray(array)) {
+        console.warn('shuffleArray: Input is not an array');
+        return [];
+    }
     const arr = [...array];
     for (let i = arr.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -40,30 +42,54 @@ function shuffleArray(array) {
     return arr;
 }
 
-// Get XP required for a specific level
+/**
+ * Get XP required for a specific level
+ * @param {number} level - Level number
+ * @returns {number} XP required for level
+ */
 function getXPForLevel(level) {
-    return XP_THRESHOLDS[level] || XP_THRESHOLDS[XP_THRESHOLDS.length - 1];
+    const lvl = Math.max(0, Math.floor(Number(level) || 0));
+    if (lvl < XP_THRESHOLDS.length) {
+        return XP_THRESHOLDS[lvl];
+    }
+    return XP_THRESHOLDS[XP_THRESHOLDS.length - 1];
 }
 
-// Get XP required for next level
+/**
+ * Get XP required for next level
+ * @param {number} level - Current level
+ * @returns {number} XP required for next level
+ */
 function getXPForNextLevel(level) {
-    return XP_THRESHOLDS[level + 1] || XP_THRESHOLDS[XP_THRESHOLDS.length - 1];
+    const lvl = Math.max(0, Math.floor(Number(level) || 0));
+    const nextLvl = Math.min(lvl + 1, XP_THRESHOLDS.length - 1);
+    return XP_THRESHOLDS[nextLvl];
 }
 
-// Get rank for a given level
+/**
+ * Get rank for a given level
+ * @param {number} level - Level number
+ * @returns {Object} Rank object with name, icon, color
+ */
 function getRankForLevel(level) {
+    const lvl = Math.max(1, Math.floor(Number(level) || 1));
     for (let i = RANKS.length - 1; i >= 0; i--) {
-        if (level >= RANKS[i].minLevel) {
-            return RANKS[i];
+        if (lvl >= RANKS[i].minLevel) {
+            return { ...RANKS[i] }; // Return copy
         }
     }
-    return RANKS[0];
+    return { ...RANKS[0] };
 }
 
-// Calculate level from XP
+/**
+ * Calculate level from XP amount
+ * @param {number} xp - XP amount
+ * @returns {number} Level number
+ */
 function getLevelFromXP(xp) {
+    const xpAmount = Math.max(0, Math.floor(Number(xp) || 0));
     for (let i = XP_THRESHOLDS.length - 1; i >= 0; i--) {
-        if (xp >= XP_THRESHOLDS[i]) {
+        if (xpAmount >= XP_THRESHOLDS[i]) {
             return i;
         }
     }
@@ -78,8 +104,8 @@ const Helpers = {
     // Array utilities
     shuffle: shuffleArray,
     shuffleArray: shuffleArray,
-    
-    // XP and Level utilities
+
+    // XP and Level utilities (expose as properties and reference functions)
     XP_THRESHOLDS,
     RANKS,
     getXPForLevel,
@@ -87,179 +113,371 @@ const Helpers = {
     getRankForLevel,
     getLevelFromXP,
 
-    // Generate random ID
+    /**
+     * Generate random alphanumeric ID
+     * @param {number} [length=9] - Length of ID
+     * @returns {string} Generated ID
+     */
     generateId: (length = 9) => {
+        const len = Math.max(1, Math.min(32, Math.floor(Number(length) || 9)));
         const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
         let result = '';
-        for (let i = 0; i < length; i++) {
+        for (let i = 0; i < len; i++) {
             result += chars.charAt(Math.floor(Math.random() * chars.length));
         }
         return result;
     },
-    
-    // Generate short code (for game/classroom codes)
+
+    /**
+     * Generate short code (for game/classroom codes)
+     * Avoids confusing characters like O, 0, I, 1
+     * @param {number} [length=6] - Length of code
+     * @returns {string} Generated code
+     */
     generateCode: (length = 6) => {
-        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Avoid confusing chars like O, 0, I, 1
+        const len = Math.max(1, Math.min(12, Math.floor(Number(length) || 6)));
+        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
         let result = '';
-        for (let i = 0; i < length; i++) {
+        for (let i = 0; i < len; i++) {
             result += chars.charAt(Math.floor(Math.random() * chars.length));
         }
         return result;
     },
 
-    // Debounce function
+    /**
+     * Create debounced version of function
+     * @param {Function} func - Function to debounce
+     * @param {number} wait - Wait time in milliseconds
+     * @returns {Function} Debounced function
+     */
     debounce: (func, wait) => {
-        let timeout;
-        return function executedFunction(...args) {
+        if (typeof func !== 'function') {
+            console.warn('Helpers.debounce: First argument must be a function');
+            return () => {};
+        }
+        const waitTime = Math.max(0, Number(wait) || 0);
+        let timeout = null;
+
+        const debounced = function (...args) {
             const later = () => {
-                clearTimeout(timeout);
-                func(...args);
+                timeout = null;
+                func.apply(this, args);
             };
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
+            if (timeout !== null) {
+                clearTimeout(timeout);
+            }
+            timeout = setTimeout(later, waitTime);
         };
+
+        debounced.cancel = () => {
+            if (timeout !== null) {
+                clearTimeout(timeout);
+                timeout = null;
+            }
+        };
+
+        return debounced;
     },
 
-    // Throttle function
+    /**
+     * Create throttled version of function
+     * @param {Function} func - Function to throttle
+     * @param {number} limit - Minimum time between calls in milliseconds
+     * @returns {Function} Throttled function
+     */
     throttle: (func, limit) => {
-        let inThrottle;
-        return function(...args) {
+        if (typeof func !== 'function') {
+            console.warn('Helpers.throttle: First argument must be a function');
+            return () => {};
+        }
+        const limitTime = Math.max(0, Number(limit) || 0);
+        let inThrottle = false;
+        let lastArgs = null;
+        let lastThis = null;
+
+        return function (...args) {
             if (!inThrottle) {
                 func.apply(this, args);
                 inThrottle = true;
-                setTimeout(() => inThrottle = false, limit);
+                setTimeout(() => {
+                    inThrottle = false;
+                    if (lastArgs) {
+                        func.apply(lastThis, lastArgs);
+                        lastArgs = null;
+                        lastThis = null;
+                    }
+                }, limitTime);
+            } else {
+                lastArgs = args;
+                lastThis = this;
             }
         };
     },
 
-    // Format number with commas
+    /**
+     * Format number with locale-aware thousand separators
+     * @param {number} num - Number to format
+     * @returns {string} Formatted number string
+     */
     formatNumber: (num) => {
-        if (num === null || num === undefined) return '0';
-        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        const n = Number(num);
+        if (isNaN(n)) return '0';
+        try {
+            return n.toLocaleString();
+        } catch (e) {
+            return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        }
     },
-    
-    // Format number with K/M suffixes
+
+    /**
+     * Format number with K/M suffixes for compact display
+     * @param {number} num - Number to format
+     * @returns {string} Compact formatted number
+     */
     formatCompact: (num) => {
-        if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
-        if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
-        return num.toString();
+        const n = Number(num);
+        if (isNaN(n)) return '0';
+        if (n >= 1000000) return (n / 1000000).toFixed(1) + 'M';
+        if (n >= 1000) return (n / 1000).toFixed(1) + 'K';
+        return n.toString();
     },
 
-    // Calculate percentage
-    percentage: (value, total) => total === 0 ? 0 : Math.round((value / total) * 100),
+    /**
+     * Calculate percentage
+     * @param {number} value - Part value
+     * @param {number} total - Total value
+     * @returns {number} Percentage (0-100)
+     */
+    percentage: (value, total) => {
+        const v = Number(value) || 0;
+        const t = Number(total);
+        if (t === 0 || isNaN(t)) return 0;
+        return Math.round((v / t) * 100);
+    },
 
-    // Clamp number between min and max
-    clamp: (num, min, max) => Math.min(Math.max(num, min), max),
+    /**
+     * Clamp number between min and max
+     * @param {number} num - Number to clamp
+     * @param {number} min - Minimum value
+     * @param {number} max - Maximum value
+     * @returns {number} Clamped value
+     */
+    clamp: (num, min, max) => {
+        const n = Number(num) || 0;
+        const minVal = Number(min) || 0;
+        const maxVal = Number(max) || 0;
+        return Math.min(Math.max(n, minVal), maxVal);
+    },
 
-    // Escape HTML
+    /**
+     * Escape HTML special characters to prevent XSS
+     * @param {string} str - String to escape
+     * @returns {string} Escaped string
+     */
     escapeHtml: (str) => {
-        if (!str) return '';
+        if (str === null || str === undefined) return '';
+        const text = String(str);
         const div = document.createElement('div');
-        div.textContent = str;
+        div.textContent = text;
         return div.innerHTML;
     },
-    
-    // Unescape HTML
+
+    /**
+     * Unescape HTML entities
+     * @param {string} str - String to unescape
+     * @returns {string} Unescaped string
+     */
     unescapeHtml: (str) => {
-        if (!str) return '';
+        if (str === null || str === undefined) return '';
+        const text = String(str);
         const div = document.createElement('div');
-        div.innerHTML = str;
-        return div.textContent;
+        div.innerHTML = text;
+        return div.textContent || '';
     },
 
     // ===========================================
     // NUMBER BASE CONVERSIONS
     // ===========================================
-    
-    // Convert denary to binary
+
+    /**
+     * Convert denary (decimal) to binary
+     * @param {number} num - Denary number
+     * @param {number} [bits=8] - Number of bits for padding
+     * @returns {string} Binary string
+     */
     denaryToBinary: (num, bits = 8) => {
-        if (num < 0) return 'Error: Negative number';
-        return num.toString(2).padStart(bits, '0');
+        const n = parseInt(num);
+        if (isNaN(n) || n < 0) return 'Error: Invalid or negative number';
+        const b = Math.max(1, Math.min(32, Math.floor(Number(bits) || 8)));
+        return n.toString(2).padStart(b, '0');
     },
 
-    // Convert binary to denary
+    /**
+     * Convert binary to denary (decimal)
+     * @param {string} binary - Binary string
+     * @returns {number|NaN} Denary number or NaN if invalid
+     */
     binaryToDenary: (binary) => {
-        if (!/^[01]+$/.test(binary)) return NaN;
+        if (!binary || typeof binary !== 'string' || !/^[01]+$/.test(binary)) {
+            return NaN;
+        }
         return parseInt(binary, 2);
     },
 
-    // Convert denary to hex
+    /**
+     * Convert denary (decimal) to hexadecimal
+     * @param {number} num - Denary number
+     * @returns {string} Hexadecimal string (uppercase)
+     */
     denaryToHex: (num) => {
-        if (num < 0) return 'Error: Negative number';
-        return num.toString(16).toUpperCase();
+        const n = parseInt(num);
+        if (isNaN(n) || n < 0) return 'Error: Invalid or negative number';
+        return n.toString(16).toUpperCase();
     },
 
-    // Convert hex to denary
+    /**
+     * Convert hexadecimal to denary (decimal)
+     * @param {string} hex - Hexadecimal string
+     * @returns {number|NaN} Denary number or NaN if invalid
+     */
     hexToDenary: (hex) => {
-        if (!/^[0-9A-Fa-f]+$/.test(hex)) return NaN;
+        if (!hex || typeof hex !== 'string' || !/^[0-9A-Fa-f]+$/.test(hex)) {
+            return NaN;
+        }
         return parseInt(hex, 16);
     },
-    
-    // Convert binary to hex
+
+    /**
+     * Convert binary to hexadecimal
+     * @param {string} binary - Binary string
+     * @returns {string} Hexadecimal string or error message
+     */
     binaryToHex: (binary) => {
-        const denary = parseInt(binary, 2);
-        return isNaN(denary) ? 'Error' : denary.toString(16).toUpperCase();
+        const denary = Helpers.binaryToDenary(binary);
+        if (isNaN(denary)) return 'Error: Invalid binary';
+        return denary.toString(16).toUpperCase();
     },
-    
-    // Convert hex to binary
+
+    /**
+     * Convert hexadecimal to binary
+     * @param {string} hex - Hexadecimal string
+     * @param {number} [bits=8] - Number of bits for padding
+     * @returns {string} Binary string or error message
+     */
     hexToBinary: (hex, bits = 8) => {
-        const denary = parseInt(hex, 16);
-        return isNaN(denary) ? 'Error' : denary.toString(2).padStart(bits, '0');
+        const denary = Helpers.hexToDenary(hex);
+        if (isNaN(denary)) return 'Error: Invalid hex';
+        const b = Math.max(1, Math.min(32, Math.floor(Number(bits) || 8)));
+        return denary.toString(2).padStart(b, '0');
     },
 
-    // Binary addition
+    /**
+     * Add two binary numbers
+     * @param {string} a - First binary number
+     * @param {string} b - Second binary number
+     * @returns {string} Sum in binary or error message
+     */
     binaryAdd: (a, b) => {
-        const sum = parseInt(a, 2) + parseInt(b, 2);
-        return sum.toString(2);
+        const numA = Helpers.binaryToDenary(a);
+        const numB = Helpers.binaryToDenary(b);
+        if (isNaN(numA) || isNaN(numB)) return 'Error: Invalid binary';
+        return (numA + numB).toString(2);
     },
 
-    // Binary left shift
+    /**
+     * Binary left shift
+     * @param {string} binary - Binary string
+     * @param {number} [positions=1] - Number of positions to shift
+     * @returns {string} Shifted binary or error message
+     */
     leftShift: (binary, positions = 1) => {
-        const num = parseInt(binary, 2);
-        return (num << positions).toString(2);
+        const num = Helpers.binaryToDenary(binary);
+        if (isNaN(num)) return 'Error: Invalid binary';
+        const pos = Math.max(0, Math.floor(Number(positions) || 1));
+        return (num << pos).toString(2);
     },
 
-    // Binary right shift
+    /**
+     * Binary right shift
+     * @param {string} binary - Binary string
+     * @param {number} [positions=1] - Number of positions to shift
+     * @returns {string} Shifted binary or error message
+     */
     rightShift: (binary, positions = 1) => {
-        const num = parseInt(binary, 2);
-        return (num >> positions).toString(2);
+        const num = Helpers.binaryToDenary(binary);
+        if (isNaN(num)) return 'Error: Invalid binary';
+        const pos = Math.max(0, Math.floor(Number(positions) || 1));
+        return (num >> pos).toString(2);
     },
 
     // ===========================================
     // DATE/TIME UTILITIES
     // ===========================================
-    
-    // Sleep/delay function
-    sleep: (ms) => new Promise(resolve => setTimeout(resolve, ms)),
-    
-    // Format date nicely
+
+    /**
+     * Sleep/delay utility (use with await)
+     * @param {number} ms - Milliseconds to sleep
+     * @returns {Promise} Promise that resolves after delay
+     */
+    sleep: (ms) => new Promise(resolve => {
+        const delay = Math.max(0, Number(ms) || 0);
+        setTimeout(resolve, delay);
+    }),
+
+    /**
+     * Format date in a readable format
+     * @param {Date|string|number} date - Date to format
+     * @returns {string} Formatted date string
+     */
     formatDate: (date) => {
-        const d = new Date(date);
-        return d.toLocaleDateString('en-GB', {
-            day: 'numeric',
-            month: 'short',
-            year: 'numeric'
-        });
+        try {
+            const d = new Date(date);
+            if (isNaN(d.getTime())) return 'Invalid date';
+            return d.toLocaleDateString('en-GB', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
+            });
+        } catch (e) {
+            return 'Invalid date';
+        }
     },
-    
-    // Format time ago (e.g., "2 hours ago")
+
+    /**
+     * Format time as relative (e.g., "2 hours ago")
+     * @param {Date|string|number} date - Date to format
+     * @returns {string} Relative time string
+     */
     timeAgo: (date) => {
-        const seconds = Math.floor((new Date() - new Date(date)) / 1000);
-        
-        if (seconds < 60) return 'just now';
-        if (seconds < 3600) return Math.floor(seconds / 60) + ' min ago';
-        if (seconds < 86400) return Math.floor(seconds / 3600) + ' hours ago';
-        if (seconds < 604800) return Math.floor(seconds / 86400) + ' days ago';
-        
-        return Helpers.formatDate(date);
+        try {
+            const d = new Date(date);
+            if (isNaN(d.getTime())) return 'Unknown';
+
+            const seconds = Math.floor((Date.now() - d.getTime()) / 1000);
+
+            if (seconds < 0) return 'just now';
+            if (seconds < 60) return 'just now';
+            if (seconds < 3600) return Math.floor(seconds / 60) + ' min ago';
+            if (seconds < 86400) return Math.floor(seconds / 3600) + ' hours ago';
+            if (seconds < 604800) return Math.floor(seconds / 86400) + ' days ago';
+
+            return Helpers.formatDate(date);
+        } catch (e) {
+            return 'Unknown';
+        }
     },
-    
-    // Format duration in mm:ss or hh:mm:ss
+
+    /**
+     * Format duration in mm:ss or hh:mm:ss
+     * @param {number} seconds - Duration in seconds
+     * @returns {string} Formatted duration string
+     */
     formatDuration: (seconds) => {
-        const h = Math.floor(seconds / 3600);
-        const m = Math.floor((seconds % 3600) / 60);
-        const s = Math.floor(seconds % 60);
-        
+        const secs = Math.max(0, Math.floor(Number(seconds) || 0));
+        const h = Math.floor(secs / 3600);
+        const m = Math.floor((secs % 3600) / 60);
+        const s = secs % 60;
+
         if (h > 0) {
             return `${h}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
         }
@@ -269,60 +487,123 @@ const Helpers = {
     // ===========================================
     // OBJECT UTILITIES
     // ===========================================
-    
-    // Deep clone object
-    deepClone: (obj) => JSON.parse(JSON.stringify(obj)),
-    
-    // Deep merge objects
+
+    /**
+     * Deep clone an object using JSON serialization
+     * Note: Does not preserve functions, undefined, or circular references
+     * @param {*} obj - Object to clone
+     * @returns {*} Cloned object
+     */
+    deepClone: (obj) => {
+        try {
+            return JSON.parse(JSON.stringify(obj));
+        } catch (e) {
+            console.warn('Helpers.deepClone: Clone failed', e);
+            return obj;
+        }
+    },
+
+    /**
+     * Deep merge two objects
+     * @param {Object} target - Target object
+     * @param {Object} source - Source object to merge
+     * @returns {Object} Merged object (new object, does not mutate inputs)
+     */
     deepMerge: (target, source) => {
+        if (!target || typeof target !== 'object') return source || {};
+        if (!source || typeof source !== 'object') return target;
+
         const result = { ...target };
         for (const key in source) {
-            if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
-                result[key] = Helpers.deepMerge(result[key] || {}, source[key]);
-            } else {
-                result[key] = source[key];
+            if (Object.prototype.hasOwnProperty.call(source, key)) {
+                if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+                    result[key] = Helpers.deepMerge(result[key], source[key]);
+                } else {
+                    result[key] = source[key];
+                }
             }
         }
         return result;
     },
-    
-    // Pick specific keys from object
+
+    /**
+     * Pick specific keys from object
+     * @param {Object} obj - Source object
+     * @param {Array<string>} keys - Keys to pick
+     * @returns {Object} New object with only specified keys
+     */
     pick: (obj, keys) => {
+        if (!obj || typeof obj !== 'object') return {};
+        if (!Array.isArray(keys)) return {};
+
         return keys.reduce((result, key) => {
-            if (key in obj) result[key] = obj[key];
+            if (Object.prototype.hasOwnProperty.call(obj, key)) {
+                result[key] = obj[key];
+            }
             return result;
         }, {});
     },
-    
-    // Omit specific keys from object
+
+    /**
+     * Omit specific keys from object
+     * @param {Object} obj - Source object
+     * @param {Array<string>} keys - Keys to omit
+     * @returns {Object} New object without specified keys
+     */
     omit: (obj, keys) => {
+        if (!obj || typeof obj !== 'object') return {};
+        if (!Array.isArray(keys)) return { ...obj };
+
         const result = { ...obj };
-        keys.forEach(key => delete result[key]);
+        keys.forEach(key => {
+            delete result[key];
+        });
         return result;
     },
 
     // ===========================================
     // DOM UTILITIES
     // ===========================================
-    
-    // Check if element is in viewport
+
+    /**
+     * Check if element is in viewport
+     * @param {HTMLElement} element - Element to check
+     * @returns {boolean} True if element is visible in viewport
+     */
     isInViewport: (element) => {
-        const rect = element.getBoundingClientRect();
-        return (
-            rect.top >= 0 &&
-            rect.left >= 0 &&
-            rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-            rect.right <= (window.innerWidth || document.documentElement.clientWidth)
-        );
+        if (!element || !(element instanceof Element)) return false;
+        try {
+            const rect = element.getBoundingClientRect();
+            return (
+                rect.top >= 0 &&
+                rect.left >= 0 &&
+                rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+                rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+            );
+        } catch (e) {
+            return false;
+        }
     },
 
-    // Animate value change
-    animateValue: (element, start, end, duration) => {
+    /**
+     * Animate value change in element
+     * @param {HTMLElement} element - Element to update
+     * @param {number} start - Start value
+     * @param {number} end - End value
+     * @param {number} [duration=1000] - Animation duration in ms
+     */
+    animateValue: (element, start, end, duration = 1000) => {
+        if (!element || !(element instanceof Element)) return;
+
+        const startVal = Number(start) || 0;
+        const endVal = Number(end) || 0;
+        const dur = Math.max(0, Number(duration) || 1000);
+
         const startTime = performance.now();
         const update = (currentTime) => {
             const elapsed = currentTime - startTime;
-            const progress = Math.min(elapsed / duration, 1);
-            const value = Math.floor(start + (end - start) * progress);
+            const progress = Math.min(elapsed / dur, 1);
+            const value = Math.floor(startVal + (endVal - startVal) * progress);
             element.textContent = value;
             if (progress < 1) {
                 requestAnimationFrame(update);
@@ -330,54 +611,231 @@ const Helpers = {
         };
         requestAnimationFrame(update);
     },
-    
-    // Smooth scroll to element
+
+    /**
+     * Smooth scroll to element
+     * @param {HTMLElement} element - Target element
+     * @param {number} [offset=0] - Offset from top
+     */
     scrollToElement: (element, offset = 0) => {
-        const top = element.getBoundingClientRect().top + window.pageYOffset - offset;
-        window.scrollTo({ top, behavior: 'smooth' });
-    },
-    
-    // Copy text to clipboard
-    copyToClipboard: async (text) => {
+        if (!element || !(element instanceof Element)) return;
         try {
-            await navigator.clipboard.writeText(text);
-            return true;
-        } catch (err) {
-            // Fallback for older browsers
+            const off = Number(offset) || 0;
+            const top = element.getBoundingClientRect().top + window.pageYOffset - off;
+            window.scrollTo({ top, behavior: 'smooth' });
+        } catch (e) {
+            console.warn('Helpers.scrollToElement: Scroll failed', e);
+        }
+    },
+
+    /**
+     * Copy text to clipboard
+     * @param {string} text - Text to copy
+     * @returns {Promise<boolean>} Promise resolving to success status
+     */
+    copyToClipboard: async (text) => {
+        if (text === null || text === undefined) return false;
+        const str = String(text);
+
+        try {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                await navigator.clipboard.writeText(str);
+                return true;
+            }
+        } catch (e) {
+            // Fall through to fallback
+        }
+
+        // Fallback for older browsers
+        try {
             const textarea = document.createElement('textarea');
-            textarea.value = text;
+            textarea.value = str;
             textarea.style.position = 'fixed';
             textarea.style.opacity = '0';
+            textarea.style.left = '-9999px';
             document.body.appendChild(textarea);
             textarea.select();
             const success = document.execCommand('copy');
             document.body.removeChild(textarea);
             return success;
+        } catch (e) {
+            console.warn('Helpers.copyToClipboard: Copy failed', e);
+            return false;
         }
     },
-    
+
     // ===========================================
     // VALIDATION UTILITIES
     // ===========================================
-    
-    // Check if valid email
+
+    /**
+     * Check if valid email format
+     * @param {string} email - Email to validate
+     * @returns {boolean} True if valid email format
+     */
     isValidEmail: (email) => {
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        if (!email || typeof email !== 'string') return false;
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
     },
-    
-    // Check if string is empty or whitespace
-    isEmpty: (str) => !str || str.trim().length === 0,
-    
-    // Validate binary string
-    isValidBinary: (str) => /^[01]+$/.test(str),
-    
-    // Validate hex string
-    isValidHex: (str) => /^[0-9A-Fa-f]+$/.test(str)
+
+    /**
+     * Check if string is empty or only whitespace
+     * @param {string} str - String to check
+     * @returns {boolean} True if empty or whitespace
+     */
+    isEmpty: (str) => {
+        if (str === null || str === undefined) return true;
+        if (typeof str !== 'string') return false;
+        return str.trim().length === 0;
+    },
+
+    /**
+     * Check if string is valid binary
+     * @param {string} str - String to validate
+     * @returns {boolean} True if valid binary string
+     */
+    isValidBinary: (str) => {
+        if (!str || typeof str !== 'string') return false;
+        return /^[01]+$/.test(str);
+    },
+
+    /**
+     * Check if string is valid hexadecimal
+     * @param {string} str - String to validate
+     * @returns {boolean} True if valid hex string
+     */
+    isValidHex: (str) => {
+        if (!str || typeof str !== 'string') return false;
+        return /^[0-9A-Fa-f]+$/.test(str);
+    },
+
+    // ===========================================
+    // ANIMATION UTILITIES
+    // ===========================================
+
+    /**
+     * Animate counter with easing
+     * @param {HTMLElement} element - Element to update
+     * @param {number} start - Start value
+     * @param {number} end - End value
+     * @param {number} [duration=1000] - Duration in ms
+     * @param {string} [suffix=''] - Suffix to append
+     */
+    animateCounter: (element, start, end, duration = 1000, suffix = '') => {
+        if (!element || !(element instanceof Element)) return;
+
+        const startVal = Number(start) || 0;
+        const endVal = Number(end) || 0;
+        const dur = Math.max(0, Number(duration) || 1000);
+        const suf = String(suffix || '');
+
+        const startTime = performance.now();
+        const update = (currentTime) => {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / dur, 1);
+            // Ease out cubic
+            const easeProgress = 1 - Math.pow(1 - progress, 3);
+            const current = Math.floor(startVal + (endVal - startVal) * easeProgress);
+            element.textContent = current.toLocaleString() + suf;
+            if (progress < 1) {
+                requestAnimationFrame(update);
+            }
+        };
+        requestAnimationFrame(update);
+    },
+
+    /**
+     * Create confetti effect
+     * @param {Object} [options] - Confetti options
+     * @param {number} [options.particleCount=100] - Number of particles
+     * @param {number} [options.spread=70] - Spread angle
+     * @param {Object} [options.origin] - Origin point {x, y}
+     * @param {Array} [options.colors] - Array of color strings
+     */
+    confetti: (options = {}) => {
+        try {
+            const defaults = {
+                particleCount: 100,
+                spread: 70,
+                origin: { x: 0.5, y: 0.5 },
+                colors: ['#10b981', '#06b6d4', '#3b82f6', '#f59e0b', '#ef4444']
+            };
+            const config = { ...defaults, ...options };
+
+            const container = document.createElement('div');
+            container.className = 'confetti-container';
+            container.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;overflow:hidden;';
+            document.body.appendChild(container);
+
+            const count = Math.min(200, Math.max(1, config.particleCount));
+            for (let i = 0; i < count; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'confetti-particle';
+                const color = config.colors[Math.floor(Math.random() * config.colors.length)];
+                const size = Math.random() * 10 + 5;
+                const left = config.origin.x * 100 + (Math.random() - 0.5) * config.spread;
+                const rotation = Math.random() * 360;
+                const duration = Math.random() * 2 + 2;
+                const delay = Math.random() * 0.5;
+                particle.style.cssText = `
+                    position:absolute;left:${left}%;top:${config.origin.y * 100}%;
+                    width:${size}px;height:${size}px;background:${color};
+                    transform:rotate(${rotation}deg);
+                    animation:confettiFall ${duration}s ease-out ${delay}s forwards;
+                `;
+                if (Math.random() > 0.5) particle.style.borderRadius = '50%';
+                container.appendChild(particle);
+            }
+
+            setTimeout(() => {
+                if (container.parentNode) {
+                    container.remove();
+                }
+            }, 5000);
+
+        } catch (e) {
+            console.warn('Helpers.confetti: Effect failed', e);
+        }
+    },
+
+    /**
+     * Add ripple effect to click event
+     * @param {Event} event - Click event
+     */
+    addRipple: (event) => {
+        try {
+            const button = event.currentTarget;
+            if (!button || !(button instanceof Element)) return;
+
+            const ripple = document.createElement('span');
+            const rect = button.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height);
+            const x = event.clientX - rect.left - size / 2;
+            const y = event.clientY - rect.top - size / 2;
+
+            ripple.className = 'btn-ripple';
+            ripple.style.width = ripple.style.height = size + 'px';
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+
+            button.appendChild(ripple);
+            setTimeout(() => {
+                if (ripple.parentNode) {
+                    ripple.remove();
+                }
+            }, 600);
+
+        } catch (e) {
+            // Silently fail - ripple is cosmetic
+        }
+    }
 };
 
-// Make global for compatibility
+// Make globals available
 if (typeof window !== 'undefined') {
     window.Helpers = Helpers;
+    window.XP_THRESHOLDS = XP_THRESHOLDS;
+    window.RANKS = RANKS;
     window.shuffleArray = shuffleArray;
     window.getXPForLevel = getXPForLevel;
     window.getXPForNextLevel = getXPForNextLevel;
@@ -385,74 +843,10 @@ if (typeof window !== 'undefined') {
     window.getLevelFromXP = getLevelFromXP;
 }
 
-// ===========================================
-// ANIMATION UTILITIES
-// ===========================================
-
-// Animated counter
-Helpers.animateCounter = (element, start, end, duration = 1000, suffix = '') => {
-    if (!element) return;
-    const startTime = performance.now();
-    const update = (currentTime) => {
-        const elapsed = currentTime - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        // Ease out cubic
-        const easeProgress = 1 - Math.pow(1 - progress, 3);
-        const current = Math.floor(start + (end - start) * easeProgress);
-        element.textContent = current.toLocaleString() + suffix;
-        if (progress < 1) requestAnimationFrame(update);
-    };
-    requestAnimationFrame(update);
-};
-
-// Confetti effect
-Helpers.confetti = (options = {}) => {
-    const defaults = { particleCount: 100, spread: 70, origin: { x: 0.5, y: 0.5 }, colors: ['#10b981', '#06b6d4', '#3b82f6', '#f59e0b', '#ef4444'] };
-    const config = { ...defaults, ...options };
-    const container = document.createElement('div');
-    container.className = 'confetti-container';
-    container.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;overflow:hidden;';
-    document.body.appendChild(container);
-    
-    for (let i = 0; i < config.particleCount; i++) {
-        const particle = document.createElement('div');
-        particle.className = 'confetti-particle';
-        const color = config.colors[Math.floor(Math.random() * config.colors.length)];
-        const size = Math.random() * 10 + 5;
-        const left = config.origin.x * 100 + (Math.random() - 0.5) * config.spread;
-        const rotation = Math.random() * 360;
-        const duration = Math.random() * 2 + 2;
-        const delay = Math.random() * 0.5;
-        particle.style.cssText = `
-            position:absolute;left:${left}%;top:${config.origin.y * 100}%;
-            width:${size}px;height:${size}px;background:${color};
-            transform:rotate(${rotation}deg);
-            animation:confettiFall ${duration}s ease-out ${delay}s forwards;
-        `;
-        if (Math.random() > 0.5) particle.style.borderRadius = '50%';
-        container.appendChild(particle);
-    }
-    setTimeout(() => container.remove(), 5000);
-};
-
-// Button ripple effect
-Helpers.addRipple = (event) => {
-    const button = event.currentTarget;
-    const ripple = document.createElement('span');
-    const rect = button.getBoundingClientRect();
-    const size = Math.max(rect.width, rect.height);
-    const x = event.clientX - rect.left - size / 2;
-    const y = event.clientY - rect.top - size / 2;
-    ripple.className = 'btn-ripple';
-    ripple.style.width = ripple.style.height = size + 'px';
-    ripple.style.left = x + 'px';
-    ripple.style.top = y + 'px';
-    button.appendChild(ripple);
-    setTimeout(() => ripple.remove(), 600);
-};
-
-// Auto-attach ripple to all buttons
+// Auto-attach ripple to buttons (with event delegation)
 document.addEventListener('click', (e) => {
     const btn = e.target.closest('.btn');
-    if (btn) Helpers.addRipple(e);
+    if (btn) {
+        Helpers.addRipple(e);
+    }
 });

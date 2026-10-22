@@ -37,48 +37,72 @@ const CarRace = {
      * Start game as player (student)
      */
     startAsPlayer: (game) => {
-        CarRace.game = game;
-        CarRace.isHost = false;
-        CarRace.playerPosition = 0;
-        CarRace.powerups = [];
-        CarRace.questions = CarRace.loadQuestions(game.settings);
-        CarRace.raceTrackLength = game.settings.questionCount || 10;
-        CarRace.render();
-        
-        // Start polling for game updates
-        CarRace.startPolling();
+        try {
+            if (!game) {
+                console.error('No game provided to CarRace.startAsPlayer');
+                return;
+            }
+            
+            CarRace.game = game;
+            CarRace.isHost = false;
+            CarRace.playerPosition = 0;
+            CarRace.powerups = [];
+            CarRace.isPenalized = false;
+            CarRace.selectedPowerup = null;
+            CarRace.questions = CarRace.loadQuestions(game.settings || {});
+            CarRace.raceTrackLength = game.settings?.questionCount || 10;
+            CarRace.render();
+            
+            // Start polling for game updates
+            CarRace.startPolling();
+        } catch (error) {
+            console.error('CarRace.startAsPlayer error:', error);
+            Toast?.show?.('Failed to join game', 'error');
+        }
     },
     
     /**
      * Load questions for the race
      */
     loadQuestions: (settings) => {
-        let questions = [...QUESTIONS];
-        
-        // Filter by topic
-        if (settings.topic && settings.topic !== 'all') {
-            questions = questions.filter(q => q.topic === settings.topic);
+        try {
+            let questions = typeof QUESTIONS !== 'undefined' && Array.isArray(QUESTIONS) ? [...QUESTIONS] : [];
+            
+            // Filter by topic
+            if (settings?.topic && settings.topic !== 'all') {
+                questions = questions.filter(q => q.topic === settings.topic);
+            }
+            
+            // Shuffle and limit
+            const count = settings?.questionCount || 10;
+            questions = (typeof Helpers !== 'undefined' && Helpers.shuffle) 
+                ? Helpers.shuffle(questions).slice(0, count)
+                : questions.sort(() => Math.random() - 0.5).slice(0, count);
+            
+            return questions;
+        } catch (error) {
+            console.error('CarRace.loadQuestions error:', error);
+            return [];
         }
-        
-        // Shuffle and limit
-        questions = Helpers.shuffle(questions).slice(0, settings.questionCount || 10);
-        
-        return questions;
     },
     
     /**
      * Render the game
      */
     render: () => {
-        const container = document.getElementById('app-main') || document.getElementById('app');
-        if (!container) {
-            console.error('No container found for CarRace');
-            return;
+        try {
+            const container = document.getElementById('app-main') || document.getElementById('app');
+            if (!container) {
+                console.error('No container found for CarRace');
+                return;
+            }
+            container.innerHTML = CarRace.renderGame();
+            
+            // Start update loop
+            CarRace.startUpdateLoop();
+        } catch (error) {
+            console.error('CarRace.render error:', error);
         }
-        container.innerHTML = CarRace.renderGame();
-        
-        // Start update loop
-        CarRace.startUpdateLoop();
     },
     
     renderGame: () => {
@@ -90,7 +114,7 @@ const CarRace = {
                 <div class="race-header">
                     <div class="race-title">
                         <h1>🏎️ Car Race</h1>
-                        <span class="race-classroom">${game.classroomName}</span>
+                        <span class="race-classroom">${Helpers.escapeHtml(game.classroomName)}</span>
                     </div>
                     <div class="race-status">
                         <span class="status-badge status-${game.status}">${game.status}</span>
@@ -557,15 +581,12 @@ const CarRace = {
     },
     
     close: () => {
-        CarRace.stopPolling();
-        if (CarRace.updateInterval) {
-            clearInterval(CarRace.updateInterval);
-        }
+        CarRace.cleanup();
         
-        if (Auth.isTeacher()) {
-            Router.navigate('teacher');
+        if (typeof Auth !== 'undefined' && Auth.isTeacher?.()) {
+            Router?.navigate?.('teacher');
         } else {
-            Router.navigate('home');
+            Router?.navigate?.('home');
         }
     },
     
@@ -658,7 +679,17 @@ const CarRace = {
             clearInterval(CarRace.penaltyTimer);
             CarRace.penaltyTimer = null;
         }
+        if (CarRace.animationFrame) {
+            cancelAnimationFrame(CarRace.animationFrame);
+            CarRace.animationFrame = null;
+        }
+        // Reset state
         CarRace.game = null;
+        CarRace.questions = [];
+        CarRace.playerPosition = 0;
+        CarRace.isPenalized = false;
+        CarRace.powerups = [];
+        CarRace.selectedPowerup = null;
         console.log('🏎️ CarRace cleanup');
     }
 };

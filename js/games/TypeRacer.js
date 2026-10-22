@@ -103,15 +103,15 @@ const TypeRacer = {
                         <label>Select Mode:</label>
                         <div class="tr-mode-buttons">
                             <button class="tr-mode-btn ${TypeRacer.mode === 'definitions' ? 'selected' : ''}"
-                                    onclick="TypeRacer.selectMode('definitions')">
+                                    onclick="TypeRacer.selectMode('definitions', event)">
                                 📝 Definitions
                             </button>
                             <button class="tr-mode-btn ${TypeRacer.mode === 'code' ? 'selected' : ''}"
-                                    onclick="TypeRacer.selectMode('code')">
+                                    onclick="TypeRacer.selectMode('code', event)">
                                 💻 Code
                             </button>
                             <button class="tr-mode-btn ${TypeRacer.mode === 'mixed' ? 'selected' : ''}"
-                                    onclick="TypeRacer.selectMode('mixed')">
+                                    onclick="TypeRacer.selectMode('mixed', event)">
                                 🎯 Mixed
                             </button>
                         </div>
@@ -135,37 +135,58 @@ const TypeRacer = {
         `;
     },
 
-    selectMode: (mode) => {
+    selectMode: (mode, evt) => {
         TypeRacer.mode = mode;
         document.querySelectorAll('.tr-mode-btn').forEach(btn => btn.classList.remove('selected'));
-        event.target.classList.add('selected');
+        
+        // Use evt parameter or find by mode
+        const targetBtn = evt?.target || document.querySelector(`.tr-mode-btn[onclick*="'${mode}'"]`);
+        if (targetBtn) {
+            targetBtn.classList.add('selected');
+        }
     },
 
     startGame: () => {
-        // Get random text based on mode
-        let textPool;
-        if (TypeRacer.mode === 'mixed') {
-            textPool = [...TypeRacer.texts.definitions, ...TypeRacer.texts.code];
-        } else {
-            textPool = TypeRacer.texts[TypeRacer.mode];
+        try {
+            // Get random text based on mode
+            let textPool;
+            if (TypeRacer.mode === 'mixed') {
+                textPool = [...TypeRacer.texts.definitions, ...TypeRacer.texts.code];
+            } else {
+                textPool = TypeRacer.texts[TypeRacer.mode];
+            }
+            
+            // Validate we have texts
+            if (!textPool || textPool.length === 0) {
+                Toast?.show?.('No texts available for this mode', 'error');
+                return;
+            }
+            
+            TypeRacer.currentText = shuffleArray([...textPool])[0];
+            TypeRacer.typedText = '';
+            TypeRacer.currentIndex = 0;
+            TypeRacer.errors = 0;
+            TypeRacer.wpm = 0;
+            TypeRacer.accuracy = 100;
+            TypeRacer.startTime = null;
+            TypeRacer.isPlaying = true;
+            
+            const container = document.querySelector('.type-racer-container');
+            if (!container) {
+                console.error('TypeRacer container not found');
+                return;
+            }
+            container.innerHTML = TypeRacer.renderGame();
+            
+            // Focus input
+            setTimeout(() => {
+                const input = document.getElementById('tr-input');
+                if (input) input.focus();
+            }, 100);
+        } catch (error) {
+            console.error('TypeRacer.startGame error:', error);
+            Toast?.show?.('Failed to start game', 'error');
         }
-        
-        TypeRacer.currentText = shuffleArray([...textPool])[0];
-        TypeRacer.typedText = '';
-        TypeRacer.currentIndex = 0;
-        TypeRacer.errors = 0;
-        TypeRacer.wpm = 0;
-        TypeRacer.accuracy = 100;
-        TypeRacer.startTime = null;
-        TypeRacer.isPlaying = true;
-        
-        const container = document.querySelector('.type-racer-container');
-        container.innerHTML = TypeRacer.renderGame();
-        
-        // Focus input
-        setTimeout(() => {
-            document.getElementById('tr-input').focus();
-        }, 100);
     },
 
     renderGame: () => {
@@ -424,6 +445,11 @@ const TypeRacer = {
     cleanup: () => {
         // Stop game and clear timer
         TypeRacer.stopGame();
+        // Reset state
+        TypeRacer.currentText = '';
+        TypeRacer.typedText = '';
+        TypeRacer.startTime = null;
+        TypeRacer.endTime = null;
         console.log('⌨️ TypeRacer cleanup');
     }
 };

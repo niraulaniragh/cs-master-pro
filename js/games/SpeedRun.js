@@ -21,23 +21,34 @@ const SpeedRun = {
     selectedTopic: 'all',
 
     open: () => {
-        const modal = document.createElement('div');
-        modal.className = 'game-modal speed-run-modal';
-        modal.id = 'speed-run-modal';
-        modal.innerHTML = SpeedRun.renderMenu();
-        document.body.appendChild(modal);
-        
-        requestAnimationFrame(() => modal.classList.add('active'));
+        try {
+            // Clean up any existing modal first
+            SpeedRun.cleanup();
+            
+            const modal = document.createElement('div');
+            modal.className = 'game-modal speed-run-modal';
+            modal.id = 'speed-run-modal';
+            modal.innerHTML = SpeedRun.renderMenu();
+            document.body.appendChild(modal);
+            
+            requestAnimationFrame(() => modal.classList.add('active'));
+        } catch (error) {
+            console.error('SpeedRun.open error:', error);
+            Toast?.show?.('Failed to open Speed Run', 'error');
+        }
     },
 
     close: () => {
-        document.removeEventListener('keydown', SpeedRun.keyHandler);
-        const modal = document.getElementById('speed-run-modal');
-        if (modal) {
-            modal.classList.remove('active');
-            setTimeout(() => modal.remove(), 300);
+        try {
+            SpeedRun.cleanup();
+            const modal = document.getElementById('speed-run-modal');
+            if (modal) {
+                modal.classList.remove('active');
+                setTimeout(() => modal.remove(), 300);
+            }
+        } catch (error) {
+            console.error('SpeedRun.close error:', error);
         }
-        SpeedRun.stopGame();
     },
 
     renderMenu: () => {
@@ -103,26 +114,45 @@ const SpeedRun = {
     },
 
     startGame: () => {
-        // Get questions based on selected topic
-        SpeedRun.questions = SpeedRun.getQuestions(50);
-        SpeedRun.currentIndex = 0;
-        SpeedRun.score = 0;
-        SpeedRun.combo = 0;
-        SpeedRun.maxCombo = 0;
-        SpeedRun.timeLeft = 60;
-        SpeedRun.correctAnswers = 0;
-        SpeedRun.wrongAnswers = 0;
-        SpeedRun.fastestAnswer = Infinity;
-        SpeedRun.isPlaying = true;
-        SpeedRun.startTime = Date.now();
-        
-        SoundFX.play('start');
-        
-        const container = document.querySelector('.speed-run-container');
-        container.innerHTML = SpeedRun.renderGame();
-        
-        SpeedRun.showQuestion();
-        SpeedRun.startTimer();
+        try {
+            // Get questions based on selected topic
+            SpeedRun.questions = SpeedRun.getQuestions(50);
+            
+            // Validate we have questions
+            if (!SpeedRun.questions || SpeedRun.questions.length === 0) {
+                Toast?.show?.('No questions available for this topic', 'error');
+                return;
+            }
+            
+            SpeedRun.currentIndex = 0;
+            SpeedRun.score = 0;
+            SpeedRun.combo = 0;
+            SpeedRun.maxCombo = 0;
+            SpeedRun.timeLeft = 60;
+            SpeedRun.correctAnswers = 0;
+            SpeedRun.wrongAnswers = 0;
+            SpeedRun.fastestAnswer = Infinity;
+            SpeedRun.isPlaying = true;
+            SpeedRun.startTime = Date.now();
+            
+            SoundFX?.play?.('start');
+            
+            const container = document.querySelector('.speed-run-container');
+            if (!container) {
+                console.error('SpeedRun container not found');
+                return;
+            }
+            container.innerHTML = SpeedRun.renderGame();
+            
+            // Register keyboard handler for this game session
+            document.addEventListener('keydown', SpeedRun.keyHandler);
+            
+            SpeedRun.showQuestion();
+            SpeedRun.startTimer();
+        } catch (error) {
+            console.error('SpeedRun.startGame error:', error);
+            Toast?.show?.('Failed to start game', 'error');
+        }
     },
 
     getQuestions: (count) => {
@@ -209,8 +239,13 @@ const SpeedRun = {
         if (!SpeedRun.isPlaying) return;
         
         const question = SpeedRun.questions[SpeedRun.currentIndex];
+        if (!question) {
+            SpeedRun.endGame();
+            return;
+        }
+        
         const isCorrect = index === question.answer;
-        const answerTime = (Date.now() - SpeedRun.questionStartTime) / 1000;
+        const answerTime = (Date.now() - (SpeedRun.questionStartTime || Date.now())) / 1000;
         
         // Calculate points
         let points = 0;
@@ -327,25 +362,30 @@ const SpeedRun = {
     endGame: () => {
         SpeedRun.stopGame();
         
-        const totalTime = (Date.now() - SpeedRun.startTime) / 1000;
-        const accuracy = SpeedRun.correctAnswers / (SpeedRun.correctAnswers + SpeedRun.wrongAnswers) * 100 || 0;
+        const totalAnswers = SpeedRun.correctAnswers + SpeedRun.wrongAnswers;
+        const accuracy = totalAnswers > 0 ? (SpeedRun.correctAnswers / totalAnswers * 100) : 0;
         
         // Save score
         SpeedRun.saveScore();
         
         // Award XP
         const xpEarned = Math.floor(SpeedRun.score / 10);
-        AppState.addXP(xpEarned);
+        AppState?.addXP?.(xpEarned);
         
         // Check achievements
         if (SpeedRun.maxCombo >= 10) {
-            AppState.unlockAchievement('speed_demon');
+            AppState?.unlockAchievement?.('speed_demon');
         }
         if (SpeedRun.score >= 2000) {
-            AppState.unlockAchievement('speed_master');
+            AppState?.unlockAchievement?.('speed_master');
         }
         
         const container = document.querySelector('.speed-run-container');
+        if (!container) {
+            console.error('SpeedRun container not found');
+            return;
+        }
+        
         const isNewRecord = SpeedRun.isNewPersonalBest();
         
         container.innerHTML = `
@@ -456,11 +496,14 @@ const SpeedRun = {
         document.removeEventListener('keydown', SpeedRun.keyHandler);
         // Clear timer
         SpeedRun.stopGame();
+        // Reset state
+        SpeedRun.questions = [];
+        SpeedRun.currentIndex = 0;
         console.log('⚡ SpeedRun cleanup');
     }
 };
 
-// Keyboard shortcuts handler for Speed Run
+// Keyboard shortcuts handler for Speed Run (defined but not auto-registered)
 SpeedRun.keyHandler = (e) => {
     if (!SpeedRun.isPlaying) return;
     
@@ -472,4 +515,4 @@ SpeedRun.keyHandler = (e) => {
         SpeedRun.answer(keyMap[key]);
     }
 };
-document.addEventListener('keydown', SpeedRun.keyHandler);
+// Note: Keyboard handler is now registered in startGame() and removed in cleanup()

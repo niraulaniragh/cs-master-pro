@@ -5,12 +5,13 @@
 
 const AnalyticsView = {
     render: () => {
-        const user = AppState.getState('user') || {};
-        const streakData = typeof StreakSystem !== 'undefined' ? StreakSystem.getData() : {};
-        const srsStats = typeof SRSSystem !== 'undefined' ? SRSSystem.getOverallStats() : {};
-        const studyStats = AnalyticsView.getStudyTimeStats();
-        
-        return `
+        try {
+            const user = typeof AppState !== 'undefined' ? AppState.getState('user') || {} : {};
+            const streakData = typeof StreakSystem !== 'undefined' ? StreakSystem.getData() : {};
+            const srsStats = typeof SRSSystem !== 'undefined' ? SRSSystem.getOverallStats() : {};
+            const studyStats = AnalyticsView.getStudyTimeStats();
+            
+            return `
             <div class="analytics-view">
                 <div class="analytics-header">
                     <h1>📊 Analytics Dashboard</h1>
@@ -109,6 +110,19 @@ const AnalyticsView = {
                 </section>
             </div>
         `;
+        } catch (error) {
+            console.error('AnalyticsView render error:', error);
+            return `
+                <div class="analytics-view">
+                    <div class="error-state">
+                        <span class="error-icon">⚠️</span>
+                        <h2>Unable to load Analytics</h2>
+                        <p>Please try refreshing the page.</p>
+                        <button class="btn btn-primary" onclick="location.reload()">Refresh</button>
+                    </div>
+                </div>
+            `;
+        }
     },
     
     init: () => {
@@ -116,7 +130,6 @@ const AnalyticsView = {
     },
 
     cleanup: () => {
-        // No intervals or event listeners to clean up
         console.log('📊 Analytics view cleanup');
     },
     

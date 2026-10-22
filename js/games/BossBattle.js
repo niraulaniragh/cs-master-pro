@@ -128,8 +128,7 @@ const BossBattle = {
     },
 
     close: () => {
-        BossBattle.isPlaying = false;
-        document.removeEventListener('keydown', BossBattle.keyHandler);
+        BossBattle.cleanup();
         const modal = document.getElementById('boss-battle-modal');
         if (modal) {
             modal.classList.remove('active');
@@ -202,32 +201,54 @@ const BossBattle = {
     },
 
     startBattle: () => {
-        const boss = BossBattle.currentBoss;
-        
-        // Get questions for this boss's topic
-        let pool = QUESTIONS;
-        if (boss.topic !== 'all') {
-            pool = QUESTIONS.filter(q => q.topic === boss.topic);
+        try {
+            const boss = BossBattle.currentBoss;
+            if (!boss) {
+                Toast?.show?.('No boss selected', 'error');
+                return;
+            }
+            
+            // Get questions for this boss's topic
+            let pool = typeof QUESTIONS !== 'undefined' ? QUESTIONS : [];
+            if (boss.topic !== 'all') {
+                pool = pool.filter(q => q.topic === boss.topic);
+            }
+            
+            // Validate we have enough questions
+            if (pool.length === 0) {
+                Toast?.show?.('No questions available for this boss', 'error');
+                return;
+            }
+            
+            BossBattle.questions = shuffleArray([...pool]).slice(0, 15);
+            BossBattle.currentIndex = 0;
+            BossBattle.playerHP = 100;
+            BossBattle.bossHP = boss.hp;
+            BossBattle.combo = 0;
+            BossBattle.totalDamage = 0;
+            BossBattle.powerUps = { heal: 2, shield: 1, critical: 2 };
+            BossBattle.hasShield = false;
+            BossBattle.criticalActive = false;
+            BossBattle.isPlaying = true;
+            
+            const container = document.querySelector('.boss-container');
+            if (!container) {
+                console.error('Boss container not found');
+                return;
+            }
+            container.innerHTML = BossBattle.renderBattle();
+            
+            // Register keyboard handler
+            document.addEventListener('keydown', BossBattle.keyHandler);
+            
+            // Dramatic entrance
+            setTimeout(() => {
+                BossBattle.showBossEntrance();
+            }, 500);
+        } catch (error) {
+            console.error('BossBattle.startBattle error:', error);
+            Toast?.show?.('Failed to start battle', 'error');
         }
-        
-        BossBattle.questions = shuffleArray([...pool]).slice(0, 15);
-        BossBattle.currentIndex = 0;
-        BossBattle.playerHP = 100;
-        BossBattle.bossHP = boss.hp;
-        BossBattle.combo = 0;
-        BossBattle.totalDamage = 0;
-        BossBattle.powerUps = { heal: 2, shield: 1, critical: 2 };
-        BossBattle.hasShield = false;
-        BossBattle.criticalActive = false;
-        BossBattle.isPlaying = true;
-        
-        const container = document.querySelector('.boss-container');
-        container.innerHTML = BossBattle.renderBattle();
-        
-        // Dramatic entrance
-        setTimeout(() => {
-            BossBattle.showBossEntrance();
-        }, 500);
     },
 
     renderBattle: () => {
@@ -486,6 +507,12 @@ const BossBattle = {
     endBattle: (victory) => {
         BossBattle.isPlaying = false;
         const boss = BossBattle.currentBoss;
+        if (!boss) {
+            console.error('No boss found');
+            BossBattle.close();
+            return;
+        }
+        
         const isPerfect = BossBattle.playerHP === 100;
         
         // Save stats
@@ -494,16 +521,21 @@ const BossBattle = {
         // Award XP
         let xpEarned = victory ? boss.reward : Math.floor(boss.reward * 0.2);
         if (isPerfect && victory) xpEarned *= 1.5;
-        AppState.addXP(Math.floor(xpEarned));
+        AppState?.addXP?.(Math.floor(xpEarned));
         
         // Achievements
         if (victory) {
-            AppState.unlockAchievement('boss_slayer');
-            if (boss.id === 'final-boss') AppState.unlockAchievement('champion');
+            AppState?.unlockAchievement?.('boss_slayer');
+            if (boss.id === 'final-boss') AppState?.unlockAchievement?.('champion');
         }
-        if (isPerfect && victory) AppState.unlockAchievement('flawless');
+        if (isPerfect && victory) AppState?.unlockAchievement?.('flawless');
         
         const container = document.querySelector('.boss-container');
+        if (!container) {
+            console.error('Boss container not found');
+            return;
+        }
+        
         container.innerHTML = `
             <button class="game-close-btn" onclick="BossBattle.close()">✕</button>
             
@@ -551,8 +583,23 @@ const BossBattle = {
     },
 
     showMenu: () => {
-        const container = document.querySelector('.boss-container');
-        container.outerHTML = `<div class="game-container boss-container">${BossBattle.renderMenu().match(/<div class="game-container boss-container">[\s\S]*<\/div>$/)[0]}`;
+        try {
+            const container = document.querySelector('.boss-container');
+            if (container) {
+                // Re-render the menu content
+                const menuHtml = BossBattle.renderMenu();
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = menuHtml;
+                const newContent = tempDiv.querySelector('.boss-container');
+                if (newContent) {
+                    container.innerHTML = newContent.innerHTML;
+                }
+            }
+        } catch (error) {
+            console.error('BossBattle.showMenu error:', error);
+            BossBattle.close();
+            BossBattle.open();
+        }
     },
 
     saveStats: (victory, perfect) => {
@@ -578,14 +625,18 @@ const BossBattle = {
     },
 
     cleanup: () => {
-        // Remove keydown listener and stop game
+        // Remove keydown listener
         document.removeEventListener('keydown', BossBattle.keyHandler);
+        // Stop game
         BossBattle.isPlaying = false;
+        // Reset state
+        BossBattle.questions = [];
+        BossBattle.currentBoss = null;
         console.log('🐉 BossBattle cleanup');
     }
 };
 
-// Keyboard shortcuts handler
+// Keyboard shortcuts handler (defined but not auto-registered)
 BossBattle.keyHandler = (e) => {
     if (!BossBattle.isPlaying) return;
     
@@ -597,4 +648,4 @@ BossBattle.keyHandler = (e) => {
         BossBattle.answer(keyMap[key]);
     }
 };
-document.addEventListener('keydown', BossBattle.keyHandler);
+// Note: Keyboard handler is now registered in startBattle() and removed in cleanup()

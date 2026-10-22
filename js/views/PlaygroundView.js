@@ -8,7 +8,8 @@ const PlaygroundView = {
     currentChallenge: null,
     
     render: () => {
-        return `
+        try {
+            return `
             <div class="playground-view">
                 <div class="playground-header">
                     <h2>🐍 Python Playground</h2>
@@ -38,10 +39,24 @@ const PlaygroundView = {
                 </div>
             </div>
         `;
+        } catch (error) {
+            console.error('PlaygroundView render error:', error);
+            return `
+                <div class="playground-view">
+                    <div class="error-state">
+                        <span class="error-icon">⚠️</span>
+                        <h2>Unable to load Python Playground</h2>
+                        <p>Please try refreshing the page.</p>
+                        <button class="btn btn-primary" onclick="location.reload()">Refresh</button>
+                    </div>
+                </div>
+            `;
+        }
     },
 
     renderSandbox: () => {
-        return `
+        try {
+            return `
             <div class="sandbox-layout">
                 <div class="code-section">
                     <div class="code-header">
@@ -106,11 +121,23 @@ Count: 5</pre>
                 </div>
             </div>
         `;
+        } catch (error) {
+            console.error('Sandbox render error:', error);
+            return '<div class="sandbox-error"><p>Failed to load sandbox</p></div>';
+        }
     },
 
     init: () => {
         console.log('🐍 Python Playground initialized');
-        setTimeout(() => PlaygroundView.updateLineNumbers(), 100);
+        try {
+            setTimeout(() => {
+                if (typeof PlaygroundView.updateLineNumbers === 'function') {
+                    PlaygroundView.updateLineNumbers();
+                }
+            }, 100);
+        } catch (error) {
+            console.error('Playground init error:', error);
+        }
     },
 
     cleanup: () => {

@@ -4,8 +4,8 @@
  */
 
 const AppState = (() => {
-    // Private state
-    let state = {
+    // Default state structure
+    const getDefaultState = () => ({
         user: {
             xp: 0,
             level: 1,
@@ -42,74 +42,165 @@ const AppState = (() => {
             isLoading: false,
             modalOpen: false
         }
-    };
+    });
+
+    // Private state
+    let state = getDefaultState();
 
     // Subscribers for reactive updates
     const subscribers = new Map();
 
-    // Deep clone utility
-    const deepClone = (obj) => JSON.parse(JSON.stringify(obj));
+    // Debounce timer for save operations
+    let saveTimer = null;
+    const SAVE_DEBOUNCE_MS = 500;
 
-    // Get state or specific path
-    const getState = (path = null) => {
-        if (!path) return deepClone(state);
+    /**
+     * Deep clone utility with error handling
+     */
+    const deepClone = (obj) => {
+        if (obj === null || obj === undefined) return obj;
+        if (typeof obj !== 'object') return obj;
+        
+        try {
+            return JSON.parse(JSON.stringify(obj));
+        } catch (error) {
+            console.error('Deep clone error:', error);
+            // Fallback: return a shallow copy for simple objects
+            if (Array.isArray(obj)) return [...obj];
+            return { ...obj };
+        }
+    };
+
+    /**
+     * Safely traverse path in object
+     */
+    const getValueAtPath = (obj, path) => {
+        if (!path || typeof path !== 'string') return obj;
+        if (!obj || typeof obj !== 'object') return undefined;
         
         const keys = path.split('.');
-        let value = state;
+        let value = obj;
+        
         for (const key of keys) {
-            value = value?.[key];
+            if (value === null || value === undefined) return undefined;
+            value = value[key];
         }
-        return deepClone(value);
+        
+        return value;
     };
 
-    // Set state with path notation
+    /**
+     * Get state or specific path
+     */
+    const getState = (path = null) => {
+        try {
+            if (!path) return deepClone(state);
+            return deepClone(getValueAtPath(state, path));
+        } catch (error) {
+            console.error('Error getting state:', error);
+            return path ? undefined : getDefaultState();
+        }
+    };
+
+    /**
+     * Set state with path notation
+     */
     const setState = (path, value) => {
-        const keys = path.split('.');
-        let current = state;
-        
-        for (let i = 0; i < keys.length - 1; i++) {
-            current = current[keys[i]];
+        if (!path || typeof path !== 'string') {
+            console.error('Invalid path for setState');
+            return;
         }
         
-        current[keys[keys.length - 1]] = value;
-        
-        // Notify subscribers
-        notifySubscribers(path, value);
-        
-        // Persist user state (to localStorage for guests, to Auth for logged in users)
-        if (path.startsWith('user')) {
-            saveUserProgress();
+        try {
+            const keys = path.split('.');
+            let current = state;
+            
+            // Navigate to parent
+            for (let i = 0; i < keys.length - 1; i++) {
+                const key = keys[i];
+                if (current[key] === undefined || current[key] === null) {
+                    current[key] = {};
+                }
+                current = current[key];
+            }
+            
+            // Set the value
+            const finalKey = keys[keys.length - 1];
+            current[finalKey] = value;
+            
+            // Notify subscribers
+            notifySubscribers(path, value);
+            
+            // Persist user state with debounce
+            if (path.startsWith('user')) {
+                debouncedSaveUserProgress();
+            }
+        } catch (error) {
+            console.error('Error setting state:', error);
         }
     };
 
-    // Save user progress - syncs with Auth if logged in
-    // Use debounced version to prevent race conditions when answering questions rapidly
+    /**
+     * Debounced save to prevent rapid successive saves
+     */
+    const debouncedSaveUserProgress = () => {
+        if (saveTimer) {
+            clearTimeout(saveTimer);
+        }
+        saveTimer = setTimeout(() => {
+            saveUserProgressImmediate();
+            saveTimer = null;
+        }, SAVE_DEBOUNCE_MS);
+    };
+
+    /**
+     * Save user progress immediately
+     */
     const saveUserProgressImmediate = () => {
-        Storage.save('user', state.user);
-        
-        // If logged in, also save to user profile
-        if (typeof Auth !== 'undefined' && Auth.isLoggedIn()) {
-            Auth.saveProgress(state.user);
+        try {
+            // Save to localStorage
+            if (typeof Storage !== 'undefined' && typeof Storage.save === 'function') {
+                Storage.save('user', state.user);
+            }
+            
+            // If logged in, also save to user profile
+            if (typeof Auth !== 'undefined' && typeof Auth.isLoggedIn === 'function' && Auth.isLoggedIn()) {
+                if (typeof Auth.saveProgress === 'function') {
+                    Auth.saveProgress(state.user);
+                }
+            }
+        } catch (error) {
+            console.error('Error saving user progress:', error);
         }
     };
-    
-    // Debounced version (500ms delay) to prevent data loss during rapid updates
-    const saveUserProgress = typeof Helpers !== 'undefined' && Helpers.debounce 
-        ? Helpers.debounce(saveUserProgressImmediate, 500)
-        : saveUserProgressImmediate;
 
-    // Update state (merge objects)
+    /**
+     * Update state (merge objects)
+     */
     const updateState = (path, updates) => {
-        const current = getState(path);
-        if (typeof current === 'object' && !Array.isArray(current)) {
-            setState(path, { ...current, ...updates });
-        } else {
-            setState(path, updates);
+        if (!path || typeof path !== 'string') return;
+        
+        try {
+            const current = getState(path);
+            if (current !== null && typeof current === 'object' && !Array.isArray(current) && typeof updates === 'object') {
+                setState(path, { ...current, ...updates });
+            } else {
+                setState(path, updates);
+            }
+        } catch (error) {
+            console.error('Error updating state:', error);
         }
     };
 
-    // Subscribe to state changes
+    /**
+     * Subscribe to state changes
+     */
     const subscribe = (path, callback) => {
+        if (!path || typeof callback !== 'function') {
+            console.warn('Invalid subscription parameters');
+            return () => {};
+        }
+        
         if (!subscribers.has(path)) {
             subscribers.set(path, []);
         }
@@ -118,109 +209,198 @@ const AppState = (() => {
         // Return unsubscribe function
         return () => {
             const subs = subscribers.get(path);
-            const index = subs.indexOf(callback);
-            if (index > -1) subs.splice(index, 1);
+            if (subs) {
+                const index = subs.indexOf(callback);
+                if (index > -1) subs.splice(index, 1);
+            }
         };
     };
 
-    // Notify subscribers of changes
+    /**
+     * Notify subscribers of changes
+     */
     const notifySubscribers = (path, value) => {
-        // Notify exact path subscribers
-        if (subscribers.has(path)) {
-            subscribers.get(path).forEach(cb => cb(value));
-        }
+        if (!path) return;
         
-        // Notify parent path subscribers
-        const parts = path.split('.');
-        for (let i = parts.length - 1; i >= 0; i--) {
-            const parentPath = parts.slice(0, i).join('.');
-            if (parentPath && subscribers.has(parentPath)) {
-                subscribers.get(parentPath).forEach(cb => cb(getState(parentPath)));
+        try {
+            // Notify exact path subscribers
+            if (subscribers.has(path)) {
+                const callbacks = subscribers.get(path);
+                for (const cb of callbacks) {
+                    try {
+                        cb(value);
+                    } catch (e) {
+                        console.error('Subscriber callback error:', e);
+                    }
+                }
             }
+            
+            // Notify parent path subscribers
+            const parts = path.split('.');
+            for (let i = parts.length - 1; i >= 0; i--) {
+                const parentPath = parts.slice(0, i).join('.');
+                if (parentPath && subscribers.has(parentPath)) {
+                    const callbacks = subscribers.get(parentPath);
+                    const parentValue = getState(parentPath);
+                    for (const cb of callbacks) {
+                        try {
+                            cb(parentValue);
+                        } catch (e) {
+                            console.error('Parent subscriber callback error:', e);
+                        }
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Error notifying subscribers:', error);
         }
     };
 
-    // Initialize state from storage (for guests)
+    /**
+     * Initialize state from storage (for guests)
+     */
     const init = () => {
-        const savedUser = Storage.load('user');
-        if (savedUser) {
-            state.user = { ...state.user, ...savedUser };
-        }
-        console.log('🔄 State initialized:', state.user.xp, 'XP, Level', state.user.level);
-        updateNavUser();
-    };
-
-    // Initialize state from a user profile (for logged in users)
-    const initWithProfile = (profile) => {
-        state.user = {
-            xp: profile.xp || 0,
-            level: profile.level || 1,
-            streak: profile.streak || 0,
-            totalCorrect: profile.totalCorrect || 0,
-            totalAnswered: profile.totalAnswered || 0,
-            achievements: profile.achievements || [],
-            topicProgress: profile.topicProgress || {},
-            settings: profile.settings || {
-                sound: true,
-                animations: true,
-                darkMode: true
+        try {
+            if (typeof Storage !== 'undefined' && typeof Storage.load === 'function') {
+                const savedUser = Storage.load('user');
+                if (savedUser && typeof savedUser === 'object') {
+                    // Merge with defaults to ensure all fields exist
+                    state.user = { ...getDefaultState().user, ...savedUser };
+                    // Ensure achievements is always an array
+                    if (!Array.isArray(state.user.achievements)) {
+                        state.user.achievements = [];
+                    }
+                }
             }
-        };
-        Storage.save('user', state.user);
-        console.log('🔄 State loaded from profile:', state.user.xp, 'XP, Level', state.user.level);
-        updateNavUser();
-    };
-
-    // Reset state (for logout)
-    const resetState = () => {
-        state.user = {
-            xp: 0,
-            level: 1,
-            streak: 0,
-            totalCorrect: 0,
-            totalAnswered: 0,
-            achievements: [],
-            topicProgress: {},
-            settings: { sound: true, animations: true, darkMode: true }
-        };
-        Storage.remove('user');
-    };
-
-    // Update nav with user info
-    const updateNavUser = () => {
-        const navUser = document.getElementById('nav-user');
-        if (!navUser) return;
-
-        if (typeof Auth !== 'undefined' && Auth.isLoggedIn()) {
-            const session = Auth.getSession();
-            const safeUsername = Helpers.escapeHtml(session.username);
-            navUser.innerHTML = `
-                <div class="user-menu">
-                    <button class="user-menu-btn" onclick="AppState.toggleUserMenu()">
-                        <span class="user-avatar">${Helpers.escapeHtml(session.username.charAt(0).toUpperCase())}</span>
-                        <span class="user-name">${safeUsername}</span>
-                        <i class="fas fa-chevron-down"></i>
-                    </button>
-                    <div class="user-dropdown" id="user-dropdown">
-                        <a href="#" onclick="App.showProfile(); return false;">
-                            <i class="fas fa-user"></i> Profile
-                        </a>
-                        <a href="#" onclick="App.logout(); return false;">
-                            <i class="fas fa-sign-out-alt"></i> Logout
-                        </a>
-                    </div>
-                </div>
-            `;
-        } else {
-            navUser.innerHTML = `
-                <button class="btn btn-primary btn-small" onclick="AuthModal.show('login')">
-                    <i class="fas fa-sign-in-alt"></i> Login
-                </button>
-            `;
+            console.log('🔄 State initialized:', state.user.xp, 'XP, Level', state.user.level);
+            updateNavUser();
+        } catch (error) {
+            console.error('Error initializing state:', error);
+            state = getDefaultState();
         }
     };
 
-    // Toggle user dropdown menu
+    /**
+     * Initialize state from a user profile (for logged in users)
+     */
+    const initWithProfile = (profile) => {
+        try {
+            if (!profile || typeof profile !== 'object') {
+                init();
+                return;
+            }
+            
+            state.user = {
+                xp: profile.xp || 0,
+                level: profile.level || 1,
+                streak: profile.streak || 0,
+                totalCorrect: profile.totalCorrect || 0,
+                totalAnswered: profile.totalAnswered || 0,
+                achievements: Array.isArray(profile.achievements) ? profile.achievements : [],
+                topicProgress: profile.topicProgress || {},
+                settings: profile.settings || {
+                    sound: true,
+                    animations: true,
+                    darkMode: true
+                }
+            };
+            
+            if (typeof Storage !== 'undefined' && typeof Storage.save === 'function') {
+                Storage.save('user', state.user);
+            }
+            
+            console.log('🔄 State loaded from profile:', state.user.xp, 'XP, Level', state.user.level);
+            updateNavUser();
+        } catch (error) {
+            console.error('Error initializing with profile:', error);
+            init();
+        }
+    };
+
+    /**
+     * Reset state (for logout)
+     */
+    const resetState = () => {
+        try {
+            state.user = getDefaultState().user;
+            if (typeof Storage !== 'undefined' && typeof Storage.remove === 'function') {
+                Storage.remove('user');
+            }
+        } catch (error) {
+            console.error('Error resetting state:', error);
+        }
+    };
+
+    /**
+     * Helper function for safe HTML escaping
+     */
+    const escapeHtml = (str) => {
+        if (typeof Helpers !== 'undefined' && typeof Helpers.escapeHtml === 'function') {
+            return Helpers.escapeHtml(str);
+        }
+        return String(str).replace(/[&<>"']/g, (m) => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        })[m]);
+    };
+
+    /**
+     * Update nav with user info
+     */
+    const updateNavUser = () => {
+        try {
+            const navUser = document.getElementById('nav-user');
+            if (!navUser) return;
+
+            const isLoggedIn = typeof Auth !== 'undefined' && typeof Auth.isLoggedIn === 'function' && Auth.isLoggedIn();
+            
+            if (isLoggedIn) {
+                const session = typeof Auth.getSession === 'function' ? Auth.getSession() : null;
+                if (session && session.username) {
+                    const safeUsername = escapeHtml(session.username);
+                    const firstChar = escapeHtml(session.username.charAt(0).toUpperCase());
+                    navUser.innerHTML = `
+                        <div class="user-menu">
+                            <button class="user-menu-btn" onclick="AppState.toggleUserMenu()">
+                                <span class="user-avatar">${firstChar}</span>
+                                <span class="user-name">${safeUsername}</span>
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                            <div class="user-dropdown" id="user-dropdown">
+                                <a href="#" onclick="App.showProfile(); return false;">
+                                    <i class="fas fa-user"></i> Profile
+                                </a>
+                                <a href="#" onclick="App.logout(); return false;">
+                                    <i class="fas fa-sign-out-alt"></i> Logout
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    // Logged in but no session data
+                    showLoginButton(navUser);
+                }
+            } else {
+                showLoginButton(navUser);
+            }
+        } catch (error) {
+            console.error('Error updating nav user:', error);
+        }
+    };
+
+    /**
+     * Show login button in nav
+     */
+    const showLoginButton = (navUser) => {
+        navUser.innerHTML = `
+            <button class="btn btn-primary btn-small" onclick="if(typeof AuthModal !== 'undefined') AuthModal.show('login');">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </button>
+        `;
+    };
+
+    /**
+     * Toggle user dropdown menu
+     */
     const toggleUserMenu = () => {
         const dropdown = document.getElementById('user-dropdown');
         if (dropdown) {
@@ -229,84 +409,141 @@ const AppState = (() => {
     };
 
     // Close dropdown when clicking outside
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('.user-menu')) {
-            const dropdown = document.getElementById('user-dropdown');
-            if (dropdown) {
-                dropdown.classList.remove('show');
+    if (typeof document !== 'undefined') {
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.user-menu')) {
+                const dropdown = document.getElementById('user-dropdown');
+                if (dropdown) {
+                    dropdown.classList.remove('show');
+                }
             }
-        }
-    });
+        });
+    }
 
-    // XP and Level System
-    const addXP = (amount) => {
-        const currentXP = state.user.xp + amount;
-        const newLevel = calculateLevel(currentXP);
-        
-        setState('user.xp', currentXP);
-        
-        if (newLevel > state.user.level) {
-            setState('user.level', newLevel);
-            Toast.show(`🎉 Level Up! You're now Level ${newLevel}!`, 'success');
-            
-            // Confetti celebration on level up
-            if (typeof Helpers !== 'undefined' && Helpers.confetti) {
-                Helpers.confetti({ particleCount: 150, spread: 90 });
-            }
-            
-            // Check level achievements
-            if (newLevel >= 5) unlockAchievement('level_5');
-            if (newLevel >= 10) unlockAchievement('level_10');
-        }
-        
-        updateNavStats();
-        return { xp: currentXP, level: newLevel, leveledUp: newLevel > state.user.level };
-    };
+    // XP thresholds for levels (cached)
+    const LEVEL_THRESHOLDS = [0, 100, 250, 500, 1000, 2000, 3500, 5500, 8000, 12000, 20000];
 
+    /**
+     * Calculate level from XP
+     */
     const calculateLevel = (xp) => {
-        const thresholds = [0, 100, 250, 500, 1000, 2000, 3500, 5500, 8000, 12000, 20000];
-        for (let i = thresholds.length - 1; i >= 0; i--) {
-            if (xp >= thresholds[i]) return i + 1;
+        if (typeof xp !== 'number' || xp < 0) return 1;
+        
+        for (let i = LEVEL_THRESHOLDS.length - 1; i >= 0; i--) {
+            if (xp >= LEVEL_THRESHOLDS[i]) return i + 1;
         }
         return 1;
     };
 
-    const updateNavStats = () => {
-        const xpEl = document.getElementById('nav-xp');
-        const levelEl = document.getElementById('nav-level');
-        if (xpEl) xpEl.textContent = state.user.xp;
-        if (levelEl) levelEl.textContent = state.user.level;
-    };
-
-    // Achievement System
-    const unlockAchievement = (id) => {
-        if (!state.user.achievements.includes(id)) {
-            state.user.achievements.push(id);
-            setState('user.achievements', state.user.achievements);
+    /**
+     * Add XP and check for level up
+     */
+    const addXP = (amount) => {
+        if (typeof amount !== 'number' || isNaN(amount) || amount <= 0) {
+            return { xp: state.user.xp, level: state.user.level, leveledUp: false };
+        }
+        
+        try {
+            const previousLevel = state.user.level;
+            const currentXP = (state.user.xp || 0) + Math.floor(amount);
+            const newLevel = calculateLevel(currentXP);
             
-            const achievement = ACHIEVEMENTS.find(a => a.id === id);
-            if (achievement) {
-                Toast.show(`🏆 Achievement: ${achievement.name}!`, 'success');
+            setState('user.xp', currentXP);
+            
+            const leveledUp = newLevel > previousLevel;
+            if (leveledUp) {
+                setState('user.level', newLevel);
+                
+                if (typeof Toast !== 'undefined' && typeof Toast.show === 'function') {
+                    Toast.show(`🎉 Level Up! You're now Level ${newLevel}!`, 'success');
+                }
+                
+                // Confetti celebration on level up
+                if (typeof Helpers !== 'undefined' && typeof Helpers.confetti === 'function') {
+                    try {
+                        Helpers.confetti({ particleCount: 150, spread: 90 });
+                    } catch (e) {
+                        console.warn('Confetti error:', e);
+                    }
+                }
+                
+                // Check level achievements
+                if (newLevel >= 5) unlockAchievement('level_5');
+                if (newLevel >= 10) unlockAchievement('level_10');
             }
+            
+            updateNavStats();
+            return { xp: currentXP, level: newLevel, leveledUp };
+        } catch (error) {
+            console.error('Error adding XP:', error);
+            return { xp: state.user.xp, level: state.user.level, leveledUp: false };
         }
     };
 
-    const hasAchievement = (id) => state.user.achievements.includes(id);
+    /**
+     * Update navigation stats display
+     */
+    const updateNavStats = () => {
+        try {
+            const xpEl = document.getElementById('nav-xp');
+            const levelEl = document.getElementById('nav-level');
+            if (xpEl) xpEl.textContent = state.user.xp || 0;
+            if (levelEl) levelEl.textContent = state.user.level || 1;
+        } catch (error) {
+            console.error('Error updating nav stats:', error);
+        }
+    };
 
-    // Reset all progress
+    /**
+     * Unlock an achievement
+     */
+    const unlockAchievement = (id) => {
+        if (!id || typeof id !== 'string') return;
+        
+        try {
+            // Ensure achievements is an array
+            if (!Array.isArray(state.user.achievements)) {
+                state.user.achievements = [];
+            }
+            
+            if (!state.user.achievements.includes(id)) {
+                state.user.achievements.push(id);
+                setState('user.achievements', [...state.user.achievements]);
+                
+                // Find and display achievement
+                if (typeof ACHIEVEMENTS !== 'undefined' && Array.isArray(ACHIEVEMENTS)) {
+                    const achievement = ACHIEVEMENTS.find(a => a && a.id === id);
+                    if (achievement && typeof Toast !== 'undefined') {
+                        Toast.show(`🏆 Achievement: ${achievement.name}!`, 'success');
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Error unlocking achievement:', error);
+        }
+    };
+
+    /**
+     * Check if user has an achievement
+     */
+    const hasAchievement = (id) => {
+        if (!id) return false;
+        return Array.isArray(state.user.achievements) && state.user.achievements.includes(id);
+    };
+
+    /**
+     * Reset all progress
+     */
     const reset = () => {
-        state.user = {
-            xp: 0,
-            level: 1,
-            streak: 0,
-            totalCorrect: 0,
-            totalAnswered: 0,
-            achievements: [],
-            topicProgress: {},
-            settings: { sound: true, animations: true, darkMode: true }
-        };
-        Storage.clear();
-        updateNavStats();
+        try {
+            state.user = getDefaultState().user;
+            if (typeof Storage !== 'undefined' && typeof Storage.clear === 'function') {
+                Storage.clear();
+            }
+            updateNavStats();
+        } catch (error) {
+            console.error('Error resetting state:', error);
+        }
     };
 
     return {

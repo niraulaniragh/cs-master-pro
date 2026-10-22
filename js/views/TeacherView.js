@@ -8,22 +8,23 @@ const TeacherView = {
     currentTab: 'classrooms',
     
     render: () => {
-        if (!Auth.isTeacher()) {
-            return `
-                <div class="teacher-view">
-                    <div class="access-denied">
-                        <span class="denied-icon">🔒</span>
-                        <h2>Teacher Access Only</h2>
-                        <p>This area is for teacher accounts only.</p>
-                        <button class="btn btn-primary" onclick="Router.navigate('home')">Go Home</button>
+        try {
+            if (typeof Auth === 'undefined' || !Auth.isTeacher()) {
+                return `
+                    <div class="teacher-view">
+                        <div class="access-denied">
+                            <span class="denied-icon">🔒</span>
+                            <h2>Teacher Access Only</h2>
+                            <p>This area is for teacher accounts only.</p>
+                            <button class="btn btn-primary" onclick="Router.navigate('home')">Go Home</button>
+                        </div>
                     </div>
-                </div>
-            `;
-        }
-        
-        const classrooms = Classroom.getTeacherClassrooms();
-        
-        return `
+                `;
+            }
+            
+            const classrooms = typeof Classroom !== 'undefined' ? Classroom.getTeacherClassrooms() : [];
+            
+            return `
             <div class="teacher-view">
                 <div class="teacher-header">
                     <div class="teacher-title">
@@ -55,63 +56,89 @@ const TeacherView = {
                 </div>
             </div>
         `;
-    },
-    
-    renderContent: () => {
-        if (TeacherView.currentTab === 'classrooms') {
-            return TeacherView.renderClassrooms();
-        } else if (TeacherView.currentTab === 'assignments') {
-            return AssignmentView.renderTeacherAssignments();
-        } else if (TeacherView.currentTab === 'games') {
-            return TeacherView.renderActiveGames();
-        }
-        return '';
-    },
-    
-    renderClassrooms: () => {
-        const classrooms = Classroom.getTeacherClassrooms();
-        
-        if (classrooms.length === 0) {
+        } catch (error) {
+            console.error('TeacherView render error:', error);
             return `
-                <div class="empty-state">
-                    <span class="empty-icon">🏫</span>
-                    <h3>No Classrooms Yet</h3>
-                    <p>Create your first classroom to get started!</p>
-                    <button class="btn btn-primary" onclick="TeacherView.showCreateClassroom()">
-                        Create Classroom
-                    </button>
+                <div class="teacher-view">
+                    <div class="error-state">
+                        <span class="error-icon">⚠️</span>
+                        <h2>Unable to load Teacher Dashboard</h2>
+                        <p>Please try refreshing the page.</p>
+                        <button class="btn btn-primary" onclick="location.reload()">Refresh</button>
+                    </div>
                 </div>
             `;
         }
+    },
+    
+    renderContent: () => {
+        try {
+            if (TeacherView.currentTab === 'classrooms') {
+                return TeacherView.renderClassrooms();
+            } else if (TeacherView.currentTab === 'assignments') {
+                return typeof AssignmentView !== 'undefined' ? AssignmentView.renderTeacherAssignments() : '<p>Assignments not available</p>';
+            } else if (TeacherView.currentTab === 'games') {
+                return TeacherView.renderActiveGames();
+            }
+            return '';
+        } catch (error) {
+            console.error('Error rendering content:', error);
+            return '<div class="error-message">Error loading content</div>';
+        }
+    },
+    
+    renderClassrooms: () => {
+        try {
+            const classrooms = typeof Classroom !== 'undefined' ? Classroom.getTeacherClassrooms() : [];
+            
+            if (classrooms.length === 0) {
+                return `
+                    <div class="empty-state">
+                        <span class="empty-icon">🏫</span>
+                        <h3>No Classrooms Yet</h3>
+                        <p>Create your first classroom to get started!</p>
+                        <button class="btn btn-primary" onclick="TeacherView.showCreateClassroom()">
+                            Create Classroom
+                        </button>
+                    </div>
+                `;
+        }
+        
+        const escapeHtml = (str) => {
+            if (typeof Helpers !== 'undefined' && Helpers.escapeHtml) {
+                return Helpers.escapeHtml(str);
+            }
+            return String(str || '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+        };
         
         return `
             <div class="classrooms-grid">
                 ${classrooms.map(classroom => `
                     <div class="classroom-card">
                         <div class="classroom-header">
-                            <h3>${classroom.name}</h3>
+                            <h3>${escapeHtml(classroom.name)}</h3>
                             <div class="classroom-code-box">
                                 <span class="code-label">Code:</span>
-                                <span class="classroom-code" title="Share this code with students">${classroom.code}</span>
-                                <button class="btn btn-tiny" onclick="event.stopPropagation(); navigator.clipboard.writeText('${classroom.code}'); Toast.show('Copied!', 'success')">📋</button>
+                                <span class="classroom-code" title="Share this code with students">${escapeHtml(classroom.code)}</span>
+                                <button class="btn btn-tiny" onclick="event.stopPropagation(); navigator.clipboard.writeText('${escapeHtml(classroom.code)}'); Toast.show('Copied!', 'success')">📋</button>
                             </div>
                         </div>
-                        <p class="classroom-desc">${classroom.description || 'No description'}</p>
+                        <p class="classroom-desc">${escapeHtml(classroom.description || 'No description')}</p>
                         <div class="classroom-stats">
                             <div class="stat">
-                                <span class="stat-value">${classroom.students.length}</span>
+                                <span class="stat-value">${Array.isArray(classroom.students) ? classroom.students.length : 0}</span>
                                 <span class="stat-label">Students</span>
                             </div>
                             <div class="stat">
-                                <span class="stat-value">${classroom.stats.totalGamesPlayed}</span>
+                                <span class="stat-value">${classroom.stats?.totalGamesPlayed || 0}</span>
                                 <span class="stat-label">Games</span>
                             </div>
                         </div>
                         <div class="classroom-actions">
-                            <button class="btn btn-small btn-primary" onclick="TeacherView.viewClassroom('${classroom.code}')">
+                            <button class="btn btn-small btn-primary" onclick="TeacherView.viewClassroom('${escapeHtml(classroom.code)}')">
                                 View Details
                             </button>
-                            <button class="btn btn-small btn-secondary" onclick="TeacherView.hostGameForClassroom('${classroom.code}')">
+                            <button class="btn btn-small btn-secondary" onclick="TeacherView.hostGameForClassroom('${escapeHtml(classroom.code)}')">
                                 🎮 Host Game
                             </button>
                         </div>
@@ -119,15 +146,29 @@ const TeacherView = {
                 `).join('')}
             </div>
         `;
+        } catch (error) {
+            console.error('Error rendering classrooms:', error);
+            return '<div class="error-message">Failed to load classrooms</div>';
+        }
     },
     
     renderActiveGames: () => {
-        const games = Classroom.getAvailableGames().filter(g => g.hostId === Auth.getCurrentUser()?.id);
-        
-        if (games.length === 0) {
-            return `
-                <div class="empty-state">
-                    <span class="empty-icon">🎮</span>
+        try {
+            const currentUser = typeof Auth !== 'undefined' && Auth.getCurrentUser ? Auth.getCurrentUser() : null;
+            const allGames = typeof Classroom !== 'undefined' ? Classroom.getAvailableGames() : [];
+            const games = Array.isArray(allGames) ? allGames.filter(g => g.hostId === currentUser?.id) : [];
+            
+            const escapeHtml = (str) => {
+                if (typeof Helpers !== 'undefined' && Helpers.escapeHtml) {
+                    return Helpers.escapeHtml(str);
+                }
+                return String(str || '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+            };
+            
+            if (games.length === 0) {
+                return `
+                    <div class="empty-state">
+                        <span class="empty-icon">🎮</span>
                     <h3>No Active Games</h3>
                     <p>Host a game from one of your classrooms!</p>
                 </div>
@@ -137,22 +178,22 @@ const TeacherView = {
         return `
             <div class="games-list">
                 ${games.map(game => `
-                    <div class="game-item ${game.status}">
+                    <div class="game-item ${game.status || 'waiting'}">
                         <div class="game-info">
                             <h4>${TeacherView.getGameTitle(game.gameType)}</h4>
-                            <p>Classroom: ${game.classroomName}</p>
+                            <p>Classroom: ${escapeHtml(game.classroomName || 'Unknown')}</p>
                             <div class="game-join-code">
                                 <span class="code-label">Join Code:</span>
-                                <span class="code-value">${game.joinCode}</span>
-                                <button class="btn btn-tiny" onclick="navigator.clipboard.writeText('${game.joinCode}'); Toast.show('Copied!', 'success')">📋</button>
+                                <span class="code-value">${escapeHtml(game.joinCode || '')}</span>
+                                <button class="btn btn-tiny" onclick="navigator.clipboard.writeText('${escapeHtml(game.joinCode || '')}'); Toast.show('Copied!', 'success')">📋</button>
                             </div>
-                            <span class="game-status status-${game.status}">${game.status}</span>
+                            <span class="game-status status-${game.status || 'waiting'}">${game.status || 'waiting'}</span>
                         </div>
                         <div class="game-players">
-                            <span>${game.players.length} player${game.players.length !== 1 ? 's' : ''}</span>
+                            <span>${Array.isArray(game.players) ? game.players.length : 0} player${(game.players?.length || 0) !== 1 ? 's' : ''}</span>
                         </div>
                         <div class="game-actions">
-                            <button class="btn btn-small btn-secondary" onclick="TeacherView.showGameJoinCode(Classroom.getGame('${game.id}'))">
+                            <button class="btn btn-small btn-secondary" onclick="TeacherView.showGameJoinCode(typeof Classroom !== 'undefined' ? Classroom.getGame('${game.id}') : null)">
                                 📺 Show Code
                             </button>
                             ${game.status === 'waiting' ? `
@@ -169,6 +210,10 @@ const TeacherView = {
                 `).join('')}
             </div>
         `;
+        } catch (error) {
+            console.error('Error rendering active games:', error);
+            return '<div class="error-message">Failed to load games</div>';
+        }
     },
     
     getGameTitle: (gameType) => {
@@ -181,7 +226,7 @@ const TeacherView = {
             'speedrun': '⚡ Speed Run',
             'battle': '⚔️ Battle Mode'
         };
-        return titles[gameType] || gameType;
+        return titles[gameType] || gameType || 'Unknown Game';
     },
     
     switchTab: (tab) => {
@@ -239,13 +284,13 @@ const TeacherView = {
         }
         
         Modal.show({
-            title: `🏫 ${classroom.name}`,
+            title: `🏫 ${Helpers.escapeHtml(classroom.name)}`,
             content: `
                 <div class="classroom-details">
                     <div class="classroom-code-display">
                         <span class="code-label">Classroom Code:</span>
-                        <span class="code-value">${classroom.code}</span>
-                        <button class="btn btn-small" onclick="navigator.clipboard.writeText('${classroom.code}'); Toast.show('Code copied!', 'success')">
+                        <span class="code-value">${Helpers.escapeHtml(classroom.code)}</span>
+                        <button class="btn btn-small" onclick="navigator.clipboard.writeText('${Helpers.escapeHtml(classroom.code)}'); Toast.show('Code copied!', 'success')">
                             📋 Copy
                         </button>
                     </div>
@@ -260,7 +305,7 @@ const TeacherView = {
                                     <div class="student-item">
                                         <span class="student-name">${Helpers.escapeHtml(s.username)}</span>
                                         <span class="student-stats">${s.stats.correctAnswers}/${s.stats.totalAnswers} correct</span>
-                                        <button class="btn btn-tiny btn-danger" onclick="TeacherView.removeStudent('${code}', '${s.id}')">
+                                        <button class="btn btn-tiny btn-danger" onclick="TeacherView.removeStudent('${Helpers.escapeHtml(code)}', '${Helpers.escapeHtml(s.id)}')">
                                             Remove
                                         </button>
                                     </div>
@@ -333,7 +378,7 @@ const TeacherView = {
             title: '🎮 Host a Game',
             content: `
                 <div class="host-game-form">
-                    <p>Hosting game for: <strong>${classroom.name}</strong></p>
+                    <p>Hosting game for: <strong>${Helpers.escapeHtml(classroom.name)}</strong></p>
                     
                     <div class="form-group">
                         <label>Game Type</label>

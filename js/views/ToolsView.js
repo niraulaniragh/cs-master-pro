@@ -6,7 +6,8 @@ const ToolsView = {
     activeTool: null,
 
     render: () => {
-        return `
+        try {
+            return `
             <div class="tools-view">
                 <h2>🔧 Interactive Tools</h2>
                 <p>Practice with these interactive tools to reinforce your learning</p>
@@ -63,6 +64,19 @@ const ToolsView = {
                 </div>
             </div>
         `;
+        } catch (error) {
+            console.error('ToolsView render error:', error);
+            return `
+                <div class="tools-view">
+                    <div class="error-state">
+                        <span class="error-icon">⚠️</span>
+                        <h2>Unable to load Tools</h2>
+                        <p>Please try refreshing the page.</p>
+                        <button class="btn btn-primary" onclick="location.reload()">Refresh</button>
+                    </div>
+                </div>
+            `;
+        }
     },
 
     init: () => {
@@ -73,18 +87,21 @@ const ToolsView = {
         // Stop any running visualizations
         ToolsView.vizRunning = false;
         ToolsView.activeTool = null;
+        // Clear any shift history
+        ToolsView.shiftHistory = [];
         console.log('🔧 Tools view cleanup');
     },
 
     openTool: (toolId, event) => {
-        ToolsView.activeTool = toolId;
-        const workspace = document.getElementById('tool-workspace');
-        if (!workspace) return;
-        
-        document.querySelectorAll('.tool-card').forEach(card => {
-            card.classList.remove('active');
-        });
-        if (event && event.currentTarget) {
+        try {
+            ToolsView.activeTool = toolId;
+            const workspace = document.getElementById('tool-workspace');
+            if (!workspace) return;
+            
+            document.querySelectorAll('.tool-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            if (event && event.currentTarget) {
             event.currentTarget.classList.add('active');
         }
 
@@ -116,12 +133,26 @@ const ToolsView = {
         }
 
         // Track tool usage
-        const usedTools = Storage.load('usedTools') || [];
+        const usedTools = (typeof Storage !== 'undefined' && Storage.load) ? Storage.load('usedTools') || [] : [];
         if (!usedTools.includes(toolId)) {
             usedTools.push(toolId);
-            Storage.save('usedTools', usedTools);
-            if (usedTools.length >= 5) {
+            if (typeof Storage !== 'undefined' && Storage.save) {
+                Storage.save('usedTools', usedTools);
+            }
+            if (usedTools.length >= 5 && typeof AppState !== 'undefined') {
                 AppState.unlockAchievement('tool_master');
+            }
+        }
+        } catch (error) {
+            console.error('Error opening tool:', error);
+            const workspace = document.getElementById('tool-workspace');
+            if (workspace) {
+                workspace.innerHTML = `
+                    <div class="tool-error">
+                        <span>⚠️</span>
+                        <p>Failed to load tool. Please try again.</p>
+                    </div>
+                `;
             }
         }
     },
@@ -999,13 +1030,17 @@ const ToolsView = {
             const code = parseInt(value);
             if (code >= 0 && code <= 127) {
                 const char = code === 32 ? 'Space' : String.fromCharCode(code);
-                result.innerHTML = `ASCII ${code} = <strong>"${char}"</strong>`;
+                // Use textContent for the character display to prevent XSS
+                result.innerHTML = `ASCII ${code} = <strong>"</strong><span id="ascii-char"></span><strong>"</strong>`;
+                document.getElementById('ascii-char').textContent = char;
             } else {
                 result.textContent = 'ASCII codes range from 0-127';
             }
         } else {
             const code = value.charCodeAt(0);
-            result.innerHTML = `"${value[0]}" = ASCII <strong>${code}</strong> (binary: ${code.toString(2).padStart(7, '0')})`;
+            // Use textContent for the character display to prevent XSS
+            result.innerHTML = `"<span id="ascii-char"></span>" = ASCII <strong>${code}</strong> (binary: ${code.toString(2).padStart(7, '0')})`;
+            document.getElementById('ascii-char').textContent = value[0];
         }
     },
 
@@ -1140,10 +1175,10 @@ const ToolsView = {
                 const newPos = (pos + shift) % 26;
                 const newChar = String.fromCharCode(newPos + 65);
                 cipher += newChar;
-                working.push(`${char}(${pos}) + ${shift} = ${newPos} → ${newChar}`);
+                working.push(`${Helpers.escapeHtml(char)}(${pos}) + ${shift} = ${newPos} → ${newChar}`);
             } else {
                 cipher += char;
-                working.push(`${char} (not a letter, unchanged)`);
+                working.push(`${Helpers.escapeHtml(char)} (not a letter, unchanged)`);
             }
         }
         
@@ -1177,7 +1212,7 @@ const ToolsView = {
                 const newPos = (plainPos + keyPos) % 26;
                 const newChar = String.fromCharCode(newPos + 65);
                 cipher += newChar;
-                working.push(`${char}(${plainPos}) + ${keyChar}(${keyPos}) = ${plainPos + keyPos}${plainPos + keyPos >= 26 ? ' mod 26 = ' + newPos : ''} → ${newChar}`);
+                working.push(`${Helpers.escapeHtml(char)}(${plainPos}) + ${keyChar}(${keyPos}) = ${plainPos + keyPos}${plainPos + keyPos >= 26 ? ' mod 26 = ' + newPos : ''} → ${newChar}`);
                 keyIndex++;
             } else {
                 cipher += char;

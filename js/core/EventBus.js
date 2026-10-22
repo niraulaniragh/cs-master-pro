@@ -7,6 +7,9 @@ const EventBus = {
     // Store event listeners
     _events: {},
     
+    // Max listeners per event to prevent memory leaks
+    _maxListeners: 100,
+    
     /**
      * Subscribe to an event
      * @param {string} event - Event name
@@ -14,9 +17,33 @@ const EventBus = {
      * @returns {Function} - Unsubscribe function
      */
     on: (event, callback) => {
+        // Validate parameters
+        if (!event || typeof event !== 'string') {
+            console.warn('EventBus.on: Invalid event name');
+            return () => {};
+        }
+        
+        if (typeof callback !== 'function') {
+            console.warn('EventBus.on: Callback must be a function');
+            return () => {};
+        }
+        
         if (!EventBus._events[event]) {
             EventBus._events[event] = [];
         }
+        
+        // Check for max listeners
+        if (EventBus._events[event].length >= EventBus._maxListeners) {
+            console.warn(`EventBus: Max listeners (${EventBus._maxListeners}) reached for event "${event}"`);
+            return () => {};
+        }
+        
+        // Prevent duplicate callbacks
+        if (EventBus._events[event].includes(callback)) {
+            console.warn(`EventBus: Duplicate callback for event "${event}"`);
+            return () => EventBus.off(event, callback);
+        }
+        
         EventBus._events[event].push(callback);
         
         // Return unsubscribe function for convenience
@@ -29,11 +56,14 @@ const EventBus = {
      * @param {Function} callback - Callback function to remove
      */
     off: (event, callback) => {
+        if (!event || typeof event !== 'string') return;
         if (!EventBus._events[event]) return;
         
-        EventBus._events[event] = EventBus._events[event].filter(
-            cb => cb !== callback
-        );
+        if (typeof callback === 'function') {
+            EventBus._events[event] = EventBus._events[event].filter(
+                cb => cb !== callback
+            );
+        }
         
         // Clean up empty event arrays
         if (EventBus._events[event].length === 0) {
@@ -47,9 +77,17 @@ const EventBus = {
      * @param {*} data - Data to pass to listeners
      */
     emit: (event, data) => {
+        if (!event || typeof event !== 'string') {
+            console.warn('EventBus.emit: Invalid event name');
+            return;
+        }
+        
         if (!EventBus._events[event]) return;
         
-        EventBus._events[event].forEach(callback => {
+        // Create a copy of listeners to avoid issues if listeners modify the array
+        const listeners = [...EventBus._events[event]];
+        
+        listeners.forEach(callback => {
             try {
                 callback(data);
             } catch (error) {
@@ -62,13 +100,29 @@ const EventBus = {
      * Subscribe to an event once (auto-unsubscribes after first emit)
      * @param {string} event - Event name
      * @param {Function} callback - Callback function
+     * @returns {Function} - Unsubscribe function
      */
     once: (event, callback) => {
+        if (!event || typeof event !== 'string') {
+            console.warn('EventBus.once: Invalid event name');
+            return () => {};
+        }
+        
+        if (typeof callback !== 'function') {
+            console.warn('EventBus.once: Callback must be a function');
+            return () => {};
+        }
+        
         const wrapper = (data) => {
             EventBus.off(event, wrapper);
-            callback(data);
+            try {
+                callback(data);
+            } catch (error) {
+                console.error(`EventBus: Error in once listener for "${event}":`, error);
+            }
         };
-        EventBus.on(event, wrapper);
+        
+        return EventBus.on(event, wrapper);
     },
     
     /**
@@ -76,7 +130,7 @@ const EventBus = {
      * @param {string} [event] - Optional event name
      */
     clear: (event) => {
-        if (event) {
+        if (event && typeof event === 'string') {
             delete EventBus._events[event];
         } else {
             EventBus._events = {};
@@ -95,7 +149,27 @@ const EventBus = {
      * @returns {number} - Number of listeners
      */
     listenerCount: (event) => {
+        if (!event || typeof event !== 'string') return 0;
         return EventBus._events[event]?.length || 0;
+    },
+    
+    /**
+     * Check if an event has listeners
+     * @param {string} event - Event name
+     * @returns {boolean}
+     */
+    hasListeners: (event) => {
+        return EventBus.listenerCount(event) > 0;
+    },
+    
+    /**
+     * Set max listeners per event
+     * @param {number} max - Maximum number of listeners
+     */
+    setMaxListeners: (max) => {
+        if (typeof max === 'number' && max > 0) {
+            EventBus._maxListeners = max;
+        }
     }
 };
 
@@ -132,7 +206,12 @@ EventBus.Events = {
     DATA_SYNCED: 'data:synced'
 };
 
+// Freeze events object to prevent accidental modification
+Object.freeze(EventBus.Events);
+
 // Export for global access
-window.EventBus = EventBus;
+if (typeof window !== 'undefined') {
+    window.EventBus = EventBus;
+}
 
 console.log('📢 EventBus loaded');

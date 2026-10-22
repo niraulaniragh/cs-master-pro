@@ -48,28 +48,57 @@ const PastPaperView = {
     },
     
     render: () => {
-        return `
-            <div class="past-paper-view">
-                <div class="pp-header">
-                    <h1>📝 Past Paper Practice</h1>
-                    <p>Practice with real IGCSE-style exam questions</p>
+        try {
+            return `
+                <div class="past-paper-view">
+                    <div class="pp-header">
+                        <h1>📝 Past Paper Practice</h1>
+                        <p>Practice with real IGCSE-style exam questions</p>
+                    </div>
+                    
+                    <div class="pp-content">
+                        ${PastPaperView.renderPaperSelection()}
+                    </div>
                 </div>
-                
-                <div class="pp-content">
-                    ${PastPaperView.renderPaperSelection()}
+            `;
+        } catch (error) {
+            console.error('PastPaperView render error:', error);
+            return `
+                <div class="past-paper-view">
+                    <div class="error-state">
+                        <span class="error-icon">⚠️</span>
+                        <h2>Unable to load Past Papers</h2>
+                        <p>Please try refreshing the page.</p>
+                        <button class="btn btn-primary" onclick="location.reload()">Refresh</button>
+                    </div>
                 </div>
-            </div>
-        `;
+            `;
+        }
     },
     
     init: () => {
         console.log('📝 Past Paper view initialized');
     },
     
+    cleanup: () => {
+        // Clear any running timer
+        if (PastPaperView.timerInterval) {
+            clearInterval(PastPaperView.timerInterval);
+            PastPaperView.timerInterval = null;
+        }
+        // Reset state
+        PastPaperView.currentPaper = null;
+        PastPaperView.currentQuestionIndex = 0;
+        PastPaperView.answers = [];
+        PastPaperView.timeRemaining = 0;
+        console.log('📝 Past Paper view cleanup');
+    },
+    
     renderPaperSelection: () => {
-        const stats = PastPaperView.getStats();
-        
-        return `
+        try {
+            const stats = PastPaperView.getStats();
+            
+            return `
             <div class="pp-selection">
                 <div class="pp-options">
                     <div class="pp-option-group">
@@ -132,21 +161,32 @@ const PastPaperView = {
                 </div>
             </div>
         `;
+        } catch (error) {
+            console.error('Error rendering paper selection:', error);
+            return '<div class="error-message">Failed to load papers</div>';
+        }
     },
     
     getTopicStats: () => {
-        const topics = {};
-        
-        Object.values(PastPaperView.papers).forEach(paper => {
-            paper.questions.forEach(q => {
-                if (!topics[q.topic]) {
-                    topics[q.topic] = { id: q.topic, name: PastPaperView.formatTopicName(q.topic), count: 0 };
+        try {
+            const topics = {};
+            
+            Object.values(PastPaperView.papers || {}).forEach(paper => {
+                if (Array.isArray(paper.questions)) {
+                    paper.questions.forEach(q => {
+                        if (!topics[q.topic]) {
+                            topics[q.topic] = { id: q.topic, name: PastPaperView.formatTopicName(q.topic), count: 0 };
+                        }
+                        topics[q.topic].count++;
+                    });
                 }
-                topics[q.topic].count++;
             });
-        });
-        
-        return Object.values(topics).sort((a, b) => b.count - a.count);
+            
+            return Object.values(topics).sort((a, b) => b.count - a.count);
+        } catch (error) {
+            console.error('Error getting topic stats:', error);
+            return [];
+        }
     },
     
     formatTopicName: (id) => {

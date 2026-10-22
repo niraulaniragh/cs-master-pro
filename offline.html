@@ -5,46 +5,110 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Offline - CS Master Pro</title>
     <style>
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --accent: #10b981;
+            --accent-hover: #059669;
+            --accent-glow: rgba(16, 185, 129, 0.4);
+            --danger: #f85149;
+            --warning: #d29922;
+            --info: #58a6ff;
+        }
+        
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
-            font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
-            background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
-            color: #e6edf3;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            color: var(--text-primary);
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             padding: 20px;
-        }
-        .offline-container {
-            text-align: center;
-            max-width: 400px;
-        }
-        .offline-icon {
-            font-size: 80px;
-            margin-bottom: 20px;
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.1); opacity: 0.8; }
-        }
-        h1 {
-            font-size: 28px;
-            margin-bottom: 10px;
-            background: linear-gradient(135deg, #10b981, #06b6d4);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        p {
-            color: #8b949e;
-            margin-bottom: 30px;
             line-height: 1.6;
         }
+        
+        .offline-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        /* Header Section */
+        .offline-header {
+            text-align: center;
+            padding: 40px 20px;
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            border: 1px solid var(--bg-tertiary);
+            margin-bottom: 24px;
+        }
+        
+        .offline-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+        }
+        
+        .offline-header h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--accent), #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .offline-header p {
+            color: var(--text-secondary);
+            max-width: 400px;
+            margin: 0 auto 24px;
+        }
+        
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(248, 81, 73, 0.1);
+            border: 1px solid rgba(248, 81, 73, 0.3);
+            border-radius: 20px;
+            font-size: 14px;
+            color: var(--danger);
+            margin-bottom: 20px;
+        }
+        
+        .status-indicator.online {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.3);
+            color: var(--accent);
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+            animation: blink 1.5s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        
         .btn {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
             padding: 12px 24px;
-            background: linear-gradient(135deg, #10b981, #059669);
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
             color: white;
             border: none;
             border-radius: 8px;
@@ -54,45 +118,658 @@
             text-decoration: none;
             transition: all 0.3s ease;
         }
+        
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
+            box-shadow: 0 4px 20px var(--accent-glow);
         }
-        .tip {
-            margin-top: 40px;
-            padding: 20px;
-            background: rgba(16, 185, 129, 0.1);
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--bg-secondary);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        /* Cached Content Section */
+        .section {
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            border: 1px solid var(--bg-tertiary);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        
+        .section h2 {
+            font-size: 18px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .section h2 .icon {
+            font-size: 20px;
+        }
+        
+        /* Flashcards */
+        .flashcard-container {
+            display: none;
+        }
+        
+        .flashcard-container.active {
+            display: block;
+        }
+        
+        .flashcard {
+            background: var(--bg-tertiary);
             border-radius: 12px;
+            padding: 32px 24px;
+            text-align: center;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            transform-style: preserve-3d;
+        }
+        
+        .flashcard:hover {
+            background: rgba(16, 185, 129, 0.05);
             border: 1px solid rgba(16, 185, 129, 0.2);
         }
-        .tip h3 {
-            color: #10b981;
-            margin-bottom: 10px;
+        
+        .flashcard.flipped .flashcard-front {
+            opacity: 0;
+            transform: rotateX(90deg);
         }
-        .tip p {
-            margin: 0;
+        
+        .flashcard.flipped .flashcard-back {
+            opacity: 1;
+            transform: rotateX(0deg);
+        }
+        
+        .flashcard-front, .flashcard-back {
+            transition: all 0.3s ease;
+        }
+        
+        .flashcard-back {
+            opacity: 0;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translateX(-50%) translateY(-50%) rotateX(-90deg);
+            width: calc(100% - 48px);
+        }
+        
+        .flashcard-question {
+            font-size: 18px;
+            font-weight: 500;
+            margin-bottom: 12px;
+        }
+        
+        .flashcard-answer {
+            font-size: 16px;
+            color: var(--accent);
+        }
+        
+        .flashcard-hint {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-top: 16px;
+        }
+        
+        .flashcard-controls {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        
+        .flashcard-controls button {
+            padding: 8px 16px;
             font-size: 14px;
         }
+        
+        .flashcard-progress {
+            text-align: center;
+            margin-top: 12px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+        
+        /* Quick Tips */
+        .tips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+        
+        .tip-card {
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            padding: 16px;
+            border-left: 3px solid var(--accent);
+        }
+        
+        .tip-card h4 {
+            font-size: 14px;
+            color: var(--accent);
+            margin-bottom: 8px;
+        }
+        
+        .tip-card p {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        
+        /* Cached Pages List */
+        .cached-pages {
+            display: none;
+        }
+        
+        .cached-pages.has-pages {
+            display: block;
+        }
+        
+        .page-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .page-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+        }
+        
+        .page-item:hover {
+            background: rgba(16, 185, 129, 0.1);
+            transform: translateX(4px);
+        }
+        
+        .page-item .icon {
+            font-size: 18px;
+        }
+        
+        .page-item .title {
+            flex: 1;
+        }
+        
+        .page-item .arrow {
+            color: var(--text-secondary);
+        }
+        
+        /* Cache Status */
+        .cache-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+        }
+        
+        .stat-box {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+        }
+        
+        .stat-box .value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        
+        .stat-box .label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 600px) {
+            .offline-header {
+                padding: 30px 16px;
+            }
+            
+            .offline-header h1 {
+                font-size: 24px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .tips-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Loading state */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+        
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid var(--bg-tertiary);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 12px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
     </style>
+    
+    <!-- Preconnect to Google Fonts in case we come back online -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
 </head>
 <body>
     <div class="offline-container">
-        <div class="offline-icon">📡</div>
-        <h1>You're Offline</h1>
-        <p>It looks like you've lost your internet connection. Don't worry - your progress is saved locally!</p>
-        <button class="btn" onclick="window.location.reload()">Try Again</button>
+        <!-- Header -->
+        <header class="offline-header">
+            <div class="offline-icon">📡</div>
+            <h1>You're Offline</h1>
+            <p>Don't worry! Your progress is saved locally, and you can still study with cached content.</p>
+            
+            <div class="status-indicator" id="status-indicator">
+                <span class="status-dot"></span>
+                <span id="status-text">No internet connection</span>
+            </div>
+            
+            <div class="button-group">
+                <button class="btn" onclick="tryReconnect()">
+                    🔄 Try Again
+                </button>
+                <button class="btn btn-secondary" onclick="goHome()">
+                    🏠 Go Home
+                </button>
+            </div>
+        </header>
         
-        <div class="tip">
-            <h3>💡 Study Tip</h3>
-            <p>While offline, try reviewing your notes on paper or testing yourself on key concepts you've learned!</p>
-        </div>
+        <!-- Offline Flashcards -->
+        <section class="section">
+            <h2><span class="icon">🎴</span> Quick Review Flashcards</h2>
+            <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 16px;">
+                Click a card to reveal the answer. Keep your learning going even offline!
+            </p>
+            
+            <div class="flashcard-container active" id="flashcard-container">
+                <div class="flashcard" id="flashcard" onclick="flipCard()">
+                    <div class="flashcard-front">
+                        <div class="flashcard-question" id="flashcard-question">Loading...</div>
+                        <div class="flashcard-hint">Click to reveal answer</div>
+                    </div>
+                    <div class="flashcard-back">
+                        <div class="flashcard-answer" id="flashcard-answer"></div>
+                    </div>
+                </div>
+                
+                <div class="flashcard-controls">
+                    <button class="btn btn-secondary" onclick="prevCard()">← Previous</button>
+                    <button class="btn" onclick="nextCard()">Next →</button>
+                </div>
+                
+                <div class="flashcard-progress">
+                    Card <span id="current-card">1</span> of <span id="total-cards">10</span>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Cached Pages -->
+        <section class="section cached-pages" id="cached-pages">
+            <h2><span class="icon">📚</span> Available Offline</h2>
+            <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 16px;">
+                These pages were cached during your last visit and are available offline.
+            </p>
+            <div class="page-list" id="page-list">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    Checking cached content...
+                </div>
+            </div>
+        </section>
+        
+        <!-- Study Tips -->
+        <section class="section">
+            <h2><span class="icon">💡</span> Offline Study Tips</h2>
+            <div class="tips-grid">
+                <div class="tip-card">
+                    <h4>📝 Write It Down</h4>
+                    <p>Practice writing algorithms and pseudocode on paper - it improves memory retention!</p>
+                </div>
+                <div class="tip-card">
+                    <h4>🧠 Mental Review</h4>
+                    <p>Close your eyes and try to recall the key concepts from each topic you've studied.</p>
+                </div>
+                <div class="tip-card">
+                    <h4>🎯 Focus Areas</h4>
+                    <p>Use this time to identify topics you're less confident about for focused review later.</p>
+                </div>
+                <div class="tip-card">
+                    <h4>💬 Teach Someone</h4>
+                    <p>Explaining concepts to others (or even yourself!) is one of the best ways to learn.</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Cache Status -->
+        <section class="section">
+            <h2><span class="icon">📊</span> Cache Status</h2>
+            <div class="cache-stats" id="cache-stats">
+                <div class="stat-box">
+                    <div class="value" id="cache-entries">-</div>
+                    <div class="label">Cached Items</div>
+                </div>
+                <div class="stat-box">
+                    <div class="value" id="cache-size">-</div>
+                    <div class="label">Storage Used</div>
+                </div>
+                <div class="stat-box">
+                    <div class="value" id="sw-version">-</div>
+                    <div class="label">App Version</div>
+                </div>
+            </div>
+        </section>
     </div>
     
     <script>
-        // Auto-reload when back online
-        window.addEventListener('online', () => {
-            window.location.reload();
+        // Offline flashcards - computer science fundamentals
+        const flashcards = [
+            { q: "What does CPU stand for?", a: "Central Processing Unit - the 'brain' of the computer that executes instructions" },
+            { q: "What is RAM?", a: "Random Access Memory - volatile memory for temporary data storage while programs run" },
+            { q: "What is the purpose of secondary storage?", a: "To store data permanently (non-volatile), even when power is off" },
+            { q: "Name the three types of buses in a computer", a: "Data bus, Address bus, and Control bus" },
+            { q: "What is an algorithm?", a: "A step-by-step set of instructions to solve a problem or complete a task" },
+            { q: "What does HTML stand for?", a: "HyperText Markup Language - used to structure web pages" },
+            { q: "What is binary?", a: "A number system using only 0 and 1 (base 2), used by computers" },
+            { q: "What is a variable in programming?", a: "A named storage location that holds a value which can change during execution" },
+            { q: "What is the difference between ROM and RAM?", a: "ROM is non-volatile and read-only; RAM is volatile and read-write" },
+            { q: "What is iteration in programming?", a: "Repeating a set of instructions (loops) - e.g., FOR, WHILE, REPEAT-UNTIL" },
+            { q: "What is selection in programming?", a: "Making decisions using conditions - e.g., IF-THEN-ELSE statements" },
+            { q: "What is 1010 in binary equal to in decimal?", a: "10 (8 + 0 + 2 + 0 = 10)" },
+            { q: "What is a compiler?", a: "Translates entire source code into machine code before execution" },
+            { q: "What is an interpreter?", a: "Translates and executes code line by line" },
+            { q: "What does ASCII stand for?", a: "American Standard Code for Information Interchange - character encoding standard" },
+            { q: "What is a subnet mask used for?", a: "To divide an IP address into network and host portions" },
+            { q: "Name two input devices", a: "Examples: Keyboard, Mouse, Scanner, Microphone, Webcam" },
+            { q: "Name two output devices", a: "Examples: Monitor, Printer, Speakers, Projector" },
+            { q: "What is an SSD?", a: "Solid State Drive - storage device using flash memory, faster than HDD" },
+            { q: "What is encryption?", a: "Converting data into a coded format to prevent unauthorized access" }
+        ];
+        
+        let currentCardIndex = 0;
+        let isFlipped = false;
+        
+        // Initialize flashcards
+        function initFlashcards() {
+            showCard(currentCardIndex);
+            document.getElementById('total-cards').textContent = flashcards.length;
+        }
+        
+        function showCard(index) {
+            const card = flashcards[index];
+            document.getElementById('flashcard-question').textContent = card.q;
+            document.getElementById('flashcard-answer').textContent = card.a;
+            document.getElementById('current-card').textContent = index + 1;
+            
+            // Reset flip state
+            isFlipped = false;
+            document.getElementById('flashcard').classList.remove('flipped');
+        }
+        
+        function flipCard() {
+            isFlipped = !isFlipped;
+            document.getElementById('flashcard').classList.toggle('flipped', isFlipped);
+        }
+        
+        function nextCard() {
+            currentCardIndex = (currentCardIndex + 1) % flashcards.length;
+            showCard(currentCardIndex);
+        }
+        
+        function prevCard() {
+            currentCardIndex = (currentCardIndex - 1 + flashcards.length) % flashcards.length;
+            showCard(currentCardIndex);
+        }
+        
+        // Network status monitoring
+        function updateNetworkStatus() {
+            const indicator = document.getElementById('status-indicator');
+            const statusText = document.getElementById('status-text');
+            
+            if (navigator.onLine) {
+                indicator.classList.add('online');
+                statusText.textContent = 'Connection restored!';
+                
+                // Auto-reload after a short delay
+                setTimeout(() => {
+                    window.location.href = '/cs-master-pro/';
+                }, 1500);
+            } else {
+                indicator.classList.remove('online');
+                statusText.textContent = 'No internet connection';
+            }
+        }
+        
+        // Try to reconnect
+        function tryReconnect() {
+            const btn = event.target;
+            btn.disabled = true;
+            btn.innerHTML = '🔄 Checking...';
+            
+            // Test connection by fetching a small resource
+            fetch('/cs-master-pro/manifest.json', { cache: 'no-store' })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.href = '/cs-master-pro/';
+                    } else {
+                        throw new Error('Not OK');
+                    }
+                })
+                .catch(() => {
+                    btn.innerHTML = '❌ Still Offline';
+                    setTimeout(() => {
+                        btn.disabled = false;
+                        btn.innerHTML = '🔄 Try Again';
+                    }, 2000);
+                });
+        }
+        
+        // Go home
+        function goHome() {
+            window.location.href = '/cs-master-pro/';
+        }
+        
+        // Check cached pages
+        async function checkCachedContent() {
+            const pageList = document.getElementById('page-list');
+            const section = document.getElementById('cached-pages');
+            
+            try {
+                const cacheNames = await caches.keys();
+                const currentCache = cacheNames.find(name => name.startsWith('csmaster-'));
+                
+                if (!currentCache) {
+                    pageList.innerHTML = '<p style="color: var(--text-secondary);">No cached content found.</p>';
+                    return;
+                }
+                
+                const cache = await caches.open(currentCache);
+                const requests = await cache.keys();
+                
+                // Filter for HTML pages
+                const pages = requests
+                    .filter(req => {
+                        const url = new URL(req.url);
+                        return url.pathname.endsWith('.html') || 
+                               url.pathname.endsWith('/') ||
+                               !url.pathname.includes('.');
+                    })
+                    .map(req => {
+                        const url = new URL(req.url);
+                        let title = url.pathname.split('/').pop() || 'Home';
+                        title = title.replace('.html', '').replace(/-/g, ' ');
+                        title = title.charAt(0).toUpperCase() + title.slice(1);
+                        
+                        return {
+                            url: req.url,
+                            title: title || 'Home',
+                            icon: getPageIcon(url.pathname)
+                        };
+                    });
+                
+                if (pages.length === 0) {
+                    section.classList.remove('has-pages');
+                    return;
+                }
+                
+                section.classList.add('has-pages');
+                pageList.innerHTML = pages.map(page => `
+                    <a href="${page.url}" class="page-item">
+                        <span class="icon">${page.icon}</span>
+                        <span class="title">${page.title}</span>
+                        <span class="arrow">→</span>
+                    </a>
+                `).join('');
+                
+            } catch (error) {
+                console.error('Error checking cache:', error);
+                pageList.innerHTML = '<p style="color: var(--text-secondary);">Could not check cached content.</p>';
+            }
+        }
+        
+        function getPageIcon(pathname) {
+            if (pathname.includes('learn')) return '📖';
+            if (pathname.includes('practice')) return '🧠';
+            if (pathname.includes('games')) return '🎮';
+            if (pathname.includes('tools')) return '🔧';
+            if (pathname.includes('playground')) return '💻';
+            return '📄';
+        }
+        
+        // Get cache statistics
+        async function getCacheStats() {
+            try {
+                // Try to communicate with service worker
+                if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                    const messageChannel = new MessageChannel();
+                    
+                    const statsPromise = new Promise((resolve, reject) => {
+                        messageChannel.port1.onmessage = (event) => {
+                            resolve(event.data);
+                        };
+                        setTimeout(() => reject(new Error('Timeout')), 3000);
+                    });
+                    
+                    navigator.serviceWorker.controller.postMessage(
+                        { type: 'GET_CACHE_STATS' },
+                        [messageChannel.port2]
+                    );
+                    
+                    const stats = await statsPromise;
+                    
+                    document.getElementById('cache-entries').textContent = stats.totalEntries || '-';
+                    document.getElementById('cache-size').textContent = stats.totalSize || '-';
+                    document.getElementById('sw-version').textContent = stats.version?.slice(0, 8) || '-';
+                    return;
+                }
+                
+                // Fallback: Count cache entries manually
+                const cacheNames = await caches.keys();
+                let totalEntries = 0;
+                
+                for (const name of cacheNames) {
+                    if (name.startsWith('csmaster-')) {
+                        const cache = await caches.open(name);
+                        const keys = await cache.keys();
+                        totalEntries += keys.length;
+                        
+                        // Extract version from cache name
+                        const version = name.replace('csmaster-v', '');
+                        document.getElementById('sw-version').textContent = version.slice(0, 8);
+                    }
+                }
+                
+                document.getElementById('cache-entries').textContent = totalEntries;
+                document.getElementById('cache-size').textContent = 'N/A';
+                
+            } catch (error) {
+                console.error('Error getting cache stats:', error);
+            }
+        }
+        
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            switch (e.key) {
+                case 'ArrowRight':
+                case ' ':
+                    if (!e.target.matches('button')) {
+                        e.preventDefault();
+                        if (isFlipped) {
+                            nextCard();
+                        } else {
+                            flipCard();
+                        }
+                    }
+                    break;
+                case 'ArrowLeft':
+                    prevCard();
+                    break;
+                case 'Enter':
+                    flipCard();
+                    break;
+            }
         });
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            initFlashcards();
+            checkCachedContent();
+            getCacheStats();
+            updateNetworkStatus();
+        });
+        
+        // Listen for online/offline events
+        window.addEventListener('online', updateNetworkStatus);
+        window.addEventListener('offline', updateNetworkStatus);
     </script>
 </body>
 </html>

@@ -39,7 +39,12 @@ const PracticeView = {
     keyboardHandler: null,
 
     render: () => {
-        return `
+        try {
+            const topicOptions = typeof TOPICS !== 'undefined' && Array.isArray(TOPICS) 
+                ? TOPICS.map(t => `<option value="${t.id}">${t.icon} ${t.name}</option>`).join('')
+                : '';
+            
+            return `
             <div class="practice-view">
                 <div class="practice-tabs">
                     <button class="tab-btn active" data-mode="quiz" onclick="PracticeView.switchMode('quiz')">
@@ -63,7 +68,7 @@ const PracticeView = {
                             <label>Topic</label>
                             <select id="topic-select" onchange="PracticeView.selectedTopic = this.value">
                                 <option value="all">All Topics</option>
-                                ${TOPICS.map(t => `<option value="${t.id}">${t.icon} ${t.name}</option>`).join('')}
+                                ${topicOptions}
                             </select>
                         </div>
                         
@@ -93,7 +98,7 @@ const PracticeView = {
                             <label>Topic</label>
                             <select id="flashcard-topic-select" onchange="PracticeView.selectedTopic = this.value">
                                 <option value="all">All Topics</option>
-                                ${TOPICS.map(t => `<option value="${t.id}">${t.icon} ${t.name}</option>`).join('')}
+                                ${topicOptions}
                             </select>
                         </div>
                     </div>
@@ -120,7 +125,7 @@ const PracticeView = {
                             <label>Topic</label>
                             <select id="pastpaper-topic-select" onchange="PracticeView.selectedTopic = this.value">
                                 <option value="all">All Topics</option>
-                                ${TOPICS.map(t => `<option value="${t.id}">${t.icon} ${t.name}</option>`).join('')}
+                                ${topicOptions}
                             </select>
                         </div>
                     </div>
@@ -251,6 +256,19 @@ const PracticeView = {
                 </div>
             </div>
         `;
+        } catch (error) {
+            console.error('PracticeView render error:', error);
+            return `
+                <div class="practice-view">
+                    <div class="error-state">
+                        <span class="error-icon">⚠️</span>
+                        <h2>Unable to load Practice Mode</h2>
+                        <p>Please try refreshing the page.</p>
+                        <button class="btn btn-primary" onclick="location.reload()">Refresh</button>
+                    </div>
+                </div>
+            `;
+        }
     },
 
     init: () => {
@@ -264,17 +282,30 @@ const PracticeView = {
         
         // Update flashcard count based on topic
         setTimeout(() => {
-            const totalEl = document.getElementById('total-flashcards');
-            if (totalEl) {
-                totalEl.textContent = typeof FLASHCARDS !== 'undefined' ? FLASHCARDS.length : 0;
+            try {
+                const totalEl = document.getElementById('total-flashcards');
+                if (totalEl) {
+                    const count = typeof FLASHCARDS !== 'undefined' && Array.isArray(FLASHCARDS) ? FLASHCARDS.length : 0;
+                    totalEl.textContent = count;
+                }
+            } catch (e) {
+                console.error('Error updating flashcard count:', e);
             }
         }, 100);
     },
     
     // Clean up when leaving the view
     cleanup: () => {
+        // Remove keyboard listener
         PracticeView.removeKeyboardNavigation();
+        // Remove swipe gesture listeners
         PracticeView.removeSwipeGestures();
+        // Reset state
+        PracticeView.isActive = false;
+        PracticeView.hasAnswered = false;
+        PracticeView.questions = [];
+        PracticeView.flashcards = [];
+        console.log('🎯 Practice view cleanup');
     },
     
     // ==================== KEYBOARD NAVIGATION ====================
@@ -513,52 +544,86 @@ const PracticeView = {
 
     // ==================== QUIZ MODE ====================
     startQuiz: () => {
-        const count = parseInt(document.getElementById('count-select').value);
-        PracticeView.questions = getRandomQuestions(count, PracticeView.selectedTopic);
-        PracticeView.currentIndex = 0;
-        PracticeView.score = 0;
-        PracticeView.streak = 0;
-        PracticeView.answers = [];
-        PracticeView.isActive = true;
-        PracticeView.hasAnswered = false;
+        try {
+            if (typeof getRandomQuestions !== 'function') {
+                Toast.show('Quiz system not available', 'error');
+                return;
+            }
+            
+            const count = parseInt(document.getElementById('count-select')?.value) || 10;
+            PracticeView.questions = getRandomQuestions(count, PracticeView.selectedTopic);
+            
+            if (!PracticeView.questions || PracticeView.questions.length === 0) {
+                Toast.show('No questions available for this topic', 'warning');
+                return;
+            }
+            
+            PracticeView.currentIndex = 0;
+            PracticeView.score = 0;
+            PracticeView.streak = 0;
+            PracticeView.answers = [];
+            PracticeView.isActive = true;
+            PracticeView.hasAnswered = false;
 
-        document.getElementById('practice-setup').classList.add('hidden');
-        document.getElementById('quiz-container').classList.remove('hidden');
+            document.getElementById('practice-setup')?.classList.add('hidden');
+            document.getElementById('quiz-container')?.classList.remove('hidden');
 
-        PracticeView.showQuestion();
-        PracticeView.announce(`Quiz started. Question 1 of ${count}.`);
+            PracticeView.showQuestion();
+            PracticeView.announce(`Quiz started. Question 1 of ${PracticeView.questions.length}.`);
+        } catch (error) {
+            console.error('Error starting quiz:', error);
+            Toast.show('Failed to start quiz. Please try again.', 'error');
+        }
     },
 
     showQuestion: () => {
-        const q = PracticeView.questions[PracticeView.currentIndex];
-        const total = PracticeView.questions.length;
-        const progress = ((PracticeView.currentIndex + 1) / total) * 100;
-        PracticeView.hasAnswered = false;
+        try {
+            const q = PracticeView.questions[PracticeView.currentIndex];
+            if (!q) {
+                console.error('Question not found at index', PracticeView.currentIndex);
+                return;
+            }
+            
+            const total = PracticeView.questions.length;
+            const progress = ((PracticeView.currentIndex + 1) / total) * 100;
+            PracticeView.hasAnswered = false;
 
-        document.getElementById('quiz-progress-text').textContent = `${PracticeView.currentIndex + 1} / ${total}`;
-        document.getElementById('quiz-progress-bar').style.width = `${progress}%`;
+            const progressText = document.getElementById('quiz-progress-text');
+            const progressBar = document.getElementById('quiz-progress-bar');
+            if (progressText) progressText.textContent = `${PracticeView.currentIndex + 1} / ${total}`;
+            if (progressBar) progressBar.style.width = `${progress}%`;
 
-        const topic = getTopicById(q.topic);
-        const shuffledOptions = q.options.map((opt, i) => ({ text: opt, originalIndex: i }));
-        Helpers.shuffle(shuffledOptions);
+            const topic = typeof getTopicById === 'function' ? getTopicById(q.topic) : null;
+            const options = Array.isArray(q.options) ? q.options : [];
+            const shuffledOptions = options.map((opt, i) => ({ text: opt, originalIndex: i }));
+            if (typeof Helpers !== 'undefined' && Helpers.shuffle) {
+                Helpers.shuffle(shuffledOptions);
+            }
 
-        document.getElementById('question-card').innerHTML = `
-            <div class="question-topic" style="color: ${topic?.color || '#888'}">
-                ${topic?.icon || '📝'} ${topic?.name || 'General'}
-            </div>
-            <h3 class="question-text">${q.question}</h3>
-            <div class="options-list" role="group" aria-label="Answer options">
-                ${shuffledOptions.map((opt, i) => `
-                    <button class="option-btn" onclick="PracticeView.selectAnswer(${opt.originalIndex}, this)" aria-label="Option ${String.fromCharCode(65 + i)}: ${opt.text}">
-                        <span class="option-letter">${String.fromCharCode(65 + i)}</span>
-                        <span class="option-text">${opt.text}</span>
-                    </button>
-                `).join('')}
-            </div>
-            <div class="quiz-keyboard-hint">
-                Press <kbd>1</kbd>-<kbd>4</kbd> or <kbd>A</kbd>-<kbd>D</kbd> to select • <kbd>Enter</kbd> to continue
-            </div>
-        `;
+            const questionCard = document.getElementById('question-card');
+            if (questionCard) {
+                questionCard.innerHTML = `
+                    <div class="question-topic" style="color: ${topic?.color || '#888'}">
+                        ${topic?.icon || '📝'} ${topic?.name || 'General'}
+                    </div>
+                    <h3 class="question-text">${q.question || 'Question not available'}</h3>
+                    <div class="options-list" role="group" aria-label="Answer options">
+                        ${shuffledOptions.map((opt, i) => `
+                            <button class="option-btn" onclick="PracticeView.selectAnswer(${opt.originalIndex}, this)" aria-label="Option ${String.fromCharCode(65 + i)}: ${opt.text}">
+                                <span class="option-letter">${String.fromCharCode(65 + i)}</span>
+                                <span class="option-text">${opt.text}</span>
+                            </button>
+                        `).join('')}
+                    </div>
+                    <div class="quiz-keyboard-hint">
+                        Press <kbd>1</kbd>-<kbd>4</kbd> or <kbd>A</kbd>-<kbd>D</kbd> to select • <kbd>Enter</kbd> to continue
+                    </div>
+                `;
+            }
+        } catch (error) {
+            console.error('Error showing question:', error);
+            Toast.show('Error displaying question', 'error');
+        }
     },
 
     selectAnswer: (answerIndex, buttonEl) => {

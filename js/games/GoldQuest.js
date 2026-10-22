@@ -39,12 +39,12 @@ const GoldQuest = {
     startAsPlayer: (game) => { GoldQuest.open(); },
 
     close: () => {
+        GoldQuest.cleanup();
         const modal = document.getElementById('goldquest-modal');
         if (modal) {
             modal.classList.remove('active');
             setTimeout(() => modal.remove(), 300);
         }
-        GoldQuest.isPlaying = false;
     },
 
     renderMenu: () => {
@@ -205,6 +205,12 @@ const GoldQuest = {
     },
     
     openShop: () => {
+        // Check if Modal is available
+        if (typeof Modal === 'undefined' || !Modal.show) {
+            Toast?.show?.('Shop not available', 'warning');
+            return;
+        }
+        
         const eq = GoldQuest.equipment;
         const costs = GoldQuest.upgradeCosts;
         
@@ -286,6 +292,13 @@ const GoldQuest = {
     cleanup: () => {
         // Stop game
         GoldQuest.isPlaying = false;
+        // Reset state
+        GoldQuest.questions = [];
+        GoldQuest.currentQuestion = null;
+        GoldQuest.currentQuestionIndex = 0;
+        GoldQuest.gold = 0;
+        GoldQuest.mineDepth = 0;
+        GoldQuest.consecutiveCorrect = 0;
         console.log('⛏️ GoldQuest cleanup');
     }
 };

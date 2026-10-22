@@ -33,12 +33,12 @@ const Factory = {
     startAsPlayer: (game) => { Factory.open(); },
 
     close: () => {
+        Factory.cleanup();
         const modal = document.getElementById('factory-modal');
         if (modal) {
             modal.classList.remove('active');
             setTimeout(() => modal.remove(), 300);
         }
-        Factory.isPlaying = false;
     },
 
     renderMenu: () => {
@@ -238,6 +238,12 @@ const Factory = {
     },
     
     openUpgrades: () => {
+        // Check if Modal is available
+        if (typeof Modal === 'undefined' || !Modal.show) {
+            Toast?.show?.('Upgrade menu not available', 'warning');
+            return;
+        }
+        
         const stats = Factory.getStats();
         const workers = stats.workers || 1;
         const machines = stats.machines || 1;
@@ -358,6 +364,12 @@ const Factory = {
     cleanup: () => {
         // Stop game
         Factory.isPlaying = false;
+        // Reset state
+        Factory.questions = [];
+        Factory.currentQuestion = null;
+        Factory.currentQuestionIndex = 0;
+        Factory.products = 0;
+        Factory.money = 0;
         console.log('🏭 Factory cleanup');
     }
 };

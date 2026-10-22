@@ -15,6 +15,8 @@ const TowerDefense = {
     towers: [],
     enemies: [],
     waveInProgress: false,
+    questionActive: false,
+    waveLoopTimer: null,
     
     towerTypes: {
         basic: { name: 'Code Tower', cost: 25, damage: 10, icon: '🗼', color: '#3b82f6' },
@@ -43,13 +45,12 @@ const TowerDefense = {
     startAsPlayer: (game) => { TowerDefense.open(); },
 
     close: () => {
+        TowerDefense.cleanup();
         const modal = document.getElementById('td-modal');
         if (modal) {
             modal.classList.remove('active');
             setTimeout(() => modal.remove(), 300);
         }
-        TowerDefense.isPlaying = false;
-        TowerDefense.waveInProgress = false;
     },
 
     renderMenu: () => {
@@ -257,7 +258,8 @@ const TowerDefense = {
                 if (enemy.position >= 100) {
                     TowerDefense.health -= 10;
                     enemy.health = 0;
-                    document.getElementById('td-health').textContent = TowerDefense.health;
+                    const healthEl = document.getElementById('td-health');
+                    if (healthEl) healthEl.textContent = TowerDefense.health;
                     
                     if (TowerDefense.health <= 0) {
                         TowerDefense.gameOver();
@@ -275,8 +277,10 @@ const TowerDefense = {
                 if (target.health <= 0) {
                     TowerDefense.gold += target.reward;
                     TowerDefense.score += target.reward;
-                    document.getElementById('td-gold').textContent = TowerDefense.gold;
-                    document.getElementById('td-score').textContent = TowerDefense.score;
+                    const goldEl = document.getElementById('td-gold');
+                    const scoreEl = document.getElementById('td-score');
+                    if (goldEl) goldEl.textContent = TowerDefense.gold;
+                    if (scoreEl) scoreEl.textContent = TowerDefense.score;
                 }
             }
         });
@@ -295,7 +299,10 @@ const TowerDefense = {
             TowerDefense.showQuestion();
         }
         
-        requestAnimationFrame(() => setTimeout(() => TowerDefense.waveLoop(), 100));
+        // Schedule next frame with proper timer tracking
+        TowerDefense.waveLoopTimer = setTimeout(() => {
+            requestAnimationFrame(() => TowerDefense.waveLoop());
+        }, 100);
     },
     
     renderEnemies: () => {
@@ -440,6 +447,16 @@ const TowerDefense = {
         TowerDefense.isPlaying = false;
         TowerDefense.waveInProgress = false;
         TowerDefense.questionActive = false;
+        // Clear any pending timers
+        if (TowerDefense.waveLoopTimer) {
+            clearTimeout(TowerDefense.waveLoopTimer);
+            TowerDefense.waveLoopTimer = null;
+        }
+        // Reset state
+        TowerDefense.towers = [];
+        TowerDefense.enemies = [];
+        TowerDefense.questions = [];
+        TowerDefense.currentQuestion = null;
         console.log('🏰 TowerDefense cleanup');
     }
 };

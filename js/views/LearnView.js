@@ -8,105 +8,138 @@ const LearnView = {
     currentSubtopic: null,
 
     render: () => {
-        return `
-            <div class="learn-view">
-                <div class="learn-sidebar">
-                    <div class="sidebar-header">
-                        <h3>📚 Topics</h3>
-                        <button class="search-mini-btn" onclick="SearchNotes.open()" title="Search Notes (Ctrl+K)">
-                            <i class="fas fa-search"></i>
-                        </button>
+        try {
+            const topics = typeof TOPICS !== 'undefined' && Array.isArray(TOPICS) ? TOPICS : [];
+            
+            return `
+                <div class="learn-view">
+                    <div class="learn-sidebar">
+                        <div class="sidebar-header">
+                            <h3>📚 Topics</h3>
+                            <button class="search-mini-btn" onclick="typeof SearchNotes !== 'undefined' && SearchNotes.open()" title="Search Notes (Ctrl+K)">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                        <div class="topic-list">
+                            ${topics.length === 0 ? `
+                                <p class="empty-topics">No topics available</p>
+                            ` : topics.map(topic => `
+                                <div class="topic-item ${LearnView.currentTopic === topic.id ? 'active' : ''}" 
+                                     style="--topic-color: ${topic.color || '#6b46c1'}"
+                                     onclick="LearnView.selectTopic('${topic.id}')">
+                                    <span class="topic-icon">${topic.icon || '📚'}</span>
+                                    <span class="topic-name">${topic.name || 'Unnamed'}</span>
+                                    <span class="topic-count">${Array.isArray(topic.subtopics) ? topic.subtopics.length : 0}</span>
+                                </div>
+                            `).join('')}
+                        </div>
                     </div>
-                    <div class="topic-list">
-                        ${TOPICS.map(topic => `
-                            <div class="topic-item ${LearnView.currentTopic === topic.id ? 'active' : ''}" 
-                                 style="--topic-color: ${topic.color}"
-                                 onclick="LearnView.selectTopic('${topic.id}')">
-                                <span class="topic-icon">${topic.icon}</span>
-                                <span class="topic-name">${topic.name}</span>
-                                <span class="topic-count">${topic.subtopics.length}</span>
+                    <div class="learn-content">
+                        <div class="subtopic-nav" id="subtopic-nav"></div>
+                        <div class="notes-container" id="notes-container">
+                            <div class="notes-placeholder">
+                                <span class="placeholder-icon">👈</span>
+                                <p>Select a topic from the sidebar to view revision notes</p>
                             </div>
-                        `).join('')}
-                    </div>
-                </div>
-                <div class="learn-content">
-                    <div class="subtopic-nav" id="subtopic-nav"></div>
-                    <div class="notes-container" id="notes-container">
-                        <div class="notes-placeholder">
-                            <span class="placeholder-icon">👈</span>
-                            <p>Select a topic from the sidebar to view revision notes</p>
                         </div>
                     </div>
                 </div>
-            </div>
-        `;
+            `;
+        } catch (error) {
+            console.error('LearnView render error:', error);
+            return `
+                <div class="learn-view">
+                    <div class="error-state">
+                        <span class="error-icon">⚠️</span>
+                        <h2>Unable to load Learn Mode</h2>
+                        <p>Please try refreshing the page.</p>
+                        <button class="btn btn-primary" onclick="location.reload()">Refresh</button>
+                    </div>
+                </div>
+            `;
+        }
     },
 
     init: () => {
         console.log('📚 Learn view initialized');
-        if (LearnView.currentTopic) {
-            LearnView.selectTopic(LearnView.currentTopic);
+        try {
+            if (LearnView.currentTopic) {
+                LearnView.selectTopic(LearnView.currentTopic);
+            }
+        } catch (error) {
+            console.error('Error initializing LearnView:', error);
         }
     },
 
     cleanup: () => {
-        // No intervals or event listeners to clean up
         console.log('📚 Learn view cleanup');
     },
 
     selectTopic: (topicId) => {
-        LearnView.currentTopic = topicId;
-        LearnView.currentSubtopic = null;
+        try {
+            if (!topicId) return;
+            
+            LearnView.currentTopic = topicId;
+            LearnView.currentSubtopic = null;
 
-        // Update active state with animation
-        document.querySelectorAll('.topic-item').forEach(item => {
-            item.classList.remove('active');
-        });
-        const activeItem = document.querySelector(`.topic-item[onclick*="${topicId}"]`);
-        if (activeItem) {
-            activeItem.classList.add('active');
+            // Update active state with animation
+            document.querySelectorAll('.topic-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            const activeItem = document.querySelector(`.topic-item[onclick*="${topicId}"]`);
+            if (activeItem) {
+                activeItem.classList.add('active');
+            }
+
+            // Get topic data
+            const topic = typeof getTopicById === 'function' ? getTopicById(topicId) : null;
+            const topicNotes = (typeof NOTES !== 'undefined' && NOTES) ? NOTES[topicId] : {};
+            const subtopics = Object.keys(topicNotes || {});
+
+            // Render subtopic navigation with print button
+            const subtopicNav = document.getElementById('subtopic-nav');
+            if (subtopicNav) {
+                subtopicNav.innerHTML = `
+                    <div class="subtopic-header">
+                        <div class="subtopic-title">
+                            <span class="topic-icon" style="color: ${topic?.color || '#6b46c1'}">${topic?.icon || '📚'}</span>
+                            <h2>${topic?.name || 'Topic'}</h2>
+                        </div>
+                        <div class="subtopic-actions">
+                            <button class="btn btn-small btn-secondary" onclick="LearnView.printNotes()" title="Print Notes">
+                                <i class="fas fa-print"></i> Print
+                            </button>
+                        </div>
+                    </div>
+                    <div class="subtopic-tabs">
+                        ${subtopics.map((sub, i) => `
+                            <button class="subtopic-tab ${i === 0 ? 'active' : ''}" 
+                                    onclick="LearnView.selectSubtopic('${sub}')">${sub}</button>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            // Show first subtopic
+            if (subtopics.length > 0) {
+                LearnView.selectSubtopic(subtopics[0]);
+            } else {
+                const notesContainer = document.getElementById('notes-container');
+                if (notesContainer) {
+                    notesContainer.innerHTML = `
+                        <div class="notes-placeholder">
+                            <p>Notes coming soon for ${topic?.name || 'this topic'}!</p>
+                        </div>
+                    `;
+                }
+            }
+
+            // Track progress
+            LearnView.trackTopicRead(topicId);
+        } catch (error) {
+            console.error('Error selecting topic:', error);
+            Toast.show('Error loading topic', 'error');
         }
-
-        // Get topic data
-        const topic = getTopicById(topicId);
-        const topicNotes = NOTES[topicId] || {};
-        const subtopics = Object.keys(topicNotes);
-
-        // Render subtopic navigation with print button
-        const subtopicNav = document.getElementById('subtopic-nav');
-        subtopicNav.innerHTML = `
-            <div class="subtopic-header">
-                <div class="subtopic-title">
-                    <span class="topic-icon" style="color: ${topic.color}">${topic.icon}</span>
-                    <h2>${topic.name}</h2>
-                </div>
-                <div class="subtopic-actions">
-                    <button class="btn btn-small btn-secondary" onclick="LearnView.printNotes()" title="Print Notes">
-                        <i class="fas fa-print"></i> Print
-                    </button>
-                </div>
-            </div>
-            <div class="subtopic-tabs">
-                ${subtopics.map((sub, i) => `
-                    <button class="subtopic-tab ${i === 0 ? 'active' : ''}" 
-                            onclick="LearnView.selectSubtopic('${sub}')">${sub}</button>
-                `).join('')}
-            </div>
-        `;
-
-        // Show first subtopic
-        if (subtopics.length > 0) {
-            LearnView.selectSubtopic(subtopics[0]);
-        } else {
-            document.getElementById('notes-container').innerHTML = `
-                <div class="notes-placeholder">
-                    <p>Notes coming soon for ${topic.name}!</p>
-                </div>
-            `;
-        }
-
-        // Track progress
-        LearnView.trackTopicRead(topicId);
     },
 
     selectSubtopic: (subtopic) => {

@@ -206,19 +206,19 @@ _____ age >= 18`,
                         <label>Select Difficulty:</label>
                         <div class="fc-diff-buttons">
                             <button class="fc-diff-btn ${FillCode.difficulty === 'easy' ? 'selected' : ''}"
-                                    onclick="FillCode.selectDifficulty('easy')">
+                                    onclick="FillCode.selectDifficulty('easy', event)">
                                 🟢 Easy
                             </button>
                             <button class="fc-diff-btn ${FillCode.difficulty === 'medium' ? 'selected' : ''}"
-                                    onclick="FillCode.selectDifficulty('medium')">
+                                    onclick="FillCode.selectDifficulty('medium', event)">
                                 🟡 Medium
                             </button>
                             <button class="fc-diff-btn ${FillCode.difficulty === 'hard' ? 'selected' : ''}"
-                                    onclick="FillCode.selectDifficulty('hard')">
+                                    onclick="FillCode.selectDifficulty('hard', event)">
                                 🔴 Hard
                             </button>
                             <button class="fc-diff-btn ${FillCode.difficulty === 'all' ? 'selected' : ''}"
-                                    onclick="FillCode.selectDifficulty('all')">
+                                    onclick="FillCode.selectDifficulty('all', event)">
                                 🎯 Mixed
                             </button>
                         </div>
@@ -233,31 +233,57 @@ _____ age >= 18`,
         `;
     },
 
-    selectDifficulty: (diff) => {
+    selectDifficulty: (diff, evt) => {
         FillCode.difficulty = diff;
         document.querySelectorAll('.fc-diff-btn').forEach(btn => btn.classList.remove('selected'));
-        event.target.classList.add('selected');
+        
+        // Use evt parameter or find by diff
+        const targetBtn = evt?.target || document.querySelector(`.fc-diff-btn[onclick*="'${diff}'"]`);
+        if (targetBtn) {
+            targetBtn.classList.add('selected');
+        }
     },
 
     startGame: () => {
-        // Filter by difficulty
-        let pool = FillCode.codeSnippets;
-        if (FillCode.difficulty !== 'all') {
-            pool = pool.filter(s => s.difficulty === FillCode.difficulty);
+        try {
+            // Filter by difficulty
+            let pool = FillCode.codeSnippets;
+            if (FillCode.difficulty !== 'all') {
+                pool = pool.filter(s => s.difficulty === FillCode.difficulty);
+            }
+            
+            // Validate we have challenges
+            if (!pool || pool.length === 0) {
+                Toast?.show?.('No challenges available for this difficulty', 'error');
+                return;
+            }
+            
+            FillCode.challenges = shuffleArray([...pool]).slice(0, 10);
+            
+            if (FillCode.challenges.length === 0) {
+                Toast?.show?.('No challenges available', 'error');
+                return;
+            }
+            
+            FillCode.currentIndex = 0;
+            FillCode.score = 0;
+            FillCode.correctAnswers = 0;
+            FillCode.wrongAnswers = 0;
+            FillCode.hintsUsed = 0;
+            FillCode.isPlaying = true;
+            
+            const container = document.querySelector('.fillcode-container');
+            if (!container) {
+                console.error('FillCode container not found');
+                return;
+            }
+            container.innerHTML = FillCode.renderGame();
+            
+            FillCode.showChallenge();
+        } catch (error) {
+            console.error('FillCode.startGame error:', error);
+            Toast?.show?.('Failed to start game', 'error');
         }
-        
-        FillCode.challenges = shuffleArray([...pool]).slice(0, 10);
-        FillCode.currentIndex = 0;
-        FillCode.score = 0;
-        FillCode.correctAnswers = 0;
-        FillCode.wrongAnswers = 0;
-        FillCode.hintsUsed = 0;
-        FillCode.isPlaying = true;
-        
-        const container = document.querySelector('.fillcode-container');
-        container.innerHTML = FillCode.renderGame();
-        
-        FillCode.showChallenge();
     },
 
     renderGame: () => {
@@ -533,6 +559,10 @@ _____ age >= 18`,
     cleanup: () => {
         // Stop game
         FillCode.isPlaying = false;
+        // Reset state
+        FillCode.challenges = [];
+        FillCode.currentIndex = 0;
+        FillCode.hintsUsed = 0;
         console.log('📝 FillCode cleanup');
     }
 };

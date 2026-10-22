@@ -15,9 +15,10 @@ const AssignmentView = {
     // ==================== TEACHER VIEW ====================
     
     renderTeacherAssignments: (classroomCode = null) => {
-        const assignments = Assignment.getTeacherAssignments(classroomCode);
-        
-        return `
+        try {
+            const assignments = typeof Assignment !== 'undefined' ? Assignment.getTeacherAssignments(classroomCode) : [];
+            
+            return `
             <div class="assignments-section">
                 <div class="section-header-row">
                     <h3>📝 Assignments</h3>
@@ -38,26 +39,44 @@ const AssignmentView = {
                 `}
             </div>
         `;
+        } catch (error) {
+            console.error('Error rendering teacher assignments:', error);
+            return '<div class="error-message">Failed to load assignments</div>';
+        }
     },
     
     renderAssignmentCard: (assignment, isTeacher = false) => {
-        const dueDate = assignment.settings.dueDate 
-            ? new Date(assignment.settings.dueDate).toLocaleDateString()
-            : 'No due date';
-        
-        const statusClass = assignment.status === 'active' ? 'status-active' : 
-                           assignment.status === 'closed' ? 'status-closed' : 'status-draft';
+        try {
+            if (!assignment) return '';
+            
+            const escapeHtml = (str) => {
+                if (typeof Helpers !== 'undefined' && Helpers.escapeHtml) {
+                    return Helpers.escapeHtml(str);
+                }
+                return String(str || '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+            };
+            
+            const dueDate = assignment.settings?.dueDate 
+                ? new Date(assignment.settings.dueDate).toLocaleDateString()
+                : 'No due date';
+            
+            const statusClass = assignment.status === 'active' ? 'status-active' : 
+                               assignment.status === 'closed' ? 'status-closed' : 'status-draft';
+            
+            // Escape user-supplied content to prevent XSS
+            const safeTitle = escapeHtml(assignment.title);
+            const safeDesc = escapeHtml(assignment.description || 'No description');
         
         if (isTeacher) {
             return `
                 <div class="assignment-card">
                     <div class="assignment-header">
-                        <h4>${assignment.title}</h4>
+                        <h4>${safeTitle}</h4>
                         <span class="assignment-status ${statusClass}">${assignment.status}</span>
                     </div>
-                    <p class="assignment-desc">${assignment.description || 'No description'}</p>
+                    <p class="assignment-desc">${safeDesc}</p>
                     <div class="assignment-meta">
-                        <span><i class="fas fa-book"></i> ${assignment.settings.topic === 'all' ? 'All Topics' : assignment.settings.topic}</span>
+                        <span><i class="fas fa-book"></i> ${assignment.settings.topic === 'all' ? 'All Topics' : Helpers.escapeHtml(assignment.settings.topic)}</span>
                         <span><i class="fas fa-question-circle"></i> ${assignment.questions.length} questions</span>
                         <span><i class="fas fa-calendar"></i> ${dueDate}</span>
                     </div>
@@ -87,7 +106,7 @@ const AssignmentView = {
             return `
                 <div class="assignment-card ${hasSubmitted ? 'completed' : 'pending'}">
                     <div class="assignment-header">
-                        <h4>${assignment.title}</h4>
+                        <h4>${safeTitle}</h4>
                         ${hasSubmitted ? `
                             <span class="score-badge ${assignment.bestScore >= assignment.settings.passingScore ? 'passed' : 'failed'}">
                                 Best: ${assignment.bestScore}%
@@ -96,9 +115,9 @@ const AssignmentView = {
                             <span class="assignment-badge new">New</span>
                         `}
                     </div>
-                    <p class="assignment-desc">${assignment.description || 'No description'}</p>
+                    <p class="assignment-desc">${safeDesc}</p>
                     <div class="assignment-meta">
-                        <span><i class="fas fa-chalkboard"></i> ${assignment.classroomName}</span>
+                        <span><i class="fas fa-chalkboard"></i> ${Helpers.escapeHtml(assignment.classroomName)}</span>
                         <span><i class="fas fa-question-circle"></i> ${assignment.questions.length} questions</span>
                         ${assignment.settings.timeLimit > 0 ? `
                             <span><i class="fas fa-clock"></i> ${assignment.settings.timeLimit} min</span>
@@ -126,14 +145,19 @@ const AssignmentView = {
                 </div>
             `;
         }
+        } catch (error) {
+            console.error('Error rendering assignment card:', error);
+            return '<div class="assignment-card error">Failed to load assignment</div>';
+        }
     },
     
     // ==================== CREATE ASSIGNMENT ====================
     
     showCreateAssignment: (classroomCode = '') => {
-        const classrooms = Classroom.getTeacherClassrooms();
+        try {
+            const classrooms = typeof Classroom !== 'undefined' ? Classroom.getTeacherClassrooms() : [];
         
-        Modal.show({
+            Modal.show({
             title: '📝 Create Assignment',
             content: `
                 <form id="create-assignment-form" class="assignment-form">
@@ -246,6 +270,10 @@ const AssignmentView = {
             document.getElementById('assign-cancel')?.addEventListener('click', Modal.close);
             document.getElementById('assign-create')?.addEventListener('click', AssignmentView.handleCreateAssignment);
         }, 0);
+        } catch (error) {
+            console.error('Error showing create assignment:', error);
+            Toast.show('Failed to open assignment form', 'error');
+        }
     },
     
     handleCreateAssignment: () => {

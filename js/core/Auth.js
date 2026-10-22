@@ -20,8 +20,12 @@ const Auth = {
     init: () => {
         console.log('🔐 Auth module initialized');
         // Ensure users storage exists
-        if (!localStorage.getItem(Auth.USERS_KEY)) {
-            localStorage.setItem(Auth.USERS_KEY, JSON.stringify({}));
+        try {
+            if (!localStorage.getItem(Auth.USERS_KEY)) {
+                localStorage.setItem(Auth.USERS_KEY, JSON.stringify({}));
+            }
+        } catch (error) {
+            console.error('Failed to initialize Auth storage:', error);
         }
     },
 
@@ -30,8 +34,12 @@ const Auth = {
      */
     getUsers: () => {
         try {
-            return JSON.parse(localStorage.getItem(Auth.USERS_KEY)) || {};
-        } catch {
+            const data = localStorage.getItem(Auth.USERS_KEY);
+            if (!data) return {};
+            const parsed = JSON.parse(data);
+            return typeof parsed === 'object' && parsed !== null ? parsed : {};
+        } catch (error) {
+            console.error('Error loading users:', error);
             return {};
         }
     },
@@ -40,16 +48,36 @@ const Auth = {
      * Save users to storage
      */
     saveUsers: (users) => {
-        localStorage.setItem(Auth.USERS_KEY, JSON.stringify(users));
+        if (!users || typeof users !== 'object') {
+            console.error('Invalid users data');
+            return false;
+        }
+        try {
+            localStorage.setItem(Auth.USERS_KEY, JSON.stringify(users));
+            return true;
+        } catch (error) {
+            console.error('Error saving users:', error);
+            return false;
+        }
     },
 
     /**
      * Generate a random salt for password hashing
      */
     generateSalt: () => {
-        const array = new Uint8Array(16);
-        crypto.getRandomValues(array);
-        return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+        try {
+            const array = new Uint8Array(16);
+            crypto.getRandomValues(array);
+            return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+        } catch (error) {
+            // Fallback for older browsers
+            console.warn('crypto.getRandomValues not available, using fallback');
+            let salt = '';
+            for (let i = 0; i < 32; i++) {
+                salt += Math.floor(Math.random() * 16).toString(16);
+            }
+            return salt;
+        }
     },
 
     /**
@@ -59,14 +87,25 @@ const Auth = {
      * @returns {Promise<{hash: string, salt: string}>}
      */
     hashPassword: async (password, salt = null) => {
+        if (!password || typeof password !== 'string') {
+            throw new Error('Invalid password');
+        }
+        
         if (!salt) {
             salt = Auth.generateSalt();
         }
-        const data = new TextEncoder().encode(password + salt);
-        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        const hash = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
-        return { hash, salt };
+        
+        try {
+            const data = new TextEncoder().encode(password + salt);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hash = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
+            return { hash, salt };
+        } catch (error) {
+            console.error('Error hashing password:', error);
+            // Fallback to legacy hash if Web Crypto fails
+            return { hash: Auth.legacyHashPassword(password + salt), salt };
+        }
     },
 
     /**
@@ -77,8 +116,15 @@ const Auth = {
      * @returns {Promise<boolean>}
      */
     verifyPassword: async (password, storedHash, salt) => {
-        const { hash } = await Auth.hashPassword(password, salt);
-        return hash === storedHash;
+        if (!password || !storedHash) return false;
+        
+        try {
+            const { hash } = await Auth.hashPassword(password, salt);
+            return hash === storedHash;
+        } catch (error) {
+            console.error('Error verifying password:', error);
+            return false;
+        }
     },
 
     /**
@@ -86,6 +132,8 @@ const Auth = {
      * DO NOT USE FOR NEW PASSWORDS - use hashPassword() instead
      */
     legacyHashPassword: (password) => {
+        if (!password || typeof password !== 'string') return '';
+        
         let hash = 0;
         const str = password + 'CSMasterPro_2024';
         for (let i = 0; i < str.length; i++) {
@@ -100,14 +148,16 @@ const Auth = {
      * Validate email format
      */
     isValidEmail: (email) => {
+        if (!email || typeof email !== 'string') return false;
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
+        return emailRegex.test(email.trim());
     },
 
     /**
      * Validate password strength (min 8 chars, at least 1 number)
      */
     isValidPassword: (password) => {
+        if (!password || typeof password !== 'string') return false;
         if (password.length < 8) return false;
         if (!/\d/.test(password)) return false;
         return true;
@@ -117,7 +167,7 @@ const Auth = {
      * Sanitize username (alphanumeric + underscore only, max 20 chars)
      */
     sanitizeUsername: (username) => {
-        if (!username) return '';
+        if (!username || typeof username !== 'string') return '';
         // Remove any characters that aren't alphanumeric or underscore
         return username.replace(/[^a-zA-Z0-9_]/g, '').substring(0, 20);
     },
@@ -126,6 +176,7 @@ const Auth = {
      * Validate username format
      */
     isValidUsername: (username) => {
+        if (!username || typeof username !== 'string') return false;
         // Check length (3-20 characters)
         if (username.length < 3 || username.length > 20) return false;
         // Check format (alphanumeric + underscore only)
@@ -138,8 +189,12 @@ const Auth = {
      */
     getRateLimitData: () => {
         try {
-            return JSON.parse(localStorage.getItem(Auth.RATE_LIMIT_KEY)) || {};
-        } catch {
+            const data = localStorage.getItem(Auth.RATE_LIMIT_KEY);
+            if (!data) return {};
+            const parsed = JSON.parse(data);
+            return typeof parsed === 'object' && parsed !== null ? parsed : {};
+        } catch (error) {
+            console.error('Error loading rate limit data:', error);
             return {};
         }
     },
@@ -148,13 +203,22 @@ const Auth = {
      * Save rate limit data
      */
     saveRateLimitData: (data) => {
-        localStorage.setItem(Auth.RATE_LIMIT_KEY, JSON.stringify(data));
+        if (!data || typeof data !== 'object') return false;
+        try {
+            localStorage.setItem(Auth.RATE_LIMIT_KEY, JSON.stringify(data));
+            return true;
+        } catch (error) {
+            console.error('Error saving rate limit data:', error);
+            return false;
+        }
     },
 
     /**
      * Check if account is locked due to failed attempts
      */
     isAccountLocked: (email) => {
+        if (!email || typeof email !== 'string') return false;
+        
         const data = Auth.getRateLimitData();
         const normalizedEmail = email.toLowerCase().trim();
         const record = data[normalizedEmail];
@@ -176,6 +240,8 @@ const Auth = {
      * Record a failed login attempt
      */
     recordFailedAttempt: (email) => {
+        if (!email || typeof email !== 'string') return 0;
+        
         const data = Auth.getRateLimitData();
         const normalizedEmail = email.toLowerCase().trim();
         
@@ -199,6 +265,8 @@ const Auth = {
      * Clear failed attempts on successful login
      */
     clearFailedAttempts: (email) => {
+        if (!email || typeof email !== 'string') return;
+        
         const data = Auth.getRateLimitData();
         const normalizedEmail = email.toLowerCase().trim();
         delete data[normalizedEmail];
@@ -209,6 +277,8 @@ const Auth = {
      * Get remaining lockout time in minutes
      */
     getRemainingLockoutTime: (email) => {
+        if (!email || typeof email !== 'string') return 0;
+        
         const data = Auth.getRateLimitData();
         const normalizedEmail = email.toLowerCase().trim();
         const record = data[normalizedEmail];
@@ -216,173 +286,203 @@ const Auth = {
         if (!record || !record.lockedUntil) return 0;
         
         const remaining = record.lockedUntil - Date.now();
-        return Math.ceil(remaining / 60000); // Convert to minutes
+        return Math.max(0, Math.ceil(remaining / 60000)); // Convert to minutes
     },
 
     /**
      * Register a new user
      */
     register: async (username, email, password, accountType = 'student') => {
-        // Sanitize username
-        const sanitizedUsername = Auth.sanitizeUsername(username);
-        
-        // Validation
-        if (!Auth.isValidUsername(sanitizedUsername)) {
-            return { success: false, error: 'Username must be 3-20 characters, alphanumeric and underscores only' };
+        try {
+            // Sanitize username
+            const sanitizedUsername = Auth.sanitizeUsername(username);
+            
+            // Validation
+            if (!Auth.isValidUsername(sanitizedUsername)) {
+                return { success: false, error: 'Username must be 3-20 characters, alphanumeric and underscores only' };
+            }
+            
+            if (!Auth.isValidEmail(email)) {
+                return { success: false, error: 'Please enter a valid email address' };
+            }
+            
+            if (!Auth.isValidPassword(password)) {
+                return { success: false, error: 'Password must be at least 8 characters with at least 1 number' };
+            }
+            
+            if (!['student', 'teacher'].includes(accountType)) {
+                return { success: false, error: 'Invalid account type' };
+            }
+
+            const users = Auth.getUsers();
+            const normalizedEmail = email.toLowerCase().trim();
+
+            // Check if email already exists
+            if (users[normalizedEmail]) {
+                return { success: false, error: 'An account with this email already exists' };
+            }
+
+            // Check if username is taken
+            const usernameTaken = Object.values(users).some(u => 
+                u && u.username && u.username.toLowerCase() === sanitizedUsername.toLowerCase()
+            );
+            if (usernameTaken) {
+                return { success: false, error: 'This username is already taken' };
+            }
+
+            // Hash password with salt
+            const { hash, salt } = await Auth.hashPassword(password);
+
+            // Create user
+            const newUser = {
+                id: Date.now().toString(36) + Math.random().toString(36).substring(2),
+                username: sanitizedUsername,
+                email: normalizedEmail,
+                passwordHash: hash,
+                passwordSalt: salt,
+                accountType: accountType,
+                createdAt: new Date().toISOString(),
+                profile: {
+                    xp: 0,
+                    level: 1,
+                    totalCorrect: 0,
+                    totalAnswered: 0,
+                    achievements: [],
+                    streak: 0,
+                    lastActive: new Date().toISOString()
+                },
+                // Teacher-specific fields
+                ...(accountType === 'teacher' ? {
+                    classrooms: [],
+                    school: ''
+                } : {}),
+                // Student-specific fields
+                ...(accountType === 'student' ? {
+                    joinedClassrooms: []
+                } : {})
+            };
+
+            users[normalizedEmail] = newUser;
+            if (!Auth.saveUsers(users)) {
+                return { success: false, error: 'Failed to save user data' };
+            }
+
+            // Auto-login after registration
+            Auth.createSession(newUser);
+
+            return { success: true, user: newUser };
+        } catch (error) {
+            console.error('Registration error:', error);
+            return { success: false, error: 'An error occurred during registration' };
         }
-        
-        if (!Auth.isValidEmail(email)) {
-            return { success: false, error: 'Please enter a valid email address' };
-        }
-        
-        if (!Auth.isValidPassword(password)) {
-            return { success: false, error: 'Password must be at least 8 characters with at least 1 number' };
-        }
-        
-        if (!['student', 'teacher'].includes(accountType)) {
-            return { success: false, error: 'Invalid account type' };
-        }
-
-        const users = Auth.getUsers();
-        const normalizedEmail = email.toLowerCase().trim();
-
-        // Check if email already exists
-        if (users[normalizedEmail]) {
-            return { success: false, error: 'An account with this email already exists' };
-        }
-
-        // Check if username is taken
-        const usernameTaken = Object.values(users).some(u => 
-            u.username.toLowerCase() === sanitizedUsername.toLowerCase()
-        );
-        if (usernameTaken) {
-            return { success: false, error: 'This username is already taken' };
-        }
-
-        // Hash password with salt
-        const { hash, salt } = await Auth.hashPassword(password);
-
-        // Create user
-        const newUser = {
-            id: Date.now().toString(36) + Math.random().toString(36).substring(2),
-            username: sanitizedUsername,
-            email: normalizedEmail,
-            passwordHash: hash,
-            passwordSalt: salt,
-            accountType: accountType,
-            createdAt: new Date().toISOString(),
-            profile: {
-                xp: 0,
-                level: 1,
-                totalCorrect: 0,
-                totalAnswered: 0,
-                achievements: [],
-                streak: 0,
-                lastActive: new Date().toISOString()
-            },
-            // Teacher-specific fields
-            ...(accountType === 'teacher' ? {
-                classrooms: [],
-                school: ''
-            } : {}),
-            // Student-specific fields
-            ...(accountType === 'student' ? {
-                joinedClassrooms: []
-            } : {})
-        };
-
-        users[normalizedEmail] = newUser;
-        Auth.saveUsers(users);
-
-        // Auto-login after registration
-        Auth.createSession(newUser);
-
-        return { success: true, user: newUser };
     },
 
     /**
      * Login user
      */
     login: async (email, password) => {
-        if (!email || !password) {
-            return { success: false, error: 'Please enter email and password' };
-        }
+        try {
+            if (!email || !password) {
+                return { success: false, error: 'Please enter email and password' };
+            }
 
-        const normalizedEmail = email.toLowerCase().trim();
+            const normalizedEmail = (email + '').toLowerCase().trim();
 
-        // Check rate limiting
-        if (Auth.isAccountLocked(normalizedEmail)) {
-            const remaining = Auth.getRemainingLockoutTime(normalizedEmail);
-            return { success: false, error: `Account temporarily locked. Try again in ${remaining} minute(s).` };
-        }
+            // Check rate limiting
+            if (Auth.isAccountLocked(normalizedEmail)) {
+                const remaining = Auth.getRemainingLockoutTime(normalizedEmail);
+                return { success: false, error: `Account temporarily locked. Try again in ${remaining} minute(s).` };
+            }
 
-        const users = Auth.getUsers();
-        const user = users[normalizedEmail];
+            const users = Auth.getUsers();
+            const user = users[normalizedEmail];
 
-        if (!user) {
-            Auth.recordFailedAttempt(normalizedEmail);
-            return { success: false, error: 'No account found with this email' };
-        }
+            if (!user) {
+                Auth.recordFailedAttempt(normalizedEmail);
+                return { success: false, error: 'No account found with this email' };
+            }
 
-        // Verify password - support both old and new hash formats
-        let isValid = false;
-        
-        if (user.passwordSalt) {
-            // New format with SHA-256 and salt
-            isValid = await Auth.verifyPassword(password, user.passwordHash, user.passwordSalt);
-        } else {
-            // Old format - simple hash (for backward compatibility)
-            const oldHash = Auth.legacyHashPassword(password);
-            isValid = (oldHash === user.passwordHash);
+            // Verify password - support both old and new hash formats
+            let isValid = false;
             
-            // If valid, upgrade to new hash format
-            if (isValid) {
-                const { hash, salt } = await Auth.hashPassword(password);
-                user.passwordHash = hash;
-                user.passwordSalt = salt;
-                Auth.saveUsers(users);
-                console.log('🔐 Password upgraded to new secure format');
+            if (user.passwordSalt) {
+                // New format with SHA-256 and salt
+                isValid = await Auth.verifyPassword(password, user.passwordHash, user.passwordSalt);
+            } else if (user.passwordHash) {
+                // Old format - simple hash (for backward compatibility)
+                const oldHash = Auth.legacyHashPassword(password);
+                isValid = (oldHash === user.passwordHash);
+                
+                // If valid, upgrade to new hash format
+                if (isValid) {
+                    try {
+                        const { hash, salt } = await Auth.hashPassword(password);
+                        user.passwordHash = hash;
+                        user.passwordSalt = salt;
+                        Auth.saveUsers(users);
+                        console.log('🔐 Password upgraded to new secure format');
+                    } catch (e) {
+                        console.warn('Failed to upgrade password format:', e);
+                    }
+                }
             }
-        }
-        
-        if (!isValid) {
-            const attempts = Auth.recordFailedAttempt(normalizedEmail);
-            const remaining = Auth.MAX_FAILED_ATTEMPTS - attempts;
-            if (remaining > 0) {
-                return { success: false, error: `Incorrect password. ${remaining} attempt(s) remaining.` };
-            } else {
-                const lockoutMins = Math.ceil(Auth.LOCKOUT_DURATION / 60000);
-                return { success: false, error: `Too many failed attempts. Account locked for ${lockoutMins} minutes.` };
+            
+            if (!isValid) {
+                const attempts = Auth.recordFailedAttempt(normalizedEmail);
+                const remaining = Auth.MAX_FAILED_ATTEMPTS - attempts;
+                if (remaining > 0) {
+                    return { success: false, error: `Incorrect password. ${remaining} attempt(s) remaining.` };
+                } else {
+                    const lockoutMins = Math.ceil(Auth.LOCKOUT_DURATION / 60000);
+                    return { success: false, error: `Too many failed attempts. Account locked for ${lockoutMins} minutes.` };
+                }
             }
+
+            // Clear failed attempts on successful login
+            Auth.clearFailedAttempts(normalizedEmail);
+
+            // Update last active
+            if (!user.profile) {
+                user.profile = {};
+            }
+            user.profile.lastActive = new Date().toISOString();
+            Auth.saveUsers(users);
+
+            // Create session
+            Auth.createSession(user);
+
+            return { success: true, user };
+        } catch (error) {
+            console.error('Login error:', error);
+            return { success: false, error: 'An error occurred during login' };
         }
-
-        // Clear failed attempts on successful login
-        Auth.clearFailedAttempts(normalizedEmail);
-
-        // Update last active
-        user.profile.lastActive = new Date().toISOString();
-        Auth.saveUsers(users);
-
-        // Create session
-        Auth.createSession(user);
-
-        return { success: true, user };
     },
 
     /**
      * Create session
      */
     createSession: (user) => {
-        const session = {
-            userId: user.id,
-            email: user.email,
-            username: user.username,
-            accountType: user.accountType || 'student',
-            loginTime: new Date().toISOString(),
-            rememberMe: true
-        };
-        // Store only in localStorage to prevent desync
-        localStorage.setItem(Auth.SESSION_KEY, JSON.stringify(session));
+        if (!user || !user.email) {
+            console.error('Invalid user for session creation');
+            return false;
+        }
+        
+        try {
+            const session = {
+                userId: user.id || '',
+                email: user.email,
+                username: user.username || 'User',
+                accountType: user.accountType || 'student',
+                loginTime: new Date().toISOString(),
+                rememberMe: true
+            };
+            // Store only in localStorage to prevent desync
+            localStorage.setItem(Auth.SESSION_KEY, JSON.stringify(session));
+            return true;
+        } catch (error) {
+            console.error('Error creating session:', error);
+            return false;
+        }
     },
 
     /**
@@ -392,8 +492,11 @@ const Auth = {
         try {
             // Only check localStorage to prevent desync issues
             const session = localStorage.getItem(Auth.SESSION_KEY);
-            return session ? JSON.parse(session) : null;
-        } catch {
+            if (!session) return null;
+            const parsed = JSON.parse(session);
+            return typeof parsed === 'object' && parsed !== null ? parsed : null;
+        } catch (error) {
+            console.error('Error getting session:', error);
             return null;
         }
     },
@@ -410,7 +513,7 @@ const Auth = {
      */
     getCurrentUser: () => {
         const session = Auth.getSession();
-        if (!session) return null;
+        if (!session || !session.email) return null;
 
         const users = Auth.getUsers();
         return users[session.email] || null;
@@ -420,10 +523,14 @@ const Auth = {
      * Logout user
      */
     logout: () => {
-        localStorage.removeItem(Auth.SESSION_KEY);
-        // Reset app state
-        if (typeof AppState !== 'undefined') {
-            AppState.resetState();
+        try {
+            localStorage.removeItem(Auth.SESSION_KEY);
+            // Reset app state
+            if (typeof AppState !== 'undefined' && typeof AppState.resetState === 'function') {
+                AppState.resetState();
+            }
+        } catch (error) {
+            console.error('Error during logout:', error);
         }
     },
 
@@ -431,19 +538,29 @@ const Auth = {
      * Update user profile
      */
     updateProfile: (updates) => {
-        const session = Auth.getSession();
-        if (!session) return false;
-
-        const users = Auth.getUsers();
-        const user = users[session.email];
+        if (!updates || typeof updates !== 'object') return false;
         
-        if (!user) return false;
+        const session = Auth.getSession();
+        if (!session || !session.email) return false;
 
-        // Merge profile updates
-        user.profile = { ...user.profile, ...updates };
-        Auth.saveUsers(users);
+        try {
+            const users = Auth.getUsers();
+            const user = users[session.email];
+            
+            if (!user) return false;
 
-        return true;
+            // Ensure profile exists
+            if (!user.profile) {
+                user.profile = {};
+            }
+
+            // Merge profile updates
+            user.profile = { ...user.profile, ...updates };
+            return Auth.saveUsers(users);
+        } catch (error) {
+            console.error('Error updating profile:', error);
+            return false;
+        }
     },
 
     /**
@@ -451,87 +568,119 @@ const Auth = {
      */
     getProfile: () => {
         const user = Auth.getCurrentUser();
-        return user ? user.profile : null;
+        return user && user.profile ? user.profile : null;
     },
 
     /**
      * Save user progress (syncs with AppState)
      */
     saveProgress: (state) => {
-        const session = Auth.getSession();
-        if (!session) return false;
-
-        const users = Auth.getUsers();
-        const user = users[session.email];
+        if (!state || typeof state !== 'object') return false;
         
-        if (!user) return false;
+        const session = Auth.getSession();
+        if (!session || !session.email) return false;
 
-        user.profile = {
-            xp: state.xp || 0,
-            level: state.level || 1,
-            totalCorrect: state.totalCorrect || 0,
-            totalAnswered: state.totalAnswered || 0,
-            achievements: state.achievements || [],
-            streak: state.streak || 0,
-            lastActive: new Date().toISOString()
-        };
+        try {
+            const users = Auth.getUsers();
+            const user = users[session.email];
+            
+            if (!user) return false;
 
-        Auth.saveUsers(users);
-        return true;
+            user.profile = {
+                xp: state.xp || 0,
+                level: state.level || 1,
+                totalCorrect: state.totalCorrect || 0,
+                totalAnswered: state.totalAnswered || 0,
+                achievements: Array.isArray(state.achievements) ? state.achievements : [],
+                streak: state.streak || 0,
+                lastActive: new Date().toISOString()
+            };
+
+            return Auth.saveUsers(users);
+        } catch (error) {
+            console.error('Error saving progress:', error);
+            return false;
+        }
     },
 
     /**
      * Delete account
      */
     deleteAccount: async (password) => {
-        const session = Auth.getSession();
-        if (!session) return { success: false, error: 'Not logged in' };
+        try {
+            const session = Auth.getSession();
+            if (!session || !session.email) {
+                return { success: false, error: 'Not logged in' };
+            }
 
-        const users = Auth.getUsers();
-        const user = users[session.email];
+            const users = Auth.getUsers();
+            const user = users[session.email];
 
-        if (!user) return { success: false, error: 'User not found' };
+            if (!user) {
+                return { success: false, error: 'User not found' };
+            }
 
-        const isValid = await Auth.verifyPassword(password, user.passwordHash, user.passwordSalt);
-        if (!isValid) {
-            return { success: false, error: 'Incorrect password' };
+            if (!user.passwordHash || !user.passwordSalt) {
+                return { success: false, error: 'Invalid account state' };
+            }
+
+            const isValid = await Auth.verifyPassword(password, user.passwordHash, user.passwordSalt);
+            if (!isValid) {
+                return { success: false, error: 'Incorrect password' };
+            }
+
+            delete users[session.email];
+            Auth.saveUsers(users);
+            Auth.logout();
+
+            return { success: true };
+        } catch (error) {
+            console.error('Error deleting account:', error);
+            return { success: false, error: 'An error occurred while deleting account' };
         }
-
-        delete users[session.email];
-        Auth.saveUsers(users);
-        Auth.logout();
-
-        return { success: true };
     },
 
     /**
      * Change password
      */
     changePassword: async (currentPassword, newPassword) => {
-        const session = Auth.getSession();
-        if (!session) return { success: false, error: 'Not logged in' };
+        try {
+            const session = Auth.getSession();
+            if (!session || !session.email) {
+                return { success: false, error: 'Not logged in' };
+            }
 
-        const users = Auth.getUsers();
-        const user = users[session.email];
+            const users = Auth.getUsers();
+            const user = users[session.email];
 
-        if (!user) return { success: false, error: 'User not found' };
+            if (!user) {
+                return { success: false, error: 'User not found' };
+            }
 
-        const isValid = await Auth.verifyPassword(currentPassword, user.passwordHash, user.passwordSalt);
-        if (!isValid) {
-            return { success: false, error: 'Current password is incorrect' };
+            if (!user.passwordHash || !user.passwordSalt) {
+                return { success: false, error: 'Invalid account state' };
+            }
+
+            const isValid = await Auth.verifyPassword(currentPassword, user.passwordHash, user.passwordSalt);
+            if (!isValid) {
+                return { success: false, error: 'Current password is incorrect' };
+            }
+
+            if (!Auth.isValidPassword(newPassword)) {
+                return { success: false, error: 'New password must be at least 8 characters with at least 1 number' };
+            }
+
+            // Hash new password with new salt
+            const { hash, salt } = await Auth.hashPassword(newPassword);
+            user.passwordHash = hash;
+            user.passwordSalt = salt;
+            Auth.saveUsers(users);
+
+            return { success: true };
+        } catch (error) {
+            console.error('Error changing password:', error);
+            return { success: false, error: 'An error occurred while changing password' };
         }
-
-        if (!Auth.isValidPassword(newPassword)) {
-            return { success: false, error: 'New password must be at least 8 characters with at least 1 number' };
-        }
-
-        // Hash new password with new salt
-        const { hash, salt } = await Auth.hashPassword(newPassword);
-        user.passwordHash = hash;
-        user.passwordSalt = salt;
-        Auth.saveUsers(users);
-
-        return { success: true };
     },
     
     /**
@@ -539,7 +688,7 @@ const Auth = {
      */
     isTeacher: () => {
         const session = Auth.getSession();
-        return session?.accountType === 'teacher';
+        return session && session.accountType === 'teacher';
     },
     
     /**
@@ -547,7 +696,7 @@ const Auth = {
      */
     isStudent: () => {
         const session = Auth.getSession();
-        return session?.accountType === 'student';
+        return session && session.accountType === 'student';
     },
     
     /**
@@ -555,27 +704,42 @@ const Auth = {
      */
     getAccountType: () => {
         const session = Auth.getSession();
-        return session?.accountType || 'student';
+        return session && session.accountType ? session.accountType : 'student';
     },
     
     /**
      * Get user by ID
      */
     getUserById: (userId) => {
-        const users = Auth.getUsers();
-        return Object.values(users).find(u => u.id === userId) || null;
+        if (!userId) return null;
+        
+        try {
+            const users = Auth.getUsers();
+            return Object.values(users).find(u => u && u.id === userId) || null;
+        } catch (error) {
+            console.error('Error getting user by ID:', error);
+            return null;
+        }
     },
     
     /**
      * Update user data directly
      */
     updateUser: (email, updates) => {
-        const users = Auth.getUsers();
-        if (users[email]) {
-            users[email] = { ...users[email], ...updates };
-            Auth.saveUsers(users);
-            return true;
+        if (!email || !updates || typeof updates !== 'object') return false;
+        
+        try {
+            const users = Auth.getUsers();
+            const normalizedEmail = email.toLowerCase().trim();
+            
+            if (users[normalizedEmail]) {
+                users[normalizedEmail] = { ...users[normalizedEmail], ...updates };
+                return Auth.saveUsers(users);
+            }
+            return false;
+        } catch (error) {
+            console.error('Error updating user:', error);
+            return false;
         }
-        return false;
     }
 };
