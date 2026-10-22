@@ -87,7 +87,7 @@ const DemoMode = {
         
         // Show activation message
         if (typeof Toast !== 'undefined') {
-            Toast.show('🎬 Demo Mode Active - Press Ctrl+Shift+D to exit', 'info');
+            Toast.show('🎬 Demo Mode Active', 'info');
         }
         
         // Reload to apply changes
@@ -131,11 +131,36 @@ const DemoMode = {
             return;
         }
         
-        // Keyboard shortcut: Ctrl+Shift+D to toggle demo mode
+        // Keyboard shortcut: Ctrl+Alt+Shift+M then press D twice quickly to toggle demo mode
+        let demoKeySequence = [];
+        let lastKeyTime = 0;
+        
         document.addEventListener('keydown', (e) => {
-            if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+            const now = Date.now();
+            
+            // Reset sequence if too much time passed (1.5 seconds)
+            if (now - lastKeyTime > 1500) {
+                demoKeySequence = [];
+            }
+            lastKeyTime = now;
+            
+            // Check for Ctrl+Alt+Shift+M
+            if (e.ctrlKey && e.altKey && e.shiftKey && e.key === 'M') {
                 e.preventDefault();
-                DemoMode.toggle();
+                demoKeySequence.push('M');
+                return;
+            }
+            
+            // After M, wait for D pressed twice
+            if (demoKeySequence.length >= 1 && e.key.toLowerCase() === 'd') {
+                e.preventDefault();
+                demoKeySequence.push('D');
+                
+                // Sequence complete: M + D + D
+                if (demoKeySequence.filter(k => k === 'D').length >= 2) {
+                    demoKeySequence = [];
+                    DemoMode.toggle();
+                }
             }
         });
         
@@ -165,7 +190,7 @@ const DemoMode = {
             box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
             animation: pulse 2s ease-in-out infinite;
         `;
-        indicator.title = 'Click to exit demo mode (or Ctrl+Shift+D)';
+        indicator.title = 'Click to exit demo mode';
         indicator.onclick = () => DemoMode.deactivate();
         document.body.appendChild(indicator);
         
