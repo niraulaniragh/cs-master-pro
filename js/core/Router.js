@@ -71,6 +71,23 @@ const Router = (() => {
             }
         }
         
+        // Hide/show navigation based on route and login status
+        const isLoggedIn = typeof Auth !== 'undefined' && Auth.isLoggedIn && Auth.isLoggedIn();
+        const nav = document.querySelector('.main-nav');
+        const footer = document.querySelector('.main-footer');
+        
+        if (route === 'landing' && !isLoggedIn) {
+            // Hide nav and footer for guests on landing page
+            if (nav) nav.classList.add('hidden');
+            if (footer) footer.classList.add('hidden');
+            document.body.classList.add('landing-mode');
+        } else {
+            // Show nav and footer for all other cases
+            if (nav) nav.classList.remove('hidden');
+            if (footer) footer.classList.remove('hidden');
+            document.body.classList.remove('landing-mode');
+        }
+        
         // Prevent double navigation
         if (isNavigating) {
             console.warn('Navigation in progress, ignoring request');

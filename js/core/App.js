@@ -193,9 +193,9 @@ const App = (() => {
                     if (loadingScreen.parentNode) {
                         loadingScreen.remove();
                     }
-                }, 500);
+                }, 400);
             }
-        }, 2000);
+        }, 800); // Reduced from 2000ms for faster perceived load
     };
 
     /**
