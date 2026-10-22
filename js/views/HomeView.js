@@ -18,11 +18,12 @@ const HomeView = {
     DAILY_GOALS_KEY: 'csmaster_daily_goals',
     
     render: () => {
-        // Check for onboarding
+        // Check for onboarding (skip if demo mode is active)
         const hasCompletedOnboarding = localStorage.getItem(HomeView.ONBOARDING_KEY) === 'true';
+        const isDemoMode = typeof DemoMode !== 'undefined' && DemoMode.isActive();
         
-        // Schedule onboarding check after render
-        if (!hasCompletedOnboarding) {
+        // Schedule onboarding check after render (skip in demo mode)
+        if (!hasCompletedOnboarding && !isDemoMode) {
             setTimeout(() => HomeView.showOnboarding(), 500);
         }
         const user = AppState.getState('user') || {};
@@ -658,14 +659,27 @@ const HomeView = {
                 });
             });
             
-            // Topic checkbox selection
+            // Topic checkbox selection - fix visual feedback
             document.querySelectorAll('.topic-checkbox').forEach(label => {
+                const checkbox = label.querySelector('input');
+                
+                // Initial state sync
+                if (checkbox.checked) {
+                    label.classList.add('selected');
+                }
+                
                 label.addEventListener('click', (e) => {
-                    if (e.target.tagName !== 'INPUT') {
-                        const checkbox = label.querySelector('input');
+                    // Prevent double-toggle if clicking directly on checkbox
+                    if (e.target.tagName === 'INPUT') {
+                        // Let the checkbox handle itself, just update visual
+                        setTimeout(() => {
+                            label.classList.toggle('selected', checkbox.checked);
+                        }, 0);
+                    } else {
+                        // Toggle checkbox manually
                         checkbox.checked = !checkbox.checked;
+                        label.classList.toggle('selected', checkbox.checked);
                     }
-                    label.classList.toggle('selected', label.querySelector('input').checked);
                 });
             });
             
