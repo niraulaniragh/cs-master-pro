@@ -131,36 +131,11 @@ const DemoMode = {
             return;
         }
         
-        // Keyboard shortcut: Ctrl+Alt+Shift+M then press D twice quickly to toggle demo mode
-        let demoKeySequence = [];
-        let lastKeyTime = 0;
-        
+        // Keyboard shortcut: Ctrl+Shift+D to toggle demo mode
         document.addEventListener('keydown', (e) => {
-            const now = Date.now();
-            
-            // Reset sequence if too much time passed (1.5 seconds)
-            if (now - lastKeyTime > 1500) {
-                demoKeySequence = [];
-            }
-            lastKeyTime = now;
-            
-            // Check for Ctrl+Alt+Shift+M
-            if (e.ctrlKey && e.altKey && e.shiftKey && e.key === 'M') {
+            if (e.ctrlKey && e.shiftKey && e.key === 'D') {
                 e.preventDefault();
-                demoKeySequence.push('M');
-                return;
-            }
-            
-            // After M, wait for D pressed twice
-            if (demoKeySequence.length >= 1 && e.key.toLowerCase() === 'd') {
-                e.preventDefault();
-                demoKeySequence.push('D');
-                
-                // Sequence complete: M + D + D
-                if (demoKeySequence.filter(k => k === 'D').length >= 2) {
-                    demoKeySequence = [];
-                    DemoMode.toggle();
-                }
+                DemoMode.toggle();
             }
         });
         
