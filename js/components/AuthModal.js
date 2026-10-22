@@ -216,7 +216,7 @@ const AuthModal = {
                                     <label for="auth-username">Username</label>
                                     <input type="text" id="auth-username" name="username" 
                                            placeholder="Choose a username" required minlength="3" maxlength="30"
-                                           autocomplete="username" pattern="[a-zA-Z0-9_-]+">
+                                           autocomplete="username" pattern="[a-zA-Z0-9_\\-]+">
                                     <span class="field-hint">3-30 characters, letters, numbers, underscores</span>
                                 </div>
                             ` : ''}
