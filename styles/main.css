@@ -12878,8 +12878,8 @@ textarea:focus {
 
 .quick-grid-6 {
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: var(--space-3);
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--space-4);
 }
 
 .quick-btn-new {
@@ -12887,12 +12887,14 @@ textarea:focus {
     flex-direction: column;
     align-items: center;
     gap: var(--space-3);
-    padding: var(--space-5) var(--space-3);
+    padding: var(--space-5) var(--space-4);
     background: var(--bg-elevated);
     border: 1px solid var(--border);
     border-radius: 14px;
     cursor: pointer;
     transition: all 0.2s;
+    min-height: 140px;
+    overflow: hidden;
 }
 
 .quick-btn-new:hover {
@@ -12925,6 +12927,9 @@ textarea:focus {
 .quick-desc {
     font-size: 0.75rem;
     color: var(--text-muted);
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
 }
 
 /* Progress Content New */
