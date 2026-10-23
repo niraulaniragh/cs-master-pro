@@ -16469,7 +16469,7 @@ textarea:focus-visible,
     stroke-dashoffset: calc(283 - (283 * var(--progress)) / 100);
 }
 
-.progress-text {
+.progress-ring .progress-text {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -16479,12 +16479,12 @@ textarea:focus-visible,
     color: #10b981;
 }
 
-.progress-info {
+.lp .progress-info {
     display: flex;
     flex-direction: column;
 }
 
-.progress-title {
+.lp .progress-title {
     font-weight: 600;
     font-size: 0.9rem;
 }
