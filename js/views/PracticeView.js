@@ -668,11 +668,11 @@ const PracticeView = {
 
         buttonEl.classList.add(isCorrect ? 'correct' : 'incorrect');
         
-        const correctBtn = document.querySelectorAll('.option-btn')[
-            Array.from(document.querySelectorAll('.option-btn')).findIndex(btn => 
-                btn.querySelector('.option-text').textContent === q.options[q.answer]
-            )
-        ];
+        const optionBtns = document.querySelectorAll('.option-btn');
+        const correctBtn = Array.from(optionBtns).find(btn => {
+            const optionTextEl = btn.querySelector('.option-text');
+            return optionTextEl && optionTextEl.textContent === q.options[q.answer];
+        });
         if (correctBtn && !isCorrect) {
             correctBtn.classList.add('correct');
         }

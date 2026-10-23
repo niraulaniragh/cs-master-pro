@@ -308,10 +308,29 @@ const Router = (() => {
         return route && typeof routes[route] === 'function';
     };
 
+    /**
+     * Cleanup router state (called on logout)
+     */
+    const cleanup = () => {
+        try {
+            // Clear navigation state
+            if (navigationTimeoutId) {
+                clearTimeout(navigationTimeoutId);
+                navigationTimeoutId = null;
+            }
+            isNavigating = false;
+            currentView = null;
+            // Don't reset isInitialized - will be set again on next init
+        } catch (error) {
+            console.error('Error cleaning up router:', error);
+        }
+    };
+
     return { 
         navigate, 
         init,
         getCurrentRoute,
-        hasRoute
+        hasRoute,
+        cleanup
     };
 })();

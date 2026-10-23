@@ -382,7 +382,12 @@ const Millionaire = {
         let shuffledQuestion = question;
         if (typeof Helpers !== 'undefined' && Helpers?.shuffleOptions) {
             const shuffled = Helpers.shuffleOptions(question);
-            shuffledQuestion = shuffled;
+            // shuffleOptions returns { options, correctIndex }, normalize to use 'answer' property
+            shuffledQuestion = {
+                ...question,
+                options: shuffled.options,
+                answer: shuffled.correctIndex
+            };
         }
         
         // Store shuffled question for answer checking

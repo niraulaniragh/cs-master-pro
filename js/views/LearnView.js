@@ -82,8 +82,8 @@ const LearnView = {
             // Check guest limits for topic access
             if (typeof GuestLimiter !== 'undefined') {
                 const canView = GuestLimiter.canViewTopic(topicId);
-                if (!canView?.allowed) {
-                    GuestLimiter.showSignupPrompt(canView?.reason, 'learn');
+                if (canView && !canView.allowed) {
+                    GuestLimiter.showSignupPrompt(canView.reason, 'learn');
                     return;
                 }
                 GuestLimiter.recordTopic(topicId);

@@ -17,6 +17,7 @@ const TowerDefense = {
     waveInProgress: false,
     questionActive: false,
     waveLoopTimer: null,
+    animationFrameId: null, // Track animation frame for cleanup
     lastAttackTime: {}, // Track per-tower attack cooldowns
     attackCooldown: 500, // ms between tower attacks
     
@@ -334,7 +335,7 @@ const TowerDefense = {
         // Schedule next frame with proper timer tracking
         TowerDefense.waveLoopTimer = setTimeout(() => {
             if (TowerDefense.isPlaying && TowerDefense.waveInProgress) {
-                requestAnimationFrame(() => TowerDefense.waveLoop());
+                TowerDefense.animationFrameId = requestAnimationFrame(() => TowerDefense.waveLoop());
             }
         }, 100);
     },
@@ -495,6 +496,12 @@ const TowerDefense = {
             TowerDefense.waveLoopTimer = null;
         }
         
+        // Cancel animation frame
+        if (TowerDefense.animationFrameId) {
+            cancelAnimationFrame(TowerDefense.animationFrameId);
+            TowerDefense.animationFrameId = null;
+        }
+        
         TowerDefense.wave++;
         
         // Bonus gold scales with difficulty
@@ -527,6 +534,12 @@ const TowerDefense = {
         if (TowerDefense.waveLoopTimer) {
             clearTimeout(TowerDefense.waveLoopTimer);
             TowerDefense.waveLoopTimer = null;
+        }
+        
+        // Cancel animation frame
+        if (TowerDefense.animationFrameId) {
+            cancelAnimationFrame(TowerDefense.animationFrameId);
+            TowerDefense.animationFrameId = null;
         }
         
         const killCount = TowerDefense.enemies.filter(e => e.health <= 0).length;
@@ -616,6 +629,12 @@ const TowerDefense = {
         if (TowerDefense.waveLoopTimer) {
             clearTimeout(TowerDefense.waveLoopTimer);
             TowerDefense.waveLoopTimer = null;
+        }
+        
+        // Cancel animation frame
+        if (TowerDefense.animationFrameId) {
+            cancelAnimationFrame(TowerDefense.animationFrameId);
+            TowerDefense.animationFrameId = null;
         }
         
         // Reset state
