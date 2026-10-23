@@ -356,15 +356,22 @@ const CarRace = {
             `;
         }
         
+        // Shuffle options if not already shuffled
+        if (!question._shuffled && typeof Helpers !== 'undefined' && Helpers.shuffleOptions) {
+            const shuffled = Helpers.shuffleOptions(question);
+            CarRace.questions[CarRace.questionIndex] = { ...shuffled, _shuffled: true };
+        }
+        const currentQ = CarRace.questions[CarRace.questionIndex];
+        
         // Get options, applying hint if active
-        let options = question.options || [];
+        let options = currentQ.options || [];
         let hiddenIndexes = [];
         
         if (CarRace.hintUsed && options.length > 2) {
             // Hide 2 wrong options (but not the correct answer)
             const wrongIndexes = options
                 .map((_, i) => i)
-                .filter(i => i !== question.answer);
+                .filter(i => i !== currentQ.answer);
             hiddenIndexes = wrongIndexes.slice(0, 2);
         }
         
@@ -372,10 +379,10 @@ const CarRace = {
             <div class="race-question">
                 <div class="question-header">
                     <span class="question-number">Checkpoint ${CarRace.questionIndex + 1}/${CarRace.raceTrackLength}</span>
-                    <span class="question-topic">${CarRace.escapeHtml(question.topic || 'General')}</span>
+                    <span class="question-topic">${CarRace.escapeHtml(currentQ.topic || 'General')}</span>
                 </div>
                 
-                <div class="question-text">${CarRace.escapeHtml(question.question || '')}</div>
+                <div class="question-text">${CarRace.escapeHtml(currentQ.question || '')}</div>
                 
                 <div class="race-options">
                     ${options.map((opt, i) => {

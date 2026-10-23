@@ -413,8 +413,13 @@ const TowerDefense = {
             TowerDefense.currentQuestionIndex = 0;
         }
         
-        const q = TowerDefense.questions[TowerDefense.currentQuestionIndex];
+        let q = TowerDefense.questions[TowerDefense.currentQuestionIndex];
         if (!q || !q.options || !Array.isArray(q.options)) return;
+        
+        // Shuffle options
+        if (typeof Helpers !== 'undefined' && Helpers.shuffleOptions) {
+            q = Helpers.shuffleOptions(q);
+        }
         
         TowerDefense.currentQuestion = q;
         TowerDefense.questionActive = true;
