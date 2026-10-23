@@ -15,7 +15,9 @@ const Router = (() => {
         games: () => typeof GamesView !== 'undefined' ? GamesView : null,
         teacher: () => typeof TeacherView !== 'undefined' ? TeacherView : null,
         analytics: () => typeof AnalyticsView !== 'undefined' ? AnalyticsView : null,
-        pastpapers: () => typeof PastPaperView !== 'undefined' ? PastPaperView : null
+        pastpapers: () => typeof PastPaperView !== 'undefined' ? PastPaperView : null,
+        profile: () => typeof ProfileView !== 'undefined' ? ProfileView : null,
+        settings: () => typeof SettingsView !== 'undefined' ? SettingsView : null
     };
 
     let currentView = null;

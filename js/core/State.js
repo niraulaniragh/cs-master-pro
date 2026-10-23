@@ -394,9 +394,13 @@ const AppState = (() => {
                                 <i class="fas fa-chevron-down"></i>
                             </button>
                             <div class="user-dropdown" id="user-dropdown">
-                                <a href="#" onclick="App.showProfile(); return false;">
+                                <a href="#" onclick="Router.navigate('profile'); AppState.toggleUserMenu(); return false;">
                                     <i class="fas fa-user"></i> Profile
                                 </a>
+                                <a href="#" onclick="Router.navigate('settings'); AppState.toggleUserMenu(); return false;">
+                                    <i class="fas fa-cog"></i> Settings
+                                </a>
+                                <div class="dropdown-divider"></div>
                                 <a href="#" onclick="App.logout(); return false;">
                                     <i class="fas fa-sign-out-alt"></i> Logout
                                 </a>
