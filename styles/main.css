@@ -16671,56 +16671,85 @@ textarea:focus-visible,
 
 
 
+
 /* ==================== LANDING PAGE ==================== */
 .landing-page {
-    max-width: 1000px;
+    max-width: 1100px;
     margin: 0 auto;
-    padding: 40px 20px;
+    padding: 20px;
 }
 
+/* Hero Section */
 .landing-hero {
     text-align: center;
-    padding: 60px 20px;
-    margin-bottom: 60px;
+    padding: 60px 20px 40px;
+}
+
+.landing-eyebrow {
+    display: inline-block;
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--primary);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin-bottom: 20px;
 }
 
 .landing-title {
-    font-size: clamp(2rem, 8vw, 3.5rem);
+    font-size: clamp(2.5rem, 10vw, 4rem);
     font-weight: 800;
     background: linear-gradient(135deg, #10b981, #3b82f6);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     margin-bottom: 16px;
+    line-height: 1.1;
 }
 
 .landing-subtitle {
-    font-size: clamp(1rem, 3vw, 1.25rem);
+    font-size: clamp(1rem, 3vw, 1.2rem);
     color: var(--text-secondary);
-    max-width: 600px;
-    margin: 0 auto 20px;
+    max-width: 650px;
+    margin: 0 auto 32px;
     line-height: 1.6;
 }
 
-.landing-badge {
-    display: inline-block;
-    background: var(--bg-elevated);
-    padding: 8px 20px;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    color: var(--text-muted);
+/* Stats Row */
+.landing-stats-row {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
     margin-bottom: 32px;
+    flex-wrap: wrap;
 }
 
+.landing-stat {
+    text-align: center;
+}
+
+.stat-num {
+    display: block;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.stat-label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+/* Buttons */
 .landing-buttons {
     display: flex;
-    gap: 16px;
+    gap: 12px;
     justify-content: center;
     flex-wrap: wrap;
 }
 
 .landing-btn {
-    padding: 14px 32px;
+    padding: 14px 28px;
     border-radius: 10px;
     font-size: 1rem;
     font-weight: 600;
@@ -16760,24 +16789,64 @@ textarea:focus-visible,
 }
 
 .landing-btn.large {
-    padding: 18px 40px;
+    padding: 16px 36px;
     font-size: 1.1rem;
+}
+
+/* Trust Banner */
+.landing-trust {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    flex-wrap: wrap;
+    padding: 20px;
+    background: var(--bg-card);
+    border-radius: 12px;
+    margin-bottom: 60px;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.landing-trust span {
+    white-space: nowrap;
+}
+
+/* Sections */
+.landing-section {
+    margin-bottom: 60px;
+}
+
+.section-title {
+    text-align: center;
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    margin-bottom: 12px;
+}
+
+.section-subtitle {
+    text-align: center;
+    color: var(--text-muted);
+    margin-bottom: 32px;
 }
 
 /* Features Grid */
 .landing-features {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 24px;
-    margin-bottom: 60px;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
 }
 
 .landing-feature {
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: 16px;
-    padding: 32px 24px;
+    padding: 28px 24px;
     text-align: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.landing-feature:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
 }
 
 .feature-icon {
@@ -16787,48 +16856,126 @@ textarea:focus-visible,
 }
 
 .landing-feature h3 {
-    font-size: 1.25rem;
+    font-size: 1.15rem;
     margin-bottom: 8px;
     color: var(--text-primary);
 }
 
 .landing-feature p {
     color: var(--text-muted);
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     line-height: 1.5;
+}
+
+/* Why Grid */
+.landing-why {
+    background: var(--bg-card);
+    border-radius: 20px;
+    padding: 40px 24px;
+}
+
+.why-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 24px;
+}
+
+.why-card {
+    text-align: center;
+    padding: 20px;
+}
+
+.why-icon {
+    font-size: 2rem;
+    margin-bottom: 12px;
+}
+
+.why-card h3 {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+}
+
+.why-card p {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+/* Topics Preview */
+.topics-preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+}
+
+.topic-tag {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 0.9rem;
 }
 
 /* CTA Section */
 .landing-cta {
     text-align: center;
-    padding: 60px 20px;
-    background: var(--bg-card);
+    padding: 60px 24px;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(59, 130, 246, 0.1));
     border-radius: 20px;
-    border: 1px solid var(--border);
+    margin-bottom: 40px;
 }
 
 .landing-cta h2 {
-    font-size: 1.75rem;
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    margin-bottom: 12px;
+}
+
+.landing-cta p {
+    color: var(--text-muted);
     margin-bottom: 24px;
 }
 
 .landing-cta .landing-btn {
-    display: block;
-    margin: 0 auto 12px;
+    display: inline-block;
+    margin: 0 8px 12px;
 }
 
-/* Mobile */
-@media (max-width: 600px) {
+/* Footer */
+.landing-footer {
+    text-align: center;
+    padding: 20px;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
     .landing-hero {
-        padding: 40px 16px;
+        padding: 40px 16px 30px;
+    }
+    
+    .landing-stats-row {
+        gap: 20px;
+    }
+    
+    .stat-num {
+        font-size: 1.5rem;
     }
     
     .landing-buttons {
         flex-direction: column;
+        align-items: center;
     }
     
     .landing-btn {
         width: 100%;
+        max-width: 280px;
+    }
+    
+    .landing-trust {
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
     }
     
     .landing-features {
@@ -16837,6 +16984,14 @@ textarea:focus-visible,
     
     .landing-feature {
         padding: 24px 20px;
+    }
+    
+    .why-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .landing-cta {
+        padding: 40px 20px;
     }
 }
 
