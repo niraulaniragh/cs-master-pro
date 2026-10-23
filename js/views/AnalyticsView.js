@@ -412,54 +412,114 @@ const AnalyticsView = {
     
     // Render achievement progress
     renderAchievementProgress: () => {
-        const achievements = [
-            { id: 'first_quiz', name: 'First Steps', desc: 'Complete your first quiz', icon: '🎯', target: 1, type: 'quizzes' },
-            { id: 'streak_7', name: 'Week Warrior', desc: '7-day streak', icon: '🔥', target: 7, type: 'streak' },
-            { id: 'mastery_10', name: 'Knowledge Seeker', desc: 'Master 10 questions', icon: '🧠', target: 10, type: 'mastered' },
-            { id: 'accuracy_90', name: 'Perfectionist', desc: '90% accuracy (50+ questions)', icon: '🎯', target: 90, type: 'accuracy' },
-            { id: 'all_topics', name: 'Well Rounded', desc: 'Practice all topics', icon: '🌟', target: 10, type: 'topics' }
-        ];
+        // Use the global ACHIEVEMENTS if available, with fallback
+        const allAchievements = typeof ACHIEVEMENTS !== 'undefined' && Array.isArray(ACHIEVEMENTS) 
+            ? ACHIEVEMENTS 
+            : [];
         
+        // Get user's unlocked achievements
+        let userAchievements = [];
+        try {
+            if (typeof AppState !== 'undefined') {
+                const user = AppState.getState('user');
+                userAchievements = Array.isArray(user?.achievements) ? user.achievements : [];
+            }
+        } catch (e) {
+            console.warn('Could not load user achievements:', e);
+        }
+        
+        // Get stats for progress calculation
         const streakData = typeof StreakSystem !== 'undefined' ? StreakSystem.getData() : {};
         const srsStats = typeof SRSSystem !== 'undefined' ? SRSSystem.getOverallStats() : {};
         
-        return achievements.map(ach => {
-            let current = 0;
+        // Calculate progress for specific achievement types
+        const getProgress = (achievement) => {
+            const id = achievement.id;
             
-            switch (ach.type) {
-                case 'streak':
-                    current = streakData.longestStreak || 0;
-                    break;
-                case 'mastered':
-                    current = srsStats.cardsMastered || 0;
-                    break;
-                case 'accuracy':
-                    current = srsStats.averageAccuracy || 0;
-                    break;
-                case 'quizzes':
-                    current = srsStats.totalReviews > 0 ? 1 : 0;
-                    break;
-                default:
-                    current = 0;
+            // If already unlocked, show 100%
+            if (userAchievements.includes(id)) {
+                return { current: 1, target: 1, percent: 100, completed: true };
             }
             
-            const progress = Math.min(100, (current / ach.target) * 100);
-            const completed = current >= ach.target;
+            // Calculate progress based on achievement type
+            let current = 0, target = 1;
             
+            switch (id) {
+                case 'first_quiz':
+                    target = 1;
+                    current = srsStats.totalReviews > 0 ? 1 : 0;
+                    break;
+                case 'streak_5':
+                    target = 5;
+                    current = streakData.currentStreak || 0;
+                    break;
+                case 'streak_10':
+                    target = 10;
+                    current = streakData.currentStreak || 0;
+                    break;
+                case 'level_5':
+                    target = 5;
+                    current = typeof AppState !== 'undefined' ? (AppState.getState('user.level') || 1) : 1;
+                    break;
+                case 'level_10':
+                    target = 10;
+                    current = typeof AppState !== 'undefined' ? (AppState.getState('user.level') || 1) : 1;
+                    break;
+                case 'century':
+                    target = 100;
+                    current = srsStats.totalReviews || 0;
+                    break;
+                case 'daily_streak_7':
+                case 'week_streak':
+                    target = 7;
+                    current = streakData.longestStreak || streakData.currentStreak || 0;
+                    break;
+                case 'daily_streak_30':
+                case 'month_streak':
+                    target = 30;
+                    current = streakData.longestStreak || streakData.currentStreak || 0;
+                    break;
+                case 'flashcard_master':
+                    target = 50;
+                    current = srsStats.cardsMastered || 0;
+                    break;
+                default:
+                    // For achievements we can't track progress, show locked
+                    return { current: 0, target: 1, percent: 0, completed: false };
+            }
+            
+            const percent = Math.min(100, Math.round((current / target) * 100));
+            return { current, target, percent, completed: percent >= 100 };
+        };
+        
+        // Take first 6 achievements for display (mix of unlocked and in-progress)
+        const displayAchievements = allAchievements.slice(0, 8).map(ach => ({
+            ...ach,
+            progress: getProgress(ach)
+        }));
+        
+        if (displayAchievements.length === 0) {
             return `
-                <div class="achievement-item ${completed ? 'completed' : ''}">
-                    <span class="achievement-icon">${ach.icon}</span>
-                    <div class="achievement-info">
-                        <span class="achievement-name">${ach.name}</span>
-                        <span class="achievement-desc">${ach.desc}</span>
-                        <div class="achievement-bar">
-                            <div class="achievement-fill" style="width: ${progress}%"></div>
-                        </div>
-                    </div>
-                    <span class="achievement-progress">${current}/${ach.target}</span>
+                <div class="empty-state">
+                    <span>🏆</span>
+                    <p>Start playing to unlock achievements!</p>
                 </div>
             `;
-        }).join('');
+        }
+        
+        return displayAchievements.map(ach => `
+            <div class="achievement-item ${ach.progress.completed ? 'completed' : ''}">
+                <span class="achievement-icon">${ach.icon || '🏆'}</span>
+                <div class="achievement-info">
+                    <span class="achievement-name">${ach.name}</span>
+                    <span class="achievement-desc">${ach.description || ach.desc || ''}</span>
+                    <div class="achievement-bar">
+                        <div class="achievement-fill" style="width: ${ach.progress.percent}%"></div>
+                    </div>
+                </div>
+                <span class="achievement-progress">${ach.progress.current}/${ach.progress.target}</span>
+            </div>
+        `).join('');
     },
     
     // Render smart recommendations

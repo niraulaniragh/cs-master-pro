@@ -56,13 +56,15 @@ const Modal = (() => {
         modalElement.className = 'modal-overlay';
         modalElement.setAttribute('role', 'dialog');
         modalElement.setAttribute('aria-modal', 'true');
+        modalElement.setAttribute('aria-labelledby', 'modal-title-id');
+        modalElement.setAttribute('aria-describedby', 'modal-body-id');
         modalElement.innerHTML = `
             <div class="modal">
                 <div class="modal-header">
-                    <h3 class="modal-title"></h3>
-                    <button class="modal-close" aria-label="Close modal">&times;</button>
+                    <h3 class="modal-title" id="modal-title-id"></h3>
+                    <button type="button" class="modal-close" aria-label="Close modal">&times;</button>
                 </div>
-                <div class="modal-body"></div>
+                <div class="modal-body" id="modal-body-id"></div>
                 <div class="modal-footer"></div>
             </div>
         `;
@@ -102,9 +104,8 @@ const Modal = (() => {
     const setupFocusTrap = () => {
         if (!modalElement) return;
 
-        const focusableElements = modalElement.querySelectorAll(
-            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        );
+        const focusableSelector = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"]), [role="button"]:not([disabled])';
+        const focusableElements = modalElement.querySelectorAll(focusableSelector);
         
         if (focusableElements.length === 0) return;
 
@@ -191,10 +192,7 @@ const Modal = (() => {
                 footerEl.innerHTML = sanitizeContent(footer);
             }
 
-            // Set ARIA label
-            if (title) {
-                modalElement.setAttribute('aria-label', title);
-            }
+            // aria-labelledby is set on create, pointing to modal-title-id
 
             onCloseCallback = typeof onClose === 'function' ? onClose : null;
 
@@ -210,6 +208,13 @@ const Modal = (() => {
             // Store current focus to restore later
             previousActiveElement = document.activeElement;
 
+            // Set inert on main content to prevent background interaction
+            const mainContent = document.querySelector('main') || document.getElementById('app');
+            if (mainContent && mainContent !== modalElement) {
+                mainContent.setAttribute('inert', '');
+                mainContent.setAttribute('aria-hidden', 'true');
+            }
+
             // Show modal with animation
             requestAnimationFrame(() => {
                 if (modalElement) {
@@ -217,9 +222,8 @@ const Modal = (() => {
                     setupFocusTrap();
                     
                     // Focus first focusable element
-                    const firstFocusable = modalElement.querySelector(
-                        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-                    );
+                    const focusableSelector = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"]), [role="button"]:not([disabled])';
+                    const firstFocusable = modalElement.querySelector(focusableSelector);
                     if (firstFocusable) {
                         firstFocusable.focus();
                     }
@@ -241,6 +245,13 @@ const Modal = (() => {
 
         try {
             modalElement.classList.remove('show');
+
+            // Remove inert from main content
+            const mainContent = document.querySelector('main') || document.getElementById('app');
+            if (mainContent) {
+                mainContent.removeAttribute('inert');
+                mainContent.removeAttribute('aria-hidden');
+            }
 
             // Update app state if available
             try {

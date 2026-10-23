@@ -390,19 +390,35 @@ const GamesView = {
     },
 
     renderGameAchievements: () => {
-        const achievements = [
-            { id: 'speed_demon', name: 'Speed Demon', icon: '⚡', desc: '10x combo in Speed Run' },
-            { id: 'speed_master', name: 'Speed Master', icon: '🏎️', desc: 'Score 2000+ in Speed Run' },
-            { id: 'battle_veteran', name: 'Battle Veteran', icon: '⚔️', desc: 'Win 10 battles' },
-            { id: 'undefeated', name: 'Undefeated', icon: '🏆', desc: '5 win streak in Battle Mode' },
-            { id: 'speed_typist', name: 'Speed Typist', icon: '⌨️', desc: '60+ WPM in Type Racer' },
-            { id: 'perfect_accuracy', name: 'Perfect Accuracy', icon: '🎯', desc: '100% accuracy in Type Racer' },
-            { id: 'millionaire', name: 'CS Millionaire', icon: '💰', desc: 'Win 1,000,000 XP in Millionaire' },
-            { id: 'quiz_master', name: 'Quiz Master', icon: '🧠', desc: 'Reach question 10 in Millionaire' },
-            { id: 'boss_slayer', name: 'Boss Slayer', icon: '🗡️', desc: 'Defeat any boss' },
-            { id: 'champion', name: 'Champion', icon: '👑', desc: 'Defeat The Examinator' },
-            { id: 'flawless', name: 'Flawless Victory', icon: '⭐', desc: 'Defeat boss with full HP' }
+        // Game-related achievement IDs
+        const gameAchievementIds = [
+            'speed_demon', 'speed_master', 'battle_veteran', 'undefeated',
+            'speed_typist', 'perfect_accuracy', 'millionaire', 'quiz_master',
+            'boss_slayer', 'champion', 'flawless'
         ];
+        
+        // Get achievements from global ACHIEVEMENTS constant
+        let achievements = [];
+        if (typeof ACHIEVEMENTS !== 'undefined' && Array.isArray(ACHIEVEMENTS)) {
+            achievements = ACHIEVEMENTS.filter(a => gameAchievementIds.includes(a.id));
+        }
+        
+        // Fallback if ACHIEVEMENTS not available
+        if (achievements.length === 0) {
+            achievements = [
+                { id: 'speed_demon', name: 'Speed Demon', icon: '⚡', description: '10x combo in Speed Run' },
+                { id: 'speed_master', name: 'Speed Master', icon: '🏎️', description: 'Score 2000+ in Speed Run' },
+                { id: 'battle_veteran', name: 'Battle Veteran', icon: '⚔️', description: 'Win 10 battles' },
+                { id: 'undefeated', name: 'Undefeated', icon: '🏆', description: '5 win streak in Battle Mode' },
+                { id: 'speed_typist', name: 'Speed Typist', icon: '⌨️', description: '60+ WPM in Type Racer' },
+                { id: 'perfect_accuracy', name: 'Perfect Accuracy', icon: '🎯', description: '100% accuracy in Type Racer' },
+                { id: 'millionaire', name: 'CS Millionaire', icon: '💰', description: 'Win 1,000,000 XP in Millionaire' },
+                { id: 'quiz_master', name: 'Quiz Master', icon: '🧠', description: 'Reach question 10 in Millionaire' },
+                { id: 'boss_slayer', name: 'Boss Slayer', icon: '🗡️', description: 'Defeat any boss' },
+                { id: 'champion', name: 'Champion', icon: '👑', description: 'Defeat The Examinator' },
+                { id: 'flawless', name: 'Flawless Victory', icon: '⭐', description: 'Defeat boss with full HP' }
+            ];
+        }
         
         let unlocked = [];
         try {
@@ -416,14 +432,18 @@ const GamesView = {
         
         return `
             <div class="game-ach-grid">
-                ${achievements.map(ach => `
-                    <div class="game-ach-card ${unlocked.includes(ach.id) ? 'unlocked' : 'locked'}">
-                        <span class="game-ach-icon">${ach.icon}</span>
-                        <span class="game-ach-name">${ach.name}</span>
-                        <span class="game-ach-desc">${ach.desc}</span>
-                        ${unlocked.includes(ach.id) ? '<span class="game-ach-check">✓</span>' : ''}
-                    </div>
-                `).join('')}
+                ${achievements.map(ach => {
+                    const isUnlocked = unlocked.includes(ach.id);
+                    const desc = ach.description || ach.desc || '';
+                    return `
+                        <div class="game-ach-card ${isUnlocked ? 'unlocked' : 'locked'}">
+                            <span class="game-ach-icon">${ach.icon}</span>
+                            <span class="game-ach-name">${ach.name}</span>
+                            <span class="game-ach-desc">${desc}</span>
+                            ${isUnlocked ? '<span class="game-ach-check">✓</span>' : ''}
+                        </div>
+                    `;
+                }).join('')}
             </div>
         `;
     }

@@ -14,16 +14,15 @@ const DailyChallenge = {
     questions: [],
 
     /**
-     * Get today's date string in ISO format (YYYY-MM-DD)
-     * @returns {string} Today's date string
+     * Get today's date string in local timezone (YYYY-MM-DD)
+     * @returns {string} Today's date string in local timezone
      */
     getToday: () => {
-        try {
-            return new Date().toISOString().split('T')[0];
-        } catch (error) {
-            console.error('DailyChallenge: Error getting today\'s date', error);
-            return new Date().toDateString(); // Fallback
-        }
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
     },
 
     /**
@@ -155,16 +154,40 @@ const DailyChallenge = {
             const today = DailyChallenge.getToday();
 
             // Validate inputs
-            const validScore = Math.max(0, Math.min(Number(score) || 0, total));
             const validTotal = Math.max(1, Number(total) || DailyChallenge.QUESTIONS_PER_DAY);
+            const validScore = Math.max(0, Math.min(Number(score) || 0, validTotal));
 
-            // Calculate yesterday's date
-            const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+            // Already completed today - return existing data without modifying streak
+            if (data.lastCompleted === today) {
+                const currentStreak = Number(data.streak) || 1;
+                const baseXP = validScore * 15;
+                const streakBonus = Math.min(currentStreak * 5, 50);
+                const perfectBonus = validScore === validTotal ? 25 : 0;
+                return {
+                    streak: currentStreak,
+                    bestStreak: Number(data.bestStreak) || currentStreak,
+                    baseXP,
+                    streakBonus,
+                    perfectBonus,
+                    totalXP: baseXP + streakBonus + perfectBonus
+                };
+            }
 
-            // Calculate streak
-            if (data.lastCompleted === yesterday) {
+            // Calculate yesterday's date in local timezone
+            const yesterdayDate = new Date();
+            yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+            const yesterday = `${yesterdayDate.getFullYear()}-${String(yesterdayDate.getMonth() + 1).padStart(2, '0')}-${String(yesterdayDate.getDate()).padStart(2, '0')}`;
+
+            // Calculate streak - check if lastCompleted exists and is valid
+            const lastCompleted = data.lastCompleted || null;
+            if (lastCompleted === yesterday) {
+                // Completed yesterday - continue streak
                 data.streak = (Number(data.streak) || 0) + 1;
-            } else if (data.lastCompleted !== today) {
+            } else if (lastCompleted === today) {
+                // Already completed today (shouldn't reach here due to early return, but safety check)
+                // Keep current streak
+            } else {
+                // Streak broken or first time - reset to 1
                 data.streak = 1;
             }
 

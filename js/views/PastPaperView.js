@@ -460,15 +460,30 @@ const PastPaperView = {
     
     startPaper: (paperId) => {
         const paper = PastPaperView.papers[paperId];
-        if (!paper) return;
+        if (!paper) {
+            console.error('Paper not found:', paperId);
+            if (typeof Toast !== 'undefined') {
+                Toast.show('Paper not found. Please try again.', 'error');
+            }
+            return;
+        }
+        
+        if (!paper.questions || paper.questions.length === 0) {
+            console.error('Paper has no questions:', paperId);
+            if (typeof Toast !== 'undefined') {
+                Toast.show('Paper has no questions.', 'error');
+            }
+            return;
+        }
         
         PastPaperView.currentPaper = { id: paperId, ...paper };
         PastPaperView.currentQuestionIndex = 0;
-        PastPaperView.answers = [];
+        PastPaperView.answers = new Array(paper.questions.length).fill(null);
         PastPaperView.showingMarkScheme = false;
         
-        // Start timer
-        const duration = PastPaperView.paperTypes[paper.paper].duration;
+        // Start timer with validation
+        const paperType = PastPaperView.paperTypes[paper.paper];
+        const duration = paperType ? paperType.duration : 90;
         PastPaperView.timeRemaining = duration * 60;
         
         PastPaperView.renderExam();
@@ -479,13 +494,17 @@ const PastPaperView = {
         // Collect all questions for this topic
         const questions = [];
         Object.values(PastPaperView.papers).forEach(paper => {
-            paper.questions.forEach(q => {
-                if (q.topic === topicId) questions.push(q);
-            });
+            if (paper.questions && Array.isArray(paper.questions)) {
+                paper.questions.forEach(q => {
+                    if (q.topic === topicId) questions.push(q);
+                });
+            }
         });
         
         if (questions.length === 0) {
-            Toast.show('No questions available for this topic', 'error');
+            if (typeof Toast !== 'undefined') {
+                Toast.show('No questions available for this topic', 'error');
+            }
             return;
         }
         
@@ -499,7 +518,7 @@ const PastPaperView = {
             questions: shuffled
         };
         PastPaperView.currentQuestionIndex = 0;
-        PastPaperView.answers = [];
+        PastPaperView.answers = new Array(shuffled.length).fill(null);
         PastPaperView.timeRemaining = 0; // No timer for topic practice
         
         PastPaperView.renderExam();
@@ -540,9 +559,9 @@ const PastPaperView = {
                     
                     <div class="pp-answer-area">
                         ${q.type === 'code' ? `
-                            <textarea id="pp-answer" class="pp-code-answer" placeholder="Write your answer here..." rows="10">${PastPaperView.answers[PastPaperView.currentQuestionIndex]?.answer || ''}</textarea>
+                            <textarea id="pp-answer" class="pp-code-answer" placeholder="Write your answer here..." rows="10">${PastPaperView.answers[PastPaperView.currentQuestionIndex]?.answer ?? ''}</textarea>
                         ` : `
-                            <textarea id="pp-answer" class="pp-written-answer" placeholder="Write your answer here..." rows="6">${PastPaperView.answers[PastPaperView.currentQuestionIndex]?.answer || ''}</textarea>
+                            <textarea id="pp-answer" class="pp-written-answer" placeholder="Write your answer here..." rows="6">${PastPaperView.answers[PastPaperView.currentQuestionIndex]?.answer ?? ''}</textarea>
                         `}
                     </div>
                     
@@ -571,12 +590,17 @@ const PastPaperView = {
     
     saveAnswer: () => {
         const answerEl = document.getElementById('pp-answer');
-        if (answerEl) {
-            PastPaperView.answers[PastPaperView.currentQuestionIndex] = {
-                answer: answerEl.value,
-                question: PastPaperView.currentPaper.questions[PastPaperView.currentQuestionIndex]
-            };
-        }
+        if (!answerEl || !PastPaperView.currentPaper) return;
+        
+        const currentIndex = PastPaperView.currentQuestionIndex;
+        const question = PastPaperView.currentPaper.questions[currentIndex];
+        
+        if (!question) return;
+        
+        PastPaperView.answers[currentIndex] = {
+            answer: answerEl.value || '',
+            question: question
+        };
     },
     
     saveAndNext: () => {
@@ -672,6 +696,8 @@ const PastPaperView = {
                 <div class="pp-results-questions">
                     ${paper.questions.map((q, i) => {
                         const answer = PastPaperView.answers[i];
+                        const userAnswer = answer?.answer || '';
+                        const displayAnswer = userAnswer.trim() ? Helpers.escapeHtml(userAnswer) : '(No answer provided)';
                         return `
                             <div class="pp-result-item">
                                 <div class="pp-result-header">
@@ -681,21 +707,21 @@ const PastPaperView = {
                                 </div>
                                 
                                 <div class="pp-result-question">
-                                    <p><strong>Question:</strong> ${q.question}</p>
+                                    <p><strong>Question:</strong> ${Helpers.escapeHtml(q.question)}</p>
                                 </div>
                                 
                                 <div class="pp-result-answer">
                                     <p><strong>Your Answer:</strong></p>
-                                    <pre class="pp-user-answer">${Helpers.escapeHtml(answer?.answer || '(No answer provided)')}</pre>
+                                    <pre class="pp-user-answer">${displayAnswer}</pre>
                                 </div>
                                 
                                 <div class="pp-mark-scheme">
-                                    <button class="btn btn-secondary btn-small" onclick="this.nextElementSibling.classList.toggle('show'); this.textContent = this.nextElementSibling.classList.contains('show') ? 'Hide Mark Scheme' : 'Show Mark Scheme'">
+                                    <button class="btn btn-secondary btn-small pp-toggle-scheme" onclick="PastPaperView.toggleMarkScheme(this)">
                                         Show Mark Scheme
                                     </button>
-                                    <div class="pp-scheme-content">
+                                    <div class="pp-scheme-content" style="display: none;">
                                         <p><strong>Mark Scheme:</strong></p>
-                                        <pre>${q.markScheme}</pre>
+                                        <pre>${Helpers.escapeHtml(q.markScheme || 'No mark scheme available')}</pre>
                                     </div>
                                 </div>
                                 
@@ -738,6 +764,15 @@ const PastPaperView = {
         
         document.getElementById('pp-total-marks').textContent = total;
         document.getElementById('pp-percentage').textContent = percentage;
+    },
+    
+    toggleMarkScheme: (button) => {
+        const schemeContent = button.nextElementSibling;
+        if (!schemeContent) return;
+        
+        const isHidden = schemeContent.style.display === 'none';
+        schemeContent.style.display = isHidden ? 'block' : 'none';
+        button.textContent = isHidden ? 'Hide Mark Scheme' : 'Show Mark Scheme';
     },
     
     saveResults: () => {

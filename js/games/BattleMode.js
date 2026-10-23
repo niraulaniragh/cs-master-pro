@@ -16,9 +16,12 @@ const BattleMode = {
     opponentName: 'CPU Bot',
     round: 0,
     maxRounds: 10,
-    powerUps: { doublePoints: 1, skipQuestion: 1, timeFreezes: 1 },
+    powerUps: { doublePoints: 1, skipQuestion: 1, timeFreeze: 1 },
     questionTimer: null,
+    opponentTimeout: null,
     timeLeft: 15,
+    playerAnswered: false, // Track if player already answered this round
+    timeFrozen: false,
 
     difficulties: {
         easy: { name: 'Rookie Bot 🤖', speed: [3, 6], accuracy: 0.5, color: '#10b981' },
@@ -118,7 +121,7 @@ const BattleMode = {
 
     selectDifficulty: (diff, evt) => {
         BattleMode.difficulty = diff;
-        BattleMode.opponentName = BattleMode.difficulties[diff].name;
+        BattleMode.opponentName = BattleMode.difficulties[diff]?.name || 'CPU Bot';
         
         document.querySelectorAll('.difficulty-btn').forEach(btn => {
             btn.classList.remove('selected');
@@ -140,6 +143,13 @@ const BattleMode = {
                 return;
             }
             
+            // Validate shuffleArray function exists
+            if (typeof shuffleArray !== 'function') {
+                console.error('shuffleArray function not found');
+                Toast?.show?.('Game initialization error', 'error');
+                return;
+            }
+            
             BattleMode.questions = shuffleArray([...QUESTIONS]).slice(0, BattleMode.maxRounds);
             
             if (BattleMode.questions.length === 0) {
@@ -156,6 +166,8 @@ const BattleMode = {
             BattleMode.powerUps = { doublePoints: 1, skipQuestion: 1, timeFreeze: 1 };
             BattleMode.isPlaying = true;
             BattleMode.activeDoublePoints = false;
+            BattleMode.playerAnswered = false;
+            BattleMode.timeFrozen = false;
             
             SoundFX?.play?.('start');
             
@@ -177,15 +189,19 @@ const BattleMode = {
     },
 
     renderGame: () => {
-        const opponent = BattleMode.difficulties[BattleMode.difficulty];
-        const username = Auth.getCurrentUser()?.username || 'You';
+        const opponent = BattleMode.difficulties[BattleMode.difficulty] || BattleMode.difficulties.normal;
+        const currentUser = typeof Auth !== 'undefined' ? Auth.getCurrentUser?.() : null;
+        const username = currentUser?.username || 'You';
+        const escapedUsername = typeof Helpers !== 'undefined' && Helpers.escapeHtml 
+            ? Helpers.escapeHtml(username) 
+            : username.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
         
         return `
             <div class="battle-game-view">
                 <div class="battle-arena">
                     <div class="battle-player player-left">
                         <div class="bp-avatar">👤</div>
-                        <div class="bp-name">${Helpers.escapeHtml(username)}</div>
+                        <div class="bp-name">${escapedUsername}</div>
                         <div class="bp-hp-bar">
                             <div class="bp-hp-fill" id="player-hp" style="width: 100%"></div>
                             <span class="bp-hp-text" id="player-hp-text">100</span>
@@ -246,13 +262,28 @@ const BattleMode = {
         }
         
         BattleMode.round++;
-        document.getElementById('battle-round').textContent = BattleMode.round;
+        BattleMode.playerAnswered = false; // Reset for new round
+        
+        const roundEl = document.getElementById('battle-round');
+        if (roundEl) roundEl.textContent = BattleMode.round;
         
         const question = BattleMode.questions[BattleMode.currentIndex];
+        if (!question || !question.options || !Array.isArray(question.options)) {
+            console.error('Invalid question format at index', BattleMode.currentIndex);
+            BattleMode.currentIndex++;
+            BattleMode.showQuestion();
+            return;
+        }
+        
         BattleMode.timeLeft = 15;
         BattleMode.activeDoublePoints = false;
         
         const questionArea = document.getElementById('battle-question-area');
+        if (!questionArea) {
+            console.error('Question area not found');
+            return;
+        }
+        
         questionArea.innerHTML = `
             <div class="battle-question animate-in">
                 <h3 class="bq-text">${question.question}</h3>
@@ -275,18 +306,34 @@ const BattleMode = {
         const timerFill = document.getElementById('battle-timer-fill');
         const timerText = document.getElementById('battle-timer-text');
         
+        if (!timerFill || !timerText) {
+            console.error('Timer elements not found');
+            return;
+        }
+        
         timerFill.style.width = '100%';
+        timerFill.classList.remove('danger');
         timerText.textContent = BattleMode.timeLeft;
         
+        // Clear any existing timer
+        if (BattleMode.questionTimer) {
+            clearInterval(BattleMode.questionTimer);
+        }
+        
         BattleMode.questionTimer = setInterval(() => {
+            if (BattleMode.timeFrozen) return; // Skip countdown when frozen
+            
             BattleMode.timeLeft -= 0.1;
             
             const percent = (BattleMode.timeLeft / 15) * 100;
-            timerFill.style.width = percent + '%';
-            timerText.textContent = Math.ceil(BattleMode.timeLeft);
+            const fill = document.getElementById('battle-timer-fill');
+            const text = document.getElementById('battle-timer-text');
             
-            if (BattleMode.timeLeft <= 5) {
-                timerFill.classList.add('danger');
+            if (fill) fill.style.width = Math.max(0, percent) + '%';
+            if (text) text.textContent = Math.ceil(Math.max(0, BattleMode.timeLeft));
+            
+            if (BattleMode.timeLeft <= 5 && fill) {
+                fill.classList.add('danger');
             }
             
             if (BattleMode.timeLeft <= 0) {
@@ -296,13 +343,19 @@ const BattleMode = {
     },
 
     simulateOpponent: (question) => {
-        const settings = BattleMode.difficulties[BattleMode.difficulty];
+        const settings = BattleMode.difficulties[BattleMode.difficulty] || BattleMode.difficulties.normal;
         const willBeCorrect = Math.random() < settings.accuracy;
         const [minTime, maxTime] = settings.speed;
         const answerTime = minTime + Math.random() * (maxTime - minTime);
         
+        // Clear any existing opponent timeout
+        if (BattleMode.opponentTimeout) {
+            clearTimeout(BattleMode.opponentTimeout);
+        }
+        
         BattleMode.opponentTimeout = setTimeout(() => {
-            if (!BattleMode.isPlaying) return;
+            // Only process opponent answer if game is still playing AND player hasn't answered yet
+            if (!BattleMode.isPlaying || BattleMode.playerAnswered) return;
             
             if (willBeCorrect) {
                 BattleMode.opponentScore += 10;
@@ -314,24 +367,36 @@ const BattleMode = {
             }
             
             BattleMode.updateDisplays();
+            
+            // Check for KO after opponent action
+            if (BattleMode.playerHP <= 0 || BattleMode.opponentHP <= 0) {
+                setTimeout(() => BattleMode.endGame(), 1000);
+            }
         }, answerTime * 1000);
     },
 
     showOpponentAction: (result) => {
+        const playerRight = document.querySelector('.player-right');
+        if (!playerRight) return;
+        
         const indicator = document.createElement('div');
         indicator.className = `opponent-indicator ${result}`;
         indicator.textContent = result === 'correct' ? '✓ Bot answered!' : '✗ Bot missed!';
-        document.querySelector('.player-right').appendChild(indicator);
+        playerRight.appendChild(indicator);
         setTimeout(() => indicator.remove(), 1000);
     },
 
     answer: (index) => {
-        if (!BattleMode.isPlaying) return;
+        if (!BattleMode.isPlaying || BattleMode.playerAnswered) return;
+        
+        BattleMode.playerAnswered = true; // Prevent double answers and stop opponent
         
         clearInterval(BattleMode.questionTimer);
         clearTimeout(BattleMode.opponentTimeout);
         
         const question = BattleMode.questions[BattleMode.currentIndex];
+        if (!question) return;
+        
         const isCorrect = index === question.answer;
         
         // Highlight answers
@@ -352,11 +417,11 @@ const BattleMode = {
             }
             BattleMode.playerScore += points;
             BattleMode.opponentHP -= 15;
-            SoundFX.play('correct');
+            SoundFX?.play?.('correct');
             BattleMode.showFeedback(true, points);
         } else {
             BattleMode.playerHP -= 10;
-            SoundFX.play('damage');
+            SoundFX?.play?.('damage');
             BattleMode.showFeedback(false, 0);
         }
         
@@ -373,19 +438,27 @@ const BattleMode = {
     },
 
     timeout: () => {
+        if (BattleMode.playerAnswered) return; // Already handled
+        
+        BattleMode.playerAnswered = true;
         clearInterval(BattleMode.questionTimer);
+        clearTimeout(BattleMode.opponentTimeout);
+        
         BattleMode.playerHP -= 15;
+        SoundFX?.play?.('damage');
         BattleMode.showFeedback(false, 0, 'Time up!');
         BattleMode.updateDisplays();
         
         // Highlight correct answer
         const question = BattleMode.questions[BattleMode.currentIndex];
-        document.querySelectorAll('.bq-option').forEach((btn, i) => {
-            btn.disabled = true;
-            if (i === question.answer) {
-                btn.classList.add('correct');
-            }
-        });
+        if (question) {
+            document.querySelectorAll('.bq-option').forEach((btn, i) => {
+                btn.disabled = true;
+                if (i === question.answer) {
+                    btn.classList.add('correct');
+                }
+            });
+        }
         
         if (BattleMode.playerHP <= 0) {
             setTimeout(() => BattleMode.endGame(), 1000);
@@ -397,37 +470,42 @@ const BattleMode = {
     },
 
     usePowerUp: (type) => {
-        if (BattleMode.powerUps[type] <= 0) return;
+        if (!BattleMode.isPlaying || BattleMode.playerAnswered) return;
+        if (!BattleMode.powerUps[type] || BattleMode.powerUps[type] <= 0) return;
         
         BattleMode.powerUps[type]--;
         
         switch (type) {
             case 'doublePoints':
                 BattleMode.activeDoublePoints = true;
-                Toast.show('2️⃣ Double Points activated!', 'info');
+                Toast?.show?.('2️⃣ Double Points activated!', 'info');
                 break;
             case 'skipQuestion':
                 clearInterval(BattleMode.questionTimer);
                 clearTimeout(BattleMode.opponentTimeout);
                 BattleMode.currentIndex++;
+                Toast?.show?.('⏭️ Question skipped!', 'info');
                 BattleMode.showQuestion();
-                Toast.show('⏭️ Question skipped!', 'info');
                 break;
             case 'timeFreeze':
-                clearInterval(BattleMode.questionTimer);
-                Toast.show('❄️ Time frozen for 5 seconds!', 'info');
+                BattleMode.timeFrozen = true;
+                Toast?.show?.('❄️ Time frozen for 5 seconds!', 'info');
                 setTimeout(() => {
                     if (BattleMode.isPlaying) {
-                        BattleMode.startQuestionTimer();
+                        BattleMode.timeFrozen = false;
                     }
                 }, 5000);
                 break;
         }
         
-        // Update UI
-        document.getElementById('pu-double').textContent = BattleMode.powerUps.doublePoints;
-        document.getElementById('pu-skip').textContent = BattleMode.powerUps.skipQuestion;
-        document.getElementById('pu-freeze').textContent = BattleMode.powerUps.timeFreeze;
+        // Update UI with null checks
+        const puDouble = document.getElementById('pu-double');
+        const puSkip = document.getElementById('pu-skip');
+        const puFreeze = document.getElementById('pu-freeze');
+        
+        if (puDouble) puDouble.textContent = BattleMode.powerUps.doublePoints;
+        if (puSkip) puSkip.textContent = BattleMode.powerUps.skipQuestion;
+        if (puFreeze) puFreeze.textContent = BattleMode.powerUps.timeFreeze;
         
         document.querySelectorAll('.pu-btn').forEach((btn, i) => {
             const types = ['doublePoints', 'skipQuestion', 'timeFreeze'];
@@ -438,39 +516,57 @@ const BattleMode = {
     },
 
     showFeedback: (correct, points, message = '') => {
+        const gameView = document.querySelector('.battle-game-view');
+        if (!gameView) return;
+        
         const feedback = document.createElement('div');
         feedback.className = `battle-feedback ${correct ? 'correct' : 'wrong'}`;
         feedback.innerHTML = correct 
             ? `<span>✓ +${points} points!</span>`
             : `<span>✗ ${message || 'Wrong!'}</span>`;
         
-        document.querySelector('.battle-game-view').appendChild(feedback);
+        gameView.appendChild(feedback);
         setTimeout(() => feedback.remove(), 1000);
     },
 
     updateDisplays: () => {
-        document.getElementById('player-score').textContent = BattleMode.playerScore;
-        document.getElementById('opponent-score').textContent = BattleMode.opponentScore;
+        const playerScore = document.getElementById('player-score');
+        const opponentScore = document.getElementById('opponent-score');
+        const playerHp = document.getElementById('player-hp');
+        const opponentHp = document.getElementById('opponent-hp');
+        const playerHpText = document.getElementById('player-hp-text');
+        const opponentHpText = document.getElementById('opponent-hp-text');
         
-        document.getElementById('player-hp').style.width = Math.max(0, BattleMode.playerHP) + '%';
-        document.getElementById('opponent-hp').style.width = Math.max(0, BattleMode.opponentHP) + '%';
+        if (playerScore) playerScore.textContent = BattleMode.playerScore;
+        if (opponentScore) opponentScore.textContent = BattleMode.opponentScore;
         
-        document.getElementById('player-hp-text').textContent = Math.max(0, BattleMode.playerHP);
-        document.getElementById('opponent-hp-text').textContent = Math.max(0, BattleMode.opponentHP);
+        const clampedPlayerHP = Math.max(0, BattleMode.playerHP);
+        const clampedOpponentHP = Math.max(0, BattleMode.opponentHP);
         
-        // HP color changes
-        if (BattleMode.playerHP <= 30) {
-            document.getElementById('player-hp').classList.add('critical');
+        if (playerHp) {
+            playerHp.style.width = clampedPlayerHP + '%';
+            if (clampedPlayerHP <= 30) playerHp.classList.add('critical');
         }
-        if (BattleMode.opponentHP <= 30) {
-            document.getElementById('opponent-hp').classList.add('critical');
+        if (opponentHp) {
+            opponentHp.style.width = clampedOpponentHP + '%';
+            if (clampedOpponentHP <= 30) opponentHp.classList.add('critical');
         }
+        
+        if (playerHpText) playerHpText.textContent = clampedPlayerHP;
+        if (opponentHpText) opponentHpText.textContent = clampedOpponentHP;
     },
 
     stopGame: () => {
         BattleMode.isPlaying = false;
-        clearInterval(BattleMode.questionTimer);
-        clearTimeout(BattleMode.opponentTimeout);
+        BattleMode.timeFrozen = false;
+        if (BattleMode.questionTimer) {
+            clearInterval(BattleMode.questionTimer);
+            BattleMode.questionTimer = null;
+        }
+        if (BattleMode.opponentTimeout) {
+            clearTimeout(BattleMode.opponentTimeout);
+            BattleMode.opponentTimeout = null;
+        }
     },
 
     endGame: () => {
@@ -501,6 +597,9 @@ const BattleMode = {
             return;
         }
         
+        const clampedPlayerHP = Math.max(0, BattleMode.playerHP);
+        const clampedOpponentHP = Math.max(0, BattleMode.opponentHP);
+        
         container.innerHTML = `
             <button class="game-close-btn" onclick="BattleMode.close()">✕</button>
             
@@ -513,13 +612,13 @@ const BattleMode = {
                     <div class="bf-player">
                         <span class="bf-name">You</span>
                         <span class="bf-score">${BattleMode.playerScore}</span>
-                        <span class="bf-hp">${Math.max(0, BattleMode.playerHP)} HP</span>
+                        <span class="bf-hp">${clampedPlayerHP} HP</span>
                     </div>
                     <div class="bf-vs">vs</div>
                     <div class="bf-player">
                         <span class="bf-name">${BattleMode.opponentName}</span>
                         <span class="bf-score">${BattleMode.opponentScore}</span>
-                        <span class="bf-hp">${Math.max(0, BattleMode.opponentHP)} HP</span>
+                        <span class="bf-hp">${clampedOpponentHP} HP</span>
                     </div>
                 </div>
                 
@@ -560,28 +659,37 @@ const BattleMode = {
     },
 
     saveStats: (won, draw) => {
-        const stats = BattleMode.getStats();
-        
-        if (won) {
-            stats.wins = (stats.wins || 0) + 1;
-            stats.winStreak = (stats.winStreak || 0) + 1;
-            stats.maxWinStreak = Math.max(stats.maxWinStreak || 0, stats.winStreak);
-        } else if (!draw) {
-            stats.losses = (stats.losses || 0) + 1;
-            stats.winStreak = 0;
+        try {
+            const stats = BattleMode.getStats();
+            
+            if (won) {
+                stats.wins = (stats.wins || 0) + 1;
+                stats.winStreak = (stats.winStreak || 0) + 1;
+                stats.maxWinStreak = Math.max(stats.maxWinStreak || 0, stats.winStreak);
+            } else if (!draw) {
+                stats.losses = (stats.losses || 0) + 1;
+                stats.winStreak = 0;
+            }
+            
+            stats.totalGames = (stats.totalGames || 0) + 1;
+            
+            localStorage.setItem('csmaster_battle_stats', JSON.stringify(stats));
+            
+            // Achievements with null checks
+            if (stats.wins >= 10) AppState?.unlockAchievement?.('battle_veteran');
+            if (stats.maxWinStreak >= 5) AppState?.unlockAchievement?.('undefeated');
+        } catch (error) {
+            console.error('BattleMode.saveStats error:', error);
         }
-        
-        stats.totalGames = (stats.totalGames || 0) + 1;
-        
-        localStorage.setItem('csmaster_battle_stats', JSON.stringify(stats));
-        
-        // Achievements
-        if (stats.wins >= 10) AppState.unlockAchievement('battle_veteran');
-        if (stats.maxWinStreak >= 5) AppState.unlockAchievement('undefeated');
     },
 
     getStats: () => {
-        return JSON.parse(localStorage.getItem('csmaster_battle_stats') || '{}');
+        try {
+            return JSON.parse(localStorage.getItem('csmaster_battle_stats') || '{}');
+        } catch (error) {
+            console.error('BattleMode.getStats error:', error);
+            return {};
+        }
     },
 
     cleanup: () => {
@@ -592,18 +700,20 @@ const BattleMode = {
         // Reset state
         BattleMode.questions = [];
         BattleMode.currentIndex = 0;
+        BattleMode.playerAnswered = false;
+        BattleMode.timeFrozen = false;
         console.log('⚔️ BattleMode cleanup');
     }
 };
 
 // Keyboard shortcuts handler (defined but not auto-registered)
 BattleMode.keyHandler = (e) => {
-    if (!BattleMode.isPlaying) return;
+    if (!BattleMode.isPlaying || BattleMode.playerAnswered) return;
     
     const key = e.key.toUpperCase();
     const keyMap = { 'A': 0, 'B': 1, 'C': 2, 'D': 3, '1': 0, '2': 1, '3': 2, '4': 3 };
     
-    if (keyMap.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(keyMap, key)) {
         e.preventDefault();
         BattleMode.answer(keyMap[key]);
     }

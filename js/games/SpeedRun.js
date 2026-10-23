@@ -54,6 +54,7 @@ const SpeedRun = {
     renderMenu: () => {
         const topScores = SpeedRun.getLeaderboard();
         const personalBest = SpeedRun.getPersonalBest();
+        const topics = typeof TOPICS !== 'undefined' && Array.isArray(TOPICS) ? TOPICS : [];
         
         return `
             <div class="game-container speed-run-container">
@@ -85,7 +86,7 @@ const SpeedRun = {
                         <label>Select Topic:</label>
                         <select id="sr-topic" onchange="SpeedRun.selectedTopic = this.value">
                             <option value="all">🎯 All Topics (Mixed)</option>
-                            ${TOPICS.map(t => `
+                            ${topics.map(t => `
                                 <option value="${t.id}">${t.icon} ${t.name}</option>
                             `).join('')}
                         </select>
@@ -102,7 +103,7 @@ const SpeedRun = {
                             ${topScores.length > 0 ? topScores.slice(0, 5).map((entry, i) => `
                                 <div class="sr-lb-entry ${i < 3 ? 'top-' + (i + 1) : ''}">
                                     <span class="sr-lb-rank">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : (i + 1)}</span>
-                                    <span class="sr-lb-name">${Helpers.escapeHtml(entry.username)}</span>
+                                    <span class="sr-lb-name">${typeof Helpers !== 'undefined' && Helpers.escapeHtml ? Helpers.escapeHtml(entry.username) : entry.username}</span>
                                     <span class="sr-lb-score">${entry.score}</span>
                                 </div>
                             `).join('') : '<p class="no-scores">No scores yet. Be the first!</p>'}
@@ -115,6 +116,12 @@ const SpeedRun = {
 
     startGame: () => {
         try {
+            // Clear any existing timer first to prevent race conditions
+            if (SpeedRun.timer) {
+                clearInterval(SpeedRun.timer);
+                SpeedRun.timer = null;
+            }
+            
             // Get questions based on selected topic
             SpeedRun.questions = SpeedRun.getQuestions(50);
             
@@ -134,6 +141,7 @@ const SpeedRun = {
             SpeedRun.fastestAnswer = Infinity;
             SpeedRun.isPlaying = true;
             SpeedRun.startTime = Date.now();
+            SpeedRun.questionStartTime = null;
             
             SoundFX?.play?.('start');
             
@@ -145,6 +153,7 @@ const SpeedRun = {
             container.innerHTML = SpeedRun.renderGame();
             
             // Register keyboard handler for this game session
+            document.removeEventListener('keydown', SpeedRun.keyHandler); // Remove first to prevent duplicates
             document.addEventListener('keydown', SpeedRun.keyHandler);
             
             SpeedRun.showQuestion();
@@ -152,20 +161,32 @@ const SpeedRun = {
         } catch (error) {
             console.error('SpeedRun.startGame error:', error);
             Toast?.show?.('Failed to start game', 'error');
+            SpeedRun.stopGame();
         }
     },
 
     getQuestions: (count) => {
+        // Check if QUESTIONS exists
+        if (typeof QUESTIONS === 'undefined' || !Array.isArray(QUESTIONS)) {
+            console.error('QUESTIONS not defined or not an array');
+            return [];
+        }
+        
         let pool = [];
         
         if (SpeedRun.selectedTopic === 'all') {
             pool = [...QUESTIONS];
         } else {
-            pool = QUESTIONS.filter(q => q.topic === SpeedRun.selectedTopic);
+            pool = QUESTIONS.filter(q => q && q.topic === SpeedRun.selectedTopic);
         }
         
         // Shuffle and pick
-        return shuffleArray([...pool]).slice(0, count);
+        if (typeof shuffleArray === 'function') {
+            return shuffleArray([...pool]).slice(0, count);
+        }
+        // Fallback shuffle if shuffleArray not defined
+        const shuffled = [...pool].sort(() => Math.random() - 0.5);
+        return shuffled.slice(0, count);
     },
 
     renderGame: () => {
@@ -212,9 +233,22 @@ const SpeedRun = {
         }
         
         const question = SpeedRun.questions[SpeedRun.currentIndex];
+        if (!question || !question.question || !Array.isArray(question.options)) {
+            console.error('Invalid question at index', SpeedRun.currentIndex);
+            SpeedRun.currentIndex++;
+            SpeedRun.showQuestion();
+            return;
+        }
+        
         SpeedRun.questionStartTime = Date.now();
         
         const questionArea = document.getElementById('sr-question-area');
+        if (!questionArea) {
+            console.error('Question area not found');
+            SpeedRun.endGame();
+            return;
+        }
+        
         questionArea.innerHTML = `
             <div class="sr-question animate-in">
                 <div class="sr-question-number">Question ${SpeedRun.currentIndex + 1}</div>
@@ -231,8 +265,11 @@ const SpeedRun = {
         `;
         
         // Update progress
-        const progress = ((SpeedRun.currentIndex) / SpeedRun.questions.length) * 100;
-        document.getElementById('sr-progress').style.width = progress + '%';
+        const progressEl = document.getElementById('sr-progress');
+        if (progressEl) {
+            const progress = ((SpeedRun.currentIndex) / SpeedRun.questions.length) * 100;
+            progressEl.style.width = progress + '%';
+        }
     },
 
     answer: (index) => {
@@ -245,7 +282,9 @@ const SpeedRun = {
         }
         
         const isCorrect = index === question.answer;
-        const answerTime = (Date.now() - (SpeedRun.questionStartTime || Date.now())) / 1000;
+        const answerTime = SpeedRun.questionStartTime 
+            ? (Date.now() - SpeedRun.questionStartTime) / 1000 
+            : 0;
         
         // Calculate points
         let points = 0;
@@ -256,14 +295,14 @@ const SpeedRun = {
             SpeedRun.combo++;
             SpeedRun.maxCombo = Math.max(SpeedRun.maxCombo, SpeedRun.combo);
             
-            // Play sound
+            // Play sound with null checks
             if (SpeedRun.combo > 1) {
-                SoundFX.play('combo');
+                SoundFX?.play?.('combo');
             } else {
-                SoundFX.play('correct');
+                SoundFX?.play?.('correct');
             }
             
-            if (answerTime < SpeedRun.fastestAnswer) {
+            if (answerTime > 0 && answerTime < SpeedRun.fastestAnswer) {
                 SpeedRun.fastestAnswer = answerTime;
             }
             
@@ -271,7 +310,7 @@ const SpeedRun = {
             points = 100;
             
             // Speed bonus (under 3 seconds = up to 50 bonus)
-            if (answerTime < 3) {
+            if (answerTime > 0 && answerTime < 3) {
                 const speedBonus = Math.floor((3 - answerTime) * 25);
                 points += speedBonus;
                 bonusText += ` +${speedBonus} speed`;
@@ -290,21 +329,26 @@ const SpeedRun = {
         } else {
             SpeedRun.wrongAnswers++;
             SpeedRun.combo = 0;
-            SoundFX.play('wrong');
+            SoundFX?.play?.('wrong');
             SpeedRun.showFeedback(false, 0, '', answerTime);
         }
         
-        // Update displays
-        document.getElementById('sr-score').textContent = SpeedRun.score;
-        document.getElementById('sr-combo').textContent = SpeedRun.combo + 'x';
+        // Update displays with null checks
+        const scoreEl = document.getElementById('sr-score');
+        if (scoreEl) scoreEl.textContent = SpeedRun.score;
+        
+        const comboEl = document.getElementById('sr-combo');
+        if (comboEl) comboEl.textContent = SpeedRun.combo + 'x';
         
         const comboDisplay = document.getElementById('sr-combo-display');
-        if (SpeedRun.combo > 0) {
-            comboDisplay.classList.add('active');
-            if (SpeedRun.combo >= 5) comboDisplay.classList.add('fire');
-            if (SpeedRun.combo >= 10) comboDisplay.classList.add('legendary');
-        } else {
-            comboDisplay.classList.remove('active', 'fire', 'legendary');
+        if (comboDisplay) {
+            if (SpeedRun.combo > 0) {
+                comboDisplay.classList.add('active');
+                if (SpeedRun.combo >= 5) comboDisplay.classList.add('fire');
+                if (SpeedRun.combo >= 10) comboDisplay.classList.add('legendary');
+            } else {
+                comboDisplay.classList.remove('active', 'fire', 'legendary');
+            }
         }
         
         // Next question after brief delay
@@ -313,36 +357,66 @@ const SpeedRun = {
     },
 
     showFeedback: (correct, points, bonus, time) => {
+        const gameView = document.querySelector('.sr-game-view');
+        if (!gameView) return;
+        
         const feedback = document.createElement('div');
         feedback.className = `sr-feedback ${correct ? 'correct' : 'wrong'}`;
         feedback.innerHTML = correct 
             ? `<span class="sr-fb-icon">✓</span><span class="sr-fb-points">+${points}</span><span class="sr-fb-bonus">${bonus}</span><span class="sr-fb-time">${time.toFixed(1)}s</span>`
             : `<span class="sr-fb-icon">✗</span><span class="sr-fb-text">Combo Lost!</span>`;
         
-        document.querySelector('.sr-game-view').appendChild(feedback);
-        setTimeout(() => feedback.remove(), 800);
+        gameView.appendChild(feedback);
+        setTimeout(() => {
+            if (feedback.parentNode) {
+                feedback.remove();
+            }
+        }, 800);
     },
 
     startTimer: () => {
         const circumference = 2 * Math.PI * 45;
         const circle = document.getElementById('sr-timer-circle');
+        if (!circle) {
+            console.error('Timer circle not found');
+            return;
+        }
         circle.style.strokeDasharray = circumference;
         
+        // Clear any existing timer to prevent multiple timers
+        if (SpeedRun.timer) {
+            clearInterval(SpeedRun.timer);
+        }
+        
         SpeedRun.timer = setInterval(() => {
+            // Safety check - stop if game is no longer playing
+            if (!SpeedRun.isPlaying) {
+                SpeedRun.stopGame();
+                return;
+            }
+            
             SpeedRun.timeLeft--;
             
-            document.getElementById('sr-timer-text').textContent = SpeedRun.timeLeft;
+            const timerText = document.getElementById('sr-timer-text');
+            const timerCircle = document.getElementById('sr-timer-circle');
+            
+            if (timerText) {
+                timerText.textContent = Math.max(0, SpeedRun.timeLeft);
+            }
             
             // Update circle
-            const progress = SpeedRun.timeLeft / 60;
-            const offset = circumference * (1 - progress);
-            circle.style.strokeDashoffset = offset;
-            
-            // Color changes
-            if (SpeedRun.timeLeft <= 10) {
-                circle.classList.add('danger');
-            } else if (SpeedRun.timeLeft <= 20) {
-                circle.classList.add('warning');
+            if (timerCircle) {
+                const progress = Math.max(0, SpeedRun.timeLeft) / 60;
+                const offset = circumference * (1 - progress);
+                timerCircle.style.strokeDashoffset = offset;
+                
+                // Color changes
+                if (SpeedRun.timeLeft <= 10) {
+                    timerCircle.classList.add('danger');
+                    timerCircle.classList.remove('warning');
+                } else if (SpeedRun.timeLeft <= 20) {
+                    timerCircle.classList.add('warning');
+                }
             }
             
             if (SpeedRun.timeLeft <= 0) {
@@ -360,6 +434,11 @@ const SpeedRun = {
     },
 
     endGame: () => {
+        // Prevent multiple calls
+        if (!SpeedRun.isPlaying && SpeedRun.timer === null) {
+            return;
+        }
+        
         SpeedRun.stopGame();
         
         const totalAnswers = SpeedRun.correctAnswers + SpeedRun.wrongAnswers;
@@ -387,6 +466,12 @@ const SpeedRun = {
         }
         
         const isNewRecord = SpeedRun.isNewPersonalBest();
+        
+        if (isNewRecord) {
+            SoundFX?.play?.('achievement');
+        } else {
+            SoundFX?.play?.('complete');
+        }
         
         container.innerHTML = `
             <button class="game-close-btn" onclick="SpeedRun.close()">✕</button>
@@ -445,45 +530,66 @@ const SpeedRun = {
     },
 
     saveScore: () => {
-        const username = Auth.getCurrentUser()?.username || 'Guest';
-        const leaderboard = JSON.parse(localStorage.getItem('csmaster_speedrun_lb') || '[]');
-        
-        leaderboard.push({
-            username,
-            score: SpeedRun.score,
-            maxCombo: SpeedRun.maxCombo,
-            correct: SpeedRun.correctAnswers,
-            accuracy: SpeedRun.correctAnswers / (SpeedRun.correctAnswers + SpeedRun.wrongAnswers) * 100,
-            date: new Date().toISOString()
-        });
-        
-        // Sort by score and keep top 100
-        leaderboard.sort((a, b) => b.score - a.score);
-        localStorage.setItem('csmaster_speedrun_lb', JSON.stringify(leaderboard.slice(0, 100)));
-        
-        // Update personal best
-        const personalBest = SpeedRun.getPersonalBest();
-        if (SpeedRun.score > (personalBest.score || 0)) {
-            localStorage.setItem('csmaster_speedrun_pb_' + username, JSON.stringify({
+        try {
+            const username = (typeof Auth !== 'undefined' && Auth?.getCurrentUser?.()?.username) || 'Guest';
+            const leaderboard = JSON.parse(localStorage.getItem('csmaster_speedrun_lb') || '[]');
+            
+            const totalAnswers = SpeedRun.correctAnswers + SpeedRun.wrongAnswers;
+            const accuracy = totalAnswers > 0 
+                ? (SpeedRun.correctAnswers / totalAnswers * 100) 
+                : 0;
+            
+            leaderboard.push({
+                username,
                 score: SpeedRun.score,
                 maxCombo: SpeedRun.maxCombo,
-                gamesPlayed: (personalBest.gamesPlayed || 0) + 1
-            }));
-        } else {
-            localStorage.setItem('csmaster_speedrun_pb_' + username, JSON.stringify({
-                ...personalBest,
-                gamesPlayed: (personalBest.gamesPlayed || 0) + 1
-            }));
+                correct: SpeedRun.correctAnswers,
+                accuracy: accuracy,
+                date: new Date().toISOString()
+            });
+            
+            // Sort by score and keep top 100
+            leaderboard.sort((a, b) => b.score - a.score);
+            localStorage.setItem('csmaster_speedrun_lb', JSON.stringify(leaderboard.slice(0, 100)));
+            
+            // Update personal best
+            const personalBest = SpeedRun.getPersonalBest();
+            const newGamesPlayed = (personalBest.gamesPlayed || 0) + 1;
+            
+            if (SpeedRun.score > (personalBest.score || 0)) {
+                localStorage.setItem('csmaster_speedrun_pb_' + username, JSON.stringify({
+                    score: SpeedRun.score,
+                    maxCombo: SpeedRun.maxCombo,
+                    gamesPlayed: newGamesPlayed
+                }));
+            } else {
+                localStorage.setItem('csmaster_speedrun_pb_' + username, JSON.stringify({
+                    ...personalBest,
+                    gamesPlayed: newGamesPlayed
+                }));
+            }
+        } catch (error) {
+            console.error('Error saving score:', error);
         }
     },
 
     getLeaderboard: () => {
-        return JSON.parse(localStorage.getItem('csmaster_speedrun_lb') || '[]');
+        try {
+            return JSON.parse(localStorage.getItem('csmaster_speedrun_lb') || '[]');
+        } catch (error) {
+            console.error('Error loading leaderboard:', error);
+            return [];
+        }
     },
 
     getPersonalBest: () => {
-        const username = Auth.getCurrentUser()?.username || 'Guest';
-        return JSON.parse(localStorage.getItem('csmaster_speedrun_pb_' + username) || '{}');
+        try {
+            const username = (typeof Auth !== 'undefined' && Auth?.getCurrentUser?.()?.username) || 'Guest';
+            return JSON.parse(localStorage.getItem('csmaster_speedrun_pb_' + username) || '{}');
+        } catch (error) {
+            console.error('Error loading personal best:', error);
+            return {};
+        }
     },
 
     isNewPersonalBest: () => {
@@ -499,6 +605,7 @@ const SpeedRun = {
         // Reset state
         SpeedRun.questions = [];
         SpeedRun.currentIndex = 0;
+        SpeedRun.questionStartTime = null;
         console.log('⚡ SpeedRun cleanup');
     }
 };
@@ -510,7 +617,7 @@ SpeedRun.keyHandler = (e) => {
     const key = e.key.toUpperCase();
     const keyMap = { 'A': 0, 'B': 1, 'C': 2, 'D': 3, '1': 0, '2': 1, '3': 2, '4': 3 };
     
-    if (keyMap.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(keyMap, key)) {
         e.preventDefault();
         SpeedRun.answer(keyMap[key]);
     }

@@ -17,6 +17,7 @@ const TypeRacer = {
     currentIndex: 0,
     mode: 'definitions', // definitions, code, mixed
     difficulty: 'medium',
+    isMobile: false,
 
     texts: {
         definitions: [
@@ -52,11 +53,21 @@ const TypeRacer = {
     },
 
     open: () => {
+        // Detect mobile device
+        TypeRacer.isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
+            || ('ontouchstart' in window) 
+            || (window.matchMedia && window.matchMedia('(max-width: 768px)').matches);
+
         const modal = document.createElement('div');
         modal.className = 'game-modal type-racer-modal';
         modal.id = 'type-racer-modal';
         modal.innerHTML = TypeRacer.renderMenu();
         document.body.appendChild(modal);
+        
+        // Prevent background scrolling on mobile
+        if (TypeRacer.isMobile) {
+            document.body.style.overflow = 'hidden';
+        }
         
         requestAnimationFrame(() => modal.classList.add('active'));
     },
@@ -68,6 +79,11 @@ const TypeRacer = {
             setTimeout(() => modal.remove(), 300);
         }
         TypeRacer.stopGame();
+        
+        // Restore scrolling on mobile
+        if (TypeRacer.isMobile) {
+            document.body.style.overflow = '';
+        }
     },
 
     renderMenu: () => {
@@ -103,15 +119,18 @@ const TypeRacer = {
                         <label>Select Mode:</label>
                         <div class="tr-mode-buttons">
                             <button class="tr-mode-btn ${TypeRacer.mode === 'definitions' ? 'selected' : ''}"
-                                    onclick="TypeRacer.selectMode('definitions', event)">
+                                    onclick="TypeRacer.selectMode('definitions', event)"
+                                    ontouchend="TypeRacer.selectMode('definitions', event)">
                                 📝 Definitions
                             </button>
                             <button class="tr-mode-btn ${TypeRacer.mode === 'code' ? 'selected' : ''}"
-                                    onclick="TypeRacer.selectMode('code', event)">
+                                    onclick="TypeRacer.selectMode('code', event)"
+                                    ontouchend="TypeRacer.selectMode('code', event)">
                                 💻 Code
                             </button>
                             <button class="tr-mode-btn ${TypeRacer.mode === 'mixed' ? 'selected' : ''}"
-                                    onclick="TypeRacer.selectMode('mixed', event)">
+                                    onclick="TypeRacer.selectMode('mixed', event)"
+                                    ontouchend="TypeRacer.selectMode('mixed', event)">
                                 🎯 Mixed
                             </button>
                         </div>
@@ -127,7 +146,7 @@ const TypeRacer = {
                         <ul>
                             <li>Focus on accuracy over speed at first</li>
                             <li>Code mode includes special characters</li>
-                            <li>Use Tab for code indentation</li>
+                            ${TypeRacer.isMobile ? '<li>Tap the input area to show keyboard</li>' : '<li>Use Tab for code indentation</li>'}
                         </ul>
                     </div>
                 </div>
@@ -136,6 +155,11 @@ const TypeRacer = {
     },
 
     selectMode: (mode, evt) => {
+        // Prevent double-firing on touch devices
+        if (evt) {
+            evt.preventDefault();
+        }
+        
         TypeRacer.mode = mode;
         document.querySelectorAll('.tr-mode-btn').forEach(btn => btn.classList.remove('selected'));
         
@@ -158,7 +182,9 @@ const TypeRacer = {
             
             // Validate we have texts
             if (!textPool || textPool.length === 0) {
-                Toast?.show?.('No texts available for this mode', 'error');
+                if (typeof Toast !== 'undefined' && Toast?.show) {
+                    Toast.show('No texts available for this mode', 'error');
+                }
                 return;
             }
             
@@ -171,6 +197,9 @@ const TypeRacer = {
             TypeRacer.startTime = null;
             TypeRacer.isPlaying = true;
             
+            // Clear any existing timer before starting
+            TypeRacer.clearTimer();
+            
             const container = document.querySelector('.type-racer-container');
             if (!container) {
                 console.error('TypeRacer container not found');
@@ -178,14 +207,22 @@ const TypeRacer = {
             }
             container.innerHTML = TypeRacer.renderGame();
             
-            // Focus input
+            // Focus input with mobile-friendly delay
             setTimeout(() => {
                 const input = document.getElementById('tr-input');
-                if (input) input.focus();
-            }, 100);
+                if (input) {
+                    input.focus();
+                    // On mobile, scroll input into view
+                    if (TypeRacer.isMobile) {
+                        input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }
+            }, TypeRacer.isMobile ? 300 : 100);
         } catch (error) {
             console.error('TypeRacer.startGame error:', error);
-            Toast?.show?.('Failed to start game', 'error');
+            if (typeof Toast !== 'undefined' && Toast?.show) {
+                Toast.show('Failed to start game', 'error');
+            }
         }
     },
 
@@ -215,7 +252,7 @@ const TypeRacer = {
                     <div class="tr-progress-fill" id="tr-progress"></div>
                 </div>
                 
-                <div class="tr-text-display" id="tr-text-display">
+                <div class="tr-text-display" id="tr-text-display" ${TypeRacer.isMobile ? 'onclick="TypeRacer.focusInput()"' : ''}>
                     ${displayText}
                 </div>
                 
@@ -223,14 +260,19 @@ const TypeRacer = {
                     <textarea 
                         id="tr-input" 
                         class="tr-input" 
-                        placeholder="Start typing here..."
+                        placeholder="${TypeRacer.isMobile ? 'Tap here to start typing...' : 'Start typing here...'}"
                         oninput="TypeRacer.handleInput(event)"
                         onkeydown="TypeRacer.handleKeyDown(event)"
+                        onpaste="TypeRacer.handlePaste(event)"
+                        onblur="TypeRacer.handleBlur(event)"
                         autocomplete="off"
                         autocorrect="off"
                         autocapitalize="off"
                         spellcheck="false"
+                        enterkeyhint="done"
+                        inputmode="text"
                     ></textarea>
+                    ${TypeRacer.isMobile ? '<div class="tr-mobile-hint">Tap above to show keyboard</div>' : ''}
                 </div>
                 
                 <div class="tr-car-track">
@@ -241,11 +283,33 @@ const TypeRacer = {
         `;
     },
 
+    focusInput: () => {
+        const input = document.getElementById('tr-input');
+        if (input) {
+            input.focus();
+        }
+    },
+
+    handleBlur: (event) => {
+        // On mobile, show a hint to refocus if game is still playing
+        if (TypeRacer.isMobile && TypeRacer.isPlaying) {
+            const hint = document.querySelector('.tr-mobile-hint');
+            if (hint) {
+                hint.textContent = 'Tap to continue typing...';
+                hint.classList.add('visible');
+            }
+        }
+    },
+
     renderTextDisplay: () => {
+        if (!TypeRacer.currentText) return '';
+        
         return TypeRacer.currentText.split('').map((char, i) => {
             let className = '';
             if (i < TypeRacer.currentIndex) {
-                className = TypeRacer.typedText[i] === char ? 'correct' : 'incorrect';
+                // Safely check if typedText has this character
+                const typedChar = TypeRacer.typedText?.[i];
+                className = typedChar === char ? 'correct' : 'incorrect';
             } else if (i === TypeRacer.currentIndex) {
                 className = 'current';
             }
@@ -259,23 +323,35 @@ const TypeRacer = {
         }).join('');
     },
 
+    handlePaste: (event) => {
+        // Prevent pasting to ensure fair typing
+        event.preventDefault();
+        if (typeof Toast !== 'undefined' && Toast?.show) {
+            Toast.show('Pasting is disabled - type it out!', 'info');
+        }
+    },
+
     handleInput: (event) => {
         if (!TypeRacer.isPlaying) return;
         
+        const input = event?.target?.value ?? '';
+        
         // Start timer on first input
-        if (!TypeRacer.startTime) {
+        if (!TypeRacer.startTime && input.length > 0) {
             TypeRacer.startTime = Date.now();
             TypeRacer.startTimer();
         }
         
-        const input = event.target.value;
-        TypeRacer.typedText = input;
-        TypeRacer.currentIndex = input.length;
+        // Limit input to text length to prevent overflow
+        const maxLength = TypeRacer.currentText?.length || 0;
+        TypeRacer.typedText = input.substring(0, maxLength);
+        TypeRacer.currentIndex = Math.min(input.length, maxLength);
         
-        // Count errors
+        // Count errors with bounds checking
         let errors = 0;
-        for (let i = 0; i < input.length; i++) {
-            if (input[i] !== TypeRacer.currentText[i]) {
+        const textLength = TypeRacer.currentText?.length || 0;
+        for (let i = 0; i < TypeRacer.currentIndex && i < textLength; i++) {
+            if (TypeRacer.typedText[i] !== TypeRacer.currentText[i]) {
                 errors++;
             }
         }
@@ -285,7 +361,7 @@ const TypeRacer = {
         TypeRacer.updateDisplays();
         
         // Check completion
-        if (input.length >= TypeRacer.currentText.length) {
+        if (TypeRacer.currentIndex >= maxLength && maxLength > 0) {
             TypeRacer.endGame();
         }
     },
@@ -295,21 +371,40 @@ const TypeRacer = {
         if (event.key === 'Tab') {
             event.preventDefault();
             const input = event.target;
-            const start = input.selectionStart;
-            input.value = input.value.substring(0, start) + '    ' + input.value.substring(input.selectionEnd);
+            if (!input) return;
+            
+            const start = input.selectionStart ?? 0;
+            const end = input.selectionEnd ?? start;
+            input.value = input.value.substring(0, start) + '    ' + input.value.substring(end);
             input.selectionStart = input.selectionEnd = start + 4;
             TypeRacer.handleInput({ target: input });
+        }
+        
+        // Handle Escape to stop game
+        if (event.key === 'Escape') {
+            TypeRacer.close();
         }
     },
 
     updateDisplays: () => {
-        // Update text display
-        document.getElementById('tr-text-display').innerHTML = TypeRacer.renderTextDisplay();
+        // Null checks for all DOM elements
+        const textDisplay = document.getElementById('tr-text-display');
+        const wpmDisplay = document.getElementById('tr-wpm');
+        const accuracyDisplay = document.getElementById('tr-accuracy');
+        const progressBar = document.getElementById('tr-progress');
+        const playerCar = document.getElementById('tr-player-car');
         
-        // Calculate WPM
-        const timeElapsed = (Date.now() - TypeRacer.startTime) / 1000 / 60; // in minutes
-        const wordsTyped = TypeRacer.currentIndex / 5; // standard: 5 chars = 1 word
-        TypeRacer.wpm = timeElapsed > 0 ? Math.round(wordsTyped / timeElapsed) : 0;
+        // Update text display
+        if (textDisplay) {
+            textDisplay.innerHTML = TypeRacer.renderTextDisplay();
+        }
+        
+        // Calculate WPM only if timer started
+        if (TypeRacer.startTime) {
+            const timeElapsed = (Date.now() - TypeRacer.startTime) / 1000 / 60; // in minutes
+            const wordsTyped = TypeRacer.currentIndex / 5; // standard: 5 chars = 1 word
+            TypeRacer.wpm = timeElapsed > 0 ? Math.round(wordsTyped / timeElapsed) : 0;
+        }
         
         // Calculate accuracy
         const correctChars = TypeRacer.currentIndex - TypeRacer.errors;
@@ -317,41 +412,78 @@ const TypeRacer = {
             ? Math.round((correctChars / TypeRacer.currentIndex) * 100) 
             : 100;
         
-        // Update stats display
-        document.getElementById('tr-wpm').textContent = TypeRacer.wpm;
-        document.getElementById('tr-accuracy').textContent = TypeRacer.accuracy + '%';
+        // Update stats display with null checks
+        if (wpmDisplay) {
+            wpmDisplay.textContent = TypeRacer.wpm;
+        }
+        if (accuracyDisplay) {
+            accuracyDisplay.textContent = TypeRacer.accuracy + '%';
+        }
         
         // Update progress
-        const progress = (TypeRacer.currentIndex / TypeRacer.currentText.length) * 100;
-        document.getElementById('tr-progress').style.width = progress + '%';
+        const textLength = TypeRacer.currentText?.length || 1;
+        const progress = (TypeRacer.currentIndex / textLength) * 100;
         
-        // Move car
-        document.getElementById('tr-player-car').style.left = `calc(${progress}% - 20px)`;
+        if (progressBar) {
+            progressBar.style.width = progress + '%';
+        }
+        
+        // Move car with null check
+        if (playerCar) {
+            playerCar.style.left = `calc(${progress}% - 20px)`;
+        }
     },
 
     startTimer: () => {
+        // Clear any existing timer first
+        TypeRacer.clearTimer();
+        
         TypeRacer.timer = setInterval(() => {
+            // Check if game is still playing and startTime exists
+            if (!TypeRacer.isPlaying || !TypeRacer.startTime) {
+                TypeRacer.clearTimer();
+                return;
+            }
+            
+            const timeDisplay = document.getElementById('tr-time');
+            if (!timeDisplay) {
+                TypeRacer.clearTimer();
+                return;
+            }
+            
             const elapsed = Math.floor((Date.now() - TypeRacer.startTime) / 1000);
             const mins = Math.floor(elapsed / 60);
             const secs = elapsed % 60;
-            document.getElementById('tr-time').textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+            timeDisplay.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
         }, 1000);
+    },
+
+    clearTimer: () => {
+        if (TypeRacer.timer !== null) {
+            clearInterval(TypeRacer.timer);
+            TypeRacer.timer = null;
+        }
     },
 
     stopGame: () => {
         TypeRacer.isPlaying = false;
-        if (TypeRacer.timer) {
-            clearInterval(TypeRacer.timer);
-            TypeRacer.timer = null;
-        }
+        TypeRacer.clearTimer();
     },
 
     endGame: () => {
         TypeRacer.stopGame();
         TypeRacer.endTime = Date.now();
         
+        // Null check for startTime
+        if (!TypeRacer.startTime) {
+            TypeRacer.startTime = TypeRacer.endTime - 1000; // fallback: assume 1 second
+        }
+        
         const totalTime = (TypeRacer.endTime - TypeRacer.startTime) / 1000;
-        const finalWpm = Math.round((TypeRacer.currentText.length / 5) / (totalTime / 60));
+        const textLength = TypeRacer.currentText?.length || 1;
+        const finalWpm = totalTime > 0 
+            ? Math.round((textLength / 5) / (totalTime / 60)) 
+            : 0;
         
         // Save stats
         TypeRacer.saveStats(finalWpm, TypeRacer.accuracy);
@@ -360,13 +492,24 @@ const TypeRacer = {
         let xpEarned = Math.floor(finalWpm / 2);
         if (TypeRacer.accuracy === 100) xpEarned += 50;
         if (TypeRacer.mode === 'code') xpEarned += 25;
-        AppState.addXP(xpEarned);
         
-        // Achievements
-        if (finalWpm >= 60) AppState.unlockAchievement('speed_typist');
-        if (TypeRacer.accuracy === 100) AppState.unlockAchievement('perfect_accuracy');
+        // Null check for AppState
+        if (typeof AppState !== 'undefined' && AppState?.addXP) {
+            AppState.addXP(xpEarned);
+        }
+        
+        // Achievements with null checks
+        if (typeof AppState !== 'undefined' && AppState?.unlockAchievement) {
+            if (finalWpm >= 60) AppState.unlockAchievement('speed_typist');
+            if (TypeRacer.accuracy === 100) AppState.unlockAchievement('perfect_accuracy');
+        }
         
         const container = document.querySelector('.type-racer-container');
+        if (!container) {
+            console.error('TypeRacer container not found for results');
+            return;
+        }
+        
         container.innerHTML = `
             <button class="game-close-btn" onclick="TypeRacer.close()">✕</button>
             
@@ -426,20 +569,30 @@ const TypeRacer = {
     },
 
     saveStats: (wpm, accuracy) => {
-        const stats = TypeRacer.getStats();
-        
-        stats.racesCompleted = (stats.racesCompleted || 0) + 1;
-        stats.bestWpm = Math.max(stats.bestWpm || 0, wpm);
-        
-        // Calculate rolling average accuracy
-        const totalAcc = (stats.avgAccuracy || 0) * ((stats.racesCompleted - 1) || 0) + accuracy;
-        stats.avgAccuracy = Math.round(totalAcc / stats.racesCompleted);
-        
-        localStorage.setItem('csmaster_typeracer_stats', JSON.stringify(stats));
+        try {
+            const stats = TypeRacer.getStats();
+            
+            stats.racesCompleted = (stats.racesCompleted || 0) + 1;
+            stats.bestWpm = Math.max(stats.bestWpm || 0, wpm);
+            
+            // Calculate rolling average accuracy
+            const prevRaces = (stats.racesCompleted - 1) || 0;
+            const totalAcc = (stats.avgAccuracy || 0) * prevRaces + accuracy;
+            stats.avgAccuracy = Math.round(totalAcc / stats.racesCompleted);
+            
+            localStorage.setItem('csmaster_typeracer_stats', JSON.stringify(stats));
+        } catch (error) {
+            console.error('TypeRacer.saveStats error:', error);
+        }
     },
 
     getStats: () => {
-        return JSON.parse(localStorage.getItem('csmaster_typeracer_stats') || '{}');
+        try {
+            return JSON.parse(localStorage.getItem('csmaster_typeracer_stats') || '{}');
+        } catch (error) {
+            console.error('TypeRacer.getStats error:', error);
+            return {};
+        }
     },
 
     cleanup: () => {
@@ -450,6 +603,8 @@ const TypeRacer = {
         TypeRacer.typedText = '';
         TypeRacer.startTime = null;
         TypeRacer.endTime = null;
+        // Restore scrolling
+        document.body.style.overflow = '';
         console.log('⌨️ TypeRacer cleanup');
     }
 };

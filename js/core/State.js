@@ -526,7 +526,7 @@ const AppState = (() => {
      * Unlock an achievement
      */
     const unlockAchievement = (id) => {
-        if (!id || typeof id !== 'string') return;
+        if (!id || typeof id !== 'string') return false;
         
         try {
             // Ensure achievements is an array
@@ -534,20 +534,48 @@ const AppState = (() => {
                 state.user.achievements = [];
             }
             
-            if (!state.user.achievements.includes(id)) {
-                state.user.achievements.push(id);
-                setState('user.achievements', [...state.user.achievements]);
-                
-                // Find and display achievement
-                if (typeof ACHIEVEMENTS !== 'undefined' && Array.isArray(ACHIEVEMENTS)) {
-                    const achievement = ACHIEVEMENTS.find(a => a && a.id === id);
-                    if (achievement && typeof Toast !== 'undefined') {
-                        Toast.show(`🏆 Achievement: ${achievement.name}!`, 'success');
-                    }
+            // Already unlocked - skip
+            if (state.user.achievements.includes(id)) {
+                return false;
+            }
+            
+            // Unlock the achievement
+            state.user.achievements.push(id);
+            setState('user.achievements', [...state.user.achievements]);
+            
+            // Find achievement details for notification
+            let achievement = null;
+            if (typeof ACHIEVEMENTS !== 'undefined' && Array.isArray(ACHIEVEMENTS)) {
+                achievement = ACHIEVEMENTS.find(a => a && a.id === id);
+            }
+            
+            // Show notification with achievement details or fallback
+            if (typeof Toast !== 'undefined' && typeof Toast.show === 'function') {
+                const name = achievement?.name || id.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+                const icon = achievement?.icon || '🏆';
+                Toast.show(`${icon} Achievement Unlocked: ${name}!`, 'success');
+            }
+            
+            // Trigger confetti for achievement unlock
+            if (typeof Helpers !== 'undefined' && typeof Helpers.confetti === 'function') {
+                try {
+                    Helpers.confetti({ particleCount: 80, spread: 60 });
+                } catch (e) {
+                    // Confetti not critical
                 }
             }
+            
+            // Dispatch custom event for UI updates
+            if (typeof window !== 'undefined') {
+                window.dispatchEvent(new CustomEvent('achievementUnlocked', { 
+                    detail: { id, achievement } 
+                }));
+            }
+            
+            return true;
         } catch (error) {
             console.error('Error unlocking achievement:', error);
+            return false;
         }
     };
 

@@ -101,6 +101,12 @@ html {
     -moz-osx-font-smoothing: grayscale;
 }
 
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+}
+
 body {
     font-family: var(--font-sans);
     background: var(--bg-primary);
@@ -661,7 +667,8 @@ label {
 .xp-fill {
     height: 100%;
     border-radius: var(--radius-full);
-    transition: width 0.5s ease;
+    transform-origin: left;
+    transition: transform 0.5s ease;
 }
 
 .xp-needed {
@@ -758,7 +765,8 @@ label {
     height: 100%;
     background: linear-gradient(90deg, var(--primary), var(--accent));
     border-radius: var(--radius-full);
-    transition: width 0.5s ease;
+    transform-origin: left;
+    transition: transform 0.5s ease;
 }
 
 .xp-to-go {
@@ -862,7 +870,8 @@ label {
     height: 100%;
     background: linear-gradient(90deg, var(--red) 0%, var(--yellow) 50%, var(--green) 100%);
     border-radius: var(--radius-full);
-    transition: width 0.5s ease;
+    transform-origin: left;
+    transition: transform 0.5s ease;
 }
 
 .accuracy-labels {
@@ -1174,7 +1183,8 @@ label {
     height: 100%;
     background: linear-gradient(90deg, var(--primary), var(--accent));
     border-radius: var(--radius-full);
-    transition: width 0.5s ease;
+    transform-origin: left;
+    transition: transform 0.5s ease;
 }
 
 .progress-text {
@@ -3795,7 +3805,8 @@ label {
     height: 100%;
     background: linear-gradient(90deg, var(--primary), var(--accent));
     border-radius: var(--radius-full);
-    transition: width 0.3s ease;
+    transform-origin: left;
+    transition: transform 0.3s ease;
 }
 
 .challenge-category {
@@ -5020,7 +5031,8 @@ body.modal-open {
     height: 100%;
     background: linear-gradient(90deg, var(--primary), var(--accent));
     border-radius: var(--radius-full);
-    transition: width 0.3s ease;
+    transform-origin: left;
+    transition: transform 0.3s ease;
 }
 
 .dc-question-container {
@@ -5332,7 +5344,8 @@ body.modal-open {
     height: 100%;
     background: var(--primary);
     border-radius: var(--radius-full);
-    transition: width 1s linear;
+    transform-origin: left;
+    transition: transform 1s linear;
 }
 
 .timer-controls {
@@ -6091,7 +6104,8 @@ textarea:focus {
 .xp-fill,
 .dc-progress-fill,
 .timer-progress-fill {
-    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: left;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Stagger animation for lists */
@@ -12354,7 +12368,8 @@ textarea:focus {
     height: 100%;
     background: linear-gradient(90deg, var(--primary), var(--accent));
     border-radius: var(--radius-full);
-    transition: width 0.5s ease;
+    transform-origin: left;
+    transition: transform 0.5s ease;
 }
 
 .progress-hint {
@@ -15497,35 +15512,41 @@ textarea:focus-visible,
     }
 }
 
-/* Flashcard swipe animation feedback */
-.flashcard.swiping-left {
-    transform: translateX(-20px) rotate(-5deg);
+/* Flashcard swipe animation feedback - uses wrapper to not conflict with flip */
+.flashcard-wrapper.swiping-left .flashcard {
+    translate: -20px 0;
+    rotate: -5deg;
     opacity: 0.8;
+    transition: translate 0.1s, rotate 0.1s, opacity 0.1s;
 }
 
-.flashcard.swiping-right {
-    transform: translateX(20px) rotate(5deg);
+.flashcard-wrapper.swiping-right .flashcard {
+    translate: 20px 0;
+    rotate: 5deg;
     opacity: 0.8;
+    transition: translate 0.1s, rotate 0.1s, opacity 0.1s;
 }
 
-.flashcard.swipe-complete-left {
+.flashcard-wrapper.swipe-complete-left .flashcard {
     animation: swipeOutLeft 0.3s ease forwards;
 }
 
-.flashcard.swipe-complete-right {
+.flashcard-wrapper.swipe-complete-right .flashcard {
     animation: swipeOutRight 0.3s ease forwards;
 }
 
 @keyframes swipeOutLeft {
     to {
-        transform: translateX(-100%) rotate(-15deg);
+        translate: -100% 0;
+        rotate: -15deg;
         opacity: 0;
     }
 }
 
 @keyframes swipeOutRight {
     to {
-        transform: translateX(100%) rotate(15deg);
+        translate: 100% 0;
+        rotate: 15deg;
         opacity: 0;
     }
 }

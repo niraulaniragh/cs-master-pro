@@ -59,22 +59,34 @@ const MemoryMatch = {
     ],
 
     open: () => {
-        const modal = document.createElement('div');
-        modal.className = 'game-modal memory-match-modal';
-        modal.id = 'memory-match-modal';
-        modal.innerHTML = MemoryMatch.renderMenu();
-        document.body.appendChild(modal);
-        
-        requestAnimationFrame(() => modal.classList.add('active'));
+        try {
+            const modal = document.createElement('div');
+            modal.className = 'game-modal memory-match-modal';
+            modal.id = 'memory-match-modal';
+            modal.innerHTML = MemoryMatch.renderMenu();
+            document.body.appendChild(modal);
+            
+            requestAnimationFrame(() => modal.classList.add('active'));
+        } catch (error) {
+            console.error('MemoryMatch.open error:', error);
+        }
     },
 
     close: () => {
-        const modal = document.getElementById('memory-match-modal');
-        if (modal) {
-            modal.classList.remove('active');
-            setTimeout(() => modal.remove(), 300);
+        try {
+            const modal = document.getElementById('memory-match-modal');
+            if (modal) {
+                modal.classList.remove('active');
+                setTimeout(() => {
+                    if (modal.parentNode) {
+                        modal.remove();
+                    }
+                }, 300);
+            }
+            MemoryMatch.stopTimer();
+        } catch (error) {
+            console.error('MemoryMatch.close error:', error);
         }
-        MemoryMatch.stopTimer();
     },
 
     renderMenu: () => {
@@ -126,6 +138,8 @@ const MemoryMatch = {
     },
 
     selectDifficulty: (diff, evt) => {
+        if (!MemoryMatch.difficulties[diff]) return;
+        
         MemoryMatch.difficulty = diff;
         document.querySelectorAll('.mm-diff-btn').forEach(btn => btn.classList.remove('selected'));
         
@@ -145,7 +159,7 @@ const MemoryMatch = {
             }
             
             // Validate we have enough term pairs
-            if (MemoryMatch.termPairs.length < settings.pairs) {
+            if (!MemoryMatch.termPairs || MemoryMatch.termPairs.length < settings.pairs) {
                 Toast?.show?.('Not enough term pairs for this difficulty', 'error');
                 return;
             }
@@ -246,75 +260,122 @@ const MemoryMatch = {
     },
 
     flipCard: (cardId) => {
-        if (MemoryMatch.isLocked) return;
-        
-        const card = MemoryMatch.cards.find(c => c.id === cardId);
-        if (!card || card.isFlipped || card.isMatched) return;
-        
-        // Flip the card
-        card.isFlipped = true;
-        const cardEl = document.querySelector(`.mm-card[data-id="${cardId}"]`);
-        cardEl.classList.add('flipped');
-        
-        MemoryMatch.flippedCards.push(card);
-        
-        // Check for match when 2 cards are flipped
-        if (MemoryMatch.flippedCards.length === 2) {
-            MemoryMatch.moves++;
-            document.getElementById('mm-moves').textContent = MemoryMatch.moves;
+        try {
+            // Prevent flipping while locked or when 2 cards already flipped
+            if (MemoryMatch.isLocked || MemoryMatch.flippedCards.length >= 2) return;
             
-            MemoryMatch.checkMatch();
+            const card = MemoryMatch.cards.find(c => c.id === cardId);
+            if (!card || card.isFlipped || card.isMatched) return;
+            
+            // Flip the card
+            card.isFlipped = true;
+            const cardEl = document.querySelector(`.mm-card[data-id="${cardId}"]`);
+            if (!cardEl) {
+                console.error('Card element not found:', cardId);
+                card.isFlipped = false;
+                return;
+            }
+            cardEl.classList.add('flipped');
+            
+            MemoryMatch.flippedCards.push(card);
+            
+            // Check for match when 2 cards are flipped
+            if (MemoryMatch.flippedCards.length === 2) {
+                MemoryMatch.moves++;
+                const movesEl = document.getElementById('mm-moves');
+                if (movesEl) {
+                    movesEl.textContent = MemoryMatch.moves;
+                }
+                
+                MemoryMatch.checkMatch();
+            }
+        } catch (error) {
+            console.error('MemoryMatch.flipCard error:', error);
+            MemoryMatch.isLocked = false;
         }
     },
 
     checkMatch: () => {
-        MemoryMatch.isLocked = true;
-        
-        const [card1, card2] = MemoryMatch.flippedCards;
-        const isMatch = card1.pairId === card2.pairId && card1.type !== card2.type;
-        
-        if (isMatch) {
-            // Match found!
-            card1.isMatched = true;
-            card2.isMatched = true;
+        try {
+            MemoryMatch.isLocked = true;
+            
+            if (MemoryMatch.flippedCards.length !== 2) {
+                MemoryMatch.isLocked = false;
+                return;
+            }
+            
+            const [card1, card2] = MemoryMatch.flippedCards;
+            if (!card1 || !card2) {
+                MemoryMatch.flippedCards = [];
+                MemoryMatch.isLocked = false;
+                return;
+            }
+            
+            const isMatch = card1.pairId === card2.pairId && card1.type !== card2.type;
             
             const card1El = document.querySelector(`.mm-card[data-id="${card1.id}"]`);
             const card2El = document.querySelector(`.mm-card[data-id="${card2.id}"]`);
-            card1El.classList.add('matched');
-            card2El.classList.add('matched');
             
-            MemoryMatch.matchedPairs++;
-            document.getElementById('mm-pairs').textContent = `${MemoryMatch.matchedPairs}/${MemoryMatch.totalPairs}`;
-            
-            MemoryMatch.flippedCards = [];
-            MemoryMatch.isLocked = false;
-            
-            // Check win
-            if (MemoryMatch.matchedPairs === MemoryMatch.totalPairs) {
-                setTimeout(() => MemoryMatch.endGame(), 500);
+            if (!card1El || !card2El) {
+                console.error('Card elements not found during match check');
+                MemoryMatch.flippedCards = [];
+                MemoryMatch.isLocked = false;
+                return;
             }
-        } else {
-            // No match - flip back
-            setTimeout(() => {
-                card1.isFlipped = false;
-                card2.isFlipped = false;
+            
+            if (isMatch) {
+                // Match found!
+                card1.isMatched = true;
+                card2.isMatched = true;
                 
-                const card1El = document.querySelector(`.mm-card[data-id="${card1.id}"]`);
-                const card2El = document.querySelector(`.mm-card[data-id="${card2.id}"]`);
-                card1El.classList.remove('flipped');
-                card2El.classList.remove('flipped');
+                card1El.classList.add('matched');
+                card2El.classList.add('matched');
+                
+                MemoryMatch.matchedPairs++;
+                const pairsEl = document.getElementById('mm-pairs');
+                if (pairsEl) {
+                    pairsEl.textContent = `${MemoryMatch.matchedPairs}/${MemoryMatch.totalPairs}`;
+                }
                 
                 MemoryMatch.flippedCards = [];
                 MemoryMatch.isLocked = false;
-            }, 1000);
+                
+                // Check win
+                if (MemoryMatch.matchedPairs === MemoryMatch.totalPairs) {
+                    setTimeout(() => MemoryMatch.endGame(), 500);
+                }
+            } else {
+                // No match - flip back
+                setTimeout(() => {
+                    card1.isFlipped = false;
+                    card2.isFlipped = false;
+                    
+                    // Re-query elements in case DOM changed
+                    const el1 = document.querySelector(`.mm-card[data-id="${card1.id}"]`);
+                    const el2 = document.querySelector(`.mm-card[data-id="${card2.id}"]`);
+                    if (el1) el1.classList.remove('flipped');
+                    if (el2) el2.classList.remove('flipped');
+                    
+                    MemoryMatch.flippedCards = [];
+                    MemoryMatch.isLocked = false;
+                }, 1000);
+            }
+        } catch (error) {
+            console.error('MemoryMatch.checkMatch error:', error);
+            MemoryMatch.flippedCards = [];
+            MemoryMatch.isLocked = false;
         }
     },
 
     startTimer: () => {
+        MemoryMatch.stopTimer(); // Clear any existing timer
         MemoryMatch.startTime = Date.now();
         MemoryMatch.timer = setInterval(() => {
             MemoryMatch.elapsedTime = Math.floor((Date.now() - MemoryMatch.startTime) / 1000);
-            document.getElementById('mm-timer').textContent = MemoryMatch.formatTime(MemoryMatch.elapsedTime);
+            const timerEl = document.getElementById('mm-timer');
+            if (timerEl) {
+                timerEl.textContent = MemoryMatch.formatTime(MemoryMatch.elapsedTime);
+            }
         }, 1000);
     },
 
@@ -326,87 +387,119 @@ const MemoryMatch = {
     },
 
     formatTime: (seconds) => {
+        if (typeof seconds !== 'number' || isNaN(seconds) || seconds < 0) {
+            return '0:00';
+        }
         const mins = Math.floor(seconds / 60);
         const secs = seconds % 60;
         return `${mins}:${secs.toString().padStart(2, '0')}`;
     },
 
     endGame: () => {
-        MemoryMatch.stopTimer();
-        
-        // Calculate score
-        const baseScore = 1000;
-        const timeBonus = Math.max(0, 300 - MemoryMatch.elapsedTime) * 2;
-        const movesPenalty = MemoryMatch.moves * 5;
-        const difficultyBonus = { easy: 0, medium: 200, hard: 500, expert: 1000 }[MemoryMatch.difficulty];
-        const finalScore = baseScore + timeBonus - movesPenalty + difficultyBonus;
-        
-        // Save score
-        MemoryMatch.saveScore(MemoryMatch.moves, MemoryMatch.elapsedTime, finalScore);
-        
-        // Award XP
-        const xpEarned = Math.floor(finalScore / 20);
-        AppState.addXP(xpEarned);
-        
-        const container = document.querySelector('.memory-container');
-        container.innerHTML = `
-            <button class="game-close-btn" onclick="MemoryMatch.close()">✕</button>
+        try {
+            MemoryMatch.stopTimer();
             
-            <div class="mm-results">
-                <div class="mm-result-banner">🎉 Congratulations! 🎉</div>
+            // Calculate score with bounds checking
+            const baseScore = 1000;
+            const timeBonus = Math.max(0, 300 - MemoryMatch.elapsedTime) * 2;
+            const movesPenalty = Math.max(0, MemoryMatch.moves) * 5;
+            const difficultyBonuses = { easy: 0, medium: 200, hard: 500, expert: 1000 };
+            const difficultyBonus = difficultyBonuses[MemoryMatch.difficulty] || 0;
+            const finalScore = Math.max(0, baseScore + timeBonus - movesPenalty + difficultyBonus);
+            
+            // Save score
+            MemoryMatch.saveScore(MemoryMatch.moves, MemoryMatch.elapsedTime, finalScore);
+            
+            // Award XP (with null check for AppState)
+            const xpEarned = Math.floor(finalScore / 20);
+            if (typeof AppState !== 'undefined' && AppState?.addXP) {
+                AppState.addXP(xpEarned);
+            }
+            
+            // Calculate efficiency with division by zero protection
+            const efficiency = MemoryMatch.moves > 0 
+                ? Math.round(MemoryMatch.totalPairs / MemoryMatch.moves * 100) 
+                : 100;
+            
+            const container = document.querySelector('.memory-container');
+            if (!container) {
+                console.error('Container not found for end game display');
+                return;
+            }
+            
+            container.innerHTML = `
+                <button class="game-close-btn" onclick="MemoryMatch.close()">✕</button>
                 
-                <div class="mm-final-score">
-                    <span class="mm-fs-value">${finalScore}</span>
-                    <span class="mm-fs-label">Final Score</span>
+                <div class="mm-results">
+                    <div class="mm-result-banner">🎉 Congratulations! 🎉</div>
+                    
+                    <div class="mm-final-score">
+                        <span class="mm-fs-value">${finalScore}</span>
+                        <span class="mm-fs-label">Final Score</span>
+                    </div>
+                    
+                    <div class="mm-results-grid">
+                        <div class="mm-result-item">
+                            <span class="mm-ri-icon">⏱️</span>
+                            <span class="mm-ri-value">${MemoryMatch.formatTime(MemoryMatch.elapsedTime)}</span>
+                            <span class="mm-ri-label">Time</span>
+                        </div>
+                        <div class="mm-result-item">
+                            <span class="mm-ri-icon">👆</span>
+                            <span class="mm-ri-value">${MemoryMatch.moves}</span>
+                            <span class="mm-ri-label">Moves</span>
+                        </div>
+                        <div class="mm-result-item">
+                            <span class="mm-ri-icon">🎯</span>
+                            <span class="mm-ri-value">${efficiency}%</span>
+                            <span class="mm-ri-label">Efficiency</span>
+                        </div>
+                        <div class="mm-result-item">
+                            <span class="mm-ri-icon">⭐</span>
+                            <span class="mm-ri-value">+${xpEarned}</span>
+                            <span class="mm-ri-label">XP</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mm-results-actions">
+                        <button class="btn btn-primary" onclick="MemoryMatch.startGame()">
+                            🔄 Play Again
+                        </button>
+                        <button class="btn btn-secondary" onclick="MemoryMatch.close()">
+                            Done
+                        </button>
+                    </div>
                 </div>
-                
-                <div class="mm-results-grid">
-                    <div class="mm-result-item">
-                        <span class="mm-ri-icon">⏱️</span>
-                        <span class="mm-ri-value">${MemoryMatch.formatTime(MemoryMatch.elapsedTime)}</span>
-                        <span class="mm-ri-label">Time</span>
-                    </div>
-                    <div class="mm-result-item">
-                        <span class="mm-ri-icon">👆</span>
-                        <span class="mm-ri-value">${MemoryMatch.moves}</span>
-                        <span class="mm-ri-label">Moves</span>
-                    </div>
-                    <div class="mm-result-item">
-                        <span class="mm-ri-icon">🎯</span>
-                        <span class="mm-ri-value">${Math.round(MemoryMatch.totalPairs / MemoryMatch.moves * 100)}%</span>
-                        <span class="mm-ri-label">Efficiency</span>
-                    </div>
-                    <div class="mm-result-item">
-                        <span class="mm-ri-icon">⭐</span>
-                        <span class="mm-ri-value">+${xpEarned}</span>
-                        <span class="mm-ri-label">XP</span>
-                    </div>
-                </div>
-                
-                <div class="mm-results-actions">
-                    <button class="btn btn-primary" onclick="MemoryMatch.startGame()">
-                        🔄 Play Again
-                    </button>
-                    <button class="btn btn-secondary" onclick="MemoryMatch.close()">
-                        Done
-                    </button>
-                </div>
-            </div>
-        `;
+            `;
+        } catch (error) {
+            console.error('MemoryMatch.endGame error:', error);
+        }
     },
 
     saveScore: (moves, time, score) => {
-        const bestScores = MemoryMatch.getBestScores();
-        const current = bestScores[MemoryMatch.difficulty];
-        
-        if (!current || moves < current.moves || (moves === current.moves && time < current.time)) {
-            bestScores[MemoryMatch.difficulty] = { moves, time, score, date: new Date().toISOString() };
-            localStorage.setItem('csmaster_memory_best', JSON.stringify(bestScores));
+        try {
+            const bestScores = MemoryMatch.getBestScores();
+            const current = bestScores[MemoryMatch.difficulty];
+            
+            if (!current || moves < current.moves || (moves === current.moves && time < current.time)) {
+                bestScores[MemoryMatch.difficulty] = { moves, time, score, date: new Date().toISOString() };
+                localStorage.setItem('csmaster_memory_best', JSON.stringify(bestScores));
+            }
+        } catch (error) {
+            console.error('MemoryMatch.saveScore error:', error);
         }
     },
 
     getBestScores: () => {
-        return JSON.parse(localStorage.getItem('csmaster_memory_best') || '{}');
+        try {
+            const stored = localStorage.getItem('csmaster_memory_best');
+            if (!stored) return {};
+            const parsed = JSON.parse(stored);
+            return typeof parsed === 'object' && parsed !== null ? parsed : {};
+        } catch (error) {
+            console.error('MemoryMatch.getBestScores error:', error);
+            return {};
+        }
     },
 
     cleanup: () => {

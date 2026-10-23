@@ -15,6 +15,13 @@ const PWAUtils = (function() {
     // Offline queue for actions to sync later
     const offlineQueue = [];
     
+    // Install prompt handling
+    let deferredInstallPrompt = null;
+    let installPromptShown = false;
+    
+    // Service worker update tracking
+    let waitingServiceWorker = null;
+    
     /**
      * Initialize PWA utilities
      */
@@ -23,6 +30,9 @@ const PWAUtils = (function() {
         setupOfflineIndicator();
         setupCacheManagement();
         loadOfflineQueue();
+        setupInstallPrompt();
+        setupUpdateNotification();
+        setupNetworkPolling();
         
         console.log('[PWAUtils] Initialized');
     }
@@ -187,6 +197,340 @@ const PWAUtils = (function() {
                     return false;
                 }
             };
+        }
+    }
+    
+    /**
+     * Setup install prompt handling
+     */
+    function setupInstallPrompt() {
+        // Capture the install prompt event
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredInstallPrompt = e;
+            console.log('[PWAUtils] Install prompt captured');
+            
+            // Show install button if not already installed
+            if (!isInstalledPWA() && !installPromptShown) {
+                showInstallButton();
+            }
+        });
+        
+        // Track successful installation
+        window.addEventListener('appinstalled', () => {
+            deferredInstallPrompt = null;
+            installPromptShown = false;
+            hideInstallButton();
+            console.log('[PWAUtils] App installed successfully');
+            
+            if (typeof Toast !== 'undefined') {
+                Toast.show('App installed! You can now use it offline.', 'success');
+            }
+        });
+    }
+    
+    /**
+     * Show install button in UI
+     */
+    function showInstallButton() {
+        if (document.getElementById('pwa-install-btn')) return;
+        
+        const btn = document.createElement('button');
+        btn.id = 'pwa-install-btn';
+        btn.className = 'pwa-install-btn';
+        btn.setAttribute('aria-label', 'Install app');
+        btn.innerHTML = `
+            <span class="pwa-install-icon">📲</span>
+            <span class="pwa-install-text">Install App</span>
+        `;
+        
+        const style = document.createElement('style');
+        style.id = 'pwa-install-styles';
+        style.textContent = `
+            .pwa-install-btn {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+                color: white;
+                border: none;
+                padding: 12px 20px;
+                border-radius: 50px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                font-size: 14px;
+                font-weight: 600;
+                cursor: pointer;
+                z-index: 9997;
+                box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
+                transition: transform 0.2s, box-shadow 0.2s;
+                animation: slideInUp 0.3s ease;
+            }
+            .pwa-install-btn:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+            }
+            .pwa-install-btn:active {
+                transform: translateY(0);
+            }
+            @keyframes slideInUp {
+                from { transform: translateY(100px); opacity: 0; }
+                to { transform: translateY(0); opacity: 1; }
+            }
+        `;
+        
+        if (!document.getElementById('pwa-install-styles')) {
+            document.head.appendChild(style);
+        }
+        
+        btn.addEventListener('click', promptInstall);
+        document.body.appendChild(btn);
+        installPromptShown = true;
+    }
+    
+    /**
+     * Hide install button
+     */
+    function hideInstallButton() {
+        const btn = document.getElementById('pwa-install-btn');
+        if (btn) btn.remove();
+    }
+    
+    /**
+     * Trigger install prompt
+     */
+    async function promptInstall() {
+        if (!deferredInstallPrompt) {
+            console.log('[PWAUtils] No install prompt available');
+            return { outcome: 'unavailable' };
+        }
+        
+        deferredInstallPrompt.prompt();
+        const result = await deferredInstallPrompt.userChoice;
+        
+        console.log('[PWAUtils] Install prompt result:', result.outcome);
+        
+        if (result.outcome === 'accepted') {
+            hideInstallButton();
+        }
+        
+        deferredInstallPrompt = null;
+        return result;
+    }
+    
+    /**
+     * Setup service worker update notification
+     */
+    function setupUpdateNotification() {
+        if (!('serviceWorker' in navigator)) return;
+        
+        navigator.serviceWorker.ready.then((registration) => {
+            // Check for updates periodically
+            setInterval(() => {
+                registration.update().catch(() => {});
+            }, 60 * 60 * 1000); // Every hour
+            
+            // Handle updates
+            registration.addEventListener('updatefound', () => {
+                const newWorker = registration.installing;
+                
+                if (!newWorker) return;
+                
+                newWorker.addEventListener('statechange', () => {
+                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                        // New version available
+                        waitingServiceWorker = newWorker;
+                        showUpdateNotification();
+                    }
+                });
+            });
+            
+            // Handle waiting worker on page load
+            if (registration.waiting) {
+                waitingServiceWorker = registration.waiting;
+                showUpdateNotification();
+            }
+        });
+        
+        // Handle controller change (update activated)
+        let refreshing = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+            if (!refreshing) {
+                refreshing = true;
+                window.location.reload();
+            }
+        });
+    }
+    
+    /**
+     * Show update notification banner
+     */
+    function showUpdateNotification() {
+        if (document.getElementById('pwa-update-banner')) return;
+        
+        const banner = document.createElement('div');
+        banner.id = 'pwa-update-banner';
+        banner.className = 'pwa-update-banner';
+        banner.setAttribute('role', 'alert');
+        banner.innerHTML = `
+            <span class="pwa-update-text">🎉 A new version is available!</span>
+            <button class="pwa-update-btn" id="pwa-update-btn">Update Now</button>
+            <button class="pwa-update-dismiss" id="pwa-update-dismiss" aria-label="Dismiss">✕</button>
+        `;
+        
+        const style = document.createElement('style');
+        style.id = 'pwa-update-styles';
+        style.textContent = `
+            .pwa-update-banner {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                color: white;
+                padding: 12px 20px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 16px;
+                z-index: 9999;
+                box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.15);
+                animation: slideUp 0.3s ease;
+            }
+            .pwa-update-text {
+                font-weight: 500;
+            }
+            .pwa-update-btn {
+                background: white;
+                color: #059669;
+                border: none;
+                padding: 8px 16px;
+                border-radius: 6px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: transform 0.2s;
+            }
+            .pwa-update-btn:hover {
+                transform: scale(1.05);
+            }
+            .pwa-update-dismiss {
+                background: transparent;
+                border: none;
+                color: white;
+                font-size: 18px;
+                cursor: pointer;
+                padding: 4px 8px;
+                opacity: 0.8;
+            }
+            .pwa-update-dismiss:hover {
+                opacity: 1;
+            }
+            @keyframes slideUp {
+                from { transform: translateY(100%); }
+                to { transform: translateY(0); }
+            }
+        `;
+        
+        if (!document.getElementById('pwa-update-styles')) {
+            document.head.appendChild(style);
+        }
+        
+        document.body.appendChild(banner);
+        
+        document.getElementById('pwa-update-btn').addEventListener('click', applyUpdate);
+        document.getElementById('pwa-update-dismiss').addEventListener('click', () => {
+            banner.remove();
+        });
+    }
+    
+    /**
+     * Apply the pending service worker update
+     */
+    function applyUpdate() {
+        if (waitingServiceWorker) {
+            waitingServiceWorker.postMessage({ type: 'SKIP_WAITING' });
+        }
+    }
+    
+    /**
+     * Setup network polling for reliable offline detection
+     */
+    function setupNetworkPolling() {
+        let lastOnlineState = navigator.onLine;
+        
+        // Poll a lightweight endpoint to verify actual connectivity
+        async function checkConnectivity() {
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000);
+                
+                const response = await fetch('/manifest.json', {
+                    method: 'HEAD',
+                    cache: 'no-store',
+                    signal: controller.signal
+                });
+                
+                clearTimeout(timeoutId);
+                return response.ok;
+            } catch {
+                return false;
+            }
+        }
+        
+        async function updateOnlineStatus() {
+            const isOnline = await checkConnectivity();
+            const indicator = document.getElementById('offline-indicator');
+            
+            if (isOnline !== lastOnlineState) {
+                lastOnlineState = isOnline;
+                
+                if (indicator) {
+                    if (isOnline) {
+                        indicator.classList.remove('visible');
+                        indicator.setAttribute('aria-hidden', 'true');
+                        document.body.classList.remove('offline');
+                    } else {
+                        indicator.classList.add('visible');
+                        indicator.setAttribute('aria-hidden', 'false');
+                        document.body.classList.add('offline');
+                    }
+                }
+                
+                // Dispatch custom event for other components
+                window.dispatchEvent(new CustomEvent('connectivitychange', { 
+                    detail: { online: isOnline } 
+                }));
+            }
+        }
+        
+        // Check every 30 seconds when page is visible
+        let pollInterval = null;
+        
+        function startPolling() {
+            if (!pollInterval) {
+                pollInterval = setInterval(updateOnlineStatus, 30000);
+            }
+        }
+        
+        function stopPolling() {
+            if (pollInterval) {
+                clearInterval(pollInterval);
+                pollInterval = null;
+            }
+        }
+        
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                stopPolling();
+            } else {
+                startPolling();
+                updateOnlineStatus(); // Check immediately when visible
+            }
+        });
+        
+        if (!document.hidden) {
+            startPolling();
         }
     }
     

@@ -246,12 +246,12 @@ const Helpers = {
      * Calculate percentage
      * @param {number} value - Part value
      * @param {number} total - Total value
-     * @returns {number} Percentage (0-100)
+     * @returns {number} Percentage (0-100), returns 0 for invalid/zero/negative total
      */
     percentage: (value, total) => {
         const v = Number(value) || 0;
         const t = Number(total);
-        if (t === 0 || isNaN(t)) return 0;
+        if (t <= 0 || isNaN(t)) return 0;
         return Math.round((v / t) * 100);
     },
 
@@ -264,8 +264,12 @@ const Helpers = {
      */
     clamp: (num, min, max) => {
         const n = Number(num) || 0;
-        const minVal = Number(min) || 0;
-        const maxVal = Number(max) || 0;
+        let minVal = Number(min) || 0;
+        let maxVal = Number(max) || 0;
+        // Swap if min > max
+        if (minVal > maxVal) {
+            [minVal, maxVal] = [maxVal, minVal];
+        }
         return Math.min(Math.max(n, minVal), maxVal);
     },
 
@@ -387,26 +391,26 @@ const Helpers = {
     /**
      * Binary left shift
      * @param {string} binary - Binary string
-     * @param {number} [positions=1] - Number of positions to shift
+     * @param {number} [positions=1] - Number of positions to shift (max 31)
      * @returns {string} Shifted binary or error message
      */
     leftShift: (binary, positions = 1) => {
         const num = Helpers.binaryToDenary(binary);
         if (isNaN(num)) return 'Error: Invalid binary';
-        const pos = Math.max(0, Math.floor(Number(positions) || 1));
+        const pos = Math.max(0, Math.min(31, Math.floor(Number(positions) || 1)));
         return (num << pos).toString(2);
     },
 
     /**
      * Binary right shift
      * @param {string} binary - Binary string
-     * @param {number} [positions=1] - Number of positions to shift
+     * @param {number} [positions=1] - Number of positions to shift (max 31)
      * @returns {string} Shifted binary or error message
      */
     rightShift: (binary, positions = 1) => {
         const num = Helpers.binaryToDenary(binary);
         if (isNaN(num)) return 'Error: Invalid binary';
-        const pos = Math.max(0, Math.floor(Number(positions) || 1));
+        const pos = Math.max(0, Math.min(31, Math.floor(Number(positions) || 1)));
         return (num >> pos).toString(2);
     },
 
@@ -457,9 +461,15 @@ const Helpers = {
 
             if (seconds < 0) return 'just now';
             if (seconds < 60) return 'just now';
-            if (seconds < 3600) return Math.floor(seconds / 60) + ' min ago';
-            if (seconds < 86400) return Math.floor(seconds / 3600) + ' hours ago';
-            if (seconds < 604800) return Math.floor(seconds / 86400) + ' days ago';
+            
+            const minutes = Math.floor(seconds / 60);
+            if (seconds < 3600) return minutes === 1 ? '1 min ago' : minutes + ' mins ago';
+            
+            const hours = Math.floor(seconds / 3600);
+            if (seconds < 86400) return hours === 1 ? '1 hour ago' : hours + ' hours ago';
+            
+            const days = Math.floor(seconds / 86400);
+            if (seconds < 604800) return days === 1 ? '1 day ago' : days + ' days ago';
 
             return Helpers.formatDate(date);
         } catch (e) {
@@ -507,23 +517,38 @@ const Helpers = {
      * Deep merge two objects
      * @param {Object} target - Target object
      * @param {Object} source - Source object to merge
+     * @param {number} [maxDepth=10] - Maximum recursion depth
      * @returns {Object} Merged object (new object, does not mutate inputs)
      */
-    deepMerge: (target, source) => {
-        if (!target || typeof target !== 'object') return source || {};
-        if (!source || typeof source !== 'object') return target;
+    deepMerge: (target, source, maxDepth = 10) => {
+        const merge = (t, s, depth, seen) => {
+            if (depth > maxDepth) {
+                console.warn('Helpers.deepMerge: Max depth exceeded');
+                return s;
+            }
+            if (!t || typeof t !== 'object') return s || {};
+            if (!s || typeof s !== 'object') return t;
+            
+            // Circular reference check
+            if (seen.has(s)) {
+                console.warn('Helpers.deepMerge: Circular reference detected');
+                return t;
+            }
+            seen.add(s);
 
-        const result = { ...target };
-        for (const key in source) {
-            if (Object.prototype.hasOwnProperty.call(source, key)) {
-                if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
-                    result[key] = Helpers.deepMerge(result[key], source[key]);
-                } else {
-                    result[key] = source[key];
+            const result = { ...t };
+            for (const key in s) {
+                if (Object.prototype.hasOwnProperty.call(s, key)) {
+                    if (s[key] && typeof s[key] === 'object' && !Array.isArray(s[key])) {
+                        result[key] = merge(result[key], s[key], depth + 1, seen);
+                    } else {
+                        result[key] = s[key];
+                    }
                 }
             }
-        }
-        return result;
+            return result;
+        };
+        return merge(target, source, 0, new WeakSet());
     },
 
     /**
@@ -598,6 +623,12 @@ const Helpers = {
         const startVal = Number(start) || 0;
         const endVal = Number(end) || 0;
         const dur = Math.max(0, Number(duration) || 1000);
+
+        // Handle zero duration - set immediately
+        if (dur === 0) {
+            element.textContent = endVal;
+            return;
+        }
 
         const startTime = performance.now();
         const update = (currentTime) => {
@@ -728,6 +759,12 @@ const Helpers = {
         const endVal = Number(end) || 0;
         const dur = Math.max(0, Number(duration) || 1000);
         const suf = String(suffix || '');
+
+        // Handle zero duration - set immediately
+        if (dur === 0) {
+            element.textContent = endVal.toLocaleString() + suf;
+            return;
+        }
 
         const startTime = performance.now();
         const update = (currentTime) => {

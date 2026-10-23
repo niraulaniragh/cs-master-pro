@@ -433,20 +433,20 @@ const PracticeView = {
         
         const currentX = e.changedTouches[0].screenX;
         const diffX = currentX - PracticeView.touchStartX;
-        const flashcard = document.getElementById('flashcard');
+        const wrapper = document.getElementById('flashcard-wrapper');
         
-        if (flashcard) {
-            // Add visual feedback during swipe
+        if (wrapper) {
+            // Add visual feedback during swipe - apply to wrapper to not conflict with flip
             if (Math.abs(diffX) > 20) {
                 if (diffX > 0) {
-                    flashcard.classList.add('swiping-right');
-                    flashcard.classList.remove('swiping-left');
+                    wrapper.classList.add('swiping-right');
+                    wrapper.classList.remove('swiping-left');
                 } else {
-                    flashcard.classList.add('swiping-left');
-                    flashcard.classList.remove('swiping-right');
+                    wrapper.classList.add('swiping-left');
+                    wrapper.classList.remove('swiping-right');
                 }
             } else {
-                flashcard.classList.remove('swiping-left', 'swiping-right');
+                wrapper.classList.remove('swiping-left', 'swiping-right');
             }
         }
     },
@@ -455,9 +455,9 @@ const PracticeView = {
         PracticeView.touchEndX = e.changedTouches[0].screenX;
         PracticeView.touchEndY = e.changedTouches[0].screenY;
         
-        const flashcard = document.getElementById('flashcard');
-        if (flashcard) {
-            flashcard.classList.remove('swiping-left', 'swiping-right');
+        const wrapper = document.getElementById('flashcard-wrapper');
+        if (wrapper) {
+            wrapper.classList.remove('swiping-left', 'swiping-right');
         }
         
         PracticeView.handleSwipeGesture();
@@ -469,14 +469,14 @@ const PracticeView = {
         
         // Check if horizontal swipe is more significant than vertical
         if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > PracticeView.minSwipeDistance) {
-            const flashcard = document.getElementById('flashcard');
+            const wrapper = document.getElementById('flashcard-wrapper');
             
             if (diffX > 0) {
                 // Swipe right - Mark as known
-                if (flashcard) {
-                    flashcard.classList.add('swipe-complete-right');
+                if (wrapper) {
+                    wrapper.classList.add('swipe-complete-right');
                     setTimeout(() => {
-                        flashcard.classList.remove('swipe-complete-right');
+                        wrapper.classList.remove('swipe-complete-right');
                         PracticeView.markKnown();
                     }, 200);
                 } else {
@@ -484,10 +484,10 @@ const PracticeView = {
                 }
             } else {
                 // Swipe left - Mark for review
-                if (flashcard) {
-                    flashcard.classList.add('swipe-complete-left');
+                if (wrapper) {
+                    wrapper.classList.add('swipe-complete-left');
                     setTimeout(() => {
-                        flashcard.classList.remove('swipe-complete-left');
+                        wrapper.classList.remove('swipe-complete-left');
                         PracticeView.markReview();
                     }, 200);
                 } else {
@@ -917,8 +917,20 @@ const PracticeView = {
     },
 
     markKnown: () => {
+        const card = PracticeView.flashcards[PracticeView.flashcardIndex];
+        
         PracticeView.knownCards.add(PracticeView.flashcardIndex);
         PracticeView.reviewCards.delete(PracticeView.flashcardIndex);
+        
+        // Track with SRS system for spaced repetition
+        if (typeof SRSSystem !== 'undefined' && card && card.id) {
+            SRSSystem.recordAnswer(card.id, true); // quality 4 = correct
+        }
+        
+        // Track with Streak system
+        if (typeof StreakSystem !== 'undefined') {
+            StreakSystem.recordActivity('flashcard');
+        }
         
         const knownCount = document.getElementById('known-count');
         const reviewCount = document.getElementById('review-count');
@@ -937,8 +949,15 @@ const PracticeView = {
     },
 
     markReview: () => {
+        const card = PracticeView.flashcards[PracticeView.flashcardIndex];
+        
         PracticeView.reviewCards.add(PracticeView.flashcardIndex);
         PracticeView.knownCards.delete(PracticeView.flashcardIndex);
+        
+        // Track with SRS system for spaced repetition - mark as needing review
+        if (typeof SRSSystem !== 'undefined' && card && card.id) {
+            SRSSystem.recordAnswer(card.id, false); // quality 1 = incorrect/needs review
+        }
         
         const knownCount = document.getElementById('known-count');
         const reviewCount = document.getElementById('review-count');

@@ -85,10 +85,17 @@ const GoldQuest = {
         GoldQuest.currentQuestionIndex = 0;
         GoldQuest.goldMultiplier = difficulty === 'easy' ? 1 : difficulty === 'medium' ? 2 : 3;
         
+        // Load saved equipment with proper defaults
         const stats = GoldQuest.getStats();
-        GoldQuest.equipment = stats.equipment || GoldQuest.equipment;
+        if (stats.equipment) {
+            GoldQuest.equipment = {
+                pickaxe: { ...GoldQuest.equipment.pickaxe, level: stats.equipment.pickaxe?.level || 1 },
+                helmet: { ...GoldQuest.equipment.helmet, level: stats.equipment.helmet?.level || 0 },
+                cart: { ...GoldQuest.equipment.cart, level: stats.equipment.cart?.level || 0 }
+            };
+        }
         
-        if (typeof QUESTIONS !== 'undefined') {
+        if (typeof QUESTIONS !== 'undefined' && Array.isArray(QUESTIONS) && QUESTIONS.length > 0) {
             GoldQuest.questions = [...QUESTIONS].sort(() => Math.random() - 0.5).slice(0, 20);
         } else {
             GoldQuest.questions = [
@@ -100,11 +107,16 @@ const GoldQuest = {
         GoldQuest.showMine();
     },
     
+    // Helper to safely get equipment values with bounds checking
+    getPickaxeIndex: () => Math.max(0, Math.min(GoldQuest.equipment.pickaxe.level - 1, GoldQuest.equipment.pickaxe.names.length - 1)),
+    getHelmetIndex: () => Math.max(0, Math.min(GoldQuest.equipment.helmet.level, GoldQuest.equipment.helmet.bonus.length - 1)),
+    
     showMine: () => {
         const container = document.querySelector('.goldquest-container');
         if (!container) return;
         
-        const pickaxeName = GoldQuest.equipment.pickaxe.names[GoldQuest.equipment.pickaxe.level - 1];
+        const pickaxeIndex = GoldQuest.getPickaxeIndex();
+        const pickaxeName = GoldQuest.equipment.pickaxe.names[pickaxeIndex] || 'Wooden';
         
         container.innerHTML = `
             <div class="game-header"><h2>⛏️ Mining...</h2><button class="close-btn" onclick="GoldQuest.close()">✕</button></div>
@@ -126,17 +138,22 @@ const GoldQuest = {
     },
     
     renderQuestion: () => {
-        if (GoldQuest.currentQuestionIndex >= GoldQuest.questions.length) {
+        if (!GoldQuest.questions || GoldQuest.currentQuestionIndex >= GoldQuest.questions.length) {
             GoldQuest.endMining();
-            return '';
+            return '<p class="gq-complete">All questions complete!</p>';
         }
         
         const q = GoldQuest.questions[GoldQuest.currentQuestionIndex];
+        if (!q || !q.options || !Array.isArray(q.options)) {
+            GoldQuest.currentQuestionIndex++;
+            return GoldQuest.renderQuestion();
+        }
+        
         GoldQuest.currentQuestion = q;
         
         return `
             <div class="gq-question">
-                <p class="question-text">${q.question}</p>
+                <p class="question-text">${q.question || 'Question'}</p>
                 <div class="gq-options">
                     ${q.options.map((opt, i) => `<button class="gq-option" onclick="GoldQuest.answer(${i})">${opt}</button>`).join('')}
                 </div>
@@ -146,7 +163,7 @@ const GoldQuest = {
     
     answer: (index) => {
         const q = GoldQuest.currentQuestion;
-        if (!q) return;
+        if (!q || typeof q.answer !== 'number') return;
         
         const isCorrect = index === q.answer;
         const buttons = document.querySelectorAll('.gq-option');
@@ -162,16 +179,22 @@ const GoldQuest = {
             GoldQuest.mineDepth += 5;
             
             const baseGold = 10;
-            const pickaxeMultiplier = GoldQuest.equipment.pickaxe.multipliers[GoldQuest.equipment.pickaxe.level - 1];
-            const helmetBonus = GoldQuest.equipment.helmet.bonus[GoldQuest.equipment.helmet.level] || 0;
+            const pickaxeIndex = GoldQuest.getPickaxeIndex();
+            const helmetIndex = GoldQuest.getHelmetIndex();
+            const pickaxeMultiplier = GoldQuest.equipment.pickaxe.multipliers[pickaxeIndex] || 1;
+            const helmetBonus = GoldQuest.equipment.helmet.bonus[helmetIndex] || 0;
             const streakBonus = Math.min(GoldQuest.consecutiveCorrect, 5);
             
             const goldEarned = Math.round((baseGold + helmetBonus) * pickaxeMultiplier * GoldQuest.goldMultiplier * (1 + streakBonus * 0.1));
             GoldQuest.gold += goldEarned;
             
-            document.getElementById('gq-gold').textContent = GoldQuest.gold;
-            document.getElementById('gq-depth').textContent = GoldQuest.mineDepth + 'm';
-            document.getElementById('gq-streak').textContent = GoldQuest.consecutiveCorrect + 'x';
+            // Safely update HUD elements
+            const goldEl = document.getElementById('gq-gold');
+            const depthEl = document.getElementById('gq-depth');
+            const streakEl = document.getElementById('gq-streak');
+            if (goldEl) goldEl.textContent = GoldQuest.gold;
+            if (depthEl) depthEl.textContent = GoldQuest.mineDepth + 'm';
+            if (streakEl) streakEl.textContent = GoldQuest.consecutiveCorrect + 'x';
             
             // Show gold popup
             const shaft = document.getElementById('mine-shaft');
@@ -183,16 +206,17 @@ const GoldQuest = {
                 setTimeout(() => popup.remove(), 1000);
             }
             
-            if (typeof SRSSystem !== 'undefined') SRSSystem.recordAnswer(q.id, true);
-            if (typeof SoundFX !== 'undefined') SoundFX.play('success');
+            if (typeof SRSSystem !== 'undefined' && SRSSystem?.recordAnswer) SRSSystem.recordAnswer(q.id, true);
+            if (typeof SoundFX !== 'undefined' && SoundFX?.play) SoundFX.play('success');
         } else {
             GoldQuest.consecutiveCorrect = 0;
-            document.getElementById('gq-streak').textContent = '0x';
-            if (typeof SRSSystem !== 'undefined') SRSSystem.recordAnswer(q.id, false);
-            if (typeof SoundFX !== 'undefined') SoundFX.play('error');
+            const streakEl = document.getElementById('gq-streak');
+            if (streakEl) streakEl.textContent = '0x';
+            if (typeof SRSSystem !== 'undefined' && SRSSystem?.recordAnswer) SRSSystem.recordAnswer(q.id, false);
+            if (typeof SoundFX !== 'undefined' && SoundFX?.play) SoundFX.play('error');
         }
         
-        if (typeof StreakSystem !== 'undefined') {
+        if (typeof StreakSystem !== 'undefined' && StreakSystem?.recordActivity) {
             StreakSystem.recordActivity('question');
             if (isCorrect) StreakSystem.recordActivity('correct');
         }
@@ -206,29 +230,61 @@ const GoldQuest = {
     
     openShop: () => {
         // Check if Modal is available
-        if (typeof Modal === 'undefined' || !Modal.show) {
-            Toast?.show?.('Shop not available', 'warning');
+        if (typeof Modal === 'undefined' || !Modal?.show) {
+            if (typeof Toast !== 'undefined' && Toast?.show) {
+                Toast.show('Shop not available', 'warning');
+            }
             return;
         }
         
         const eq = GoldQuest.equipment;
         const costs = GoldQuest.upgradeCosts;
         
-        const canUpgrade = (type) => eq[type].level < costs[type].length && GoldQuest.gold >= costs[type][eq[type].level];
+        // Safe upgrade check with bounds validation
+        const canUpgrade = (type) => {
+            const currentLevel = eq[type]?.level ?? 0;
+            const maxLevel = costs[type]?.length ?? 0;
+            const upgradeCost = costs[type]?.[currentLevel];
+            return currentLevel < maxLevel && typeof upgradeCost === 'number' && GoldQuest.gold >= upgradeCost;
+        };
+        
+        const getUpgradeCost = (type) => {
+            const currentLevel = eq[type]?.level ?? 0;
+            return costs[type]?.[currentLevel] ?? '—';
+        };
+        
+        const pickaxeIndex = GoldQuest.getPickaxeIndex();
+        const pickaxeName = eq.pickaxe.names[pickaxeIndex] || 'Pickaxe';
         
         Modal.show({
             title: '🛒 Mining Shop',
             content: `
                 <div class="gq-shop">
-                    <p>Current Gold: <strong>${GoldQuest.gold} 🪙</strong></p>
+                    <p class="shop-gold">Current Gold: <strong>${GoldQuest.gold} 🪙</strong></p>
                     <div class="shop-items">
                         <div class="shop-item">
-                            <span>⛏️ ${eq.pickaxe.names[eq.pickaxe.level - 1]} Pickaxe (Lv ${eq.pickaxe.level}/6)</span>
-                            ${eq.pickaxe.level < 6 ? `<button class="btn btn-small btn-primary" onclick="GoldQuest.upgrade('pickaxe')" ${canUpgrade('pickaxe') ? '' : 'disabled'}>${costs.pickaxe[eq.pickaxe.level]} 🪙</button>` : '<span>MAX</span>'}
+                            <div class="item-info">
+                                <span class="item-icon">⛏️</span>
+                                <span class="item-name">${pickaxeName} Pickaxe</span>
+                                <span class="item-level">Lv ${eq.pickaxe.level}/6</span>
+                            </div>
+                            ${eq.pickaxe.level < 6 ? `<button class="btn btn-small btn-primary" onclick="GoldQuest.upgrade('pickaxe')" ${canUpgrade('pickaxe') ? '' : 'disabled'}>${getUpgradeCost('pickaxe')} 🪙</button>` : '<span class="max-badge">MAX</span>'}
                         </div>
                         <div class="shop-item">
-                            <span>⛑️ Mining Helmet (Lv ${eq.helmet.level}/5)</span>
-                            ${eq.helmet.level < 5 ? `<button class="btn btn-small btn-primary" onclick="GoldQuest.upgrade('helmet')" ${canUpgrade('helmet') ? '' : 'disabled'}>${costs.helmet[eq.helmet.level]} 🪙</button>` : '<span>MAX</span>'}
+                            <div class="item-info">
+                                <span class="item-icon">⛑️</span>
+                                <span class="item-name">Mining Helmet</span>
+                                <span class="item-level">Lv ${eq.helmet.level}/5</span>
+                            </div>
+                            ${eq.helmet.level < 5 ? `<button class="btn btn-small btn-primary" onclick="GoldQuest.upgrade('helmet')" ${canUpgrade('helmet') ? '' : 'disabled'}>${getUpgradeCost('helmet')} 🪙</button>` : '<span class="max-badge">MAX</span>'}
+                        </div>
+                        <div class="shop-item">
+                            <div class="item-info">
+                                <span class="item-icon">🛒</span>
+                                <span class="item-name">Mining Cart</span>
+                                <span class="item-level">Lv ${eq.cart.level}/5</span>
+                            </div>
+                            ${eq.cart.level < 5 ? `<button class="btn btn-small btn-primary" onclick="GoldQuest.upgrade('cart')" ${canUpgrade('cart') ? '' : 'disabled'}>${getUpgradeCost('cart')} 🪙</button>` : '<span class="max-badge">MAX</span>'}
                         </div>
                     </div>
                 </div>
@@ -238,14 +294,39 @@ const GoldQuest = {
     },
     
     upgrade: (type) => {
-        const cost = GoldQuest.upgradeCosts[type][GoldQuest.equipment[type].level];
-        if (GoldQuest.gold >= cost) {
-            GoldQuest.gold -= cost;
-            GoldQuest.equipment[type].level++;
-            const stats = GoldQuest.getStats();
-            stats.equipment = GoldQuest.equipment;
-            GoldQuest.saveStats(stats);
-            Toast.show(`⬆️ ${type} upgraded!`, 'success');
+        const eq = GoldQuest.equipment[type];
+        const costs = GoldQuest.upgradeCosts[type];
+        
+        if (!eq || !costs) return;
+        
+        const currentLevel = eq.level ?? 0;
+        const cost = costs[currentLevel];
+        
+        // Validate upgrade is possible
+        if (typeof cost !== 'number' || currentLevel >= costs.length || GoldQuest.gold < cost) {
+            if (typeof Toast !== 'undefined' && Toast?.show) {
+                Toast.show('Cannot upgrade - not enough gold', 'warning');
+            }
+            return;
+        }
+        
+        GoldQuest.gold -= cost;
+        GoldQuest.equipment[type].level++;
+        
+        // Save updated equipment
+        const stats = GoldQuest.getStats();
+        stats.equipment = GoldQuest.equipment;
+        GoldQuest.saveStats(stats);
+        
+        // Update gold display in HUD if visible
+        const goldEl = document.getElementById('gq-gold');
+        if (goldEl) goldEl.textContent = GoldQuest.gold;
+        
+        if (typeof Toast !== 'undefined' && Toast?.show) {
+            Toast.show(`⬆️ ${type.charAt(0).toUpperCase() + type.slice(1)} upgraded!`, 'success');
+        }
+        
+        if (typeof Modal !== 'undefined' && Modal?.close) {
             Modal.close();
             GoldQuest.openShop();
         }
@@ -260,7 +341,7 @@ const GoldQuest = {
         GoldQuest.saveStats(stats);
         
         const xpEarned = Math.round(GoldQuest.gold / 5);
-        if (typeof AppState !== 'undefined') {
+        if (typeof AppState !== 'undefined' && AppState?.getState && AppState?.setState) {
             const user = AppState.getState('user') || {};
             user.xp = (user.xp || 0) + xpEarned;
             AppState.setState('user', user);
@@ -286,13 +367,25 @@ const GoldQuest = {
         }
     },
     
-    getStats: () => { try { return JSON.parse(localStorage.getItem('csmaster_goldquest') || '{}'); } catch (e) { return {}; } },
-    saveStats: (stats) => { localStorage.setItem('csmaster_goldquest', JSON.stringify(stats)); },
+    getStats: () => {
+        try {
+            return JSON.parse(localStorage.getItem('csmaster_goldquest') || '{}');
+        } catch (e) {
+            console.warn('GoldQuest: Failed to load stats', e);
+            return {};
+        }
+    },
+    
+    saveStats: (stats) => {
+        try {
+            localStorage.setItem('csmaster_goldquest', JSON.stringify(stats));
+        } catch (e) {
+            console.warn('GoldQuest: Failed to save stats', e);
+        }
+    },
 
     cleanup: () => {
-        // Stop game
         GoldQuest.isPlaying = false;
-        // Reset state
         GoldQuest.questions = [];
         GoldQuest.currentQuestion = null;
         GoldQuest.currentQuestionIndex = 0;

@@ -17,12 +17,14 @@ const TowerDefense = {
     waveInProgress: false,
     questionActive: false,
     waveLoopTimer: null,
+    lastAttackTime: {}, // Track per-tower attack cooldowns
+    attackCooldown: 500, // ms between tower attacks
     
     towerTypes: {
-        basic: { name: 'Code Tower', cost: 25, damage: 10, icon: '🗼', color: '#3b82f6' },
-        fire: { name: 'Bug Blaster', cost: 50, damage: 20, icon: '🔥', color: '#ef4444' },
-        ice: { name: 'Freeze Ray', cost: 50, damage: 15, icon: '❄️', color: '#06b6d4', slow: true },
-        lightning: { name: 'Logic Zapper', cost: 75, damage: 30, icon: '⚡', color: '#eab308' }
+        basic: { name: 'Code Tower', cost: 25, damage: 10, range: 100, icon: '🗼', color: '#3b82f6' },
+        fire: { name: 'Bug Blaster', cost: 50, damage: 20, range: 100, icon: '🔥', color: '#ef4444' },
+        ice: { name: 'Freeze Ray', cost: 50, damage: 15, range: 100, icon: '❄️', color: '#06b6d4', slow: 0.5 },
+        lightning: { name: 'Logic Zapper', cost: 75, damage: 30, range: 100, icon: '⚡', color: '#eab308' }
     },
     
     enemyTypes: {
@@ -103,8 +105,11 @@ const TowerDefense = {
         TowerDefense.enemies = [];
         TowerDefense.currentQuestionIndex = 0;
         TowerDefense.difficulty = difficulty;
+        TowerDefense.lastAttackTime = {};
+        TowerDefense.waveInProgress = false;
+        TowerDefense.questionActive = false;
         
-        if (typeof QUESTIONS !== 'undefined') {
+        if (typeof QUESTIONS !== 'undefined' && Array.isArray(QUESTIONS) && QUESTIONS.length > 0) {
             TowerDefense.questions = [...QUESTIONS].sort(() => Math.random() - 0.5);
         } else {
             TowerDefense.questions = [
@@ -166,23 +171,30 @@ const TowerDefense = {
     
     buildTower: (type) => {
         const tower = TowerDefense.towerTypes[type];
+        if (!tower) {
+            TowerDefense.showToast('Invalid tower type!', 'error');
+            return;
+        }
+        
         if (TowerDefense.gold < tower.cost) {
-            Toast.show('Not enough gold!', 'error');
+            TowerDefense.showToast('Not enough gold!', 'error');
             return;
         }
         
         if (TowerDefense.towers.length >= 6) {
-            Toast.show('Maximum towers reached!', 'warning');
+            TowerDefense.showToast('Maximum towers reached!', 'warning');
             return;
         }
         
         TowerDefense.gold -= tower.cost;
-        TowerDefense.towers.push({ type, ...tower, id: Date.now() });
+        const towerId = Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        TowerDefense.towers.push({ type, ...tower, id: towerId });
+        TowerDefense.lastAttackTime[towerId] = 0;
         
-        document.getElementById('td-gold').textContent = TowerDefense.gold;
+        TowerDefense.updateHUD('gold', TowerDefense.gold);
         TowerDefense.renderTowers();
         
-        if (typeof SoundFX !== 'undefined') SoundFX.play('click');
+        if (typeof SoundFX !== 'undefined' && SoundFX.play) SoundFX.play('click');
     },
     
     renderTowers: () => {
@@ -198,11 +210,14 @@ const TowerDefense = {
     },
     
     startWave: () => {
-        if (TowerDefense.waveInProgress) return;
+        if (TowerDefense.waveInProgress || !TowerDefense.isPlaying) return;
         TowerDefense.waveInProgress = true;
         
-        document.getElementById('start-wave-btn').disabled = true;
-        document.getElementById('start-wave-btn').textContent = '⚔️ Wave in Progress...';
+        const btn = document.getElementById('start-wave-btn');
+        if (btn) {
+            btn.disabled = true;
+            btn.textContent = '⚔️ Wave in Progress...';
+        }
         
         // Generate enemies for this wave
         TowerDefense.generateEnemies();
@@ -216,21 +231,28 @@ const TowerDefense = {
         const wave = TowerDefense.wave;
         const diffMult = TowerDefense.difficulty === 'easy' ? 0.8 : TowerDefense.difficulty === 'hard' ? 1.3 : 1;
         
-        // More enemies each wave
+        // More enemies each wave with caps
         const bugCount = Math.min(3 + wave, 10);
         const virusCount = wave >= 2 ? Math.min(wave - 1, 5) : 0;
         const trojanCount = wave >= 4 ? Math.min(wave - 3, 3) : 0;
+        const wormCount = wave >= 6 ? Math.min(wave - 5, 2) : 0;
         const bossCount = wave % 5 === 0 ? 1 : 0;
         
         const addEnemy = (type, count) => {
             const base = TowerDefense.enemyTypes[type];
+            if (!base) return;
+            
             for (let i = 0; i < count; i++) {
+                const scaledHealth = Math.round(base.health * diffMult * (1 + wave * 0.1));
                 TowerDefense.enemies.push({
                     ...base,
-                    health: Math.round(base.health * diffMult * (1 + wave * 0.1)),
-                    maxHealth: Math.round(base.health * diffMult * (1 + wave * 0.1)),
-                    position: -10 - (i * 15), // Staggered spawn
-                    id: Date.now() + Math.random()
+                    type,
+                    health: scaledHealth,
+                    maxHealth: scaledHealth,
+                    baseSpeed: base.speed,
+                    position: -10 - (TowerDefense.enemies.length * 12), // Staggered spawn based on total count
+                    slowedUntil: 0,
+                    id: Date.now() + '_' + Math.random().toString(36).substr(2, 9)
                 });
             }
         };
@@ -238,93 +260,162 @@ const TowerDefense = {
         addEnemy('bug', bugCount);
         addEnemy('virus', virusCount);
         addEnemy('trojan', trojanCount);
+        addEnemy('worm', wormCount);
         if (bossCount) addEnemy('boss', bossCount);
         
-        // Shuffle enemies
+        // Shuffle enemies for varied spawn order
         TowerDefense.enemies.sort(() => Math.random() - 0.5);
+        
+        // Re-stagger positions after shuffle
+        TowerDefense.enemies.forEach((enemy, i) => {
+            enemy.position = -10 - (i * 12);
+        });
     },
     
     waveLoop: () => {
         if (!TowerDefense.isPlaying || !TowerDefense.waveInProgress) return;
         
-        // Move enemies
+        const now = Date.now();
         let allDead = true;
-        TowerDefense.enemies.forEach(enemy => {
-            if (enemy.health > 0) {
-                allDead = false;
-                enemy.position += enemy.speed;
-                
-                // Check if reached base
-                if (enemy.position >= 100) {
-                    TowerDefense.health -= 10;
-                    enemy.health = 0;
-                    const healthEl = document.getElementById('td-health');
-                    if (healthEl) healthEl.textContent = TowerDefense.health;
-                    
-                    if (TowerDefense.health <= 0) {
-                        TowerDefense.gameOver();
-                        return;
-                    }
-                }
-            }
-        });
+        let reachedBase = false;
         
-        // Tower attacks
-        TowerDefense.towers.forEach(tower => {
-            const target = TowerDefense.enemies.find(e => e.health > 0 && e.position >= 0 && e.position <= 100);
-            if (target) {
-                target.health -= tower.damage;
-                if (target.health <= 0) {
-                    TowerDefense.gold += target.reward;
-                    TowerDefense.score += target.reward;
-                    const goldEl = document.getElementById('td-gold');
-                    const scoreEl = document.getElementById('td-score');
-                    if (goldEl) goldEl.textContent = TowerDefense.gold;
-                    if (scoreEl) scoreEl.textContent = TowerDefense.score;
-                }
+        // Move enemies
+        for (let i = 0; i < TowerDefense.enemies.length; i++) {
+            const enemy = TowerDefense.enemies[i];
+            if (enemy.health <= 0) continue;
+            
+            allDead = false;
+            
+            // Calculate speed (check for slow effect)
+            let speed = enemy.baseSpeed;
+            if (enemy.slowedUntil && now < enemy.slowedUntil) {
+                speed *= 0.5;
             }
-        });
+            enemy.speed = speed;
+            
+            enemy.position += speed;
+            
+            // Check if reached base
+            if (enemy.position >= 100) {
+                TowerDefense.health -= 10;
+                enemy.health = 0;
+                reachedBase = true;
+            }
+        }
         
-        // Render enemies
+        // Update health display if enemies reached base
+        if (reachedBase) {
+            TowerDefense.updateHUD('health', TowerDefense.health);
+            
+            if (TowerDefense.health <= 0) {
+                TowerDefense.gameOver();
+                return;
+            }
+        }
+        
+        // Tower attacks with cooldown
+        TowerDefense.processTowerAttacks(now);
+        
+        // Render enemies (batched)
         TowerDefense.renderEnemies();
         
         // Check wave complete
-        if (allDead || TowerDefense.enemies.every(e => e.health <= 0)) {
+        const allEnemiesDead = TowerDefense.enemies.every(e => e.health <= 0);
+        if (allDead || allEnemiesDead) {
             TowerDefense.waveComplete();
             return;
         }
         
-        // Show question periodically
-        if (!TowerDefense.questionActive && Math.random() < 0.1) {
+        // Show question periodically (reduced frequency, only when not already active)
+        if (!TowerDefense.questionActive && Math.random() < 0.05) {
             TowerDefense.showQuestion();
         }
         
         // Schedule next frame with proper timer tracking
         TowerDefense.waveLoopTimer = setTimeout(() => {
-            requestAnimationFrame(() => TowerDefense.waveLoop());
+            if (TowerDefense.isPlaying && TowerDefense.waveInProgress) {
+                requestAnimationFrame(() => TowerDefense.waveLoop());
+            }
         }, 100);
+    },
+    
+    processTowerAttacks: (now) => {
+        // Find alive enemies in range, sorted by position (closest to base first)
+        const aliveEnemies = TowerDefense.enemies
+            .filter(e => e.health > 0 && e.position >= 0 && e.position <= 100)
+            .sort((a, b) => b.position - a.position);
+        
+        if (aliveEnemies.length === 0) return;
+        
+        let goldGained = 0;
+        let scoreGained = 0;
+        
+        TowerDefense.towers.forEach(tower => {
+            // Check cooldown
+            const lastAttack = TowerDefense.lastAttackTime[tower.id] || 0;
+            if (now - lastAttack < TowerDefense.attackCooldown) return;
+            
+            // Find target (prioritize closest to base)
+            const target = aliveEnemies.find(e => e.health > 0);
+            if (!target) return;
+            
+            // Attack
+            TowerDefense.lastAttackTime[tower.id] = now;
+            target.health -= tower.damage;
+            
+            // Apply slow effect for ice towers
+            if (tower.slow) {
+                target.slowedUntil = now + 2000; // 2 second slow
+            }
+            
+            // Check if killed
+            if (target.health <= 0) {
+                goldGained += target.reward;
+                scoreGained += target.reward;
+            }
+        });
+        
+        // Batch update gold/score
+        if (goldGained > 0) {
+            TowerDefense.gold += goldGained;
+            TowerDefense.score += scoreGained;
+            TowerDefense.updateHUD('gold', TowerDefense.gold);
+            TowerDefense.updateHUD('score', TowerDefense.score);
+        }
     },
     
     renderEnemies: () => {
         const track = document.getElementById('td-track');
         if (!track) return;
         
-        track.innerHTML = TowerDefense.enemies
-            .filter(e => e.health > 0 && e.position >= 0)
-            .map(e => `
-                <div class="td-enemy" style="left: ${e.position}%">
-                    <div class="enemy-health" style="width: ${(e.health / e.maxHealth) * 100}%"></div>
-                    <span class="enemy-sprite">${e.icon}</span>
-                </div>
-            `).join('');
+        // Build HTML in one pass
+        const html = [];
+        for (let i = 0; i < TowerDefense.enemies.length; i++) {
+            const e = TowerDefense.enemies[i];
+            if (e.health > 0 && e.position >= 0) {
+                const healthPct = Math.max(0, (e.health / e.maxHealth) * 100);
+                const isSlowed = e.slowedUntil && Date.now() < e.slowedUntil;
+                html.push(`
+                    <div class="td-enemy${isSlowed ? ' slowed' : ''}" style="left: ${Math.min(e.position, 100)}%">
+                        <div class="enemy-health" style="width: ${healthPct}%"></div>
+                        <span class="enemy-sprite">${e.icon}</span>
+                    </div>
+                `);
+            }
+        }
+        track.innerHTML = html.join('');
     },
     
     showQuestion: () => {
+        if (!TowerDefense.questions || TowerDefense.questions.length === 0) return;
+        
         if (TowerDefense.currentQuestionIndex >= TowerDefense.questions.length) {
             TowerDefense.currentQuestionIndex = 0;
         }
         
         const q = TowerDefense.questions[TowerDefense.currentQuestionIndex];
+        if (!q || !q.options || !Array.isArray(q.options)) return;
+        
         TowerDefense.currentQuestion = q;
         TowerDefense.questionActive = true;
         
@@ -333,9 +424,9 @@ const TowerDefense = {
             questionArea.style.display = 'block';
             questionArea.innerHTML = `
                 <div class="td-question-card">
-                    <p>${q.question}</p>
+                    <p>${TowerDefense.escapeHtml(q.question)}</p>
                     <div class="td-options">
-                        ${q.options.map((opt, i) => `<button class="td-option" onclick="TowerDefense.answer(${i})">${opt}</button>`).join('')}
+                        ${q.options.map((opt, i) => `<button class="td-option" onclick="TowerDefense.answer(${i})">${TowerDefense.escapeHtml(opt)}</button>`).join('')}
                     </div>
                 </div>
             `;
@@ -351,68 +442,98 @@ const TowerDefense = {
         
         if (isCorrect) {
             // Power up towers - deal bonus damage to all enemies
+            let goldGained = 0;
+            let scoreGained = 0;
+            
             TowerDefense.enemies.forEach(e => {
                 if (e.health > 0) {
                     e.health -= 20;
                     if (e.health <= 0) {
-                        TowerDefense.gold += e.reward;
-                        TowerDefense.score += e.reward;
+                        goldGained += e.reward;
+                        scoreGained += e.reward;
                     }
                 }
             });
-            document.getElementById('td-gold').textContent = TowerDefense.gold;
-            document.getElementById('td-score').textContent = TowerDefense.score;
             
-            Toast.show('⚡ Towers powered up! Bonus damage dealt!', 'success');
-            if (typeof SRSSystem !== 'undefined') SRSSystem.recordAnswer(q.id, true);
+            TowerDefense.gold += goldGained;
+            TowerDefense.score += scoreGained;
+            TowerDefense.updateHUD('gold', TowerDefense.gold);
+            TowerDefense.updateHUD('score', TowerDefense.score);
+            
+            TowerDefense.showToast('⚡ Towers powered up! Bonus damage dealt!', 'success');
+            if (typeof SRSSystem !== 'undefined' && SRSSystem.recordAnswer) SRSSystem.recordAnswer(q.id, true);
         } else {
-            Toast.show('❌ Wrong! Enemies advance faster!', 'error');
-            TowerDefense.enemies.forEach(e => e.position += 10);
-            if (typeof SRSSystem !== 'undefined') SRSSystem.recordAnswer(q.id, false);
+            TowerDefense.showToast('❌ Wrong! Enemies advance faster!', 'error');
+            TowerDefense.enemies.forEach(e => {
+                if (e.health > 0) e.position += 10;
+            });
+            if (typeof SRSSystem !== 'undefined' && SRSSystem.recordAnswer) SRSSystem.recordAnswer(q.id, false);
         }
         
-        if (typeof StreakSystem !== 'undefined') {
+        if (typeof StreakSystem !== 'undefined' && StreakSystem.recordActivity) {
             StreakSystem.recordActivity('question');
             if (isCorrect) StreakSystem.recordActivity('correct');
         }
         
         TowerDefense.currentQuestionIndex++;
-        document.getElementById('td-question').style.display = 'none';
+        
+        const questionArea = document.getElementById('td-question');
+        if (questionArea) questionArea.style.display = 'none';
     },
     
     waveComplete: () => {
         TowerDefense.waveInProgress = false;
+        
+        // Clear any pending timer
+        if (TowerDefense.waveLoopTimer) {
+            clearTimeout(TowerDefense.waveLoopTimer);
+            TowerDefense.waveLoopTimer = null;
+        }
+        
         TowerDefense.wave++;
         
-        // Bonus gold
-        const waveBonus = TowerDefense.wave * 10;
+        // Bonus gold scales with difficulty
+        const diffBonus = TowerDefense.difficulty === 'easy' ? 1.2 : TowerDefense.difficulty === 'hard' ? 0.8 : 1;
+        const waveBonus = Math.round(TowerDefense.wave * 10 * diffBonus);
         TowerDefense.gold += waveBonus;
         
-        Toast.show(`🌊 Wave ${TowerDefense.wave - 1} Complete! +${waveBonus} gold`, 'success');
+        TowerDefense.showToast(`🌊 Wave ${TowerDefense.wave - 1} Complete! +${waveBonus} gold`, 'success');
         
         // Update UI
-        document.getElementById('td-wave').textContent = TowerDefense.wave;
-        document.getElementById('td-gold').textContent = TowerDefense.gold;
+        TowerDefense.updateHUD('wave', TowerDefense.wave);
+        TowerDefense.updateHUD('gold', TowerDefense.gold);
         
         const btn = document.getElementById('start-wave-btn');
         if (btn) {
             btn.disabled = false;
             btn.textContent = `▶️ Start Wave ${TowerDefense.wave}`;
         }
+        
+        // Update header
+        const header = document.querySelector('.td-container .game-header h2');
+        if (header) header.textContent = `🏰 Wave ${TowerDefense.wave}`;
     },
     
     gameOver: () => {
         TowerDefense.isPlaying = false;
         TowerDefense.waveInProgress = false;
         
+        // Clear timer
+        if (TowerDefense.waveLoopTimer) {
+            clearTimeout(TowerDefense.waveLoopTimer);
+            TowerDefense.waveLoopTimer = null;
+        }
+        
+        const killCount = TowerDefense.enemies.filter(e => e.health <= 0).length;
+        
         const stats = TowerDefense.getStats();
         stats.highScore = Math.max(stats.highScore || 0, TowerDefense.score);
         stats.highestWave = Math.max(stats.highestWave || 0, TowerDefense.wave - 1);
-        stats.totalKills = (stats.totalKills || 0) + TowerDefense.enemies.filter(e => e.health <= 0).length;
+        stats.totalKills = (stats.totalKills || 0) + killCount;
         TowerDefense.saveStats(stats);
         
         const xpEarned = Math.round(TowerDefense.score / 5);
-        if (typeof AppState !== 'undefined') {
+        if (typeof AppState !== 'undefined' && AppState.getState && AppState.setState) {
             const user = AppState.getState('user') || {};
             user.xp = (user.xp || 0) + xpEarned;
             AppState.setState('user', user);
@@ -428,6 +549,7 @@ const TowerDefense = {
                     <div class="results-stats">
                         <div class="result-item"><span>Waves Survived</span><span>${TowerDefense.wave - 1}</span></div>
                         <div class="result-item"><span>Final Score</span><span>${TowerDefense.score}</span></div>
+                        <div class="result-item"><span>Bugs Killed</span><span>${killCount}</span></div>
                         <div class="result-item"><span>XP Earned</span><span>+${xpEarned}</span></div>
                     </div>
                     <div class="results-actions">
@@ -439,24 +561,65 @@ const TowerDefense = {
         }
     },
     
-    getStats: () => { try { return JSON.parse(localStorage.getItem('csmaster_td') || '{}'); } catch (e) { return {}; } },
-    saveStats: (stats) => { localStorage.setItem('csmaster_td', JSON.stringify(stats)); },
+    // Helper: Update HUD element safely
+    updateHUD: (id, value) => {
+        const el = document.getElementById('td-' + id);
+        if (el) el.textContent = value;
+    },
+    
+    // Helper: Show toast notification with fallback
+    showToast: (message, type) => {
+        if (typeof Toast !== 'undefined' && Toast.show) {
+            Toast.show(message, type);
+        } else {
+            console.log(`[${type}] ${message}`);
+        }
+    },
+    
+    // Helper: Escape HTML to prevent XSS
+    escapeHtml: (text) => {
+        if (typeof text !== 'string') return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    },
+    
+    getStats: () => {
+        try {
+            return JSON.parse(localStorage.getItem('csmaster_td') || '{}');
+        } catch (e) {
+            console.warn('Failed to load TowerDefense stats:', e);
+            return {};
+        }
+    },
+    
+    saveStats: (stats) => {
+        try {
+            localStorage.setItem('csmaster_td', JSON.stringify(stats));
+        } catch (e) {
+            console.warn('Failed to save TowerDefense stats:', e);
+        }
+    },
 
     cleanup: () => {
         // Stop game
         TowerDefense.isPlaying = false;
         TowerDefense.waveInProgress = false;
         TowerDefense.questionActive = false;
+        
         // Clear any pending timers
         if (TowerDefense.waveLoopTimer) {
             clearTimeout(TowerDefense.waveLoopTimer);
             TowerDefense.waveLoopTimer = null;
         }
+        
         // Reset state
         TowerDefense.towers = [];
         TowerDefense.enemies = [];
         TowerDefense.questions = [];
         TowerDefense.currentQuestion = null;
+        TowerDefense.lastAttackTime = {};
+        
         console.log('🏰 TowerDefense cleanup');
     }
 };

@@ -12,6 +12,7 @@ const Millionaire = {
     lifelines: { fiftyFifty: true, askAudience: true, phoneFriend: true },
     isAnswerLocked: false,
     selectedAnswer: null,
+    eliminatedAnswers: [], // Track eliminated answers for 50:50
 
     // Prize ladder (XP instead of money)
     prizes: [
@@ -39,6 +40,7 @@ const Millionaire = {
             modal.classList.remove('active');
             setTimeout(() => modal.remove(), 300);
         }
+        Millionaire.cleanup();
     },
 
     renderMenu: () => {
@@ -111,7 +113,15 @@ const Millionaire = {
         try {
             // Validate QUESTIONS exists
             if (typeof QUESTIONS === 'undefined' || !Array.isArray(QUESTIONS) || QUESTIONS.length < 15) {
-                Toast?.show?.('Not enough questions available (need at least 15)', 'error');
+                if (typeof Toast !== 'undefined' && Toast?.show) {
+                    Toast.show('Not enough questions available (need at least 15)', 'error');
+                }
+                return;
+            }
+            
+            // Validate shuffleArray exists
+            if (typeof shuffleArray !== 'function') {
+                console.error('shuffleArray function not found');
                 return;
             }
             
@@ -123,7 +133,9 @@ const Millionaire = {
             Millionaire.questions = allQuestions.slice(0, 15);
             
             if (Millionaire.questions.length < 15) {
-                Toast?.show?.('Not enough questions available', 'error');
+                if (typeof Toast !== 'undefined' && Toast?.show) {
+                    Toast.show('Not enough questions available', 'error');
+                }
                 return;
             }
             
@@ -133,6 +145,7 @@ const Millionaire = {
             Millionaire.isPlaying = true;
             Millionaire.isAnswerLocked = false;
             Millionaire.selectedAnswer = null;
+            Millionaire.eliminatedAnswers = [];
             
             const container = document.querySelector('.millionaire-container');
             if (!container) {
@@ -144,7 +157,9 @@ const Millionaire = {
             Millionaire.showQuestion();
         } catch (error) {
             console.error('Millionaire.startGame error:', error);
-            Toast?.show?.('Failed to start game', 'error');
+            if (typeof Toast !== 'undefined' && Toast?.show) {
+                Toast.show('Failed to start game', 'error');
+            }
         }
     },
 
@@ -203,6 +218,15 @@ const Millionaire = {
         `;
     },
 
+    escapeHtml: (text) => {
+        if (typeof Helpers !== 'undefined' && Helpers?.escapeHtml) {
+            return Helpers.escapeHtml(text);
+        }
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    },
+
     showQuestion: () => {
         if (!Millionaire.isPlaying || Millionaire.currentQuestion >= Millionaire.questions.length) {
             Millionaire.winGame();
@@ -210,8 +234,14 @@ const Millionaire = {
         }
         
         const question = Millionaire.questions[Millionaire.currentQuestion];
+        if (!question || !question.options || !Array.isArray(question.options)) {
+            console.error('Invalid question at index', Millionaire.currentQuestion);
+            return;
+        }
+        
         Millionaire.selectedAnswer = null;
         Millionaire.isAnswerLocked = false;
+        Millionaire.eliminatedAnswers = [];
         
         // Update prize ladder
         document.querySelectorAll('.mill-prize-row').forEach((row, i) => {
@@ -223,24 +253,29 @@ const Millionaire = {
         
         // Show question with animation
         const questionPanel = document.getElementById('mill-question-panel');
-        questionPanel.innerHTML = `
-            <div class="mill-question-number">Question ${Millionaire.currentQuestion + 1} of 15</div>
-            <div class="mill-question-text animate-in">${question.question}</div>
-        `;
+        if (questionPanel) {
+            questionPanel.innerHTML = `
+                <div class="mill-question-number">Question ${Millionaire.currentQuestion + 1} of 15</div>
+                <div class="mill-question-text animate-in">${Millionaire.escapeHtml(question.question)}</div>
+            `;
+        }
         
         // Show answers
         const answersPanel = document.getElementById('mill-answers');
-        const letters = ['A', 'B', 'C', 'D'];
-        answersPanel.innerHTML = question.options.map((opt, i) => `
-            <button class="mill-answer animate-in" data-index="${i}" onclick="Millionaire.selectAnswer(${i})" style="animation-delay: ${i * 0.1}s">
-                <span class="mill-answer-letter">${letters[i]}:</span>
-                <span class="mill-answer-text">${opt}</span>
-            </button>
-        `).join('');
+        if (answersPanel) {
+            const letters = ['A', 'B', 'C', 'D'];
+            answersPanel.innerHTML = question.options.map((opt, i) => `
+                <button class="mill-answer animate-in" data-index="${i}" onclick="Millionaire.selectAnswer(${i})" style="animation-delay: ${i * 0.1}s">
+                    <span class="mill-answer-letter">${letters[i]}:</span>
+                    <span class="mill-answer-text">${Millionaire.escapeHtml(opt)}</span>
+                </button>
+            `).join('');
+        }
     },
 
     selectAnswer: (index) => {
         if (Millionaire.isAnswerLocked) return;
+        if (Millionaire.eliminatedAnswers.includes(index)) return; // Can't select eliminated answers
         
         Millionaire.selectedAnswer = index;
         
@@ -258,6 +293,9 @@ const Millionaire = {
     },
 
     showConfirmation: () => {
+        // Remove any existing confirm box
+        document.querySelector('.mill-confirm-box')?.remove();
+        
         const confirmBox = document.createElement('div');
         confirmBox.className = 'mill-confirm-box';
         confirmBox.innerHTML = `
@@ -268,8 +306,6 @@ const Millionaire = {
             </div>
         `;
         
-        // Remove any existing confirm box
-        document.querySelector('.mill-confirm-box')?.remove();
         const mainArea = document.querySelector('.mill-main-area');
         if (mainArea) {
             mainArea.appendChild(confirmBox);
@@ -278,9 +314,14 @@ const Millionaire = {
 
     lockAnswer: () => {
         document.querySelector('.mill-confirm-box')?.remove();
+        
+        if (Millionaire.selectedAnswer === null) return;
+        
         Millionaire.isAnswerLocked = true;
         
         const question = Millionaire.questions[Millionaire.currentQuestion];
+        if (!question) return;
+        
         const isCorrect = Millionaire.selectedAnswer === question.answer;
         
         // Dramatic pause and reveal
@@ -327,7 +368,9 @@ const Millionaire = {
             prizeRow.classList.add('won');
         }
         
-        Toast.show(`🎉 Correct! You've won ${Millionaire.currentPrize.toLocaleString()} XP!`, 'success');
+        if (typeof Toast !== 'undefined' && Toast?.show) {
+            Toast.show(`🎉 Correct! You've won ${Millionaire.currentPrize.toLocaleString()} XP!`, 'success');
+        }
         
         Millionaire.currentQuestion++;
         
@@ -367,13 +410,22 @@ const Millionaire = {
     useFiftyFifty: () => {
         if (!Millionaire.lifelines.fiftyFifty || Millionaire.isAnswerLocked) return;
         
+        const question = Millionaire.questions[Millionaire.currentQuestion];
+        if (!question || typeof question.answer !== 'number') return;
+        
         Millionaire.lifelines.fiftyFifty = false;
         const fiftyBtn = document.getElementById('ll-fifty');
         if (fiftyBtn) fiftyBtn.classList.add('used');
         
-        const question = Millionaire.questions[Millionaire.currentQuestion];
         const wrongAnswers = [0, 1, 2, 3].filter(i => i !== question.answer);
+        
+        if (typeof shuffleArray !== 'function') {
+            console.error('shuffleArray not available');
+            return;
+        }
+        
         const toRemove = shuffleArray(wrongAnswers).slice(0, 2);
+        Millionaire.eliminatedAnswers = toRemove;
         
         toRemove.forEach(index => {
             const btn = document.querySelector(`.mill-answer[data-index="${index}"]`);
@@ -383,27 +435,46 @@ const Millionaire = {
             }
         });
         
-        Toast.show('50:50 used! Two wrong answers removed.', 'info');
+        // Clear selection if eliminated answer was selected
+        if (Millionaire.selectedAnswer !== null && toRemove.includes(Millionaire.selectedAnswer)) {
+            Millionaire.selectedAnswer = null;
+            document.querySelectorAll('.mill-answer').forEach(btn => btn.classList.remove('selected'));
+            document.querySelector('.mill-confirm-box')?.remove();
+        }
+        
+        if (typeof Toast !== 'undefined' && Toast?.show) {
+            Toast.show('50:50 used! Two wrong answers removed.', 'info');
+        }
     },
 
     useAskAudience: () => {
         if (!Millionaire.lifelines.askAudience || Millionaire.isAnswerLocked) return;
         
+        const question = Millionaire.questions[Millionaire.currentQuestion];
+        if (!question || typeof question.answer !== 'number') return;
+        
         Millionaire.lifelines.askAudience = false;
         const audienceBtn = document.getElementById('ll-audience');
         if (audienceBtn) audienceBtn.classList.add('used');
         
-        const question = Millionaire.questions[Millionaire.currentQuestion];
-        
         // Generate audience percentages (correct answer gets highest)
-        let percentages = [5, 10, 15, 20];
         const correctPercent = 40 + Math.floor(Math.random() * 30); // 40-70%
-        percentages = shuffleArray(percentages);
+        let remaining = 100 - correctPercent;
         
-        // Adjust to total 100
-        const total = percentages.reduce((a, b) => a + b, 0);
-        percentages = percentages.map(p => Math.round(p / total * (100 - correctPercent)));
+        // Distribute remaining among other answers
+        const percentages = [0, 0, 0, 0];
         percentages[question.answer] = correctPercent;
+        
+        const otherIndices = [0, 1, 2, 3].filter(i => i !== question.answer);
+        otherIndices.forEach((idx, i) => {
+            if (i === otherIndices.length - 1) {
+                percentages[idx] = remaining; // Last one gets remainder
+            } else {
+                const share = Math.floor(Math.random() * (remaining / 2));
+                percentages[idx] = share;
+                remaining -= share;
+            }
+        });
         
         // Show results
         const resultsHtml = `
@@ -422,21 +493,26 @@ const Millionaire = {
             </div>
         `;
         
+        // Remove existing audience results
+        document.querySelector('.mill-audience-results')?.remove();
+        
         const resultsDiv = document.createElement('div');
         resultsDiv.innerHTML = resultsHtml;
         const mainArea = document.querySelector('.mill-main-area');
-        if (mainArea) mainArea.appendChild(resultsDiv.firstElementChild);
+        if (mainArea && resultsDiv.firstElementChild) {
+            mainArea.appendChild(resultsDiv.firstElementChild);
+        }
     },
 
     usePhoneFriend: () => {
         if (!Millionaire.lifelines.phoneFriend || Millionaire.isAnswerLocked) return;
         
+        const question = Millionaire.questions[Millionaire.currentQuestion];
+        if (!question || !question.options || typeof question.answer !== 'number') return;
+        
         Millionaire.lifelines.phoneFriend = false;
         const phoneBtn = document.getElementById('ll-phone');
         if (phoneBtn) phoneBtn.classList.add('used');
-        
-        const question = Millionaire.questions[Millionaire.currentQuestion];
-        if (!question || !question.options) return;
         
         const letters = ['A', 'B', 'C', 'D'];
         
@@ -445,11 +521,11 @@ const Millionaire = {
         const correctIndex = question.answer;
         const wrongIndices = [0, 1, 2, 3].filter(i => i !== correctIndex && i < question.options.length);
         
-        // Handle edge case where there might not be wrong answers
+        let suggestedIndex;
         if (wrongIndices.length === 0 || isCorrect) {
-            var suggestedIndex = correctIndex;
+            suggestedIndex = correctIndex;
         } else {
-            var suggestedIndex = shuffleArray(wrongIndices)[0];
+            suggestedIndex = shuffleArray(wrongIndices)[0];
         }
         
         const confidence = isCorrect ? (70 + Math.floor(Math.random() * 25)) : (30 + Math.floor(Math.random() * 40));
@@ -461,11 +537,14 @@ const Millionaire = {
         const suggestedLetter = letters[suggestedIndex] || 'A';
         const suggestedText = question.options[suggestedIndex] || 'that option';
         
+        // Remove existing phone dialog
+        document.querySelector('.mill-phone-dialog')?.remove();
+        
         const dialogHtml = `
             <div class="mill-phone-dialog">
-                <h4>📞 Calling ${friendName}...</h4>
+                <h4>📞 Calling ${Millionaire.escapeHtml(friendName)}...</h4>
                 <p class="phone-message">
-                    "Hmm, I think it's <strong>${suggestedLetter}: ${Helpers?.escapeHtml?.(suggestedText) || suggestedText}</strong>. 
+                    "Hmm, I think it's <strong>${suggestedLetter}: ${Millionaire.escapeHtml(suggestedText)}</strong>. 
                     I'm about ${confidence}% sure about that."
                 </p>
                 <button class="btn btn-secondary" onclick="this.parentElement.remove()">Thanks!</button>
@@ -475,22 +554,28 @@ const Millionaire = {
         const dialogDiv = document.createElement('div');
         dialogDiv.innerHTML = dialogHtml;
         const mainArea = document.querySelector('.mill-main-area');
-        if (mainArea) mainArea.appendChild(dialogDiv.firstElementChild);
+        if (mainArea && dialogDiv.firstElementChild) {
+            mainArea.appendChild(dialogDiv.firstElementChild);
+        }
     },
 
     endGame: (walkedAway, prize, isMillionaire = false) => {
-        // Save stats
-        Millionaire.saveStats(Millionaire.currentQuestion, prize || 0, isMillionaire);
+        const safePrize = prize || 0;
         
-        // Award XP
-        const xpEarned = Math.floor((prize || 0) / 100);
-        if (xpEarned > 0) {
+        // Save stats
+        Millionaire.saveStats(Millionaire.currentQuestion, safePrize, isMillionaire);
+        
+        // Award XP (prize is already XP, so use directly or scale as needed)
+        const xpEarned = Math.floor(safePrize / 10); // 10% of prize as actual XP reward
+        if (xpEarned > 0 && typeof AppState !== 'undefined' && AppState?.addXP) {
             AppState.addXP(xpEarned);
         }
         
         // Achievements
-        if (isMillionaire) AppState.unlockAchievement('millionaire');
-        if (Millionaire.currentQuestion >= 10) AppState.unlockAchievement('quiz_master');
+        if (typeof AppState !== 'undefined' && AppState?.unlockAchievement) {
+            if (isMillionaire) AppState.unlockAchievement('millionaire');
+            if (Millionaire.currentQuestion >= 10) AppState.unlockAchievement('quiz_master');
+        }
         
         const container = document.querySelector('.millionaire-container');
         if (!container) {
@@ -498,6 +583,10 @@ const Millionaire = {
             Millionaire.close();
             return;
         }
+        
+        const questionReached = walkedAway || isMillionaire 
+            ? Millionaire.currentQuestion 
+            : Millionaire.currentQuestion + 1;
         
         container.innerHTML = `
             <button class="game-close-btn" onclick="Millionaire.close()">✕</button>
@@ -508,13 +597,13 @@ const Millionaire = {
                 </div>
                 
                 <div class="mill-final-prize">
-                    <span class="mill-fp-value">${(prize || 0).toLocaleString()}</span>
+                    <span class="mill-fp-value">${safePrize.toLocaleString()}</span>
                     <span class="mill-fp-label">XP Won</span>
                 </div>
                 
                 <div class="mill-result-info">
-                    <p>You reached question ${Millionaire.currentQuestion + (walkedAway || isMillionaire ? 0 : 1)} of 15</p>
-                    <p>+${xpEarned} XP added to your account</p>
+                    <p>You reached question ${questionReached} of 15</p>
+                    <p>+${xpEarned.toLocaleString()} XP added to your account</p>
                 </div>
                 
                 <div class="mill-results-actions">
@@ -530,18 +619,28 @@ const Millionaire = {
     },
 
     saveStats: (level, prize, isMillionaire) => {
-        const stats = Millionaire.getStats();
-        
-        stats.gamesPlayed = (stats.gamesPlayed || 0) + 1;
-        stats.bestLevel = Math.max(stats.bestLevel || 0, level);
-        stats.totalXP = (stats.totalXP || 0) + Math.floor(prize / 100);
-        if (isMillionaire) stats.millionaireWins = (stats.millionaireWins || 0) + 1;
-        
-        localStorage.setItem('csmaster_millionaire_stats', JSON.stringify(stats));
+        try {
+            const stats = Millionaire.getStats();
+            const safePrize = prize || 0;
+            
+            stats.gamesPlayed = (stats.gamesPlayed || 0) + 1;
+            stats.bestLevel = Math.max(stats.bestLevel || 0, level);
+            stats.totalXP = (stats.totalXP || 0) + safePrize;
+            if (isMillionaire) stats.millionaireWins = (stats.millionaireWins || 0) + 1;
+            
+            localStorage.setItem('csmaster_millionaire_stats', JSON.stringify(stats));
+        } catch (e) {
+            console.error('Failed to save Millionaire stats:', e);
+        }
     },
 
     getStats: () => {
-        return JSON.parse(localStorage.getItem('csmaster_millionaire_stats') || '{}');
+        try {
+            return JSON.parse(localStorage.getItem('csmaster_millionaire_stats') || '{}');
+        } catch (e) {
+            console.error('Failed to load Millionaire stats:', e);
+            return {};
+        }
     },
 
     cleanup: () => {
@@ -550,6 +649,7 @@ const Millionaire = {
         Millionaire.isAnswerLocked = false;
         Millionaire.selectedAnswer = null;
         Millionaire.questions = [];
+        Millionaire.eliminatedAnswers = [];
         console.log('💰 Millionaire cleanup');
     }
 };

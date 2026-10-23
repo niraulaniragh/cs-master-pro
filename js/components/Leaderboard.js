@@ -55,9 +55,11 @@ const Leaderboard = {
 
             // Get current session for highlighting current user
             let currentEmail = null;
+            let currentUsername = null;
             try {
                 const session = Auth.getSession ? Auth.getSession() : null;
                 currentEmail = session?.email || null;
+                currentUsername = session?.username || null;
             } catch (e) {
                 // Session check failed, continue without
             }
@@ -66,13 +68,16 @@ const Leaderboard = {
                 .filter(user => user && typeof user === 'object')
                 .map(user => {
                     const profile = user.profile || {};
+                    // Check if this is current user by email OR username
+                    const isCurrentUser = (currentEmail && user.email && user.email.toLowerCase() === currentEmail.toLowerCase()) ||
+                                         (currentUsername && user.username && user.username.toLowerCase() === currentUsername.toLowerCase());
                     return {
                         username: String(user.username || 'Anonymous'),
                         xp: Math.max(0, Number(profile.xp) || 0),
                         level: Math.max(1, Number(profile.level) || 1),
                         achievements: Array.isArray(profile.achievements) ? profile.achievements.length : 0,
                         totalCorrect: Math.max(0, Number(profile.totalCorrect) || 0),
-                        isCurrentUser: currentEmail !== null && user.email === currentEmail
+                        isCurrentUser
                     };
                 })
                 .sort((a, b) => {
@@ -191,34 +196,34 @@ const Leaderboard = {
                     
                     <div class="leaderboard-podium">
                         ${rankings.length >= 2 ? `
-                            <div class="podium-spot second">
-                                <div class="podium-avatar">${Leaderboard.escapeHtml(rankings[1].username.charAt(0).toUpperCase())}</div>
-                                <div class="podium-name">${Leaderboard.escapeHtml(rankings[1].username)}</div>
+                            <div class="podium-spot second ${rankings[1].isCurrentUser ? 'current-user highlight' : ''}">
+                                <div class="podium-avatar silver">${Leaderboard.escapeHtml(rankings[1].username.charAt(0).toUpperCase())}</div>
+                                <div class="podium-name">${Leaderboard.escapeHtml(rankings[1].username)}${rankings[1].isCurrentUser ? ' (You)' : ''}</div>
                                 <div class="podium-xp">${Leaderboard.formatNumber(rankings[1].xp)} XP</div>
-                                <div class="podium-rank">🥈</div>
+                                <div class="podium-rank">${Leaderboard.getRankIcon(rankings[1].rank)}</div>
                             </div>
                         ` : ''}
                         ${rankings.length >= 1 ? `
-                            <div class="podium-spot first">
+                            <div class="podium-spot first ${rankings[0].isCurrentUser ? 'current-user highlight' : ''}">
                                 <div class="podium-avatar gold">${Leaderboard.escapeHtml(rankings[0].username.charAt(0).toUpperCase())}</div>
-                                <div class="podium-name">${Leaderboard.escapeHtml(rankings[0].username)}</div>
+                                <div class="podium-name">${Leaderboard.escapeHtml(rankings[0].username)}${rankings[0].isCurrentUser ? ' (You)' : ''}</div>
                                 <div class="podium-xp">${Leaderboard.formatNumber(rankings[0].xp)} XP</div>
-                                <div class="podium-rank">🥇</div>
+                                <div class="podium-rank">${Leaderboard.getRankIcon(rankings[0].rank)}</div>
                             </div>
                         ` : ''}
                         ${rankings.length >= 3 ? `
-                            <div class="podium-spot third">
-                                <div class="podium-avatar">${Leaderboard.escapeHtml(rankings[2].username.charAt(0).toUpperCase())}</div>
-                                <div class="podium-name">${Leaderboard.escapeHtml(rankings[2].username)}</div>
+                            <div class="podium-spot third ${rankings[2].isCurrentUser ? 'current-user highlight' : ''}">
+                                <div class="podium-avatar bronze">${Leaderboard.escapeHtml(rankings[2].username.charAt(0).toUpperCase())}</div>
+                                <div class="podium-name">${Leaderboard.escapeHtml(rankings[2].username)}${rankings[2].isCurrentUser ? ' (You)' : ''}</div>
                                 <div class="podium-xp">${Leaderboard.formatNumber(rankings[2].xp)} XP</div>
-                                <div class="podium-rank">🥉</div>
+                                <div class="podium-rank">${Leaderboard.getRankIcon(rankings[2].rank)}</div>
                             </div>
                         ` : ''}
                     </div>
                     
                     <div class="leaderboard-list">
-                        ${rankings.slice(0, displayLimit).map(user => `
-                            <div class="leaderboard-row ${user.isCurrentUser ? 'current-user' : ''} ${Leaderboard.getRankClass(user.rank)}">
+                        ${rankings.slice(3, displayLimit).map(user => `
+                            <div class="leaderboard-row ${user.isCurrentUser ? 'current-user highlight' : ''} ${Leaderboard.getRankClass(user.rank)}" ${user.isCurrentUser ? 'data-current-user="true"' : ''}>
                                 <div class="lb-rank">${Leaderboard.getRankIcon(user.rank)}</div>
                                 <div class="lb-avatar">${Leaderboard.escapeHtml(user.username.charAt(0).toUpperCase())}</div>
                                 <div class="lb-info">
@@ -268,9 +273,9 @@ const Leaderboard = {
                     </div>
                     <div class="lb-mini-list">
                         ${rankings.map(user => `
-                            <div class="lb-mini-row ${user.isCurrentUser ? 'current-user' : ''}">
+                            <div class="lb-mini-row ${user.isCurrentUser ? 'current-user highlight' : ''}" ${user.isCurrentUser ? 'data-current-user="true"' : ''}>
                                 <span class="lb-mini-rank">${Leaderboard.getRankIcon(user.rank)}</span>
-                                <span class="lb-mini-name">${Leaderboard.escapeHtml(user.username)}</span>
+                                <span class="lb-mini-name">${Leaderboard.escapeHtml(user.username)}${user.isCurrentUser ? ' (You)' : ''}</span>
                                 <span class="lb-mini-xp">${Leaderboard.formatNumber(user.xp)} XP</span>
                             </div>
                         `).join('')}
@@ -307,20 +312,22 @@ const Leaderboard = {
      */
     refresh: () => {
         Leaderboard.clearCache();
+        // Force fetch fresh rankings
+        const rankings = Leaderboard.getRankings(true);
+        
         // If there's a leaderboard element on the page, re-render it
         const container = document.querySelector('.leaderboard');
         if (container) {
-            const parent = container.parentElement;
-            if (parent) {
-                parent.innerHTML = Leaderboard.render();
-            }
+            container.outerHTML = Leaderboard.render();
         }
         const miniContainer = document.querySelector('.leaderboard-mini');
         if (miniContainer) {
-            const parent = miniContainer.parentElement;
-            if (parent) {
-                parent.innerHTML = Leaderboard.renderMini();
-            }
+            miniContainer.outerHTML = Leaderboard.renderMini();
+        }
+        
+        // Emit event for any listeners
+        if (typeof EventBus !== 'undefined' && EventBus.emit) {
+            EventBus.emit('leaderboard:updated', { rankings });
         }
     }
 };

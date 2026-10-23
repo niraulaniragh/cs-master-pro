@@ -12,6 +12,7 @@ const FillCode = {
     correctAnswers: 0,
     wrongAnswers: 0,
     hintsUsed: 0,
+    hintShown: false, // Track if hint is currently shown
     difficulty: 'medium',
 
     // Code challenges with blanks
@@ -155,6 +156,15 @@ _____ age >= 18`,
         }
     ],
 
+    // Safe toast helper
+    showToast: (message, type = 'info') => {
+        if (typeof Toast !== 'undefined' && Toast?.show) {
+            Toast.show(message, type);
+        } else {
+            console.log(`[${type}] ${message}`);
+        }
+    },
+
     open: () => {
         const modal = document.createElement('div');
         modal.className = 'game-modal fillcode-modal';
@@ -171,6 +181,7 @@ _____ age >= 18`,
             modal.classList.remove('active');
             setTimeout(() => modal.remove(), 300);
         }
+        FillCode.cleanup();
     },
 
     renderMenu: () => {
@@ -234,6 +245,8 @@ _____ age >= 18`,
     },
 
     selectDifficulty: (diff, evt) => {
+        if (!diff) return;
+        
         FillCode.difficulty = diff;
         document.querySelectorAll('.fc-diff-btn').forEach(btn => btn.classList.remove('selected'));
         
@@ -254,22 +267,40 @@ _____ age >= 18`,
             
             // Validate we have challenges
             if (!pool || pool.length === 0) {
-                Toast?.show?.('No challenges available for this difficulty', 'error');
+                FillCode.showToast('No challenges available for this difficulty', 'error');
                 return;
             }
             
-            FillCode.challenges = shuffleArray([...pool]).slice(0, 10);
+            // Check shuffleArray exists
+            if (typeof shuffleArray !== 'function') {
+                console.error('shuffleArray function not found');
+                FillCode.challenges = pool.slice(0, 10);
+            } else {
+                FillCode.challenges = shuffleArray([...pool]).slice(0, 10);
+            }
             
             if (FillCode.challenges.length === 0) {
-                Toast?.show?.('No challenges available', 'error');
+                FillCode.showToast('No challenges available', 'error');
                 return;
             }
             
+            // Validate challenge structure
+            const validChallenges = FillCode.challenges.filter(c => 
+                c && c.code && Array.isArray(c.blanks) && c.blanks.length > 0
+            );
+            
+            if (validChallenges.length === 0) {
+                FillCode.showToast('Invalid challenge data', 'error');
+                return;
+            }
+            
+            FillCode.challenges = validChallenges;
             FillCode.currentIndex = 0;
             FillCode.score = 0;
             FillCode.correctAnswers = 0;
             FillCode.wrongAnswers = 0;
             FillCode.hintsUsed = 0;
+            FillCode.hintShown = false;
             FillCode.isPlaying = true;
             
             const container = document.querySelector('.fillcode-container');
@@ -282,7 +313,7 @@ _____ age >= 18`,
             FillCode.showChallenge();
         } catch (error) {
             console.error('FillCode.startGame error:', error);
-            Toast?.show?.('Failed to start game', 'error');
+            FillCode.showToast('Failed to start game', 'error');
         }
     },
 
@@ -316,24 +347,56 @@ _____ age >= 18`,
         
         const challenge = FillCode.challenges[FillCode.currentIndex];
         
-        // Update progress
-        document.getElementById('fc-progress-text').textContent = `${FillCode.currentIndex + 1} / ${FillCode.challenges.length}`;
-        document.getElementById('fc-progress-fill').style.width = `${(FillCode.currentIndex / FillCode.challenges.length) * 100}%`;
+        // Validate challenge data
+        if (!challenge || !challenge.code || !Array.isArray(challenge.blanks)) {
+            console.error('Invalid challenge at index', FillCode.currentIndex);
+            FillCode.currentIndex++;
+            FillCode.showChallenge();
+            return;
+        }
+        
+        // Reset hint state for new challenge
+        FillCode.hintShown = false;
+        
+        // Update progress with null checks
+        const progressText = document.getElementById('fc-progress-text');
+        const progressFill = document.getElementById('fc-progress-fill');
+        
+        if (progressText) {
+            progressText.textContent = `${FillCode.currentIndex + 1} / ${FillCode.challenges.length}`;
+        }
+        if (progressFill) {
+            progressFill.style.width = `${(FillCode.currentIndex / FillCode.challenges.length) * 100}%`;
+        }
         
         // Create code display with input blanks
         let codeHtml = challenge.code;
         let blankIndex = 0;
         codeHtml = codeHtml.replace(/_____/g, () => {
             const idx = blankIndex++;
-            return `<input type="text" class="fc-blank" data-index="${idx}" data-answer="${challenge.blanks[idx]}" autocomplete="off" spellcheck="false">`;
+            const answer = challenge.blanks[idx] || '';
+            // Escape the answer for data attribute
+            const escapedAnswer = answer.replace(/"/g, '&quot;');
+            return `<input type="text" class="fc-blank" data-index="${idx}" data-answer="${escapedAnswer}" autocomplete="off" spellcheck="false" placeholder="...">`;
         });
         
         const challengeArea = document.getElementById('fc-challenge-area');
+        if (!challengeArea) {
+            console.error('Challenge area not found');
+            return;
+        }
+        
+        // Shuffle word bank for display
+        let wordBankItems = [...challenge.blanks];
+        if (typeof shuffleArray === 'function') {
+            wordBankItems = shuffleArray(wordBankItems);
+        }
+        
         challengeArea.innerHTML = `
             <div class="fc-challenge animate-in">
                 <div class="fc-challenge-header">
-                    <h3>${challenge.title}</h3>
-                    <span class="fc-diff-badge ${challenge.difficulty}">${challenge.difficulty}</span>
+                    <h3>${challenge.title || 'Challenge'}</h3>
+                    <span class="fc-diff-badge ${challenge.difficulty || 'medium'}">${challenge.difficulty || 'medium'}</span>
                 </div>
                 
                 <div class="fc-code-block">
@@ -342,13 +405,15 @@ _____ age >= 18`,
                 
                 <div class="fc-word-bank" id="fc-word-bank">
                     <span class="fc-wb-label">Word Bank:</span>
-                    ${shuffleArray([...challenge.blanks]).map(word => `
-                        <button class="fc-word" onclick="FillCode.insertWord('${word}')">${word}</button>
+                    ${wordBankItems.map((word, i) => `
+                        <button class="fc-word" data-word="${word.replace(/"/g, '&quot;')}" data-index="${i}" onclick="FillCode.insertWord(this)">${word}</button>
                     `).join('')}
                 </div>
                 
+                <div class="fc-hint-container" id="fc-hint-container"></div>
+                
                 <div class="fc-actions">
-                    <button class="btn btn-secondary" onclick="FillCode.showHint()">
+                    <button class="btn btn-secondary fc-hint-btn" onclick="FillCode.showHint()">
                         💡 Hint
                     </button>
                     <button class="btn btn-primary" onclick="FillCode.checkAnswer()">
@@ -359,7 +424,10 @@ _____ age >= 18`,
         `;
         
         // Focus first blank
-        document.querySelector('.fc-blank')?.focus();
+        const firstBlank = document.querySelector('.fc-blank');
+        if (firstBlank) {
+            firstBlank.focus();
+        }
         
         // Add keyboard navigation
         document.querySelectorAll('.fc-blank').forEach((input, i, inputs) => {
@@ -373,10 +441,20 @@ _____ age >= 18`,
                     }
                 }
             });
+            
+            // Clear word bank button when manually typing
+            input.addEventListener('input', () => {
+                input.classList.remove('filled');
+                // Don't auto-reset word bank on typing - user may be correcting
+            });
         });
     },
 
-    insertWord: (word) => {
+    insertWord: (btnElement) => {
+        if (!btnElement || btnElement.classList.contains('used')) return;
+        
+        const word = btnElement.dataset.word || btnElement.textContent;
+        
         // Find first empty blank and insert word
         const blanks = document.querySelectorAll('.fc-blank');
         for (const blank of blanks) {
@@ -384,17 +462,14 @@ _____ age >= 18`,
                 blank.value = word;
                 blank.classList.add('filled');
                 
-                // Disable word in bank
-                document.querySelectorAll('.fc-word').forEach(btn => {
-                    if (btn.textContent === word && !btn.classList.contains('used')) {
-                        btn.classList.add('used');
-                        return;
-                    }
-                });
+                // Mark this specific button as used
+                btnElement.classList.add('used');
                 
                 // Focus next blank
                 const nextBlank = [...blanks].find(b => !b.value);
-                if (nextBlank) nextBlank.focus();
+                if (nextBlank) {
+                    nextBlank.focus();
+                }
                 
                 break;
             }
@@ -403,55 +478,109 @@ _____ age >= 18`,
 
     showHint: () => {
         const challenge = FillCode.challenges[FillCode.currentIndex];
-        FillCode.hintsUsed++;
+        if (!challenge) return;
         
-        // Show hint modal
-        const hintHtml = `
+        const hintContainer = document.getElementById('fc-hint-container');
+        if (!hintContainer) return;
+        
+        // If hint already shown, toggle it off
+        if (FillCode.hintShown) {
+            hintContainer.innerHTML = '';
+            FillCode.hintShown = false;
+            return;
+        }
+        
+        // Only count hint once per challenge
+        if (!FillCode.hintShown) {
+            FillCode.hintsUsed++;
+        }
+        FillCode.hintShown = true;
+        
+        // Show hint in dedicated container (prevents stacking)
+        hintContainer.innerHTML = `
             <div class="fc-hint-modal">
                 <h4>💡 Hint</h4>
-                <p>${challenge.explanation}</p>
-                <button class="btn btn-secondary" onclick="this.parentElement.remove()">Got it!</button>
+                <p>${challenge.explanation || 'No hint available for this challenge.'}</p>
+                <button class="btn btn-secondary btn-small" onclick="FillCode.hideHint()">Got it!</button>
             </div>
         `;
-        
-        const hintDiv = document.createElement('div');
-        hintDiv.innerHTML = hintHtml;
-        document.querySelector('.fc-challenge-area').appendChild(hintDiv.firstElementChild);
+    },
+
+    hideHint: () => {
+        const hintContainer = document.getElementById('fc-hint-container');
+        if (hintContainer) {
+            hintContainer.innerHTML = '';
+        }
+        FillCode.hintShown = false;
     },
 
     checkAnswer: () => {
         const challenge = FillCode.challenges[FillCode.currentIndex];
+        if (!challenge || !Array.isArray(challenge.blanks)) {
+            console.error('Invalid challenge for answer check');
+            return;
+        }
+        
         const blanks = document.querySelectorAll('.fc-blank');
+        if (blanks.length === 0) {
+            console.error('No blanks found');
+            return;
+        }
+        
+        // Hide hint if shown
+        FillCode.hideHint();
+        
         let allCorrect = true;
+        let filledCount = 0;
         
         blanks.forEach((blank, i) => {
-            const userAnswer = blank.value.trim().toLowerCase();
-            const correctAnswer = challenge.blanks[i].toLowerCase();
+            const userAnswer = (blank.value || '').trim().toLowerCase();
+            const correctAnswer = (challenge.blanks[i] || '').toLowerCase();
+            
+            // Check if blank is filled
+            if (userAnswer) {
+                filledCount++;
+            }
             
             if (userAnswer === correctAnswer) {
+                blank.classList.remove('wrong', 'shown-answer');
                 blank.classList.add('correct');
             } else {
+                blank.classList.remove('correct', 'shown-answer');
                 blank.classList.add('wrong');
                 allCorrect = false;
             }
             blank.disabled = true;
         });
         
+        // Warn if not all blanks filled
+        if (filledCount < blanks.length) {
+            FillCode.showToast('Some blanks were left empty', 'warning');
+        }
+        
+        const scoreEl = document.getElementById('fc-score');
+        
         if (allCorrect) {
             FillCode.correctAnswers++;
-            const points = FillCode.hintsUsed === 0 ? 100 : 50;
+            // More points if no hints used for this challenge
+            const points = FillCode.hintShown ? 50 : 100;
             FillCode.score += points;
-            document.getElementById('fc-score').textContent = `Score: ${FillCode.score}`;
             
-            Toast.show(`✓ Correct! +${points} points`, 'success');
+            if (scoreEl) {
+                scoreEl.textContent = `Score: ${FillCode.score}`;
+                scoreEl.classList.add('score-bump');
+                setTimeout(() => scoreEl.classList.remove('score-bump'), 300);
+            }
+            
+            FillCode.showToast(`✓ Correct! +${points} points`, 'success');
         } else {
             FillCode.wrongAnswers++;
-            Toast.show('✗ Not quite right. Check the correct answers.', 'error');
+            FillCode.showToast('✗ Not quite right. Check the correct answers.', 'error');
             
-            // Show correct answers
+            // Show correct answers for wrong ones
             blanks.forEach((blank, i) => {
                 if (blank.classList.contains('wrong')) {
-                    blank.value = challenge.blanks[i];
+                    blank.value = challenge.blanks[i] || '';
                     blank.classList.remove('wrong');
                     blank.classList.add('shown-answer');
                 }
@@ -460,11 +589,14 @@ _____ age >= 18`,
         
         // Show next button
         const actions = document.querySelector('.fc-actions');
-        actions.innerHTML = `
-            <button class="btn btn-primary" onclick="FillCode.nextChallenge()">
-                ${FillCode.currentIndex < FillCode.challenges.length - 1 ? 'Next Challenge →' : 'See Results'}
-            </button>
-        `;
+        if (actions) {
+            const isLast = FillCode.currentIndex >= FillCode.challenges.length - 1;
+            actions.innerHTML = `
+                <button class="btn btn-primary btn-large" onclick="FillCode.nextChallenge()">
+                    ${isLast ? '🏆 See Results' : 'Next Challenge →'}
+                </button>
+            `;
+        }
     },
 
     nextChallenge: () => {
@@ -475,21 +607,41 @@ _____ age >= 18`,
     endGame: () => {
         FillCode.isPlaying = false;
         
-        const accuracy = Math.round((FillCode.correctAnswers / FillCode.challenges.length) * 100);
+        const total = FillCode.challenges.length || 1;
+        const accuracy = Math.round((FillCode.correctAnswers / total) * 100);
         
         // Save stats
         FillCode.saveStats(FillCode.correctAnswers, accuracy);
         
-        // Award XP
-        const xpEarned = FillCode.score / 2;
-        AppState.addXP(xpEarned);
+        // Award XP (with AppState check)
+        const xpEarned = Math.round(FillCode.score / 2);
+        if (typeof AppState !== 'undefined' && AppState?.addXP) {
+            AppState.addXP(xpEarned);
+        }
         
         const container = document.querySelector('.fillcode-container');
+        if (!container) {
+            console.error('Container not found for results');
+            return;
+        }
+        
+        // Determine performance message
+        let performanceMsg = '🎉 Challenge Complete!';
+        if (accuracy === 100) {
+            performanceMsg = '🏆 Perfect Score!';
+        } else if (accuracy >= 80) {
+            performanceMsg = '⭐ Excellent Work!';
+        } else if (accuracy >= 60) {
+            performanceMsg = '👍 Good Job!';
+        } else if (accuracy < 40) {
+            performanceMsg = '📚 Keep Practicing!';
+        }
+        
         container.innerHTML = `
             <button class="game-close-btn" onclick="FillCode.close()">✕</button>
             
             <div class="fc-results">
-                <div class="fc-result-banner">🎉 Challenge Complete!</div>
+                <div class="fc-result-banner">${performanceMsg}</div>
                 
                 <div class="fc-final-score">
                     <span class="fc-fs-value">${FillCode.score}</span>
@@ -532,28 +684,38 @@ _____ age >= 18`,
     },
 
     saveStats: (correct, accuracy) => {
-        const stats = FillCode.getStats();
-        
-        stats.challengesCompleted = (stats.challengesCompleted || 0) + FillCode.challenges.length;
-        stats.totalCorrect = (stats.totalCorrect || 0) + correct;
-        
-        // Update accuracy (rolling average)
-        const totalAttempts = stats.challengesCompleted;
-        stats.accuracy = Math.round((stats.totalCorrect / totalAttempts) * 100);
-        
-        // Update streak
-        if (correct === FillCode.challenges.length) {
-            stats.currentStreak = (stats.currentStreak || 0) + 1;
-            stats.bestStreak = Math.max(stats.bestStreak || 0, stats.currentStreak);
-        } else {
-            stats.currentStreak = 0;
+        try {
+            const stats = FillCode.getStats();
+            const challengeCount = FillCode.challenges.length || 0;
+            
+            stats.challengesCompleted = (stats.challengesCompleted || 0) + challengeCount;
+            stats.totalCorrect = (stats.totalCorrect || 0) + correct;
+            
+            // Update accuracy (rolling average)
+            const totalAttempts = stats.challengesCompleted || 1;
+            stats.accuracy = Math.round((stats.totalCorrect / totalAttempts) * 100);
+            
+            // Update streak
+            if (correct === challengeCount && challengeCount > 0) {
+                stats.currentStreak = (stats.currentStreak || 0) + 1;
+                stats.bestStreak = Math.max(stats.bestStreak || 0, stats.currentStreak);
+            } else {
+                stats.currentStreak = 0;
+            }
+            
+            localStorage.setItem('csmaster_fillcode_stats', JSON.stringify(stats));
+        } catch (error) {
+            console.error('Failed to save stats:', error);
         }
-        
-        localStorage.setItem('csmaster_fillcode_stats', JSON.stringify(stats));
     },
 
     getStats: () => {
-        return JSON.parse(localStorage.getItem('csmaster_fillcode_stats') || '{}');
+        try {
+            return JSON.parse(localStorage.getItem('csmaster_fillcode_stats') || '{}');
+        } catch (error) {
+            console.error('Failed to load stats:', error);
+            return {};
+        }
     },
 
     cleanup: () => {
@@ -563,6 +725,7 @@ _____ age >= 18`,
         FillCode.challenges = [];
         FillCode.currentIndex = 0;
         FillCode.hintsUsed = 0;
+        FillCode.hintShown = false;
         console.log('📝 FillCode cleanup');
     }
 };

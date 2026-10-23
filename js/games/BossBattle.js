@@ -9,10 +9,13 @@ const BossBattle = {
     currentBoss: null,
     playerHP: 100,
     bossHP: 100,
+    maxBossHP: 100,
     questions: [],
     currentIndex: 0,
     combo: 0,
+    maxCombo: 0,
     totalDamage: 0,
+    difficulty: 1,
     powerUps: { heal: 2, shield: 1, critical: 2 },
     hasShield: false,
     criticalActive: false,
@@ -215,21 +218,35 @@ const BossBattle = {
             }
             
             // Validate we have enough questions
-            if (pool.length === 0) {
+            if (!pool || pool.length === 0) {
                 Toast?.show?.('No questions available for this boss', 'error');
                 return;
             }
             
-            BossBattle.questions = shuffleArray([...pool]).slice(0, 15);
+            // Calculate difficulty based on boss defeats
+            const stats = BossBattle.getStats();
+            const defeatedCount = stats.defeated?.length || 0;
+            BossBattle.difficulty = 1 + (defeatedCount * 0.15); // 15% harder per boss defeated
+            
+            // Scale boss HP and attack with difficulty
+            const scaledHP = Math.floor(boss.hp * BossBattle.difficulty);
+            const scaledAttack = Math.floor(boss.attack * (1 + (defeatedCount * 0.1)));
+            
+            BossBattle.questions = typeof shuffleArray === 'function' 
+                ? shuffleArray([...pool]).slice(0, 15) 
+                : [...pool].sort(() => Math.random() - 0.5).slice(0, 15);
             BossBattle.currentIndex = 0;
             BossBattle.playerHP = 100;
-            BossBattle.bossHP = boss.hp;
+            BossBattle.bossHP = scaledHP;
+            BossBattle.maxBossHP = scaledHP;
             BossBattle.combo = 0;
+            BossBattle.maxCombo = 0;
             BossBattle.totalDamage = 0;
             BossBattle.powerUps = { heal: 2, shield: 1, critical: 2 };
             BossBattle.hasShield = false;
             BossBattle.criticalActive = false;
             BossBattle.isPlaying = true;
+            BossBattle.scaledBossAttack = scaledAttack;
             
             const container = document.querySelector('.boss-container');
             if (!container) {
@@ -239,6 +256,7 @@ const BossBattle = {
             container.innerHTML = BossBattle.renderBattle();
             
             // Register keyboard handler
+            document.removeEventListener('keydown', BossBattle.keyHandler); // Prevent duplicates
             document.addEventListener('keydown', BossBattle.keyHandler);
             
             // Dramatic entrance
@@ -253,25 +271,29 @@ const BossBattle = {
 
     renderBattle: () => {
         const boss = BossBattle.currentBoss;
-        const username = Auth.getCurrentUser()?.username || 'Hero';
+        if (!boss) return '<div class="error">No boss selected</div>';
+        
+        const user = typeof Auth !== 'undefined' ? Auth.getCurrentUser?.() : null;
+        const username = user?.username || 'Hero';
         
         return `
             <div class="boss-battle-view" style="--boss-color: ${boss.color}">
                 <div class="boss-arena">
                     <div class="boss-player player-side">
                         <div class="boss-avatar player-avatar">👤</div>
-                        <div class="boss-name">${Helpers.escapeHtml(username)}</div>
+                        <div class="boss-name">${typeof Helpers !== 'undefined' ? Helpers.escapeHtml(username) : username}</div>
                         <div class="boss-hp-container">
                             <div class="boss-hp-bar">
                                 <div class="boss-hp-fill player-hp" id="player-hp"></div>
                             </div>
                             <span class="boss-hp-text" id="player-hp-text">100/100</span>
                         </div>
-                        ${BossBattle.hasShield ? '<div class="shield-indicator">🛡️</div>' : ''}
+                        <div class="shield-indicator ${BossBattle.hasShield ? 'active' : ''}" id="shield-indicator">🛡️</div>
                     </div>
                     
                     <div class="boss-vs-indicator">
                         <span class="combo-counter" id="combo-counter">Combo: 0x</span>
+                        ${BossBattle.difficulty > 1 ? `<span class="difficulty-badge">⚠️ ${Math.round((BossBattle.difficulty - 1) * 100)}% harder</span>` : ''}
                     </div>
                     
                     <div class="boss-player boss-side">
@@ -281,7 +303,7 @@ const BossBattle = {
                             <div class="boss-hp-bar">
                                 <div class="boss-hp-fill boss-hp" id="boss-hp"></div>
                             </div>
-                            <span class="boss-hp-text" id="boss-hp-text">${boss.hp}/${boss.hp}</span>
+                            <span class="boss-hp-text" id="boss-hp-text">${BossBattle.maxBossHP}/${BossBattle.maxBossHP}</span>
                         </div>
                     </div>
                 </div>
@@ -311,11 +333,13 @@ const BossBattle = {
 
     showBossEntrance: () => {
         const boss = BossBattle.currentBoss;
+        if (!boss) return;
         
         BossBattle.addBattleLog(`${boss.icon} ${boss.name} appears!`, 'entrance');
         BossBattle.addBattleLog(`"${boss.description}"`, 'boss-speak');
         
         setTimeout(() => {
+            if (!BossBattle.isPlaying) return;
             BossBattle.addBattleLog('Battle Start! Answer questions to attack!', 'system');
             BossBattle.showQuestion();
         }, 2000);
@@ -335,8 +359,16 @@ const BossBattle = {
         }
         
         const question = BossBattle.questions[BossBattle.currentIndex];
+        if (!question || !question.options) {
+            console.error('Invalid question at index', BossBattle.currentIndex);
+            BossBattle.currentIndex++;
+            BossBattle.showQuestion();
+            return;
+        }
         
         const questionArea = document.getElementById('boss-question-area');
+        if (!questionArea) return;
+        
         questionArea.innerHTML = `
             <div class="boss-question animate-in">
                 <h3>${question.question}</h3>
@@ -356,8 +388,11 @@ const BossBattle = {
         if (!BossBattle.isPlaying) return;
         
         const question = BossBattle.questions[BossBattle.currentIndex];
+        if (!question) return;
+        
         const isCorrect = index === question.answer;
         const boss = BossBattle.currentBoss;
+        if (!boss) return;
         
         // Disable all options
         document.querySelectorAll('.boss-option').forEach((btn, i) => {
@@ -368,40 +403,48 @@ const BossBattle = {
         
         if (isCorrect) {
             BossBattle.combo++;
+            BossBattle.maxCombo = Math.max(BossBattle.maxCombo, BossBattle.combo);
             
-            // Calculate damage
-            let damage = 15 + (BossBattle.combo * 2);
+            // Calculate damage with combo bonus
+            let damage = 15 + (BossBattle.combo * 3); // Increased combo multiplier
             if (BossBattle.criticalActive) {
                 damage *= 2;
                 BossBattle.criticalActive = false;
                 BossBattle.addBattleLog('⚡ CRITICAL HIT!', 'critical');
             }
             
-            BossBattle.bossHP -= damage;
+            BossBattle.bossHP = Math.max(0, BossBattle.bossHP - damage);
             BossBattle.totalDamage += damage;
             
             BossBattle.addBattleLog(`You deal ${damage} damage! 💥`, 'player-attack');
             BossBattle.showDamageEffect('boss', damage);
             
-            document.getElementById('combo-counter').textContent = `Combo: ${BossBattle.combo}x`;
-            document.getElementById('combo-counter').classList.add('pulse');
-            setTimeout(() => document.getElementById('combo-counter').classList.remove('pulse'), 300);
+            const comboCounter = document.getElementById('combo-counter');
+            if (comboCounter) {
+                comboCounter.textContent = `Combo: ${BossBattle.combo}x`;
+                comboCounter.classList.add('pulse');
+                setTimeout(() => comboCounter.classList.remove('pulse'), 300);
+            }
             
         } else {
             BossBattle.combo = 0;
-            document.getElementById('combo-counter').textContent = 'Combo: 0x';
+            const comboCounter = document.getElementById('combo-counter');
+            if (comboCounter) comboCounter.textContent = 'Combo: 0x';
             
-            // Boss attacks
+            // Boss attacks with scaled damage
             const attack = boss.attacks[Math.floor(Math.random() * boss.attacks.length)];
-            let damage = boss.attack;
+            let damage = BossBattle.scaledBossAttack || boss.attack;
             
             if (BossBattle.hasShield) {
                 damage = Math.floor(damage / 2);
                 BossBattle.hasShield = false;
                 BossBattle.addBattleLog(`🛡️ Shield absorbed half the damage!`, 'shield');
+                // Update shield indicator
+                const shieldIndicator = document.getElementById('shield-indicator');
+                if (shieldIndicator) shieldIndicator.classList.remove('active');
             }
             
-            BossBattle.playerHP -= damage;
+            BossBattle.playerHP = Math.max(0, BossBattle.playerHP - damage);
             
             BossBattle.addBattleLog(`${boss.icon} uses ${attack}! -${damage} HP`, 'boss-attack');
             BossBattle.showDamageEffect('player', damage);
@@ -412,6 +455,7 @@ const BossBattle = {
         
         // Check for battle end
         setTimeout(() => {
+            if (!BossBattle.isPlaying) return;
             if (BossBattle.bossHP <= 0) {
                 BossBattle.endBattle(true);
             } else if (BossBattle.playerHP <= 0) {

@@ -5,8 +5,17 @@
 
 const Toast = (() => {
     let container = null;
-    const activeToasts = new Set(); // Track active toasts for cleanup
+    const activeToasts = new Map(); // Track active toasts with unique IDs
     const MAX_TOASTS = 5; // Limit concurrent toasts
+    let toastIdCounter = 0;
+
+    // Default durations by type (errors stay longer)
+    const DEFAULT_DURATIONS = {
+        success: 3000,
+        error: 5000,
+        warning: 4000,
+        info: 3000
+    };
 
     /**
      * Initialize toast container
@@ -24,8 +33,24 @@ const Toast = (() => {
 
         container = document.createElement('div');
         container.className = 'toast-container';
-        container.setAttribute('role', 'alert');
+        // Accessibility: Use aria-live region for screen readers
+        container.setAttribute('role', 'region');
+        container.setAttribute('aria-label', 'Notifications');
         container.setAttribute('aria-live', 'polite');
+        container.setAttribute('aria-atomic', 'false');
+        // Stacking: Apply inline styles for proper stacking context
+        container.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 100vh;
+            overflow: hidden;
+            pointer-events: none;
+        `;
         document.body.appendChild(container);
         return container;
     };
@@ -61,12 +86,16 @@ const Toast = (() => {
     /**
      * Validate duration
      * @param {*} duration - The duration value
+     * @param {string} type - The toast type for default duration
      * @returns {number} Valid duration in milliseconds
      */
-    const validateDuration = (duration) => {
+    const validateDuration = (duration, type) => {
+        if (duration === undefined || duration === null) {
+            return DEFAULT_DURATIONS[type] || 3000;
+        }
         const num = Number(duration);
         if (isNaN(num) || num < 0) {
-            return 3000; // Default
+            return DEFAULT_DURATIONS[type] || 3000;
         }
         return Math.min(Math.max(num, 500), 30000); // Clamp between 500ms and 30s
     };
@@ -76,18 +105,34 @@ const Toast = (() => {
      */
     const enforceLimit = () => {
         if (activeToasts.size >= MAX_TOASTS) {
-            const oldest = activeToasts.values().next().value;
+            const oldestId = activeToasts.keys().next().value;
+            const oldest = activeToasts.get(oldestId);
             if (oldest && oldest.element) {
-                removeToast(oldest);
+                removeToast(oldestId);
             }
         }
     };
 
     /**
-     * Remove a toast element with animation
-     * @param {Object} toastData - Toast data object with element and timeoutId
+     * Update stacking positions with animation
      */
-    const removeToast = (toastData) => {
+    const updateStackPositions = () => {
+        let index = 0;
+        activeToasts.forEach((toastData) => {
+            if (toastData.element) {
+                toastData.element.style.transform = `translateY(${index * 0}px)`;
+                toastData.element.style.order = index;
+                index++;
+            }
+        });
+    };
+
+    /**
+     * Remove a toast element with animation
+     * @param {number} toastId - Toast ID to remove
+     */
+    const removeToast = (toastId) => {
+        const toastData = activeToasts.get(toastId);
         if (!toastData || !toastData.element) return;
 
         // Clear timeout to prevent double removal
@@ -96,9 +141,12 @@ const Toast = (() => {
             toastData.timeoutId = null;
         }
 
-        activeToasts.delete(toastData);
+        activeToasts.delete(toastId);
 
         const element = toastData.element;
+        
+        // Animate out
+        element.style.animation = 'toast-slide-out 0.3s ease-in forwards';
         element.classList.remove('show');
 
         // Wait for animation then remove
@@ -106,6 +154,7 @@ const Toast = (() => {
             if (element.parentNode) {
                 element.remove();
             }
+            updateStackPositions();
         }, 300);
 
         // Store cleanup timeout for potential early cleanup
@@ -113,14 +162,116 @@ const Toast = (() => {
     };
 
     /**
+     * Handle keyboard events on toast
+     * @param {KeyboardEvent} event - Keyboard event
+     * @param {number} toastId - Toast ID
+     */
+    const handleKeyDown = (event, toastId) => {
+        if (event.key === 'Escape' || event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            removeToast(toastId);
+        }
+    };
+
+    /**
+     * Inject required CSS if not present
+     */
+    const injectStyles = () => {
+        if (document.getElementById('toast-animation-styles')) return;
+        
+        const style = document.createElement('style');
+        style.id = 'toast-animation-styles';
+        style.textContent = `
+            @keyframes toast-slide-in {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes toast-slide-out {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+            }
+            .toast {
+                pointer-events: auto;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 12px 16px;
+                border-radius: 8px;
+                background: #333;
+                color: #fff;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                font-size: 14px;
+                max-width: 350px;
+                opacity: 0;
+                transform: translateX(100%);
+                transition: opacity 0.3s ease, transform 0.3s ease;
+            }
+            .toast.show {
+                opacity: 1;
+                transform: translateX(0);
+                animation: toast-slide-in 0.3s ease-out;
+            }
+            .toast-success { background: #10b981; }
+            .toast-error { background: #ef4444; }
+            .toast-warning { background: #f59e0b; }
+            .toast-info { background: #3b82f6; }
+            .toast-close {
+                background: none;
+                border: none;
+                color: inherit;
+                cursor: pointer;
+                padding: 4px;
+                margin-left: auto;
+                opacity: 0.7;
+                font-size: 16px;
+                line-height: 1;
+                border-radius: 4px;
+            }
+            .toast-close:hover,
+            .toast-close:focus {
+                opacity: 1;
+                background: rgba(255,255,255,0.1);
+            }
+            .toast-close:focus {
+                outline: 2px solid rgba(255,255,255,0.5);
+                outline-offset: 2px;
+            }
+            .toast-progress {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                height: 3px;
+                background: rgba(255,255,255,0.3);
+                border-radius: 0 0 8px 8px;
+            }
+            .toast { position: relative; overflow: hidden; }
+        `;
+        document.head.appendChild(style);
+    };
+
+    /**
      * Show a toast notification
      * @param {string} message - The message to display
      * @param {string} [type='info'] - Toast type: success, error, warning, info
-     * @param {number} [duration=3000] - Duration in milliseconds
+     * @param {number} [duration] - Duration in milliseconds (defaults by type)
      * @returns {Object|null} Toast control object with dismiss method, or null on failure
      */
-    const show = (message, type = 'info', duration = 3000) => {
+    const show = (message, type = 'info', duration) => {
         try {
+            injectStyles();
+            
             const containerEl = init();
             if (!containerEl) {
                 console.warn('Toast: Could not initialize container');
@@ -135,14 +286,18 @@ const Toast = (() => {
             }
 
             const validType = validateType(type);
-            const validDuration = validateDuration(duration);
+            const validDuration = validateDuration(duration, validType);
 
             // Enforce toast limit
             enforceLimit();
 
+            const toastId = ++toastIdCounter;
             const toast = document.createElement('div');
             toast.className = `toast toast-${validType}`;
-            toast.setAttribute('role', 'status');
+            toast.setAttribute('role', validType === 'error' ? 'alert' : 'status');
+            toast.setAttribute('aria-live', validType === 'error' ? 'assertive' : 'polite');
+            toast.setAttribute('aria-atomic', 'true');
+            toast.setAttribute('tabindex', '0');
 
             const icons = {
                 success: '✅',
@@ -152,9 +307,24 @@ const Toast = (() => {
             };
 
             toast.innerHTML = `
-                <span class="toast-icon">${icons[validType]}</span>
+                <span class="toast-icon" aria-hidden="true">${icons[validType]}</span>
                 <span class="toast-message">${sanitizedMessage}</span>
+                <button class="toast-close" aria-label="Dismiss notification" type="button">×</button>
+                <div class="toast-progress" style="animation: toast-progress ${validDuration}ms linear forwards;"></div>
             `;
+
+            // Add progress bar animation
+            const progressStyle = document.createElement('style');
+            progressStyle.textContent = `
+                @keyframes toast-progress {
+                    from { width: 100%; }
+                    to { width: 0%; }
+                }
+            `;
+            if (!document.getElementById('toast-progress-style')) {
+                progressStyle.id = 'toast-progress-style';
+                document.head.appendChild(progressStyle);
+            }
 
             containerEl.appendChild(toast);
 
@@ -164,7 +334,39 @@ const Toast = (() => {
                 timeoutId: null,
                 cleanupTimeoutId: null
             };
-            activeToasts.add(toastData);
+            activeToasts.set(toastId, toastData);
+
+            // Event listeners for dismiss
+            const closeBtn = toast.querySelector('.toast-close');
+            closeBtn.addEventListener('click', () => removeToast(toastId));
+            toast.addEventListener('keydown', (e) => handleKeyDown(e, toastId));
+
+            // Pause auto-dismiss on hover/focus
+            let remainingTime = validDuration;
+            let startTime = Date.now();
+
+            const pauseDismiss = () => {
+                if (toastData.timeoutId) {
+                    clearTimeout(toastData.timeoutId);
+                    remainingTime -= Date.now() - startTime;
+                    const progress = toast.querySelector('.toast-progress');
+                    if (progress) progress.style.animationPlayState = 'paused';
+                }
+            };
+
+            const resumeDismiss = () => {
+                startTime = Date.now();
+                const progress = toast.querySelector('.toast-progress');
+                if (progress) progress.style.animationPlayState = 'running';
+                toastData.timeoutId = setTimeout(() => {
+                    removeToast(toastId);
+                }, remainingTime);
+            };
+
+            toast.addEventListener('mouseenter', pauseDismiss);
+            toast.addEventListener('mouseleave', resumeDismiss);
+            toast.addEventListener('focusin', pauseDismiss);
+            toast.addEventListener('focusout', resumeDismiss);
 
             // Play sound based on type (with safety check)
             try {
@@ -195,13 +397,16 @@ const Toast = (() => {
 
             // Auto remove after duration
             toastData.timeoutId = setTimeout(() => {
-                removeToast(toastData);
+                removeToast(toastId);
             }, validDuration);
+
+            updateStackPositions();
 
             // Return control object
             return {
+                id: toastId,
                 element: toast,
-                dismiss: () => removeToast(toastData)
+                dismiss: () => removeToast(toastId)
             };
 
         } catch (error) {
@@ -246,7 +451,7 @@ const Toast = (() => {
      * Clear all active toasts
      */
     const clearAll = () => {
-        activeToasts.forEach(toastData => {
+        activeToasts.forEach((toastData, toastId) => {
             if (toastData.timeoutId) {
                 clearTimeout(toastData.timeoutId);
             }
@@ -269,6 +474,11 @@ const Toast = (() => {
             container.remove();
         }
         container = null;
+        // Remove injected styles
+        const styles = document.getElementById('toast-animation-styles');
+        if (styles) styles.remove();
+        const progressStyle = document.getElementById('toast-progress-style');
+        if (progressStyle) progressStyle.remove();
     };
 
     /**

@@ -14,6 +14,10 @@ const Auth = {
     MAX_FAILED_ATTEMPTS: 5,
     LOCKOUT_DURATION: 15 * 60 * 1000, // 15 minutes in milliseconds
     
+    // Session config
+    SESSION_DURATION: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
+    SESSION_REFRESH_THRESHOLD: 30 * 60 * 1000, // Refresh if less than 30 min remaining
+    
     /**
      * Initialize auth module
      */
@@ -24,8 +28,28 @@ const Auth = {
             if (!localStorage.getItem(Auth.USERS_KEY)) {
                 localStorage.setItem(Auth.USERS_KEY, JSON.stringify({}));
             }
+            // Validate existing session on init
+            Auth.validateSession();
         } catch (error) {
             console.error('Failed to initialize Auth storage:', error);
+        }
+    },
+
+    /**
+     * Generate a cryptographically secure session token
+     */
+    generateSessionToken: () => {
+        try {
+            const array = new Uint8Array(32);
+            crypto.getRandomValues(array);
+            return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+        } catch (error) {
+            console.warn('crypto.getRandomValues not available, using fallback');
+            let token = '';
+            for (let i = 0; i < 64; i++) {
+                token += Math.floor(Math.random() * 16).toString(16);
+            }
+            return token;
         }
     },
 
@@ -459,7 +483,7 @@ const Auth = {
     },
 
     /**
-     * Create session
+     * Create session with secure token and expiry
      */
     createSession: (user) => {
         if (!user || !user.email) {
@@ -468,15 +492,28 @@ const Auth = {
         }
         
         try {
+            const now = Date.now();
+            const sessionToken = Auth.generateSessionToken();
             const session = {
                 userId: user.id || '',
                 email: user.email,
                 username: user.username || 'User',
                 accountType: user.accountType || 'student',
                 loginTime: new Date().toISOString(),
+                createdAt: now,
+                expiresAt: now + Auth.SESSION_DURATION,
+                sessionToken: sessionToken,
                 rememberMe: true
             };
-            // Store only in localStorage to prevent desync
+            
+            // Store session token hash in user record for validation
+            const users = Auth.getUsers();
+            if (users[user.email]) {
+                users[user.email].activeSessionToken = sessionToken;
+                users[user.email].sessionCreatedAt = now;
+                Auth.saveUsers(users);
+            }
+            
             localStorage.setItem(Auth.SESSION_KEY, JSON.stringify(session));
             return true;
         } catch (error) {
@@ -486,19 +523,59 @@ const Auth = {
     },
 
     /**
-     * Get current session
+     * Validate session integrity and expiry
      */
-    getSession: () => {
+    validateSession: () => {
         try {
-            // Only check localStorage to prevent desync issues
-            const session = localStorage.getItem(Auth.SESSION_KEY);
-            if (!session) return null;
-            const parsed = JSON.parse(session);
-            return typeof parsed === 'object' && parsed !== null ? parsed : null;
+            const sessionData = localStorage.getItem(Auth.SESSION_KEY);
+            if (!sessionData) return null;
+            
+            const session = JSON.parse(sessionData);
+            if (!session || typeof session !== 'object') {
+                Auth.clearSessionData();
+                return null;
+            }
+            
+            const now = Date.now();
+            
+            // Check session expiry
+            if (session.expiresAt && now > session.expiresAt) {
+                console.log('🔐 Session expired');
+                Auth.clearSessionData();
+                return null;
+            }
+            
+            // Validate session token against stored user record
+            if (session.email && session.sessionToken) {
+                const users = Auth.getUsers();
+                const user = users[session.email];
+                if (!user || user.activeSessionToken !== session.sessionToken) {
+                    console.log('🔐 Session token invalid (possibly logged in elsewhere)');
+                    Auth.clearSessionData();
+                    return null;
+                }
+            }
+            
+            // Refresh session if close to expiry
+            if (session.expiresAt && (session.expiresAt - now) < Auth.SESSION_REFRESH_THRESHOLD) {
+                session.expiresAt = now + Auth.SESSION_DURATION;
+                localStorage.setItem(Auth.SESSION_KEY, JSON.stringify(session));
+                console.log('🔐 Session refreshed');
+            }
+            
+            return session;
         } catch (error) {
-            console.error('Error getting session:', error);
+            console.error('Error validating session:', error);
+            Auth.clearSessionData();
             return null;
         }
+    },
+
+    /**
+     * Get current session (with validation)
+     */
+    getSession: () => {
+        return Auth.validateSession();
     },
 
     /**
@@ -520,17 +597,62 @@ const Auth = {
     },
 
     /**
-     * Logout user
+     * Clear all session-related data from storage
+     */
+    clearSessionData: () => {
+        try {
+            // Clear from localStorage
+            localStorage.removeItem(Auth.SESSION_KEY);
+            // Clear from sessionStorage as fallback
+            sessionStorage.removeItem(Auth.SESSION_KEY);
+            // Clear any cached auth data
+            sessionStorage.removeItem('csmaster_auth_cache');
+        } catch (error) {
+            console.error('Error clearing session data:', error);
+        }
+    },
+
+    /**
+     * Logout user - comprehensive cleanup
      */
     logout: () => {
         try {
-            localStorage.removeItem(Auth.SESSION_KEY);
+            // Get session before clearing to invalidate server-side token
+            const session = Auth.getSession();
+            
+            // Invalidate session token in user record
+            if (session && session.email) {
+                const users = Auth.getUsers();
+                if (users[session.email]) {
+                    delete users[session.email].activeSessionToken;
+                    delete users[session.email].sessionCreatedAt;
+                    Auth.saveUsers(users);
+                }
+            }
+            
+            // Clear all session data
+            Auth.clearSessionData();
+            
+            // Clear any sensitive cached data
+            sessionStorage.clear();
+            
             // Reset app state
             if (typeof AppState !== 'undefined' && typeof AppState.resetState === 'function') {
                 AppState.resetState();
             }
+            
+            console.log('🔐 Logout complete');
+            return true;
         } catch (error) {
             console.error('Error during logout:', error);
+            // Force clear even on error
+            try {
+                localStorage.removeItem(Auth.SESSION_KEY);
+                sessionStorage.clear();
+            } catch (e) {
+                // Ignore
+            }
+            return false;
         }
     },
 
@@ -641,7 +763,7 @@ const Auth = {
     },
 
     /**
-     * Change password
+     * Change password (invalidates all other sessions)
      */
     changePassword: async (currentPassword, newPassword) => {
         try {
@@ -674,7 +796,16 @@ const Auth = {
             const { hash, salt } = await Auth.hashPassword(newPassword);
             user.passwordHash = hash;
             user.passwordSalt = salt;
+            user.passwordChangedAt = Date.now();
+            
+            // Invalidate all sessions by clearing active token
+            delete user.activeSessionToken;
+            delete user.sessionCreatedAt;
+            
             Auth.saveUsers(users);
+            
+            // Create new session for current user
+            Auth.createSession(user);
 
             return { success: true };
         } catch (error) {
