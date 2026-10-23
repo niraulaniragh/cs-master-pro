@@ -9,6 +9,7 @@ const AuthModal = {
     selectedAccountType: 'student', // 'student' or 'teacher'
     boundEventHandlers: new Map(), // Track event handlers for cleanup
     escapeHandler: null,
+    isSubmitting: false, // Prevent double submissions
 
     /**
      * Sanitize text for safe display
@@ -25,24 +26,60 @@ const AuthModal = {
     /**
      * Validate email format
      * @param {string} email - Email to validate
+     * @returns {Object} Validation result with isValid and message
+     */
+    validateEmail: (email) => {
+        if (!email || typeof email !== 'string') {
+            return { isValid: false, message: 'Email address is required' };
+        }
+        const trimmed = email.trim();
+        if (trimmed.length === 0) {
+            return { isValid: false, message: 'Email address is required' };
+        }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
+            return { isValid: false, message: 'Please enter a valid email address (e.g., user@example.com)' };
+        }
+        if (trimmed.length > 254) {
+            return { isValid: false, message: 'Email address is too long' };
+        }
+        return { isValid: true, message: '' };
+    },
+
+    /**
+     * Legacy email validation (kept for compatibility)
+     * @param {string} email - Email to validate
      * @returns {boolean} True if valid
      */
     isValidEmail: (email) => {
-        if (!email || typeof email !== 'string') return false;
-        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+        return AuthModal.validateEmail(email).isValid;
     },
 
     /**
      * Validate password strength
      * @param {string} password - Password to validate
+     * @param {boolean} isSignup - Whether this is for signup (stricter rules)
      * @returns {Object} Validation result with isValid and message
      */
-    validatePassword: (password) => {
+    validatePassword: (password, isSignup = false) => {
         if (!password) {
             return { isValid: false, message: 'Password is required' };
         }
-        if (password.length < 6) {
-            return { isValid: false, message: 'Password must be at least 6 characters' };
+        if (password.length < 8) {
+            return { isValid: false, message: 'Password must be at least 8 characters long' };
+        }
+        if (password.length > 128) {
+            return { isValid: false, message: 'Password is too long (maximum 128 characters)' };
+        }
+        if (isSignup) {
+            if (!/[A-Z]/.test(password)) {
+                return { isValid: false, message: 'Password must contain at least one uppercase letter' };
+            }
+            if (!/[a-z]/.test(password)) {
+                return { isValid: false, message: 'Password must contain at least one lowercase letter' };
+            }
+            if (!/[0-9]/.test(password)) {
+                return { isValid: false, message: 'Password must contain at least one number' };
+            }
         }
         return { isValid: true, message: '' };
     },
@@ -224,7 +261,7 @@ const AuthModal = {
                             <div class="auth-field">
                                 <label for="auth-email">Email</label>
                                 <input type="email" id="auth-email" name="email" 
-                                       placeholder="Enter your email" required
+                                       placeholder="Enter your email" required maxlength="254"
                                        autocomplete="email">
                             </div>
                             
@@ -233,20 +270,20 @@ const AuthModal = {
                                 <div class="password-input-wrapper">
                                     <input type="password" id="auth-password" name="password" 
                                            placeholder="${!isLogin ? 'Create a password' : 'Enter your password'}" 
-                                           required minlength="6"
+                                           required minlength="8" maxlength="128"
                                            autocomplete="${!isLogin ? 'new-password' : 'current-password'}">
                                     <button type="button" class="toggle-password" aria-label="Toggle password visibility">
                                         👁️
                                     </button>
                                 </div>
-                                ${!isLogin ? '<span class="field-hint">At least 6 characters</span>' : ''}
+                                ${!isLogin ? '<span class="field-hint">At least 8 characters with uppercase, lowercase, and number</span>' : ''}
                             </div>
                             
                             ${!isLogin ? `
                                 <div class="auth-field">
                                     <label for="auth-confirm-password">Confirm Password</label>
                                     <input type="password" id="auth-confirm-password" name="confirmPassword" 
-                                           placeholder="Confirm your password" required minlength="6"
+                                           placeholder="Confirm your password" required minlength="8" maxlength="128"
                                            autocomplete="new-password">
                                 </div>
                             ` : ''}
@@ -361,6 +398,9 @@ const AuthModal = {
                 form.addEventListener('submit', AuthModal.handleSubmit);
             }
 
+            // Real-time field validation
+            AuthModal.attachFieldValidation();
+
         } catch (error) {
             console.error('AuthModal: Error attaching event listeners', error);
         }
@@ -390,12 +430,23 @@ const AuthModal = {
     /**
      * Show error message
      * @param {string} message - Error message to display
+     * @param {string} [fieldId] - Optional field ID to highlight
      */
-    showError: (message) => {
+    showError: (message, fieldId) => {
         const errorEl = document.getElementById('auth-error');
         if (errorEl) {
             errorEl.textContent = AuthModal.escapeHtml(message || 'An error occurred');
             errorEl.classList.remove('hidden');
+            // Scroll error into view for better UX
+            errorEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+        // Highlight the problematic field
+        if (fieldId) {
+            const field = document.getElementById(fieldId);
+            if (field) {
+                field.classList.add('field-error');
+                field.setAttribute('aria-invalid', 'true');
+            }
         }
     },
 
@@ -408,6 +459,72 @@ const AuthModal = {
             errorEl.textContent = '';
             errorEl.classList.add('hidden');
         }
+        // Clear all field error states
+        document.querySelectorAll('.field-error').forEach(field => {
+            field.classList.remove('field-error');
+            field.removeAttribute('aria-invalid');
+        });
+    },
+
+    /**
+     * Add real-time validation to form fields
+     */
+    attachFieldValidation: () => {
+        const emailField = document.getElementById('auth-email');
+        const passwordField = document.getElementById('auth-password');
+        const usernameField = document.getElementById('auth-username');
+        const confirmField = document.getElementById('auth-confirm-password');
+
+        const showFieldError = (field, message) => {
+            const hint = field?.parentElement?.querySelector('.field-hint, .field-error-hint');
+            if (hint) {
+                hint.dataset.originalText = hint.dataset.originalText || hint.textContent;
+                hint.textContent = message;
+                hint.classList.add('field-error-hint');
+            }
+            field?.classList.add('field-error');
+        };
+
+        const clearFieldError = (field) => {
+            const hint = field?.parentElement?.querySelector('.field-error-hint');
+            if (hint && hint.dataset.originalText) {
+                hint.textContent = hint.dataset.originalText;
+                hint.classList.remove('field-error-hint');
+            }
+            field?.classList.remove('field-error');
+        };
+
+        if (emailField) {
+            emailField.addEventListener('blur', () => {
+                const validation = AuthModal.validateEmail(emailField.value);
+                if (!validation.isValid && emailField.value.trim()) {
+                    showFieldError(emailField, validation.message);
+                } else {
+                    clearFieldError(emailField);
+                }
+            });
+        }
+
+        if (usernameField) {
+            usernameField.addEventListener('blur', () => {
+                const validation = AuthModal.validateUsername(usernameField.value);
+                if (!validation.isValid && usernameField.value.trim()) {
+                    showFieldError(usernameField, validation.message);
+                } else {
+                    clearFieldError(usernameField);
+                }
+            });
+        }
+
+        if (confirmField && passwordField) {
+            confirmField.addEventListener('blur', () => {
+                if (confirmField.value && confirmField.value !== passwordField.value) {
+                    showFieldError(confirmField, 'Passwords do not match');
+                } else {
+                    clearFieldError(confirmField);
+                }
+            });
+        }
     },
 
     /**
@@ -418,6 +535,13 @@ const AuthModal = {
         event.preventDefault();
         AuthModal.hideError();
 
+        // Prevent double submission
+        if (AuthModal.isSubmitting) {
+            return;
+        }
+
+        const submitBtn = document.querySelector('.auth-submit-btn');
+
         try {
             const form = event.target;
             if (!form) return;
@@ -425,20 +549,24 @@ const AuthModal = {
             const email = (form.email?.value || '').trim();
             const password = form.password?.value || '';
 
-            // Validate email
-            if (!AuthModal.isValidEmail(email)) {
-                AuthModal.showError('Please enter a valid email address');
+            // Validate email with descriptive message
+            const emailValidation = AuthModal.validateEmail(email);
+            if (!emailValidation.isValid) {
+                AuthModal.showError(emailValidation.message);
+                form.email?.focus();
                 return;
             }
 
-            // Validate password
-            const passwordValidation = AuthModal.validatePassword(password);
+            // Validate password (stricter for signup)
+            const isSignup = AuthModal.mode === 'signup';
+            const passwordValidation = AuthModal.validatePassword(password, isSignup);
             if (!passwordValidation.isValid) {
                 AuthModal.showError(passwordValidation.message);
+                form.password?.focus();
                 return;
             }
 
-            if (AuthModal.mode === 'signup') {
+            if (isSignup) {
                 const username = (form.username?.value || '').trim();
                 const confirmPassword = form.confirmPassword?.value || '';
 
@@ -446,20 +574,25 @@ const AuthModal = {
                 const usernameValidation = AuthModal.validateUsername(username);
                 if (!usernameValidation.isValid) {
                     AuthModal.showError(usernameValidation.message);
+                    form.username?.focus();
                     return;
                 }
 
                 // Check passwords match
                 if (password !== confirmPassword) {
-                    AuthModal.showError('Passwords do not match');
+                    AuthModal.showError('Passwords do not match. Please re-enter your password.');
+                    form.confirmPassword?.focus();
                     return;
                 }
 
-                // Attempt registration
+                // Check Auth service availability
                 if (typeof Auth === 'undefined' || !Auth.register) {
-                    AuthModal.showError('Authentication service unavailable');
+                    AuthModal.showError('Authentication service is currently unavailable. Please try again later.');
                     return;
                 }
+
+                // Set loading state
+                AuthModal.setSubmitting(true, submitBtn);
 
                 const result = await Auth.register(username, email, password, AuthModal.selectedAccountType);
 
@@ -481,14 +614,17 @@ const AuthModal = {
                         App.init();
                     }
                 } else {
-                    AuthModal.showError(result?.error || 'Registration failed');
+                    AuthModal.showError(AuthModal.formatApiError(result?.error, 'Registration failed'));
                 }
             } else {
-                // Attempt login
+                // Check Auth service availability
                 if (typeof Auth === 'undefined' || !Auth.login) {
-                    AuthModal.showError('Authentication service unavailable');
+                    AuthModal.showError('Authentication service is currently unavailable. Please try again later.');
                     return;
                 }
+
+                // Set loading state
+                AuthModal.setSubmitting(true, submitBtn);
 
                 const result = await Auth.login(email, password);
 
@@ -507,12 +643,56 @@ const AuthModal = {
                         App.init();
                     }
                 } else {
-                    AuthModal.showError(result?.error || 'Login failed');
+                    // Generic message for login failures (security: don't reveal if email exists)
+                    AuthModal.showError('Invalid email or password. Please check your credentials and try again.');
                 }
             }
         } catch (error) {
             console.error('AuthModal: Submit error', error);
-            AuthModal.showError('An unexpected error occurred. Please try again.');
+            AuthModal.showError('An unexpected error occurred. Please check your connection and try again.');
+        } finally {
+            AuthModal.setSubmitting(false, submitBtn);
         }
+    },
+
+    /**
+     * Set submitting state with loading indicator
+     * @param {boolean} isSubmitting - Whether form is submitting
+     * @param {HTMLElement} submitBtn - Submit button element
+     */
+    setSubmitting: (isSubmitting, submitBtn) => {
+        AuthModal.isSubmitting = isSubmitting;
+        if (submitBtn) {
+            submitBtn.disabled = isSubmitting;
+            if (isSubmitting) {
+                submitBtn.dataset.originalText = submitBtn.textContent;
+                submitBtn.textContent = 'Please wait...';
+                submitBtn.classList.add('loading');
+            } else {
+                submitBtn.textContent = submitBtn.dataset.originalText || (AuthModal.mode === 'login' ? 'Log In' : 'Create Account');
+                submitBtn.classList.remove('loading');
+            }
+        }
+    },
+
+    /**
+     * Format API error messages for display
+     * @param {string} error - Error from API
+     * @param {string} fallback - Fallback message
+     * @returns {string} User-friendly error message
+     */
+    formatApiError: (error, fallback) => {
+        if (!error) return fallback;
+        
+        // Map common error codes to user-friendly messages
+        const errorMap = {
+            'email_exists': 'An account with this email already exists. Try logging in instead.',
+            'username_taken': 'This username is already taken. Please choose another.',
+            'invalid_credentials': 'Invalid email or password.',
+            'rate_limited': 'Too many attempts. Please wait a moment and try again.',
+            'network_error': 'Unable to connect. Please check your internet connection.'
+        };
+
+        return errorMap[error] || error || fallback;
     }
 };

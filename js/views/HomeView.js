@@ -193,7 +193,7 @@ const HomeView = {
                                         </div>
                                         <span class="progress-text">${xp} / ${xpForNext} XP</span>
                                     </div>
-                                    <p class="progress-next">${(xpForNext - user.xp).toLocaleString()} XP until Level ${user.level + 1}</p>
+                                    <p class="progress-next">${(xpForNext - xp).toLocaleString()} XP until Level ${level + 1}</p>
                                 </div>
                             </div>
                             <div class="progress-stats">
@@ -316,7 +316,7 @@ const HomeView = {
             `).join('');
         } catch (e) {
             console.error('Leaderboard error:', e);
-            return '<p class="empty-text">Could not load leaderboard</p>';
+            return '<p class="empty-text">Leaderboard temporarily unavailable. Please refresh.</p>';
         }
     },
     
@@ -403,8 +403,8 @@ const HomeView = {
     // Classroom section for students
     renderClassroomSection: () => {
         try {
-            // Only show for students
-            if (typeof Auth === 'undefined' || !Auth.isStudent()) return '';
+            // Only show for students - check if Auth and isStudent method exist
+            if (typeof Auth === 'undefined' || typeof Auth.isStudent !== 'function' || !Auth.isStudent()) return '';
             
             const classrooms = typeof Classroom !== 'undefined' ? Classroom.getStudentClassrooms() : [];
             const availableGames = typeof Classroom !== 'undefined' ? Classroom.getAvailableGames() : [];
@@ -517,6 +517,10 @@ const HomeView = {
                     return;
                 }
                 
+                if (typeof Classroom === 'undefined' || typeof Classroom.join !== 'function') {
+                    Toast.show('Classroom system unavailable', 'error');
+                    return;
+                }
                 const result = Classroom.join(code);
                 if (result.success) {
                     Modal.close();
@@ -531,8 +535,9 @@ const HomeView = {
     },
     
     leaveClassroom: (code) => {
-        const classroom = Classroom.get(code);
-        if (confirm(`Leave "${classroom?.name}"? You can rejoin later with the code.`)) {
+        const classroom = typeof Classroom !== 'undefined' ? Classroom.get(code) : null;
+        const classroomName = classroom?.name || 'this classroom';
+        if (confirm(`Leave "${classroomName}"? You can rejoin later with the code.`)) {
             const result = Classroom.leave(code);
             if (result.success) {
                 Toast.show('Left classroom', 'info');
@@ -544,19 +549,25 @@ const HomeView = {
     },
     
     joinGame: (gameId) => {
+        if (typeof Classroom === 'undefined') {
+            Toast.show('Classroom system unavailable', 'error');
+            return;
+        }
         const result = Classroom.joinGame(gameId);
         if (result.success) {
             const game = result.game;
-            if (game.gameType === 'race') {
+            if (game.gameType === 'race' && typeof CarRace !== 'undefined') {
                 CarRace.startAsPlayer(game);
-            } else if (game.gameType === 'crypto') {
+            } else if (game.gameType === 'crypto' && typeof CryptoHack !== 'undefined') {
                 CryptoHack.startAsPlayer(game);
-            } else if (game.gameType === 'tower') {
+            } else if (game.gameType === 'tower' && typeof TowerDefense !== 'undefined') {
                 TowerDefense.startAsPlayer(game);
-            } else if (game.gameType === 'factory') {
+            } else if (game.gameType === 'factory' && typeof Factory !== 'undefined') {
                 Factory.startAsPlayer(game);
-            } else if (game.gameType === 'gold') {
+            } else if (game.gameType === 'gold' && typeof GoldQuest !== 'undefined') {
                 GoldQuest.startAsPlayer(game);
+            } else {
+                Toast.show('Game module not available', 'error');
             }
         } else {
             Toast.show(result.error, 'error');
@@ -603,6 +614,10 @@ const HomeView = {
                 }
                 
                 // Find the game by code
+                if (typeof Classroom === 'undefined' || typeof Classroom.findGameByCode !== 'function') {
+                    Toast.show('Game system unavailable', 'error');
+                    return;
+                }
                 const game = Classroom.findGameByCode(code);
                 if (game) {
                     Modal.close();

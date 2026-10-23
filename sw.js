@@ -12,7 +12,7 @@
  */
 
 // Version management - update this on each deploy
-const BUILD_TIMESTAMP = '20261023173900';
+const BUILD_TIMESTAMP = '20261023183451';
 const CACHE_NAME = `csmaster-v${BUILD_TIMESTAMP}`;
 const OFFLINE_URL = '/cs-master-pro/offline.html';
 
@@ -277,20 +277,26 @@ async function staleWhileRevalidate(request) {
     const cache = await caches.open(CACHE_NAME);
     const cachedResponse = await cache.match(request);
     
-    // Start fetching in background
-    const fetchPromise = fetch(request)
-        .then(async (networkResponse) => {
+    // Start fetching in background with timeout
+    const fetchPromise = (async () => {
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
+            
+            const networkResponse = await fetch(request, { signal: controller.signal });
+            clearTimeout(timeoutId);
+            
             if (networkResponse && networkResponse.ok) {
                 // Clone and cache the new response with timestamp
                 const responseToCache = networkResponse.clone();
                 await cacheWithMetadata(cache, request, responseToCache);
             }
             return networkResponse;
-        })
-        .catch((error) => {
+        } catch (error) {
             console.log('[SW] Background fetch failed:', request.url);
             return null;
-        });
+        }
+    })();
     
     // Return cached response immediately if available
     if (cachedResponse) {
@@ -300,18 +306,8 @@ async function staleWhileRevalidate(request) {
     }
     
     // No cache - wait for network
-    try {
-        const networkResponse = await fetchPromise;
-        
-        if (networkResponse) {
-            return networkResponse;
-        }
-        
-        // Return error response
-        return createErrorResponse(request);
-    } catch (error) {
-        return createErrorResponse(request);
-    }
+    const networkResponse = await fetchPromise;
+    return networkResponse || createErrorResponse(request);
 }
 
 /**
@@ -448,14 +444,12 @@ function createErrorResponse(request) {
     }
     
     if (/\.(png|jpg|jpeg|gif|svg|webp)$/.test(url.pathname)) {
-        // Return a transparent 1x1 pixel
-        return new Response(
-            'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
-            {
-                status: 503,
-                headers: { 'Content-Type': 'image/gif' }
-            }
-        );
+        // Return a transparent 1x1 GIF pixel (actual binary)
+        const gif = Uint8Array.from(atob('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'), c => c.charCodeAt(0));
+        return new Response(gif, {
+            status: 503,
+            headers: { 'Content-Type': 'image/gif' }
+        });
     }
     
     return new Response('Offline - resource unavailable', {

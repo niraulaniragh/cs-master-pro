@@ -804,7 +804,7 @@ label {
     margin-bottom: var(--space-6);
 }
 
-.stat-item {
+.stats-grid .stat-item {
     display: flex;
     align-items: center;
     gap: var(--space-3);
@@ -1133,46 +1133,7 @@ label {
     line-height: 1.5;
 }
 
-/* Old classes for compatibility - DISABLED (conflicts with new home stats)
-.stats-overview-old {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: var(--space-4);
-}
-
-.stat-card-old {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    padding: var(--space-6);
-    text-align: center;
-    transition: all 0.3s ease;
-}
-
-.stat-card-old:hover {
-    border-color: var(--primary);
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-glow);
-}
-
-.stat-icon-old {
-    font-size: 2.5rem;
-    margin-bottom: var(--space-3);
-}
-
-.stat-value-old {
-    font-size: 2rem;
-    font-weight: 800;
-    color: var(--text-primary);
-    margin-bottom: var(--space-1);
-}
-
-.stat-label-old {
-    color: var(--text-muted);
-    font-size: 0.875rem;
-    font-weight: 500;
-}
-*/
+/* Legacy stat classes removed - consolidated into stats-overview and stat-card */
 
 .progress-section {
     background: var(--bg-card);
@@ -6030,10 +5991,6 @@ body.modal-open {
 }
 
 /* Button press effect */
-.btn {
-    transition: all 0.2s ease;
-}
-
 .btn:active {
     transform: scale(0.98);
 }
@@ -6993,6 +6950,16 @@ textarea:focus {
     .playground-layout {
         grid-template-columns: 1fr;
     }
+    
+    /* Dashboard responsive */
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    /* Analytics responsive */
+    .analytics-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 @media (max-width: 768px) {
@@ -7031,6 +6998,42 @@ textarea:focus {
         flex-direction: column;
         gap: var(--space-6);
     }
+    
+    /* Quick actions mobile */
+    .quick-grid-6 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    /* Topics mobile */
+    .topics-progress-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    /* Games mobile */
+    .games-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    /* Tools mobile */
+    .tools-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    /* Leaderboard mobile */
+    .podium {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    /* Practice mobile */
+    .setup-options {
+        flex-direction: column;
+    }
+    
+    /* Feature row mobile */
+    .feature-row {
+        grid-template-columns: 1fr;
+    }
 }
 
 @media (max-width: 480px) {
@@ -7045,6 +7048,44 @@ textarea:focus {
     .setup-options {
         flex-direction: column;
         align-items: center;
+    }
+    
+    /* Stats mobile */
+    .stats-overview {
+        grid-template-columns: 1fr;
+    }
+    
+    /* Quick grid mobile */
+    .quick-grid-6 {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    /* Progress card mobile */
+    .progress-content-new {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    /* Flashcard mobile */
+    .flashcard {
+        height: 250px;
+    }
+    
+    .flashcard-actions {
+        flex-direction: column;
+        gap: var(--space-2);
+    }
+    
+    /* Modal mobile */
+    .modal-content {
+        width: 95%;
+        padding: var(--space-4);
+    }
+    
+    /* Buttons full width on small screens */
+    .result-actions .btn,
+    .flashcard-actions .btn {
+        width: 100%;
     }
 }
 
@@ -11729,7 +11770,7 @@ textarea:focus {
     margin-bottom: 20px;
 }
 
-.leaderboard-list {
+.final-leaderboard .leaderboard-list {
     background: rgba(255, 255, 255, 0.05);
     border-radius: 12px;
     overflow: hidden;
@@ -12732,7 +12773,7 @@ textarea:focus {
     gap: var(--space-2);
 }
 
-.topic-item {
+.topics-list-new .topic-item {
     display: flex;
     align-items: center;
     gap: var(--space-3);
@@ -12743,7 +12784,7 @@ textarea:focus {
     transition: all 0.2s;
 }
 
-.topic-item:hover {
+.topics-list-new .topic-item:hover {
     background: var(--bg-hover);
     transform: translateX(4px);
 }
@@ -15111,12 +15152,18 @@ textarea:focus {
     outline-offset: 2px;
 }
 
+/* Remove default focus for mouse users, keep for keyboard */
+:focus:not(:focus-visible) {
+    outline: none;
+}
+
 a:focus-visible,
 button:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible,
-[tabindex]:focus-visible {
+[tabindex]:focus-visible,
+[role="button"]:focus-visible {
     outline: 3px solid var(--primary);
     outline-offset: 2px;
 }
@@ -15127,13 +15174,20 @@ textarea:focus-visible,
     box-shadow: 0 0 0 6px rgba(6, 182, 212, 0.2);
 }
 
+.btn-primary:focus-visible {
+    box-shadow: 0 0 0 6px rgba(16, 185, 129, 0.3);
+}
+
 .nav-link:focus-visible {
     outline: 3px solid var(--primary);
     outline-offset: 2px;
     background: var(--bg-hover);
 }
 
-.option-btn:focus-visible {
+.option-btn:focus-visible,
+.race-option:focus-visible,
+.dc-option:focus-visible,
+.crypto-option:focus-visible {
     outline: 3px solid var(--primary);
     outline-offset: 2px;
     border-color: var(--primary);
@@ -15142,6 +15196,40 @@ textarea:focus-visible,
 .flashcard:focus-visible {
     outline: 3px solid var(--primary);
     outline-offset: 4px;
+}
+
+/* Card focus states */
+.topic-card:focus-visible,
+.action-card:focus-visible,
+.tool-card:focus-visible,
+.game-card:focus-visible,
+.challenge-card:focus-visible,
+.assignment-card:focus-visible {
+    outline: 3px solid var(--primary);
+    outline-offset: 2px;
+    border-color: var(--primary);
+}
+
+/* Tab focus states */
+.tab-btn:focus-visible,
+.subtopic-tab:focus-visible,
+.mode-tab:focus-visible {
+    outline: 3px solid var(--primary);
+    outline-offset: 2px;
+}
+
+/* Modal close button */
+.modal-close:focus-visible,
+.auth-close:focus-visible {
+    outline: 3px solid var(--primary);
+    outline-offset: 2px;
+}
+
+/* Toggle and checkbox focus */
+.toggle-btn:focus-visible,
+.checkbox-label input:focus-visible + span {
+    outline: 3px solid var(--primary);
+    outline-offset: 2px;
 }
 
 /* Touch Target Minimum Sizes (48px for mobile) */

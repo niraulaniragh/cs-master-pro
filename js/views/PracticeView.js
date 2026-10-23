@@ -325,8 +325,11 @@ const PracticeView = {
             }
             
             // Flashcard mode keyboard shortcuts
-            if (PracticeView.mode === 'flashcards' && !document.getElementById('flashcard-container').classList.contains('hidden')) {
-                PracticeView.handleFlashcardKeyboard(e);
+            if (PracticeView.mode === 'flashcards') {
+                const flashcardContainer = document.getElementById('flashcard-container');
+                if (flashcardContainer && !flashcardContainer.classList.contains('hidden')) {
+                    PracticeView.handleFlashcardKeyboard(e);
+                }
             }
         };
         
@@ -395,6 +398,8 @@ const PracticeView = {
             case 'r':
                 e.preventDefault();
                 PracticeView.markReview();
+                break;
+            default:
                 break;
         }
     },
@@ -520,25 +525,37 @@ const PracticeView = {
         });
         
         // Hide all setups and containers
-        document.getElementById('practice-setup').classList.add('hidden');
-        document.getElementById('flashcard-setup').classList.add('hidden');
-        document.getElementById('pastpaper-setup').classList.add('hidden');
-        document.getElementById('quiz-container').classList.add('hidden');
-        document.getElementById('flashcard-container').classList.add('hidden');
-        document.getElementById('pastpaper-container').classList.add('hidden');
+        const elementsToHide = [
+            'practice-setup', 'flashcard-setup', 'pastpaper-setup',
+            'quiz-container', 'flashcard-container', 'pastpaper-container'
+        ];
+        elementsToHide.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.classList.add('hidden');
+        });
         
         // Remove swipe gestures when not in flashcard mode
         PracticeView.removeSwipeGestures();
         
         // Show appropriate setup
         if (mode === 'quiz') {
-            document.getElementById('practice-setup').classList.remove('hidden');
+            const el = document.getElementById('practice-setup');
+            if (el) el.classList.remove('hidden');
         } else if (mode === 'flashcards') {
-            document.getElementById('flashcard-setup').classList.remove('hidden');
-            const count = getFlashcardsByTopic(PracticeView.selectedTopic).length;
-            document.getElementById('total-flashcards').textContent = count;
+            const el = document.getElementById('flashcard-setup');
+            if (el) el.classList.remove('hidden');
+            try {
+                const count = typeof getFlashcardsByTopic === 'function' 
+                    ? getFlashcardsByTopic(PracticeView.selectedTopic).length 
+                    : 0;
+                const totalEl = document.getElementById('total-flashcards');
+                if (totalEl) totalEl.textContent = count;
+            } catch (e) {
+                console.warn('Could not load flashcard count:', e);
+            }
         } else if (mode === 'pastpaper') {
-            document.getElementById('pastpaper-setup').classList.remove('hidden');
+            const el = document.getElementById('pastpaper-setup');
+            if (el) el.classList.remove('hidden');
         }
     },
 
@@ -770,77 +787,127 @@ const PracticeView = {
     resetQuiz: () => {
         PracticeView.isActive = false;
         PracticeView.hasAnswered = false;
-        document.getElementById('quiz-container').classList.add('hidden');
-        document.getElementById('quiz-container').innerHTML = `
-            <div class="quiz-header">
-                <div class="quiz-progress">
-                    <span id="quiz-progress-text">1 / 10</span>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="quiz-progress-bar" style="width: 10%"></div>
+        
+        const containerEl = document.getElementById('quiz-container');
+        const setupEl = document.getElementById('practice-setup');
+        
+        if (containerEl) {
+            containerEl.classList.add('hidden');
+            containerEl.innerHTML = `
+                <div class="quiz-header">
+                    <div class="quiz-progress">
+                        <span id="quiz-progress-text">1 / 10</span>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="quiz-progress-bar" style="width: 10%"></div>
+                        </div>
+                    </div>
+                    <div class="quiz-stats">
+                        <span class="stat">🔥 <span id="streak-count">0</span></span>
+                        <span class="stat">✅ <span id="correct-count">0</span></span>
                     </div>
                 </div>
-                <div class="quiz-stats">
-                    <span class="stat">🔥 <span id="streak-count">0</span></span>
-                    <span class="stat">✅ <span id="correct-count">0</span></span>
-                </div>
-            </div>
-            <div class="question-card" id="question-card"></div>
-        `;
-        document.getElementById('practice-setup').classList.remove('hidden');
+                <div class="question-card" id="question-card"></div>
+            `;
+        }
+        if (setupEl) setupEl.classList.remove('hidden');
     },
 
     // ==================== FLASHCARD MODE ====================
     startFlashcards: () => {
-        PracticeView.flashcards = getFlashcardsByTopic(PracticeView.selectedTopic);
-        Helpers.shuffle(PracticeView.flashcards);
-        PracticeView.flashcardIndex = 0;
-        PracticeView.flippedCards = new Set();
-        PracticeView.knownCards = new Set();
-        PracticeView.reviewCards = new Set();
+        try {
+            if (typeof getFlashcardsByTopic !== 'function') {
+                Toast.show('Flashcard system not available', 'error');
+                return;
+            }
+            
+            PracticeView.flashcards = getFlashcardsByTopic(PracticeView.selectedTopic);
+            
+            if (!PracticeView.flashcards || PracticeView.flashcards.length === 0) {
+                Toast.show('No flashcards available for this topic', 'warning');
+                return;
+            }
+            
+            if (typeof Helpers !== 'undefined' && Helpers.shuffle) {
+                Helpers.shuffle(PracticeView.flashcards);
+            }
+            PracticeView.flashcardIndex = 0;
+            PracticeView.flippedCards = new Set();
+            PracticeView.knownCards = new Set();
+            PracticeView.reviewCards = new Set();
 
-        document.getElementById('flashcard-setup').classList.add('hidden');
-        document.getElementById('flashcard-container').classList.remove('hidden');
+            const setupEl = document.getElementById('flashcard-setup');
+            const containerEl = document.getElementById('flashcard-container');
+            if (setupEl) setupEl.classList.add('hidden');
+            if (containerEl) containerEl.classList.remove('hidden');
 
-        // Set up swipe gestures for flashcards
-        PracticeView.setupSwipeGestures();
+            // Set up swipe gestures for flashcards
+            PracticeView.setupSwipeGestures();
 
-        PracticeView.showFlashcard();
-        PracticeView.announce(`Flashcard study started. Card 1 of ${PracticeView.flashcards.length}.`);
+            PracticeView.showFlashcard();
+            PracticeView.announce(`Flashcard study started. Card 1 of ${PracticeView.flashcards.length}.`);
+        } catch (error) {
+            console.error('Error starting flashcards:', error);
+            Toast.show('Failed to start flashcards. Please try again.', 'error');
+        }
     },
 
     showFlashcard: () => {
         const card = PracticeView.flashcards[PracticeView.flashcardIndex];
+        if (!card) {
+            console.error('Flashcard not found at index', PracticeView.flashcardIndex);
+            return;
+        }
+        
         const total = PracticeView.flashcards.length;
         const progress = ((PracticeView.flashcardIndex + 1) / total) * 100;
 
-        document.getElementById('flashcard-progress-text').textContent = `${PracticeView.flashcardIndex + 1} / ${total}`;
-        document.getElementById('flashcard-progress-bar').style.width = `${progress}%`;
+        const progressText = document.getElementById('flashcard-progress-text');
+        const progressBar = document.getElementById('flashcard-progress-bar');
+        if (progressText) progressText.textContent = `${PracticeView.flashcardIndex + 1} / ${total}`;
+        if (progressBar) progressBar.style.width = `${progress}%`;
 
-        const topic = getTopicById(card.topic);
-        document.getElementById('flashcard-topic').innerHTML = `
-            <span style="color: ${topic?.color || '#888'}">${topic?.icon || '📝'} ${topic?.name || 'General'}</span>
-        `;
-        document.getElementById('flashcard-question').textContent = card.front;
-        document.getElementById('flashcard-answer').textContent = card.back;
+        const topic = typeof getTopicById === 'function' ? getTopicById(card.topic) : null;
+        const topicEl = document.getElementById('flashcard-topic');
+        const questionEl = document.getElementById('flashcard-question');
+        const answerEl = document.getElementById('flashcard-answer');
+        
+        if (topicEl) {
+            topicEl.innerHTML = `
+                <span style="color: ${topic?.color || '#888'}">${topic?.icon || '📝'} ${topic?.name || 'General'}</span>
+            `;
+        }
+        if (questionEl) questionEl.textContent = card.front || '';
+        if (answerEl) answerEl.textContent = card.back || '';
 
         const flashcardEl = document.getElementById('flashcard');
-        flashcardEl.classList.remove('flipped');
-        flashcardEl.setAttribute('aria-label', `Flashcard ${PracticeView.flashcardIndex + 1} of ${total}. Question: ${card.front}. Click or press Space to reveal answer.`);
+        if (flashcardEl) {
+            flashcardEl.classList.remove('flipped');
+            flashcardEl.setAttribute('aria-label', `Flashcard ${PracticeView.flashcardIndex + 1} of ${total}. Question: ${card.front}. Click or press Space to reveal answer.`);
+        }
 
-        document.getElementById('prev-card-btn').disabled = PracticeView.flashcardIndex === 0;
-        document.getElementById('next-card-btn').textContent = 
-            PracticeView.flashcardIndex === total - 1 ? 'Finish →' : 'Next →';
+        const prevBtn = document.getElementById('prev-card-btn');
+        const nextBtn = document.getElementById('next-card-btn');
+        if (prevBtn) prevBtn.disabled = PracticeView.flashcardIndex === 0;
+        if (nextBtn) {
+            nextBtn.textContent = PracticeView.flashcardIndex === total - 1 ? 'Finish →' : 'Next →';
+        }
 
-        document.getElementById('known-count').textContent = PracticeView.knownCards.size;
-        document.getElementById('review-count').textContent = PracticeView.reviewCards.size;
+        const knownCount = document.getElementById('known-count');
+        const reviewCount = document.getElementById('review-count');
+        if (knownCount) knownCount.textContent = PracticeView.knownCards.size;
+        if (reviewCount) reviewCount.textContent = PracticeView.reviewCards.size;
     },
 
     flipCard: () => {
         const flashcard = document.getElementById('flashcard');
+        if (!flashcard) return;
+        
         const isFlipped = flashcard.classList.toggle('flipped');
         PracticeView.flippedCards.add(PracticeView.flashcardIndex);
         
         const card = PracticeView.flashcards[PracticeView.flashcardIndex];
+        if (!card) return;
+        
         if (isFlipped) {
             flashcard.setAttribute('aria-label', `Answer: ${card.back}. Click or press Space to see question again.`);
             PracticeView.announce(`Answer: ${card.back}`);
@@ -852,11 +919,18 @@ const PracticeView = {
     markKnown: () => {
         PracticeView.knownCards.add(PracticeView.flashcardIndex);
         PracticeView.reviewCards.delete(PracticeView.flashcardIndex);
-        document.getElementById('known-count').textContent = PracticeView.knownCards.size;
-        document.getElementById('review-count').textContent = PracticeView.reviewCards.size;
         
-        AppState.addXP(5);
-        Toast.show('✅ Great! Card marked as known (+5 XP)', 'success');
+        const knownCount = document.getElementById('known-count');
+        const reviewCount = document.getElementById('review-count');
+        if (knownCount) knownCount.textContent = PracticeView.knownCards.size;
+        if (reviewCount) reviewCount.textContent = PracticeView.reviewCards.size;
+        
+        if (typeof AppState !== 'undefined' && AppState.addXP) {
+            AppState.addXP(5);
+        }
+        if (typeof Toast !== 'undefined') {
+            Toast.show('✅ Great! Card marked as known (+5 XP)', 'success');
+        }
         PracticeView.announce('Card marked as known. Plus 5 XP.');
         
         setTimeout(() => PracticeView.nextCard(), 500);
@@ -865,10 +939,15 @@ const PracticeView = {
     markReview: () => {
         PracticeView.reviewCards.add(PracticeView.flashcardIndex);
         PracticeView.knownCards.delete(PracticeView.flashcardIndex);
-        document.getElementById('known-count').textContent = PracticeView.knownCards.size;
-        document.getElementById('review-count').textContent = PracticeView.reviewCards.size;
         
-        Toast.show('🔄 Card marked for review', 'info');
+        const knownCount = document.getElementById('known-count');
+        const reviewCount = document.getElementById('review-count');
+        if (knownCount) knownCount.textContent = PracticeView.knownCards.size;
+        if (reviewCount) reviewCount.textContent = PracticeView.reviewCards.size;
+        
+        if (typeof Toast !== 'undefined') {
+            Toast.show('🔄 Card marked for review', 'info');
+        }
         PracticeView.announce('Card marked for review.');
         
         setTimeout(() => PracticeView.nextCard(), 500);
@@ -897,10 +976,12 @@ const PracticeView = {
         const knownCount = PracticeView.knownCards.size;
         const reviewCount = PracticeView.reviewCards.size;
         const unseenCount = total - knownCount - reviewCount;
-        const percentage = Math.round((knownCount / total) * 100);
+        const percentage = total > 0 ? Math.round((knownCount / total) * 100) : 0;
         const xpEarned = knownCount * 5;
 
-        AppState.addXP(20);
+        if (typeof AppState !== 'undefined' && AppState.addXP) {
+            AppState.addXP(20);
+        }
         
         // Remove swipe gestures
         PracticeView.removeSwipeGestures();
@@ -908,283 +989,367 @@ const PracticeView = {
         // Announce results
         PracticeView.announce(`Study session complete! ${knownCount} cards known, ${reviewCount} need review. ${percentage} percent mastery. Plus ${xpEarned + 20} XP.`);
 
-        if (percentage === 100) AppState.unlockAchievement('flashcard_master');
+        if (percentage === 100 && typeof AppState !== 'undefined' && AppState.unlockAchievement) {
+            AppState.unlockAchievement('flashcard_master');
+        }
 
-        document.getElementById('flashcard-container').innerHTML = `
-            <div class="results-card" role="region" aria-label="Flashcard Study Results">
-                <h2>📚 Study Session Complete!</h2>
-                
-                <div class="flashcard-results">
-                    <div class="result-stat known">
-                        <span class="result-number">${knownCount}</span>
-                        <span class="result-label">✅ Known</span>
+        const containerEl = document.getElementById('flashcard-container');
+        if (containerEl) {
+            containerEl.innerHTML = `
+                <div class="results-card" role="region" aria-label="Flashcard Study Results">
+                    <h2>📚 Study Session Complete!</h2>
+                    
+                    <div class="flashcard-results">
+                        <div class="result-stat known">
+                            <span class="result-number">${knownCount}</span>
+                            <span class="result-label">✅ Known</span>
+                        </div>
+                        <div class="result-stat review">
+                            <span class="result-number">${reviewCount}</span>
+                            <span class="result-label">🔄 Need Review</span>
+                        </div>
+                        <div class="result-stat unseen">
+                            <span class="result-number">${unseenCount}</span>
+                            <span class="result-label">⏭️ Skipped</span>
+                        </div>
                     </div>
-                    <div class="result-stat review">
-                        <span class="result-number">${reviewCount}</span>
-                        <span class="result-label">🔄 Need Review</span>
-                    </div>
-                    <div class="result-stat unseen">
-                        <span class="result-number">${unseenCount}</span>
-                        <span class="result-label">⏭️ Skipped</span>
+                    
+                    <div class="result-percentage">${percentage}% Mastery</div>
+                    <div class="result-xp">+${xpEarned + 20} XP earned!</div>
+                    
+                    ${reviewCount > 0 ? `
+                        <div class="review-suggestion">
+                            <p>💡 You have ${reviewCount} card${reviewCount !== 1 ? 's' : ''} to review. Practice makes perfect!</p>
+                            <button class="btn btn-secondary" onclick="PracticeView.studyReviewCards()">
+                                Study Review Cards
+                            </button>
+                        </div>
+                    ` : knownCount === total ? `
+                        <div class="review-suggestion success">
+                            <p>🎉 Perfect! You knew all ${total} cards!</p>
+                        </div>
+                    ` : ''}
+                    
+                    <div class="result-actions">
+                        <button class="btn btn-secondary" onclick="Router.navigate('home')">Home</button>
+                        <button class="btn btn-primary" onclick="PracticeView.resetFlashcards()">Study Again</button>
                     </div>
                 </div>
-                
-                <div class="result-percentage">${percentage}% Mastery</div>
-                <div class="result-xp">+${xpEarned + 20} XP earned!</div>
-                
-                ${reviewCount > 0 ? `
-                    <div class="review-suggestion">
-                        <p>💡 You have ${reviewCount} cards to review. Practice makes perfect!</p>
-                        <button class="btn btn-secondary" onclick="PracticeView.studyReviewCards()">
-                            Study Review Cards
-                        </button>
-                    </div>
-                ` : ''}
-                
-                <div class="result-actions">
-                    <button class="btn btn-secondary" onclick="Router.navigate('home')">Home</button>
-                    <button class="btn btn-primary" onclick="PracticeView.resetFlashcards()">Study Again</button>
-                </div>
-            </div>
-        `;
+            `;
+        }
     },
 
     studyReviewCards: () => {
         const reviewIndices = Array.from(PracticeView.reviewCards);
         if (reviewIndices.length === 0) {
-            Toast.show('No cards marked for review!', 'info');
+            if (typeof Toast !== 'undefined') {
+                Toast.show('No cards marked for review. Great job!', 'info');
+            }
             return;
         }
 
-        PracticeView.flashcards = reviewIndices.map(i => PracticeView.flashcards[i]);
+        // Create new array from review cards only
+        const originalFlashcards = PracticeView.flashcards;
+        PracticeView.flashcards = reviewIndices
+            .map(i => originalFlashcards[i])
+            .filter(card => card != null);
+        
+        if (PracticeView.flashcards.length === 0) {
+            if (typeof Toast !== 'undefined') {
+                Toast.show('No valid review cards found', 'warning');
+            }
+            return;
+        }
+        
         PracticeView.flashcardIndex = 0;
         PracticeView.knownCards.clear();
         PracticeView.reviewCards.clear();
 
-        document.getElementById('flashcard-container').innerHTML = `
-            <div class="flashcard-header">
-                <div class="flashcard-progress">
-                    <span id="flashcard-progress-text">1 / ${PracticeView.flashcards.length}</span>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="flashcard-progress-bar" style="width: 3%"></div>
-                    </div>
-                </div>
-                <div class="flashcard-stats">
-                    <span class="stat known">✅ <span id="known-count">0</span></span>
-                    <span class="stat review">🔄 <span id="review-count">0</span></span>
-                </div>
-            </div>
-            
-            <div class="flashcard-wrapper" id="flashcard-wrapper">
-                <div class="flashcard" id="flashcard" onclick="PracticeView.flipCard()" tabindex="0" role="button" aria-label="Flashcard - click or press Space to flip">
-                    <div class="flashcard-inner">
-                        <div class="flashcard-front">
-                            <span class="flip-hint">Click to reveal answer</span>
-                            <div class="flashcard-topic" id="flashcard-topic"></div>
-                            <div class="flashcard-question" id="flashcard-question"></div>
-                        </div>
-                        <div class="flashcard-back">
-                            <span class="flip-hint">Click to see question</span>
-                            <div class="flashcard-answer" id="flashcard-answer"></div>
+        const containerEl = document.getElementById('flashcard-container');
+        if (containerEl) {
+            containerEl.innerHTML = `
+                <div class="flashcard-header">
+                    <div class="flashcard-progress">
+                        <span id="flashcard-progress-text">1 / ${PracticeView.flashcards.length}</span>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="flashcard-progress-bar" style="width: 3%"></div>
                         </div>
                     </div>
+                    <div class="flashcard-stats">
+                        <span class="stat known">✅ <span id="known-count">0</span></span>
+                        <span class="stat review">🔄 <span id="review-count">0</span></span>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="swipe-indicator">
-                👈 Swipe left for Review • Swipe right for Got It 👉
-            </div>
-            
-            <div class="flashcard-keyboard-hint">
-                <kbd>Space</kbd> or <kbd>F</kbd> to flip • <kbd>←</kbd><kbd>→</kbd> to navigate • <kbd>G</kbd> Got it • <kbd>R</kbd> Review
-            </div>
-            
-            <div class="flashcard-actions">
-                <button class="btn btn-review" onclick="PracticeView.markReview()">🔄 Review Again</button>
-                <button class="btn btn-known" onclick="PracticeView.markKnown()">✅ Got It!</button>
-            </div>
-            
-            <div class="flashcard-nav">
-                <button class="btn btn-secondary" onclick="PracticeView.prevCard()" id="prev-card-btn">← Previous</button>
-                <button class="btn btn-secondary" onclick="PracticeView.nextCard()" id="next-card-btn">Next →</button>
-            </div>
-        `;
+                
+                <div class="flashcard-wrapper" id="flashcard-wrapper">
+                    <div class="flashcard" id="flashcard" onclick="PracticeView.flipCard()" tabindex="0" role="button" aria-label="Flashcard - click or press Space to flip">
+                        <div class="flashcard-inner">
+                            <div class="flashcard-front">
+                                <span class="flip-hint">Click to reveal answer</span>
+                                <div class="flashcard-topic" id="flashcard-topic"></div>
+                                <div class="flashcard-question" id="flashcard-question"></div>
+                            </div>
+                            <div class="flashcard-back">
+                                <span class="flip-hint">Click to see question</span>
+                                <div class="flashcard-answer" id="flashcard-answer"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="swipe-indicator">
+                    👈 Swipe left for Review • Swipe right for Got It 👉
+                </div>
+                
+                <div class="flashcard-keyboard-hint">
+                    <kbd>Space</kbd> or <kbd>F</kbd> to flip • <kbd>←</kbd><kbd>→</kbd> to navigate • <kbd>G</kbd> Got it • <kbd>R</kbd> Review
+                </div>
+                
+                <div class="flashcard-actions">
+                    <button class="btn btn-review" onclick="PracticeView.markReview()">🔄 Review Again</button>
+                    <button class="btn btn-known" onclick="PracticeView.markKnown()">✅ Got It!</button>
+                </div>
+                
+                <div class="flashcard-nav">
+                    <button class="btn btn-secondary" onclick="PracticeView.prevCard()" id="prev-card-btn">← Previous</button>
+                    <button class="btn btn-secondary" onclick="PracticeView.nextCard()" id="next-card-btn">Next →</button>
+                </div>
+            `;
+        }
 
         // Re-setup swipe gestures
         PracticeView.setupSwipeGestures();
         PracticeView.showFlashcard();
+        PracticeView.announce(`Reviewing ${PracticeView.flashcards.length} card${PracticeView.flashcards.length !== 1 ? 's' : ''}.`);
     },
 
     resetFlashcards: () => {
         PracticeView.removeSwipeGestures();
-        document.getElementById('flashcard-container').classList.add('hidden');
-        document.getElementById('flashcard-container').innerHTML = `
-            <div class="flashcard-header">
-                <div class="flashcard-progress">
-                    <span id="flashcard-progress-text">1 / 35</span>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="flashcard-progress-bar" style="width: 3%"></div>
-                    </div>
-                </div>
-                <div class="flashcard-stats">
-                    <span class="stat known">✅ <span id="known-count">0</span></span>
-                    <span class="stat review">🔄 <span id="review-count">0</span></span>
-                </div>
-            </div>
-            
-            <div class="flashcard-wrapper" id="flashcard-wrapper">
-                <div class="flashcard" id="flashcard" onclick="PracticeView.flipCard()" tabindex="0" role="button" aria-label="Flashcard - click or press Space to flip">
-                    <div class="flashcard-inner">
-                        <div class="flashcard-front">
-                            <span class="flip-hint">Click to reveal answer</span>
-                            <div class="flashcard-topic" id="flashcard-topic"></div>
-                            <div class="flashcard-question" id="flashcard-question"></div>
-                        </div>
-                        <div class="flashcard-back">
-                            <span class="flip-hint">Click to see question</span>
-                            <div class="flashcard-answer" id="flashcard-answer"></div>
+        const containerEl = document.getElementById('flashcard-container');
+        const setupEl = document.getElementById('flashcard-setup');
+        
+        if (containerEl) {
+            containerEl.classList.add('hidden');
+            containerEl.innerHTML = `
+                <div class="flashcard-header">
+                    <div class="flashcard-progress">
+                        <span id="flashcard-progress-text">1 / 35</span>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="flashcard-progress-bar" style="width: 3%"></div>
                         </div>
                     </div>
+                    <div class="flashcard-stats">
+                        <span class="stat known">✅ <span id="known-count">0</span></span>
+                        <span class="stat review">🔄 <span id="review-count">0</span></span>
+                    </div>
                 </div>
-            </div>
-            
-            <div class="swipe-indicator">
-                👈 Swipe left for Review • Swipe right for Got It 👉
-            </div>
-            
-            <div class="flashcard-keyboard-hint">
-                <kbd>Space</kbd> or <kbd>F</kbd> to flip • <kbd>←</kbd><kbd>→</kbd> to navigate • <kbd>G</kbd> Got it • <kbd>R</kbd> Review
-            </div>
-            
-            <div class="flashcard-actions">
-                <button class="btn btn-review" onclick="PracticeView.markReview()">🔄 Review Again</button>
-                <button class="btn btn-known" onclick="PracticeView.markKnown()">✅ Got It!</button>
-            </div>
-            
-            <div class="flashcard-nav">
-                <button class="btn btn-secondary" onclick="PracticeView.prevCard()" id="prev-card-btn">← Previous</button>
-                <button class="btn btn-secondary" onclick="PracticeView.nextCard()" id="next-card-btn">Next →</button>
-            </div>
-        `;
-        document.getElementById('flashcard-setup').classList.remove('hidden');
+                
+                <div class="flashcard-wrapper" id="flashcard-wrapper">
+                    <div class="flashcard" id="flashcard" onclick="PracticeView.flipCard()" tabindex="0" role="button" aria-label="Flashcard - click or press Space to flip">
+                        <div class="flashcard-inner">
+                            <div class="flashcard-front">
+                                <span class="flip-hint">Click to reveal answer</span>
+                                <div class="flashcard-topic" id="flashcard-topic"></div>
+                                <div class="flashcard-question" id="flashcard-question"></div>
+                            </div>
+                            <div class="flashcard-back">
+                                <span class="flip-hint">Click to see question</span>
+                                <div class="flashcard-answer" id="flashcard-answer"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="swipe-indicator">
+                    👈 Swipe left for Review • Swipe right for Got It 👉
+                </div>
+                
+                <div class="flashcard-keyboard-hint">
+                    <kbd>Space</kbd> or <kbd>F</kbd> to flip • <kbd>←</kbd><kbd>→</kbd> to navigate • <kbd>G</kbd> Got it • <kbd>R</kbd> Review
+                </div>
+                
+                <div class="flashcard-actions">
+                    <button class="btn btn-review" onclick="PracticeView.markReview()">🔄 Review Again</button>
+                    <button class="btn btn-known" onclick="PracticeView.markKnown()">✅ Got It!</button>
+                </div>
+                
+                <div class="flashcard-nav">
+                    <button class="btn btn-secondary" onclick="PracticeView.prevCard()" id="prev-card-btn">← Previous</button>
+                    <button class="btn btn-secondary" onclick="PracticeView.nextCard()" id="next-card-btn">Next →</button>
+                </div>
+            `;
+        }
+        if (setupEl) setupEl.classList.remove('hidden');
     },
 
     // ==================== PAST PAPER MODE ====================
     startPastPaper: () => {
-        PracticeView.pastPaperQuestions = getPastPaperQuestionsByTopic(PracticeView.selectedTopic);
-        Helpers.shuffle(PracticeView.pastPaperQuestions);
-        PracticeView.pastPaperIndex = 0;
-        PracticeView.showingMarkScheme = false;
+        try {
+            if (typeof getPastPaperQuestionsByTopic !== 'function') {
+                Toast.show('Past paper system not available', 'error');
+                return;
+            }
+            
+            PracticeView.pastPaperQuestions = getPastPaperQuestionsByTopic(PracticeView.selectedTopic);
+            
+            if (!PracticeView.pastPaperQuestions || PracticeView.pastPaperQuestions.length === 0) {
+                Toast.show('No past paper questions available for this topic', 'warning');
+                return;
+            }
+            
+            if (typeof Helpers !== 'undefined' && Helpers.shuffle) {
+                Helpers.shuffle(PracticeView.pastPaperQuestions);
+            }
+            PracticeView.pastPaperIndex = 0;
+            PracticeView.showingMarkScheme = false;
 
-        document.getElementById('pastpaper-setup').classList.add('hidden');
-        document.getElementById('pastpaper-container').classList.remove('hidden');
+            const setupEl = document.getElementById('pastpaper-setup');
+            const containerEl = document.getElementById('pastpaper-container');
+            if (setupEl) setupEl.classList.add('hidden');
+            if (containerEl) containerEl.classList.remove('hidden');
 
-        PracticeView.showPastPaperQuestion();
+            PracticeView.showPastPaperQuestion();
+            PracticeView.announce(`Past paper practice started. Question 1 of ${PracticeView.pastPaperQuestions.length}.`);
+        } catch (error) {
+            console.error('Error starting past paper practice:', error);
+            Toast.show('Failed to start past paper practice. Please try again.', 'error');
+        }
     },
 
     showPastPaperQuestion: () => {
         const q = PracticeView.pastPaperQuestions[PracticeView.pastPaperIndex];
+        if (!q) {
+            console.error('Past paper question not found at index', PracticeView.pastPaperIndex);
+            return;
+        }
+        
         const total = PracticeView.pastPaperQuestions.length;
-        const topic = getTopicById(q.topic);
+        const topic = typeof getTopicById === 'function' ? getTopicById(q.topic) : null;
 
-        document.getElementById('pastpaper-progress-text').textContent = `Question ${PracticeView.pastPaperIndex + 1} / ${total}`;
+        const progressEl = document.getElementById('pastpaper-progress-text');
+        if (progressEl) progressEl.textContent = `Question ${PracticeView.pastPaperIndex + 1} / ${total}`;
 
-        document.getElementById('pastpaper-question').innerHTML = `
-            <div class="pp-question-card">
-                <div class="pp-header">
-                    <span class="pp-topic" style="color: ${topic?.color || '#888'}">
-                        ${topic?.icon || '📝'} ${topic?.name || 'General'}
-                    </span>
-                    <span class="pp-marks">[${q.marks} marks]</span>
+        const questionEl = document.getElementById('pastpaper-question');
+        if (questionEl) {
+            questionEl.innerHTML = `
+                <div class="pp-question-card">
+                    <div class="pp-header">
+                        <span class="pp-topic" style="color: ${topic?.color || '#888'}">
+                            ${topic?.icon || '📝'} ${topic?.name || 'General'}
+                        </span>
+                        <span class="pp-marks">[${q.marks || 0} marks]</span>
+                    </div>
+                    
+                    <div class="pp-question-text">
+                        <p>${q.question || 'Question not available'}</p>
+                    </div>
+                    
+                    <div class="pp-answer-area">
+                        <label for="pp-user-answer">Your Answer:</label>
+                        <textarea id="pp-user-answer" placeholder="Write your answer here. Think about what points the mark scheme would include..." rows="8" aria-describedby="pp-answer-hint"></textarea>
+                        <span id="pp-answer-hint" class="sr-only">Write your full response as you would in an exam</span>
+                    </div>
+                    
+                    <div class="pp-actions">
+                        <button class="btn btn-primary" onclick="PracticeView.showMarkScheme()">
+                            📋 Show Mark Scheme
+                        </button>
+                    </div>
                 </div>
-                
-                <div class="pp-question-text">
-                    <p>${q.question}</p>
-                </div>
-                
-                <div class="pp-answer-area">
-                    <label for="pp-user-answer">Your Answer:</label>
-                    <textarea id="pp-user-answer" placeholder="Write your answer here. Think about what points the mark scheme would include..." rows="8" aria-describedby="pp-answer-hint"></textarea>
-                    <span id="pp-answer-hint" class="sr-only">Write your full response as you would in an exam</span>
-                </div>
-                
-                <div class="pp-actions">
-                    <button class="btn btn-primary" onclick="PracticeView.showMarkScheme()">
-                        📋 Show Mark Scheme
-                    </button>
-                </div>
-            </div>
-        `;
+            `;
+        }
     },
 
     showMarkScheme: () => {
         const q = PracticeView.pastPaperQuestions[PracticeView.pastPaperIndex];
+        if (!q) {
+            console.error('Past paper question not found');
+            return;
+        }
+        
         const total = PracticeView.pastPaperQuestions.length;
-        const userAnswer = document.getElementById('pp-user-answer').value;
+        const userAnswerEl = document.getElementById('pp-user-answer');
+        const userAnswer = userAnswerEl ? userAnswerEl.value : '';
         
         // Award XP for attempting
-        AppState.addXP(10);
+        if (typeof AppState !== 'undefined' && AppState.addXP) {
+            AppState.addXP(10);
+        }
+        
+        const markSchemeList = Array.isArray(q.markScheme) 
+            ? q.markScheme.map(point => `<li>${point}</li>`).join('')
+            : '<li>Mark scheme not available</li>';
 
-        document.getElementById('pastpaper-question').innerHTML = `
-            <div class="pp-question-card">
-                <div class="pp-header">
-                    <span class="pp-topic">📋 Mark Scheme</span>
-                    <span class="pp-marks">[${q.marks} marks]</span>
-                </div>
-                
-                <div class="pp-question-text">
-                    <p><strong>Question:</strong> ${q.question}</p>
-                </div>
-                
-                ${userAnswer ? `
-                    <div class="pp-user-answer-review">
-                        <h4>Your Answer:</h4>
-                        <p>${userAnswer}</p>
+        const questionEl = document.getElementById('pastpaper-question');
+        if (questionEl) {
+            questionEl.innerHTML = `
+                <div class="pp-question-card">
+                    <div class="pp-header">
+                        <span class="pp-topic">📋 Mark Scheme</span>
+                        <span class="pp-marks">[${q.marks || 0} marks]</span>
                     </div>
-                ` : ''}
-                
-                <div class="pp-mark-scheme" role="region" aria-label="Mark scheme points">
-                    <h4>✅ Mark Scheme Points:</h4>
-                    <ul>
-                        ${q.markScheme.map(point => `<li>${point}</li>`).join('')}
-                    </ul>
-                </div>
-                
-                <div class="pp-sample-answer">
-                    <h4>📝 Sample Answer:</h4>
-                    <p>${q.sampleAnswer}</p>
-                </div>
-                
-                <div class="pp-self-assess">
-                    <h4>How many marks would you give yourself?</h4>
-                    <div class="pp-marks-buttons" role="group" aria-label="Self assessment marks">
-                        ${Array.from({length: q.marks + 1}, (_, i) => 
-                            `<button class="mark-btn" onclick="PracticeView.selfAssess(${i}, ${q.marks})" aria-label="${i} out of ${q.marks} marks">${i}</button>`
-                        ).join('')}
+                    
+                    <div class="pp-question-text">
+                        <p><strong>Question:</strong> ${q.question || ''}</p>
+                    </div>
+                    
+                    ${userAnswer ? `
+                        <div class="pp-user-answer-review">
+                            <h4>Your Answer:</h4>
+                            <p>${userAnswer}</p>
+                        </div>
+                    ` : `
+                        <div class="pp-user-answer-review empty">
+                            <h4>Your Answer:</h4>
+                            <p><em>No answer provided - try writing one next time!</em></p>
+                        </div>
+                    `}
+                    
+                    <div class="pp-mark-scheme" role="region" aria-label="Mark scheme points">
+                        <h4>✅ Mark Scheme Points:</h4>
+                        <ul>
+                            ${markSchemeList}
+                        </ul>
+                    </div>
+                    
+                    <div class="pp-sample-answer">
+                        <h4>📝 Sample Answer:</h4>
+                        <p>${q.sampleAnswer || 'Sample answer not available'}</p>
+                    </div>
+                    
+                    <div class="pp-self-assess">
+                        <h4>How many marks would you give yourself?</h4>
+                        <div class="pp-marks-buttons" role="group" aria-label="Self assessment marks">
+                            ${Array.from({length: (q.marks || 0) + 1}, (_, i) => 
+                                `<button class="mark-btn" onclick="PracticeView.selfAssess(${i}, ${q.marks || 0})" aria-label="${i} out of ${q.marks || 0} marks">${i}</button>`
+                            ).join('')}
+                        </div>
                     </div>
                 </div>
-            </div>
-        `;
+            `;
+        }
     },
 
     selfAssess: (marks, maxMarks) => {
-        const percentage = Math.round((marks / maxMarks) * 100);
+        const percentage = maxMarks > 0 ? Math.round((marks / maxMarks) * 100) : 0;
         let feedback = '';
         
         if (percentage >= 80) {
             feedback = '🌟 Excellent! You covered most of the key points.';
-            AppState.addXP(20);
+            if (typeof AppState !== 'undefined' && AppState.addXP) AppState.addXP(20);
         } else if (percentage >= 60) {
             feedback = '👍 Good effort! Review the points you missed.';
-            AppState.addXP(10);
+            if (typeof AppState !== 'undefined' && AppState.addXP) AppState.addXP(10);
         } else if (percentage >= 40) {
             feedback = '📚 Keep practicing! Focus on the mark scheme structure.';
-            AppState.addXP(5);
+            if (typeof AppState !== 'undefined' && AppState.addXP) AppState.addXP(5);
         } else {
             feedback = '💪 Don\'t give up! Study the sample answer and try similar questions.';
         }
 
-        Toast.show(feedback, percentage >= 60 ? 'success' : 'info');
+        if (typeof Toast !== 'undefined') {
+            Toast.show(feedback, percentage >= 60 ? 'success' : 'info');
+        }
         PracticeView.announce(`You gave yourself ${marks} out of ${maxMarks} marks. ${feedback}`);
 
         // Show navigation
@@ -1192,20 +1357,22 @@ const PracticeView = {
         const isLast = PracticeView.pastPaperIndex >= total - 1;
 
         const actionsDiv = document.querySelector('.pp-self-assess');
-        actionsDiv.innerHTML = `
-            <div class="pp-feedback" role="alert">
-                <p>${feedback}</p>
-                <p>You gave yourself <strong>${marks}/${maxMarks}</strong> marks</p>
-            </div>
-            <div class="pp-nav-buttons">
-                ${PracticeView.pastPaperIndex > 0 ? 
-                    '<button class="btn btn-secondary" onclick="PracticeView.prevPastPaper()">← Previous</button>' : ''}
-                ${isLast ? 
-                    '<button class="btn btn-primary" onclick="PracticeView.finishPastPaper()">Finish 🎉</button>' :
-                    '<button class="btn btn-primary" onclick="PracticeView.nextPastPaper()">Next Question →</button>'
-                }
-            </div>
-        `;
+        if (actionsDiv) {
+            actionsDiv.innerHTML = `
+                <div class="pp-feedback" role="alert">
+                    <p>${feedback}</p>
+                    <p>You gave yourself <strong>${marks}/${maxMarks}</strong> marks</p>
+                </div>
+                <div class="pp-nav-buttons">
+                    ${PracticeView.pastPaperIndex > 0 ? 
+                        '<button class="btn btn-secondary" onclick="PracticeView.prevPastPaper()">← Previous</button>' : ''}
+                    ${isLast ? 
+                        '<button class="btn btn-primary" onclick="PracticeView.finishPastPaper()">Finish 🎉</button>' :
+                        '<button class="btn btn-primary" onclick="PracticeView.nextPastPaper()">Next Question →</button>'
+                    }
+                </div>
+            `;
+        }
     },
 
     prevPastPaper: () => {
@@ -1224,32 +1391,37 @@ const PracticeView = {
 
     finishPastPaper: () => {
         const total = PracticeView.pastPaperQuestions.length;
-        AppState.addXP(30); // Bonus for completing
+        if (typeof AppState !== 'undefined' && AppState.addXP) {
+            AppState.addXP(30); // Bonus for completing
+        }
 
-        document.getElementById('pastpaper-question').innerHTML = `
-            <div class="results-card" role="region" aria-label="Past Paper Practice Results">
-                <h2>📄 Practice Complete!</h2>
-                <p>You practiced ${total} exam-style questions!</p>
-                <div class="result-xp">+XP earned for practice!</div>
-                
-                <div class="pp-tips">
-                    <h4>💡 Tips for Improvement:</h4>
-                    <ul>
-                        <li>Re-read the sample answers to understand the structure</li>
-                        <li>Practice writing answers under timed conditions</li>
-                        <li>Focus on using technical vocabulary</li>
-                        <li>Always relate to the scenario in the question</li>
-                    </ul>
+        const questionEl = document.getElementById('pastpaper-question');
+        if (questionEl) {
+            questionEl.innerHTML = `
+                <div class="results-card" role="region" aria-label="Past Paper Practice Results">
+                    <h2>📄 Practice Complete!</h2>
+                    <p>You practiced ${total} exam-style question${total !== 1 ? 's' : ''}!</p>
+                    <div class="result-xp">+XP earned for practice!</div>
+                    
+                    <div class="pp-tips">
+                        <h4>💡 Tips for Improvement:</h4>
+                        <ul>
+                            <li>Re-read the sample answers to understand the structure</li>
+                            <li>Practice writing answers under timed conditions</li>
+                            <li>Focus on using technical vocabulary</li>
+                            <li>Always relate to the scenario in the question</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="result-actions">
+                        <button class="btn btn-secondary" onclick="Router.navigate('home')">Home</button>
+                        <button class="btn btn-primary" onclick="PracticeView.resetPastPaper()">Practice More</button>
+                    </div>
                 </div>
-                
-                <div class="result-actions">
-                    <button class="btn btn-secondary" onclick="Router.navigate('home')">Home</button>
-                    <button class="btn btn-primary" onclick="PracticeView.resetPastPaper()">Practice More</button>
-                </div>
-            </div>
-        `;
+            `;
+        }
         
-        PracticeView.announce(`Practice complete! You practiced ${total} exam-style questions.`);
+        PracticeView.announce(`Practice complete! You practiced ${total} exam-style question${total !== 1 ? 's' : ''}.`);
     },
 
     exitPastPaper: () => {
@@ -1257,16 +1429,21 @@ const PracticeView = {
     },
 
     resetPastPaper: () => {
-        document.getElementById('pastpaper-container').classList.add('hidden');
-        document.getElementById('pastpaper-container').innerHTML = `
-            <div class="pastpaper-header">
-                <div class="pastpaper-progress">
-                    <span id="pastpaper-progress-text">Question 1 / 12</span>
+        const containerEl = document.getElementById('pastpaper-container');
+        const setupEl = document.getElementById('pastpaper-setup');
+        
+        if (containerEl) {
+            containerEl.classList.add('hidden');
+            containerEl.innerHTML = `
+                <div class="pastpaper-header">
+                    <div class="pastpaper-progress">
+                        <span id="pastpaper-progress-text">Question 1 / 12</span>
+                    </div>
+                    <button class="btn btn-secondary btn-small" onclick="PracticeView.exitPastPaper()">Exit</button>
                 </div>
-                <button class="btn btn-secondary btn-small" onclick="PracticeView.exitPastPaper()">Exit</button>
-            </div>
-            <div class="pastpaper-question" id="pastpaper-question"></div>
-        `;
-        document.getElementById('pastpaper-setup').classList.remove('hidden');
+                <div class="pastpaper-question" id="pastpaper-question"></div>
+            `;
+        }
+        if (setupEl) setupEl.classList.remove('hidden');
     }
 };

@@ -20,7 +20,10 @@ const Router = (() => {
 
     let currentView = null;
     let isNavigating = false;
+    let navigationTimeoutId = null;
+    let isInitialized = false;
     const TRANSITION_DURATION = 300;
+    const NAVIGATION_TIMEOUT = 5000; // Safety timeout to reset stuck navigation
 
     /**
      * Get view safely
@@ -36,14 +39,24 @@ const Router = (() => {
     };
 
     /**
+     * Escape HTML to prevent XSS
+     */
+    const escapeHtml = (str) => {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    };
+
+    /**
      * Show error state in container
      */
     const showError = (container, message = 'Page not found') => {
+        const safeMessage = escapeHtml(message);
         container.innerHTML = `
             <div class="error-state" style="text-align: center; padding: 4rem;">
                 <span style="font-size: 4rem;">⚠️</span>
                 <h2>Something went wrong</h2>
-                <p>${message}</p>
+                <p>${safeMessage}</p>
                 <button class="btn btn-primary" onclick="Router.navigate('home')">Go Home</button>
             </div>
         `;
@@ -58,7 +71,6 @@ const Router = (() => {
     const navigate = (route, params = {}, pushState = true) => {
         // Validate route
         if (!route || typeof route !== 'string') {
-            console.error('Invalid route');
             route = 'home';
         }
         
@@ -90,12 +102,19 @@ const Router = (() => {
         
         // Prevent double navigation
         if (isNavigating) {
-            console.warn('Navigation in progress, ignoring request');
             return;
         }
         
-        console.log(`📍 Navigating to: ${route}`);
         isNavigating = true;
+        
+        // Safety timeout to reset stuck navigation flag
+        if (navigationTimeoutId) {
+            clearTimeout(navigationTimeoutId);
+        }
+        navigationTimeoutId = setTimeout(() => {
+            isNavigating = false;
+            navigationTimeoutId = null;
+        }, NAVIGATION_TIMEOUT);
         
         try {
             // Update state
@@ -112,7 +131,6 @@ const Router = (() => {
             // Get the view
             const View = getView(route);
             if (!View) {
-                console.error(`Route not found or invalid: ${route}`);
                 if (route !== 'home') {
                     isNavigating = false;
                     navigate('home', {}, false);
@@ -132,14 +150,13 @@ const Router = (() => {
                 try {
                     currentView.cleanup();
                 } catch (e) {
-                    console.warn('View cleanup error:', e);
+                    // Cleanup errors are non-critical
                 }
             }
 
             // Get container
             const container = document.getElementById('main-content');
             if (!container) {
-                console.error('Main content container not found');
                 isNavigating = false;
                 return;
             }
@@ -152,7 +169,7 @@ const Router = (() => {
                 try {
                     history.pushState({ route, params }, '', `#${route}`);
                 } catch (e) {
-                    console.warn('Failed to push state:', e);
+                    // History API failure is non-critical
                 }
             }
             
@@ -174,7 +191,7 @@ const Router = (() => {
                         try {
                             View.init(params || {});
                         } catch (initError) {
-                            console.error('View init error:', initError);
+                            // View init error - page still rendered
                         }
                     }
                     
@@ -182,16 +199,22 @@ const Router = (() => {
                     window.scrollTo(0, 0);
                     
                 } catch (error) {
-                    console.error(`Error rendering view: ${route}`, error);
                     showError(container, 'Failed to load the page. Please try again.');
                 } finally {
                     isNavigating = false;
+                    if (navigationTimeoutId) {
+                        clearTimeout(navigationTimeoutId);
+                        navigationTimeoutId = null;
+                    }
                 }
             }, TRANSITION_DURATION);
             
         } catch (error) {
-            console.error('Navigation error:', error);
             isNavigating = false;
+            if (navigationTimeoutId) {
+                clearTimeout(navigationTimeoutId);
+                navigationTimeoutId = null;
+            }
             
             const container = document.getElementById('main-content');
             if (container) {
@@ -204,23 +227,26 @@ const Router = (() => {
      * Initialize router
      */
     const init = () => {
+        // Prevent double initialization
+        if (isInitialized) {
+            return;
+        }
+        
         try {
-            // Handle nav clicks
-            document.querySelectorAll('.nav-link').forEach(link => {
-                // Remove existing listeners by cloning
-                const newLink = link.cloneNode(true);
-                if (link.parentNode) {
-                    link.parentNode.replaceChild(newLink, link);
-                }
-                
-                newLink.addEventListener('click', (e) => {
+            // Use event delegation for nav clicks (more performant)
+            const navHandler = (e) => {
+                const link = e.target.closest('.nav-link');
+                if (link) {
                     e.preventDefault();
-                    const route = newLink.dataset && newLink.dataset.route;
+                    const route = link.dataset && link.dataset.route;
                     if (route) {
                         navigate(route);
                     }
-                });
-            });
+                }
+            };
+            
+            // Attach to document once instead of each link
+            document.addEventListener('click', navHandler);
 
             // Handle browser back/forward
             window.addEventListener('popstate', (e) => {
@@ -249,16 +275,15 @@ const Router = (() => {
                 initialRoute = isLoggedIn ? 'home' : 'landing';
             }
             
+            isInitialized = true;
             navigate(initialRoute, {}, false);
             
-            console.log('🚦 Router initialized');
         } catch (error) {
-            console.error('Router initialization error:', error);
             // Try to navigate to home as fallback
             try {
                 navigate('home', {}, false);
             } catch (e) {
-                console.error('Failed to navigate to home:', e);
+                // Critical failure
             }
         }
     };

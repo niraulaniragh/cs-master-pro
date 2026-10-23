@@ -158,13 +158,16 @@ const AppState = (() => {
      */
     const saveUserProgressImmediate = () => {
         try {
-            // Save to localStorage
-            if (typeof Storage !== 'undefined' && typeof Storage.save === 'function') {
+            // Save to localStorage (Storage is our custom module, not window.Storage)
+            if (typeof Storage !== 'undefined' && Storage !== null && typeof Storage.save === 'function') {
                 Storage.save('user', state.user);
+            } else if (typeof localStorage !== 'undefined') {
+                // Fallback to raw localStorage
+                localStorage.setItem('cs_user', JSON.stringify(state.user));
             }
             
             // If logged in, also save to user profile
-            if (typeof Auth !== 'undefined' && typeof Auth.isLoggedIn === 'function' && Auth.isLoggedIn()) {
+            if (typeof Auth !== 'undefined' && Auth !== null && typeof Auth.isLoggedIn === 'function' && Auth.isLoggedIn()) {
                 if (typeof Auth.saveProgress === 'function') {
                     Auth.saveProgress(state.user);
                 }
@@ -261,15 +264,35 @@ const AppState = (() => {
      */
     const init = () => {
         try {
-            if (typeof Storage !== 'undefined' && typeof Storage.load === 'function') {
-                const savedUser = Storage.load('user');
-                if (savedUser && typeof savedUser === 'object') {
-                    // Merge with defaults to ensure all fields exist
-                    state.user = { ...getDefaultState().user, ...savedUser };
-                    // Ensure achievements is always an array
-                    if (!Array.isArray(state.user.achievements)) {
-                        state.user.achievements = [];
+            let savedUser = null;
+            
+            if (typeof Storage !== 'undefined' && Storage !== null && typeof Storage.load === 'function') {
+                savedUser = Storage.load('user');
+            } else if (typeof localStorage !== 'undefined') {
+                // Fallback to raw localStorage
+                const raw = localStorage.getItem('cs_user');
+                if (raw) {
+                    try {
+                        savedUser = JSON.parse(raw);
+                    } catch (e) {
+                        console.warn('Failed to parse saved user data:', e);
                     }
+                }
+            }
+            
+            if (savedUser && typeof savedUser === 'object') {
+                const defaults = getDefaultState().user;
+                // Merge with defaults to ensure all fields exist
+                state.user = { ...defaults, ...savedUser };
+                // Ensure nested settings are merged properly
+                state.user.settings = { ...defaults.settings, ...(savedUser.settings || {}) };
+                // Ensure achievements is always an array
+                if (!Array.isArray(state.user.achievements)) {
+                    state.user.achievements = [];
+                }
+                // Ensure topicProgress is always an object
+                if (!state.user.topicProgress || typeof state.user.topicProgress !== 'object') {
+                    state.user.topicProgress = {};
                 }
             }
             console.log('🔄 State initialized:', state.user.xp, 'XP, Level', state.user.level);
@@ -290,22 +313,23 @@ const AppState = (() => {
                 return;
             }
             
+            const defaults = getDefaultState().user;
+            
             state.user = {
-                xp: profile.xp || 0,
-                level: profile.level || 1,
-                streak: profile.streak || 0,
-                totalCorrect: profile.totalCorrect || 0,
-                totalAnswered: profile.totalAnswered || 0,
+                xp: typeof profile.xp === 'number' ? profile.xp : 0,
+                level: typeof profile.level === 'number' ? profile.level : 1,
+                streak: typeof profile.streak === 'number' ? profile.streak : 0,
+                totalCorrect: typeof profile.totalCorrect === 'number' ? profile.totalCorrect : 0,
+                totalAnswered: typeof profile.totalAnswered === 'number' ? profile.totalAnswered : 0,
                 achievements: Array.isArray(profile.achievements) ? profile.achievements : [],
-                topicProgress: profile.topicProgress || {},
-                settings: profile.settings || {
-                    sound: true,
-                    animations: true,
-                    darkMode: true
+                topicProgress: (profile.topicProgress && typeof profile.topicProgress === 'object') ? profile.topicProgress : {},
+                settings: {
+                    ...defaults.settings,
+                    ...(profile.settings && typeof profile.settings === 'object' ? profile.settings : {})
                 }
             };
             
-            if (typeof Storage !== 'undefined' && typeof Storage.save === 'function') {
+            if (typeof Storage !== 'undefined' && Storage !== null && typeof Storage.save === 'function') {
                 Storage.save('user', state.user);
             }
             
@@ -323,9 +347,13 @@ const AppState = (() => {
     const resetState = () => {
         try {
             state.user = getDefaultState().user;
-            if (typeof Storage !== 'undefined' && typeof Storage.remove === 'function') {
+            if (typeof Storage !== 'undefined' && Storage !== null && typeof Storage.remove === 'function') {
                 Storage.remove('user');
+            } else if (typeof localStorage !== 'undefined') {
+                localStorage.removeItem('cs_user');
             }
+            updateNavStats();
+            updateNavUser();
         } catch (error) {
             console.error('Error resetting state:', error);
         }
@@ -536,11 +564,22 @@ const AppState = (() => {
      */
     const reset = () => {
         try {
-            state.user = getDefaultState().user;
-            if (typeof Storage !== 'undefined' && typeof Storage.clear === 'function') {
-                Storage.clear();
+            // Cancel any pending save
+            if (saveTimer) {
+                clearTimeout(saveTimer);
+                saveTimer = null;
             }
+            
+            state.user = getDefaultState().user;
+            
+            if (typeof Storage !== 'undefined' && Storage !== null && typeof Storage.clear === 'function') {
+                Storage.clear();
+            } else if (typeof localStorage !== 'undefined') {
+                localStorage.removeItem('cs_user');
+            }
+            
             updateNavStats();
+            updateNavUser();
         } catch (error) {
             console.error('Error resetting state:', error);
         }
@@ -561,7 +600,9 @@ const AppState = (() => {
         updateNavStats,
         updateNavUser,
         toggleUserMenu,
-        reset
+        reset,
+        // Force immediate save (useful before page unload)
+        forceSave: saveUserProgressImmediate
     };
 })();
 

@@ -764,7 +764,7 @@
 
 .bq-option.wrong {
     border-color: var(--red);
-    background: rgba(16, 185, 129, 0.2);
+    background: rgba(239, 68, 68, 0.2);
 }
 
 .bq-option-key {
@@ -1208,7 +1208,7 @@
 
 .tr-text-display span.incorrect {
     color: var(--red);
-    background: rgba(16, 185, 129, 0.2);
+    background: rgba(239, 68, 68, 0.2);
 }
 
 .tr-text-display span.current {
@@ -1439,7 +1439,7 @@
 
 .mill-answer.wrong {
     border-color: var(--red);
-    background: linear-gradient(90deg, rgba(16, 185, 129, 0.3), transparent);
+    background: linear-gradient(90deg, rgba(239, 68, 68, 0.3), transparent);
 }
 
 .mill-answer.eliminated {
@@ -1669,7 +1669,7 @@
 
 .fc-diff-badge.easy { background: rgba(16, 185, 129, 0.2); color: var(--green); }
 .fc-diff-badge.medium { background: rgba(251, 191, 36, 0.2); color: var(--yellow); }
-.fc-diff-badge.hard { background: rgba(16, 185, 129, 0.2); color: var(--red); }
+.fc-diff-badge.hard { background: rgba(239, 68, 68, 0.2); color: var(--red); }
 
 .fc-code-block {
     background: var(--bg-primary);
@@ -2013,7 +2013,7 @@
 }
 
 .boss-option.correct { border-color: var(--green); background: rgba(16, 185, 129, 0.2); }
-.boss-option.wrong { border-color: var(--red); background: rgba(16, 185, 129, 0.2); }
+.boss-option.wrong { border-color: var(--red); background: rgba(239, 68, 68, 0.2); }
 
 .boss-opt-key {
     width: 32px;
@@ -2242,7 +2242,7 @@
 
 .game-difficulty.easy { background: rgba(16, 185, 129, 0.2); color: var(--green); }
 .game-difficulty.medium { background: rgba(251, 191, 36, 0.2); color: var(--yellow); }
-.game-difficulty.hard { background: rgba(16, 185, 129, 0.2); color: var(--red); }
+.game-difficulty.hard { background: rgba(239, 68, 68, 0.2); color: var(--red); }
 .game-difficulty.variable { background: rgba(59, 130, 246, 0.2); color: var(--blue); }
 .game-difficulty.easyhard { background: rgba(168, 85, 247, 0.2); color: var(--primary); }
 
@@ -2605,6 +2605,7 @@
         border-radius: 0;
         min-height: 100vh;
         max-height: 100vh;
+        -webkit-overflow-scrolling: touch;
     }
     
     .game-header {
@@ -2641,8 +2642,10 @@
         gap: var(--space-2);
     }
     
-    .diff-card {
+    .diff-card,
+    .difficulty-btn {
         padding: var(--space-3);
+        min-height: 44px;
     }
     
     .diff-icon {
@@ -2657,7 +2660,7 @@
         font-size: 1rem;
     }
     
-    /* Options */
+    /* Options - ensure 44px minimum touch target */
     .sr-option,
     .bq-option,
     .boss-option,
@@ -2667,14 +2670,25 @@
         min-height: 44px;
     }
     
+    /* Buttons touch target */
+    .mill-lifeline,
+    .pu-btn,
+    .boss-pu-btn,
+    .fc-word {
+        min-height: 44px;
+        min-width: 44px;
+    }
+    
     /* Battle */
-    .player-avatar {
+    .player-avatar,
+    .bp-avatar {
         width: 50px;
         height: 50px;
         font-size: 1.5rem;
     }
     
-    .player-name {
+    .player-name,
+    .bp-name {
         font-size: 0.9rem;
     }
     
@@ -2690,7 +2704,8 @@
     }
     
     /* Type Racer */
-    .tr-target-text {
+    .tr-target-text,
+    .tr-text-display {
         font-size: 1rem;
         padding: var(--space-2);
     }
@@ -2698,6 +2713,7 @@
     .tr-input {
         font-size: 16px; /* Prevents iOS zoom */
         padding: var(--space-2);
+        min-height: 80px;
     }
     
     /* Timer/Progress */
@@ -2722,25 +2738,30 @@
     }
     
     /* Millionaire */
-    .mill-ladder {
+    .mill-ladder,
+    .mill-prize-ladder {
         padding: var(--space-1);
     }
     
-    .mill-step {
+    .mill-step,
+    .mill-prize-row {
         font-size: 0.6rem;
         padding: 2px 6px;
     }
     
     .mill-lifeline {
-        width: 36px;
-        height: 36px;
+        width: 44px;
+        height: 44px;
         font-size: 0.9rem;
     }
     
     /* Fill Code */
-    .fc-code-container {
+    .fc-code-container,
+    .fc-code-block {
         font-size: 0.75rem;
         padding: var(--space-2);
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
     
     .fc-blank {
@@ -2748,9 +2769,35 @@
         min-width: 50px;
     }
     
-    .fc-options {
-        grid-template-columns: 1fr 1fr;
+    .fc-options,
+    .fc-word-bank {
         gap: var(--space-2);
+    }
+    
+    /* Results screens */
+    .sr-results,
+    .battle-results,
+    .mm-results,
+    .tr-results,
+    .mill-results,
+    .fc-results,
+    .boss-results {
+        padding: var(--space-4);
+    }
+    
+    .sr-final-value,
+    .mm-fs-value,
+    .tr-fw-value,
+    .fc-fs-value,
+    .mill-fp-value {
+        font-size: 2.5rem;
+    }
+    
+    .sr-results-grid,
+    .mm-results-grid,
+    .tr-results-grid,
+    .fc-results-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 
@@ -2976,4 +3023,66 @@
 
 .games-view .game-ach-card:hover .game-ach-icon {
     transform: scale(1.15);
+}
+
+/* ==========================================
+   ACCESSIBILITY & FOCUS STATES
+========================================== */
+/* Focus visible for keyboard navigation */
+.sr-option:focus-visible,
+.bq-option:focus-visible,
+.boss-option:focus-visible,
+.mill-answer:focus-visible,
+.mm-card:focus-visible,
+.difficulty-btn:focus-visible,
+.game-card:focus-visible,
+.fc-word:focus-visible,
+.pu-btn:focus-visible,
+.mill-lifeline:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+    .game-container,
+    .mm-card-inner,
+    .sr-feedback,
+    .battle-feedback,
+    .damage-number,
+    .games-view .game-card,
+    .games-view .games-grid .game-card {
+        animation: none !important;
+        transition: none !important;
+    }
+    
+    .games-view .game-card::after {
+        display: none;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .sr-option,
+    .bq-option,
+    .boss-option,
+    .mill-answer {
+        border-width: 3px;
+    }
+    
+    .sr-option.correct,
+    .bq-option.correct,
+    .boss-option.correct,
+    .mill-answer.correct {
+        background: var(--green);
+        color: white;
+    }
+    
+    .sr-option.wrong,
+    .bq-option.wrong,
+    .boss-option.wrong,
+    .mill-answer.wrong {
+        background: var(--red);
+        color: white;
+    }
 }

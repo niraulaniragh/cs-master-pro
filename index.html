@@ -12,6 +12,19 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#10b981">
     <meta name="description" content="CS Master Pro - Interactive IGCSE Computer Science revision for Edexcel 4CP0. Quizzes, games, flashcards, and more!">
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="CS Master Pro">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="CS Master Pro - Edexcel IGCSE Computer Science (4CP0)">
+    <meta property="og:description" content="Interactive IGCSE Computer Science revision for Edexcel 4CP0. Quizzes, games, flashcards, and more!">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="en_GB">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="CS Master Pro - Edexcel IGCSE Computer Science">
+    <meta name="twitter:description" content="Interactive IGCSE Computer Science revision for Edexcel 4CP0. Quizzes, games, flashcards, and more!">
     
     <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
@@ -37,11 +50,11 @@
     
     <!-- Highlight.js for code syntax highlighting -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/atom-one-dark.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
     
     <!-- KaTeX for math rendering -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
     
     <!-- 
     ===========================================
@@ -66,7 +79,7 @@
 </head>
 <body>
     <!-- Loading Screen -->
-    <div id="loading-screen" class="loading-screen">
+    <div id="loading-screen" class="loading-screen" role="status" aria-live="polite" aria-label="Loading application">
         <div class="loader-content">
             <div class="loader-logo">
                 <svg viewBox="0 0 100 100" class="loader-svg">
@@ -135,23 +148,23 @@
                 <span class="brand-badge">PRO</span>
             </div>
             <div class="nav-links" id="nav-links" role="menubar">
-                <a href="#" class="nav-link active" data-route="home">
-                    <i class="fas fa-home"></i> <span>Home</span>
+                <a href="#" class="nav-link active" data-route="home" role="menuitem">
+                    <i class="fas fa-home" aria-hidden="true"></i> <span>Home</span>
                 </a>
-                <a href="#" class="nav-link" data-route="learn">
-                    <i class="fas fa-book-open"></i> <span>Learn</span>
+                <a href="#" class="nav-link" data-route="learn" role="menuitem">
+                    <i class="fas fa-book-open" aria-hidden="true"></i> <span>Learn</span>
                 </a>
-                <a href="#" class="nav-link" data-route="practice">
-                    <i class="fas fa-brain"></i> <span>Practice</span>
+                <a href="#" class="nav-link" data-route="practice" role="menuitem">
+                    <i class="fas fa-brain" aria-hidden="true"></i> <span>Practice</span>
                 </a>
-                <a href="#" class="nav-link" data-route="tools">
-                    <i class="fas fa-tools"></i> <span>Tools</span>
+                <a href="#" class="nav-link" data-route="tools" role="menuitem">
+                    <i class="fas fa-tools" aria-hidden="true"></i> <span>Tools</span>
                 </a>
-                <a href="#" class="nav-link" data-route="playground">
-                    <i class="fas fa-code"></i> <span>Playground</span>
+                <a href="#" class="nav-link" data-route="playground" role="menuitem">
+                    <i class="fas fa-code" aria-hidden="true"></i> <span>Playground</span>
                 </a>
-                <a href="#" class="nav-link" data-route="games">
-                    <i class="fas fa-gamepad"></i> <span>Games</span>
+                <a href="#" class="nav-link" data-route="games" role="menuitem">
+                    <i class="fas fa-gamepad" aria-hidden="true"></i> <span>Games</span>
                 </a>
             </div>
             <div class="nav-stats">
@@ -726,61 +739,6 @@
         });
     </script>
         
-    <!-- Hamburger Menu Toggle for Mobile
-        document.addEventListener('DOMContentLoaded', () => {
-            const hamburger = document.getElementById('hamburger-menu');
-            const navLinks = document.getElementById('nav-links');
-            
-            if (hamburger && navLinks) {
-                hamburger.addEventListener('click', () => {
-                    const isExpanded = hamburger.getAttribute('aria-expanded') === 'true';
-                    hamburger.setAttribute('aria-expanded', !isExpanded);
-                    navLinks.classList.toggle('mobile-open');
-                });
-                
-                // Close menu when clicking a nav link
-                navLinks.querySelectorAll('.nav-link').forEach(link => {
-                    link.addEventListener('click', () => {
-                        hamburger.setAttribute('aria-expanded', 'false');
-                        navLinks.classList.remove('mobile-open');
-                    });
-                });
-                
-                // Close menu when clicking outside
-                document.addEventListener('click', (e) => {
-                    if (!hamburger.contains(e.target) && !navLinks.contains(e.target)) {
-                        hamburger.setAttribute('aria-expanded', 'false');
-                        navLinks.classList.remove('mobile-open');
-                    }
-                });
-                
-                // Handle keyboard navigation for nav brand
-                const navBrand = document.querySelector('.nav-brand');
-                if (navBrand) {
-                    navBrand.addEventListener('keydown', (e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault();
-                            Router.navigate('home');
-                        }
-                    });
-                }
-            }
-            
-            // Update modal aria-hidden state when shown/hidden
-            const modalOverlay = document.getElementById('modal-overlay');
-            if (modalOverlay) {
-                const observer = new MutationObserver((mutations) => {
-                    mutations.forEach((mutation) => {
-                        if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-                            const isVisible = modalOverlay.classList.contains('show');
-                            modalOverlay.setAttribute('aria-hidden', !isVisible);
-                        }
-                    });
-                });
-                observer.observe(modalOverlay, { attributes: true });
-            }
-        });
-    </script>
     
     <!-- Cookie Consent Manager -->
     <script>

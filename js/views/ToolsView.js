@@ -80,6 +80,9 @@ const ToolsView = {
     },
 
     init: () => {
+        ToolsView.shiftHistory = [];
+        ToolsView.vizRunning = false;
+        ToolsView.vizArray = [];
         console.log('🔧 Tools view initialized');
     },
 
@@ -113,47 +116,47 @@ const ToolsView = {
                 card.classList.remove('active');
             });
             if (event && event.currentTarget) {
-            event.currentTarget.classList.add('active');
-        }
-
-        switch(toolId) {
-            case 'binary':
-                workspace.innerHTML = ToolsView.renderBinaryConverter();
-                break;
-            case 'logic':
-                workspace.innerHTML = ToolsView.renderLogicGates();
-                ToolsView.renderTruthTable();
-                break;
-            case 'algorithm':
-                workspace.innerHTML = ToolsView.renderAlgorithmVisualizer();
-                ToolsView.initAlgorithmVisualizer();
-                break;
-            case 'ascii':
-                workspace.innerHTML = ToolsView.renderASCIITable();
-                break;
-            case 'filesize':
-                workspace.innerHTML = ToolsView.renderFileSizeCalculator();
-                ToolsView.calcImageSize();
-                break;
-            case 'cipher':
-                workspace.innerHTML = ToolsView.renderCipherTool();
-                break;
-            case 'tracetable':
-                workspace.innerHTML = ToolsView.renderTraceTable();
-                break;
-        }
-
-        // Track tool usage
-        const usedTools = (typeof Storage !== 'undefined' && Storage.load) ? Storage.load('usedTools') || [] : [];
-        if (!usedTools.includes(toolId)) {
-            usedTools.push(toolId);
-            if (typeof Storage !== 'undefined' && Storage.save) {
-                Storage.save('usedTools', usedTools);
+                event.currentTarget.classList.add('active');
             }
-            if (usedTools.length >= 5 && typeof AppState !== 'undefined') {
-                AppState.unlockAchievement('tool_master');
+
+            switch(toolId) {
+                case 'binary':
+                    workspace.innerHTML = ToolsView.renderBinaryConverter();
+                    break;
+                case 'logic':
+                    workspace.innerHTML = ToolsView.renderLogicGates();
+                    ToolsView.renderTruthTable();
+                    break;
+                case 'algorithm':
+                    workspace.innerHTML = ToolsView.renderAlgorithmVisualizer();
+                    ToolsView.initAlgorithmVisualizer();
+                    break;
+                case 'ascii':
+                    workspace.innerHTML = ToolsView.renderASCIITable();
+                    break;
+                case 'filesize':
+                    workspace.innerHTML = ToolsView.renderFileSizeCalculator();
+                    ToolsView.calcImageSize();
+                    break;
+                case 'cipher':
+                    workspace.innerHTML = ToolsView.renderCipherTool();
+                    break;
+                case 'tracetable':
+                    workspace.innerHTML = ToolsView.renderTraceTable();
+                    break;
             }
-        }
+
+            // Track tool usage
+            const usedTools = (typeof Storage !== 'undefined' && Storage.load) ? Storage.load('usedTools') || [] : [];
+            if (!usedTools.includes(toolId)) {
+                usedTools.push(toolId);
+                if (typeof Storage !== 'undefined' && Storage.save) {
+                    Storage.save('usedTools', usedTools);
+                }
+                if (usedTools.length >= 5 && typeof AppState !== 'undefined') {
+                    AppState.unlockAchievement('tool_master');
+                }
+            }
         } catch (error) {
             console.error('Error opening tool:', error);
             const workspace = document.getElementById('tool-workspace');
@@ -860,7 +863,8 @@ const ToolsView = {
                         <option value="binary">Binary Search</option>
                     </select>
                     <button class="btn btn-secondary" onclick="ToolsView.generateArray()">New Array</button>
-                    <button class="btn btn-primary" onclick="ToolsView.runAlgorithm()">Run</button>
+                    <button class="btn btn-primary" id="run-btn" onclick="ToolsView.runAlgorithm()">Run</button>
+                    <button class="btn btn-danger hidden" id="stop-btn" onclick="ToolsView.stopAlgorithm()">Stop</button>
                     <input type="range" id="speed-slider" min="1" max="10" value="5">
                     <span>Speed</span>
                 </div>
@@ -907,6 +911,12 @@ const ToolsView = {
         if (ToolsView.vizRunning) return;
         ToolsView.vizRunning = true;
         
+        // Toggle button visibility
+        const runBtn = document.getElementById('run-btn');
+        const stopBtn = document.getElementById('stop-btn');
+        if (runBtn) runBtn.classList.add('hidden');
+        if (stopBtn) stopBtn.classList.remove('hidden');
+        
         const algorithm = document.getElementById('algorithm-select').value;
         const speed = 11 - document.getElementById('speed-slider').value;
         const delay = speed * 50;
@@ -927,6 +937,23 @@ const ToolsView = {
         }
         
         ToolsView.vizRunning = false;
+        
+        // Restore button visibility
+        if (runBtn) runBtn.classList.remove('hidden');
+        if (stopBtn) stopBtn.classList.add('hidden');
+    },
+
+    stopAlgorithm: () => {
+        ToolsView.vizRunning = false;
+        const statusEl = document.getElementById('viz-status');
+        if (statusEl) {
+            statusEl.textContent = 'Stopped';
+        }
+        // Restore button visibility
+        const runBtn = document.getElementById('run-btn');
+        const stopBtn = document.getElementById('stop-btn');
+        if (runBtn) runBtn.classList.remove('hidden');
+        if (stopBtn) stopBtn.classList.add('hidden');
     },
 
     bubbleSortViz: async (delay) => {
@@ -934,7 +961,9 @@ const ToolsView = {
         const n = arr.length;
         
         for (let i = 0; i < n - 1; i++) {
+            if (!ToolsView.vizRunning) return;
             for (let j = 0; j < n - i - 1; j++) {
+                if (!ToolsView.vizRunning) return;
                 ToolsView.vizArray = [...arr];
                 ToolsView.renderVizArray({comparing: [j, j+1]});
                 document.getElementById('viz-status').textContent = `Comparing positions ${j} and ${j+1}`;
@@ -959,6 +988,7 @@ const ToolsView = {
         document.getElementById('viz-status').textContent = `Searching for ${target}...`;
         
         for (let i = 0; i < ToolsView.vizArray.length; i++) {
+            if (!ToolsView.vizRunning) return;
             ToolsView.renderVizArray({comparing: [i]});
             await Helpers.sleep(delay);
             
@@ -978,6 +1008,7 @@ const ToolsView = {
         let low = 0, high = ToolsView.vizArray.length - 1;
         
         while (low <= high) {
+            if (!ToolsView.vizRunning) return;
             const mid = Math.floor((low + high) / 2);
             ToolsView.renderVizArray({comparing: [mid]});
             await Helpers.sleep(delay * 2);
