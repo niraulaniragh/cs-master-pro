@@ -693,13 +693,14 @@ const HomeView = {
                     .skill-btn { flex: 1; min-width: 120px; padding: 1rem; border: 2px solid var(--border); border-radius: 12px; background: var(--bg-secondary); cursor: pointer; text-align: center; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 0.25rem; }
                     .skill-btn span { font-size: 0.8rem; color: var(--text-muted); }
                     .skill-btn:hover { border-color: var(--primary); }
-                    .skill-btn.selected { border-color: var(--primary); background: var(--primary-light); }
+                    .skill-btn.selected { border-color: var(--primary); background: rgba(16, 185, 129, 0.2); color: var(--primary); }
                     .weak-topics-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.5rem; max-height: 200px; overflow-y: auto; padding: 0.5rem; }
-                    .topic-checkbox { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; border: 2px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 0.2s; }
-                    .topic-checkbox:hover { border-color: var(--primary); }
-                    .topic-checkbox.selected { border-color: var(--primary); background: var(--primary-light); }
+                    .topic-checkbox { display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem; border: 2px solid var(--border); border-radius: 8px; cursor: pointer; transition: all 0.2s; user-select: none; }
+                    .topic-checkbox:hover { border-color: var(--primary); background: rgba(16, 185, 129, 0.05); }
+                    .topic-checkbox.selected { border-color: var(--primary); background: rgba(16, 185, 129, 0.2); }
+                    .topic-checkbox.selected::before { content: '✓ '; color: var(--primary); font-weight: bold; }
                     .topic-checkbox input { display: none; }
-                    .topic-icon { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+                    .topic-icon { width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
                     .topic-name { font-size: 0.85rem; flex: 1; }
                 </style>
             `,
@@ -718,26 +719,18 @@ const HomeView = {
                 });
             });
             
-            // Topic checkbox selection - fix visual feedback
+            // Topic checkbox selection - simplified
             document.querySelectorAll('.topic-checkbox').forEach(label => {
-                const checkbox = label.querySelector('input');
-                
-                // Initial state sync
-                if (checkbox.checked) {
-                    label.classList.add('selected');
-                }
-                
                 label.addEventListener('click', (e) => {
-                    // Prevent double-toggle if clicking directly on checkbox
-                    if (e.target.tagName === 'INPUT') {
-                        // Let the checkbox handle itself, just update visual
-                        setTimeout(() => {
-                            label.classList.toggle('selected', checkbox.checked);
-                        }, 0);
-                    } else {
-                        // Toggle checkbox manually
+                    e.preventDefault();
+                    const checkbox = label.querySelector('input');
+                    if (checkbox) {
                         checkbox.checked = !checkbox.checked;
-                        label.classList.toggle('selected', checkbox.checked);
+                        if (checkbox.checked) {
+                            label.classList.add('selected');
+                        } else {
+                            label.classList.remove('selected');
+                        }
                     }
                 });
             });
@@ -775,7 +768,7 @@ const HomeView = {
                 // Refresh home view to show personalized content
                 Router.navigate('home');
             });
-        }, 0);
+        }, 100);
     },
     
     getUserPreferences: () => {
