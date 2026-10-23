@@ -222,9 +222,50 @@ const GamesView = {
             GuestLimiter.recordGame(gameId);
         }
         
+        // Game module lookup (avoid eval for CSP compliance)
+        const gameModules = {
+            'SpeedRun': typeof SpeedRun !== 'undefined' ? SpeedRun : null,
+            'BattleMode': typeof BattleMode !== 'undefined' ? BattleMode : null,
+            'MemoryMatch': typeof MemoryMatch !== 'undefined' ? MemoryMatch : null,
+            'TypeRacer': typeof TypeRacer !== 'undefined' ? TypeRacer : null,
+            'Millionaire': typeof Millionaire !== 'undefined' ? Millionaire : null,
+            'FillCode': typeof FillCode !== 'undefined' ? FillCode : null,
+            'BossBattle': typeof BossBattle !== 'undefined' ? BossBattle : null,
+            'GoldQuest': typeof GoldQuest !== 'undefined' ? GoldQuest : null,
+            'Factory': typeof Factory !== 'undefined' ? Factory : null,
+            'TowerDefense': typeof TowerDefense !== 'undefined' ? TowerDefense : null,
+            'DailyChallenge': typeof DailyChallenge !== 'undefined' ? DailyChallenge : null
+        };
+        
+        // Parse action string (e.g., "SpeedRun.open()")
+        const match = gameAction.match(/^(\w+)\.(\w+)\(\)$/);
+        if (!match) {
+            console.error('Invalid game action format:', gameAction);
+            return;
+        }
+        
+        const [, moduleName, methodName] = match;
+        const gameModule = gameModules[moduleName];
+        
+        if (!gameModule) {
+            console.error('Game module not found:', moduleName);
+            if (typeof Toast !== 'undefined') {
+                Toast.show('Game not available. Please refresh the page.', 'error');
+            }
+            return;
+        }
+        
+        if (typeof gameModule[methodName] !== 'function') {
+            console.error('Game method not found:', methodName);
+            if (typeof Toast !== 'undefined') {
+                Toast.show('Failed to launch game. Please try again.', 'error');
+            }
+            return;
+        }
+        
         // Launch the game
         try {
-            eval(gameAction);
+            gameModule[methodName]();
         } catch (e) {
             console.error('Failed to launch game:', gameId, e);
             if (typeof Toast !== 'undefined') {

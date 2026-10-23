@@ -12,7 +12,7 @@
  */
 
 // Version management - update this on each deploy
-const BUILD_TIMESTAMP = '20261023185523';
+const BUILD_TIMESTAMP = '20261023191040';
 const CACHE_NAME = `csmaster-v${BUILD_TIMESTAMP}`;
 const OFFLINE_URL = '/cs-master-pro/offline.html';
 
