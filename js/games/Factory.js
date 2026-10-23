@@ -571,10 +571,8 @@ const Factory = {
         
         Factory.currentQuestion = q;
         
-        // Shuffle answer options using Helpers.shuffleOptions
-        const shuffled = (typeof Helpers !== 'undefined' && Helpers.shuffleOptions) 
-            ? Helpers.shuffleOptions(q)
-            : Factory.shuffleOptionsInternal(q);
+        // Shuffle answer options - always use internal to get originalIndices format
+        const shuffled = Factory.shuffleOptionsInternal(q);
         
         return `
             <div class="f-question">

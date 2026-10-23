@@ -526,7 +526,9 @@ const TypeRacer = {
                 return;
             }
             
-            const shuffled = shuffleArray([...textPool]);
+            const shuffled = (typeof shuffleArray === 'function') 
+                ? shuffleArray([...textPool]) 
+                : [...textPool].sort(() => Math.random() - 0.5);
             TypeRacer.currentText = shuffled[0];
             TypeRacer.bestTextId = TypeRacer.currentText.substring(0, 50);
             TypeRacer.typedText = '';

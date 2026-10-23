@@ -300,10 +300,11 @@ const HomeView = {
     
     renderLeaderboard: () => {
         try {
-            if (typeof Leaderboard === 'undefined') {
+            if (typeof Leaderboard === 'undefined' || typeof Leaderboard.getRankings !== 'function') {
                 return '<p class="empty-text">Leaderboard loading...</p>';
             }
-            const leaders = Leaderboard.getRankings().slice(0, 5);
+            const rankings = Leaderboard.getRankings();
+            const leaders = rankings ? rankings.slice(0, 5) : [];
             if (!leaders || leaders.length === 0) {
                 return '<p class="empty-text">No players yet. Be the first!</p>';
             }

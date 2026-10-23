@@ -25,7 +25,7 @@ const SettingsView = {
         timerDuration: 30, // seconds
         shuffleQuestions: true,
         shuffleAnswers: true,
-        immediateFeeback: true,
+        immediateFeedback: true,
         showCorrectAnswer: true,
         
         // Quiz Settings
@@ -705,7 +705,7 @@ const SettingsView = {
                                 ${SettingsView.renderToggle('autosave-toggle', 'autoSave', 'Auto-Save Progress', 'Automatically save your progress', settings.autoSave)}
                                 ${SettingsView.renderToggle('hints-toggle', 'showHints', 'Show Hints', 'Display helpful hints during quizzes', settings.showHints)}
                                 ${SettingsView.renderToggle('explanations-toggle', 'showExplanations', 'Show Explanations', 'Show detailed explanations after answers', settings.showExplanations)}
-                                ${SettingsView.renderToggle('feedback-toggle', 'immediateFeeback', 'Immediate Feedback', 'Show correct/incorrect immediately', settings.immediateFeeback)}
+                                ${SettingsView.renderToggle('feedback-toggle', 'immediateFeedback', 'Immediate Feedback', 'Show correct/incorrect immediately', settings.immediateFeedback)}
                                 ${SettingsView.renderToggle('correct-toggle', 'showCorrectAnswer', 'Show Correct Answer', 'Reveal correct answer when wrong', settings.showCorrectAnswer)}
                             </div>
                         </div>
