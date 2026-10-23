@@ -705,6 +705,549 @@ const NEW_PAST_PAPER_QUESTIONS = [
 // Append new past paper questions
 PAST_PAPER_QUESTIONS.push(...NEW_PAST_PAPER_QUESTIONS);
 
+// ==================== ADDITIONAL PAST PAPER QUESTIONS (IDs 20100+) ====================
+// Covers Paper 1 (theory) and Paper 2 (programming/algorithms) style questions
+// Topics: algorithms, programming, data representation, networks, security
+
+const ADDITIONAL_PAST_PAPER_QUESTIONS = [
+    // ========== ALGORITHMS - Paper 1 & 2 Style ==========
+    {
+        id: 20100,
+        topic: 'problem-solving',
+        marks: 6,
+        year: '2023',
+        paper: 'Paper 2',
+        question: 'The following pseudocode implements a linear search:\n\nFUNCTION linearSearch(arr, target)\n    FOR i ← 0 TO LENGTH(arr) - 1\n        IF arr[i] = target THEN\n            RETURN i\n        ENDIF\n    ENDFOR\n    RETURN -1\nENDFUNCTION\n\n(a) Explain what the function returns when the target is found and when it is not found. [2]\n(b) State the time complexity of this algorithm and justify your answer. [2]\n(c) Rewrite this algorithm to search from the end of the array to the beginning. [2]',
+        markScheme: [
+            '(a) Returns the index position when target is found (1)',
+            'Returns -1 when target is not found (1)',
+            '(b) Time complexity is O(n) / linear (1)',
+            'Justification: worst case checks every element once (1)',
+            '(c) Loop from LENGTH-1 TO 0 / decrementing (1)',
+            'Correct comparison and return logic maintained (1)'
+        ],
+        sampleAnswer: '(a) When the target is found, the function returns the index position (i) where the element was located. When the target is not found after checking all elements, it returns -1 to indicate the search was unsuccessful.\n\n(b) The time complexity is O(n) - linear time. This is because in the worst case, the algorithm must check every element in the array once before finding the target (at the end) or determining it\'s not present.\n\n(c) FUNCTION linearSearchReverse(arr, target)\n    FOR i ← LENGTH(arr) - 1 TO 0 STEP -1\n        IF arr[i] = target THEN\n            RETURN i\n        ENDIF\n    ENDFOR\n    RETURN -1\nENDFUNCTION'
+    },
+    {
+        id: 20101,
+        topic: 'problem-solving',
+        marks: 5,
+        year: '2022',
+        paper: 'Paper 1',
+        question: 'Describe the merge sort algorithm. Include in your answer:\n- How the algorithm divides the data [2]\n- How the algorithm combines the sorted sublists [2]\n- The time complexity of the algorithm [1]',
+        markScheme: [
+            'Divides: Recursively splits list in half until single elements (1)',
+            'Divides: Single elements are considered sorted (1)',
+            'Combines: Compares elements from two sublists (1)',
+            'Combines: Places smaller element first / merges in order (1)',
+            'Time complexity: O(n log n) in all cases (1)'
+        ],
+        sampleAnswer: 'Merge sort is a divide-and-conquer algorithm:\n\nDividing: The algorithm recursively divides the list in half until each sublist contains only a single element. A single element is inherently sorted, so these become the base cases.\n\nCombining: The sorted sublists are merged back together by comparing the first elements of each sublist. The smaller element is placed into the result first. This comparison continues until all elements from both sublists are merged into a single sorted list.\n\nTime complexity: O(n log n) in best, average, and worst cases. The log n comes from the number of times we can halve n, and the n comes from the merging step at each level.'
+    },
+    {
+        id: 20102,
+        topic: 'problem-solving',
+        marks: 4,
+        year: '2023',
+        paper: 'Paper 2',
+        question: 'A binary search is performed on the sorted array: [2, 5, 8, 12, 16, 23, 38, 45, 56, 72]\n\n(a) Show the steps taken to find the value 23. [3]\n(b) How many comparisons were needed? [1]',
+        markScheme: [
+            '(a) Step 1: Middle index = 4, value 16, 23 > 16, search right half (1)',
+            'Step 2: Middle of right half, index 7, value 45, 23 < 45, search left (1)',
+            'Step 3: Middle = index 5, value 23, found (1)',
+            '(b) 3 comparisons needed (1)'
+        ],
+        sampleAnswer: '(a) Array: [2, 5, 8, 12, 16, 23, 38, 45, 56, 72] (indices 0-9)\n\nStep 1: Middle index = (0+9)÷2 = 4, value = 16\n23 > 16, so search right half (indices 5-9)\n\nStep 2: Middle index = (5+9)÷2 = 7, value = 45\n23 < 45, so search left half (indices 5-6)\n\nStep 3: Middle index = (5+6)÷2 = 5, value = 23\n23 = 23, target found at index 5\n\n(b) 3 comparisons were needed to find the value 23.'
+    },
+    {
+        id: 20103,
+        topic: 'problem-solving',
+        marks: 6,
+        year: '2022',
+        paper: 'Paper 2',
+        question: 'Complete a trace table for the following algorithm:\n\nx ← 1\ny ← 0\nWHILE x <= 4\n    y ← y + x * x\n    x ← x + 1\nENDWHILE\nOUTPUT y\n\nShow all values of x and y at each iteration. What is the final output?',
+        markScheme: [
+            'Initial values x=1, y=0 shown (1)',
+            'First iteration: y=0+1=1, x=2 (1)',
+            'Second iteration: y=1+4=5, x=3 (1)',
+            'Third iteration: y=5+9=14, x=4 (1)',
+            'Fourth iteration: y=14+16=30, x=5 (1)',
+            'Final output: 30 (1)'
+        ],
+        sampleAnswer: 'Trace table:\n\n| Iteration | x (start) | y (start) | x*x | y (after) | x (after) |\n|-----------|-----------|-----------|-----|-----------|------------|\n| Initial   | 1         | 0         | -   | 0         | 1          |\n| 1         | 1         | 0         | 1   | 1         | 2          |\n| 2         | 2         | 1         | 4   | 5         | 3          |\n| 3         | 3         | 5         | 9   | 14        | 4          |\n| 4         | 4         | 14        | 16  | 30        | 5          |\n\nLoop ends when x=5 (5 <= 4 is FALSE)\n\nFinal output: 30\n\nThe algorithm calculates the sum of squares: 1² + 2² + 3² + 4² = 1 + 4 + 9 + 16 = 30'
+    },
+
+    // ========== PROGRAMMING - Paper 2 Style ==========
+    {
+        id: 20104,
+        topic: 'programming',
+        marks: 6,
+        year: '2023',
+        paper: 'Paper 2',
+        question: 'A program stores student grades in an array. Write pseudocode for a function that:\n- Takes an array of integer grades (0-100) as a parameter\n- Returns the average grade\n- Handles the case where the array might be empty\n\nInclude appropriate validation.',
+        markScheme: [
+            'Function declaration with array parameter (1)',
+            'Check for empty array and handle appropriately (1)',
+            'Initialize sum/total variable to 0 (1)',
+            'Loop through all elements adding to sum (1)',
+            'Calculate average correctly (sum / length) (1)',
+            'Return the average value (1)'
+        ],
+        sampleAnswer: 'FUNCTION calculateAverage(grades)\n    // Handle empty array\n    IF LENGTH(grades) = 0 THEN\n        RETURN 0  // or could return -1 to indicate error\n    ENDIF\n    \n    total ← 0\n    \n    // Sum all grades\n    FOR i ← 0 TO LENGTH(grades) - 1\n        total ← total + grades[i]\n    ENDFOR\n    \n    // Calculate and return average\n    average ← total / LENGTH(grades)\n    RETURN average\nENDFUNCTION'
+    },
+    {
+        id: 20105,
+        topic: 'programming',
+        marks: 5,
+        year: '2022',
+        paper: 'Paper 2',
+        question: 'Write pseudocode for a procedure that:\n- Reads numbers from a file called "numbers.txt"\n- Outputs only the even numbers\n- Counts and outputs how many even numbers were found',
+        markScheme: [
+            'Opens file correctly for reading (1)',
+            'Loop to read until EOF (1)',
+            'Correct even number check (MOD 2 = 0) (1)',
+            'Counter incremented for each even number (1)',
+            'Outputs count and closes file (1)'
+        ],
+        sampleAnswer: 'PROCEDURE findEvenNumbers()\n    OPEN "numbers.txt" FOR READ\n    count ← 0\n    \n    WHILE NOT EOF("numbers.txt")\n        READ num FROM "numbers.txt"\n        IF num MOD 2 = 0 THEN\n            OUTPUT num\n            count ← count + 1\n        ENDIF\n    ENDWHILE\n    \n    CLOSE "numbers.txt"\n    OUTPUT "Total even numbers found: ", count\nENDPROCEDURE'
+    },
+    {
+        id: 20106,
+        topic: 'programming',
+        marks: 4,
+        year: '2023',
+        paper: 'Paper 2',
+        question: 'Explain the difference between a procedure and a function. Give an example of when you would use each.',
+        markScheme: [
+            'Procedure: performs actions but does not return a value (1)',
+            'Function: returns a value to the calling code (1)',
+            'Procedure example: printing output, updating global variable (1)',
+            'Function example: calculating a result needed in an expression (1)'
+        ],
+        sampleAnswer: 'A procedure is a subroutine that performs a series of actions but does not return a value to the calling code. It might display output, modify files, or update global variables.\n\nExample of procedure: A displayMenu() procedure that prints options to the screen.\n\nA function is a subroutine that performs actions and returns a value that can be used in expressions or assigned to variables.\n\nExample of function: A calculateArea(length, width) function that returns the area, allowing code like: totalArea ← calculateArea(5, 3) + calculateArea(4, 2)'
+    },
+    {
+        id: 20107,
+        topic: 'programming',
+        marks: 6,
+        year: '2022',
+        paper: 'Paper 2',
+        question: 'A shop needs to validate product codes. A valid code:\n- Is exactly 8 characters long\n- Starts with two uppercase letters\n- Ends with 6 digits\n\nWrite pseudocode for a function that returns TRUE if a code is valid, FALSE otherwise.',
+        markScheme: [
+            'Function declaration with code parameter (1)',
+            'Length check: exactly 8 characters (1)',
+            'Check first two characters are uppercase letters (A-Z / ASCII 65-90) (1)',
+            'Loop or check last 6 characters are digits (1)',
+            'Correct use of ASCII values or string functions (1)',
+            'Returns TRUE/FALSE appropriately (1)'
+        ],
+        sampleAnswer: 'FUNCTION validateProductCode(code)\n    // Check length\n    IF LENGTH(code) ≠ 8 THEN\n        RETURN FALSE\n    ENDIF\n    \n    // Check first two characters are uppercase letters\n    FOR i ← 0 TO 1\n        char ← SUBSTRING(code, i, 1)\n        IF ASC(char) < 65 OR ASC(char) > 90 THEN\n            RETURN FALSE\n        ENDIF\n    ENDFOR\n    \n    // Check last 6 characters are digits\n    FOR i ← 2 TO 7\n        char ← SUBSTRING(code, i, 1)\n        IF ASC(char) < 48 OR ASC(char) > 57 THEN\n            RETURN FALSE\n        ENDIF\n    ENDFOR\n    \n    RETURN TRUE\nENDFUNCTION'
+    },
+    {
+        id: 20108,
+        topic: 'programming',
+        marks: 5,
+        year: '2023',
+        paper: 'Paper 2',
+        question: 'A 2D array called grid[4][4] stores a game board. Write pseudocode to:\n(a) Initialize all elements to 0 [2]\n(b) Check if any row contains all the same value (returns TRUE/FALSE) [3]',
+        markScheme: [
+            '(a) Nested loops for rows and columns (1)',
+            '(a) Assignment of 0 to each element (1)',
+            '(b) Outer loop iterates through each row (1)',
+            '(b) Inner loop/check compares elements in row (1)',
+            '(b) Returns TRUE if match found, FALSE if not (1)'
+        ],
+        sampleAnswer: '(a) Initialize all elements to 0:\nFOR row ← 0 TO 3\n    FOR col ← 0 TO 3\n        grid[row][col] ← 0\n    ENDFOR\nENDFOR\n\n(b) Check for row with all same values:\nFUNCTION checkMatchingRow(grid)\n    FOR row ← 0 TO 3\n        firstValue ← grid[row][0]\n        allMatch ← TRUE\n        \n        FOR col ← 1 TO 3\n            IF grid[row][col] ≠ firstValue THEN\n                allMatch ← FALSE\n            ENDIF\n        ENDFOR\n        \n        IF allMatch = TRUE THEN\n            RETURN TRUE\n        ENDIF\n    ENDFOR\n    RETURN FALSE\nENDFUNCTION'
+    },
+
+    // ========== DATA REPRESENTATION - Paper 1 Style ==========
+    {
+        id: 20109,
+        topic: 'data',
+        marks: 5,
+        year: '2023',
+        paper: 'Paper 1',
+        question: '(a) Convert the denary number 156 to:\n    (i) Binary [2]\n    (ii) Hexadecimal [1]\n(b) Perform the binary addition: 10110101 + 01001110. Show any overflow if it occurs. [2]',
+        markScheme: [
+            '(a)(i) 156 = 10011100 in binary (1)',
+            '(a)(i) Working shown: 128+16+8+4 = 156 (1)',
+            '(a)(ii) 9C in hexadecimal (1)',
+            '(b) Result: 100000011 (1)',
+            '(b) Overflow occurs (9 bits needed for 8-bit result) (1)'
+        ],
+        sampleAnswer: '(a)(i) Converting 156 to binary:\n156 ÷ 2 = 78 r 0\n78 ÷ 2 = 39 r 0\n39 ÷ 2 = 19 r 1\n19 ÷ 2 = 9 r 1\n9 ÷ 2 = 4 r 1\n4 ÷ 2 = 2 r 0\n2 ÷ 2 = 1 r 0\n1 ÷ 2 = 0 r 1\n\nReading remainders bottom-up: 10011100\nCheck: 128+16+8+4 = 156 ✓\n\n(a)(ii) Converting to hexadecimal:\n1001 1100 = 9 C\nSo 156 = 9C in hexadecimal\n\n(b) Binary addition:\n  10110101  (181)\n+ 01001110  (78)\n-----------\n 100000011  (259)\n\nOverflow occurs because the result (259) exceeds the maximum 8-bit value (255). The result requires 9 bits.'
+    },
+    {
+        id: 20110,
+        topic: 'data',
+        marks: 6,
+        year: '2022',
+        paper: 'Paper 1',
+        question: 'A digital audio file has the following properties:\n- Sample rate: 44,100 Hz\n- Bit depth: 16 bits\n- Stereo (2 channels)\n- Duration: 3 minutes\n\n(a) Calculate the file size in megabytes. Show your working. [4]\n(b) Explain one way to reduce the file size and state any disadvantage. [2]',
+        markScheme: [
+            '(a) Duration in seconds: 3 × 60 = 180 seconds (1)',
+            '(a) Total samples: 44,100 × 180 × 2 = 15,876,000 (1)',
+            '(a) Total bits: 15,876,000 × 16 = 254,016,000 bits (1)',
+            '(a) Convert to MB: 254,016,000 ÷ 8 ÷ 1,000,000 ≈ 31.75 MB (1)',
+            '(b) Reduce sample rate/bit depth/use compression (1)',
+            '(b) Disadvantage: loss of quality/detail (1)'
+        ],
+        sampleAnswer: '(a) File size calculation:\nDuration: 3 minutes = 180 seconds\nSamples per second per channel: 44,100\nNumber of channels: 2\nBits per sample: 16\n\nTotal samples = 44,100 × 180 × 2 = 15,876,000 samples\nTotal bits = 15,876,000 × 16 = 254,016,000 bits\nBytes = 254,016,000 ÷ 8 = 31,752,000 bytes\nMegabytes = 31,752,000 ÷ 1,000,000 = 31.75 MB\n\n(b) One way to reduce file size: Use lossy compression (e.g., convert to MP3)\nDisadvantage: Some audio data is permanently lost, which may reduce sound quality, particularly noticeable in high frequencies or quiet passages.'
+    },
+    {
+        id: 20111,
+        topic: 'data',
+        marks: 4,
+        year: '2023',
+        paper: 'Paper 1',
+        question: 'Explain the difference between lossy and lossless compression. Give one example file format for each type and explain why that compression type is appropriate for that format.',
+        markScheme: [
+            'Lossy: permanently removes some data to achieve compression (1)',
+            'Lossless: no data is lost, original can be fully reconstructed (1)',
+            'Lossy example: JPEG/MP3/MP4 - small quality loss acceptable for images/audio/video (1)',
+            'Lossless example: PNG/ZIP/FLAC - exact data must be preserved for documents/archives (1)'
+        ],
+        sampleAnswer: 'Lossy compression permanently removes some data during compression. The original file cannot be fully reconstructed, but significant file size reduction is achieved.\n\nExample: MP3 for audio files. This is appropriate because the human ear cannot detect certain frequencies, so removing them reduces file size without noticeable quality loss for most listeners.\n\nLossless compression reduces file size without losing any data. The original file can be perfectly reconstructed from the compressed version.\n\nExample: PNG for images with text or logos. This is appropriate because text must remain crisp and readable - any loss of data could blur edges or change colors, making text difficult to read.'
+    },
+    {
+        id: 20112,
+        topic: 'data',
+        marks: 5,
+        year: '2022',
+        paper: 'Paper 1',
+        question: 'Using 8-bit two\'s complement:\n(a) Represent -45 in binary. Show your working. [3]\n(b) Add -45 and +30 in binary. Show your working and give the result in denary. [2]',
+        markScheme: [
+            '(a) +45 = 00101101 (1)',
+            '(a) Inverted = 11010010 (1)',
+            '(a) Add 1 = 11010011 = -45 (1)',
+            '(b) -45 + 30 = 11010011 + 00011110 = 11110001 (1)',
+            '(b) Result = -15 in denary (1)'
+        ],
+        sampleAnswer: '(a) Converting -45 to 8-bit two\'s complement:\nStep 1: Convert +45 to binary\n45 = 32 + 8 + 4 + 1 = 00101101\n\nStep 2: Invert all bits\n00101101 → 11010010\n\nStep 3: Add 1\n11010010 + 1 = 11010011\n\nSo -45 in two\'s complement is: 11010011\n\n(b) Adding -45 + 30:\n-45 = 11010011\n+30 = 00011110\n\n  11010011\n+ 00011110\n-----------\n  11110001\n\nConverting result to denary (MSB is 1, so negative):\nInvert: 00001110, Add 1: 00001111 = 15\nResult: -15'
+    },
+
+    // ========== NETWORKS - Paper 1 Style ==========
+    {
+        id: 20113,
+        topic: 'networks',
+        marks: 6,
+        year: '2023',
+        paper: 'Paper 1',
+        question: 'Describe the four layers of the TCP/IP model. For each layer, state its purpose and give one example protocol or technology used at that layer.',
+        markScheme: [
+            'Application layer: provides network services to applications (1)',
+            'Application example: HTTP, SMTP, FTP, DNS (1)',
+            'Transport layer: end-to-end data transfer and reliability (1)',
+            'Transport example: TCP, UDP (1)',
+            'Internet layer: addressing and routing packets between networks (1)',
+            'Internet example: IP, ICMP (1)',
+            'Link/Network Access layer: physical transmission of data (1)',
+            'Link example: Ethernet, Wi-Fi, MAC addresses (1)'
+        ],
+        sampleAnswer: '1. Application Layer\nPurpose: Provides network services directly to user applications. Handles high-level protocols for specific services.\nExample: HTTP (web browsing), SMTP (sending email)\n\n2. Transport Layer\nPurpose: Provides end-to-end communication between hosts. Ensures reliable data transfer, error checking, and flow control.\nExample: TCP (reliable, ordered delivery), UDP (fast, connectionless)\n\n3. Internet Layer\nPurpose: Handles logical addressing (IP addresses) and routing packets across multiple networks from source to destination.\nExample: IP (Internet Protocol) for addressing and routing\n\n4. Link/Network Access Layer\nPurpose: Handles physical transmission of data over the network medium. Deals with hardware addressing and physical connection.\nExample: Ethernet for wired connections, Wi-Fi for wireless'
+    },
+    {
+        id: 20114,
+        topic: 'networks',
+        marks: 5,
+        year: '2022',
+        paper: 'Paper 1',
+        question: 'A company is setting up a network using star topology.\n(a) Draw a diagram showing 5 computers connected in a star topology. [2]\n(b) State two advantages and one disadvantage of star topology. [3]',
+        markScheme: [
+            '(a) Central switch/hub shown (1)',
+            '(a) All 5 computers connected directly to central device (1)',
+            '(b) Advantage 1: Single device failure doesn\'t affect others (1)',
+            '(b) Advantage 2: Easy to add new devices / easy fault detection (1)',
+            '(b) Disadvantage: Central switch is single point of failure / more cabling needed (1)'
+        ],
+        sampleAnswer: '(a) Star Topology Diagram:\n\n         [PC1]    [PC2]\n            \\    /\n         [SWITCH/HUB]\n           /  |  \\\n       [PC3] [PC4] [PC5]\n\nAll computers connect directly to the central switch.\n\n(b) Advantages:\n1. If one computer or cable fails, it doesn\'t affect the rest of the network - other devices continue communicating normally.\n2. Easy to add new devices - simply connect them to an available port on the switch without disrupting existing connections.\n\nDisadvantage:\nThe central switch is a single point of failure. If it breaks down, the entire network stops functioning and no devices can communicate with each other.'
+    },
+    {
+        id: 20115,
+        topic: 'networks',
+        marks: 4,
+        year: '2023',
+        paper: 'Paper 1',
+        question: 'Explain the difference between TCP and UDP. Give one application where each protocol would be most appropriate and explain why.',
+        markScheme: [
+            'TCP: connection-oriented, reliable, guarantees delivery and order (1)',
+            'UDP: connectionless, faster, no guarantee of delivery (1)',
+            'TCP application: web browsing/email/file transfer - data must arrive complete and in order (1)',
+            'UDP application: video streaming/gaming/VoIP - speed more important than perfect delivery (1)'
+        ],
+        sampleAnswer: 'TCP (Transmission Control Protocol):\n- Connection-oriented: establishes connection before sending data\n- Reliable: guarantees delivery through acknowledgments and retransmission\n- Ordered: data arrives in the correct sequence\n\nAppropriate for: Web browsing (HTTP/HTTPS). Web pages must load completely with all elements in the correct position. Missing or out-of-order data would corrupt the page.\n\nUDP (User Datagram Protocol):\n- Connectionless: sends data without establishing connection first\n- Faster: no overhead for reliability checking\n- No delivery guarantee: packets may be lost or arrive out of order\n\nAppropriate for: Video streaming. Speed is crucial for real-time playback. A few lost packets cause minor glitches but waiting for retransmission would cause noticeable buffering and delays.'
+    },
+
+    // ========== SECURITY - Paper 1 Style ==========
+    {
+        id: 20116,
+        topic: 'networks',
+        marks: 6,
+        year: '2023',
+        paper: 'Paper 1',
+        question: 'A company has experienced several cyber attacks.\n(a) Describe what ransomware is and how it affects a computer system. [2]\n(b) Describe what a phishing attack is. [2]\n(c) State two measures the company could implement to protect against these attacks. [2]',
+        markScheme: [
+            '(a) Ransomware encrypts files/locks system (1)',
+            '(a) Demands payment/ransom for decryption key (1)',
+            '(b) Phishing uses fake emails/websites (1)',
+            '(b) Tricks users into revealing personal information/credentials (1)',
+            '(c) Measure 1: Regular backups / staff training / email filtering (1)',
+            '(c) Measure 2: Anti-malware software / firewall / 2FA (1)'
+        ],
+        sampleAnswer: '(a) Ransomware is a type of malware that encrypts the victim\'s files or locks their entire system, making the data inaccessible. The attacker then demands a ransom payment (often in cryptocurrency) in exchange for the decryption key to restore access to the files.\n\n(b) Phishing is a social engineering attack where criminals send fraudulent emails or create fake websites that appear to be from legitimate organizations (banks, services, colleagues). The goal is to trick recipients into revealing sensitive information such as passwords, credit card numbers, or personal details by making them believe they are interacting with a trusted source.\n\n(c) Protection measures:\n1. Implement regular, automated backups stored offline or in the cloud. This allows recovery from ransomware without paying the ransom.\n2. Conduct regular cybersecurity awareness training for staff to help them recognize and report phishing attempts before clicking suspicious links or attachments.'
+    },
+    {
+        id: 20117,
+        topic: 'networks',
+        marks: 5,
+        year: '2022',
+        paper: 'Paper 1',
+        question: 'Explain the importance of encryption in network security. In your answer:\n- Describe what encryption does [2]\n- Explain the difference between symmetric and asymmetric encryption [2]\n- Give an example of where encryption is used [1]',
+        markScheme: [
+            'Encryption converts plaintext to unreadable ciphertext (1)',
+            'Only authorized users with key can decrypt (1)',
+            'Symmetric: same key encrypts and decrypts (1)',
+            'Asymmetric: different keys (public/private) for encrypt/decrypt (1)',
+            'Example: HTTPS, email, file storage, banking (1)'
+        ],
+        sampleAnswer: 'Encryption is essential for network security as it protects data confidentiality.\n\nWhat encryption does:\nEncryption converts readable data (plaintext) into an unreadable format (ciphertext) using a mathematical algorithm and a key. Only someone with the correct decryption key can convert it back to readable form, preventing unauthorized access to sensitive information.\n\nSymmetric vs Asymmetric:\nSymmetric encryption uses the same secret key for both encryption and decryption. It\'s fast but requires secure key distribution between parties.\n\nAsymmetric encryption uses a pair of keys: a public key (shared openly) to encrypt and a private key (kept secret) to decrypt. This solves the key distribution problem but is slower.\n\nExample:\nHTTPS uses encryption to secure web communications. When you access your bank\'s website, encryption ensures that your login credentials and financial data cannot be intercepted and read by attackers monitoring the network.'
+    },
+    {
+        id: 20118,
+        topic: 'networks',
+        marks: 4,
+        year: '2023',
+        paper: 'Paper 1',
+        question: 'Describe four security threats that could affect a computer network and explain how each could be prevented.',
+        markScheme: [
+            'Threat 1 (e.g., malware) with valid prevention (1)',
+            'Threat 2 (e.g., phishing) with valid prevention (1)',
+            'Threat 3 (e.g., DDoS) with valid prevention (1)',
+            'Threat 4 (e.g., SQL injection/brute force) with valid prevention (1)'
+        ],
+        sampleAnswer: '1. Malware (viruses, worms, trojans)\nPrevention: Install and regularly update anti-malware software, and avoid downloading from untrusted sources.\n\n2. Phishing attacks\nPrevention: Train users to recognize suspicious emails, implement email filtering, and use multi-factor authentication.\n\n3. DDoS (Distributed Denial of Service)\nPrevention: Use DDoS protection services, implement rate limiting, and have redundant servers to handle traffic spikes.\n\n4. Brute force attacks\nPrevention: Enforce strong password policies, implement account lockout after failed attempts, and use CAPTCHA on login forms.'
+    },
+
+    // ========== DATABASES - Paper 1 & 2 Style ==========
+    {
+        id: 20119,
+        topic: 'databases',
+        marks: 6,
+        year: '2023',
+        paper: 'Paper 2',
+        question: 'A bookshop database has these tables:\n\nBooks(BookID, Title, AuthorID, Price, StockQuantity)\nAuthors(AuthorID, FirstName, LastName, Country)\nSales(SaleID, BookID, SaleDate, Quantity)\n\nWrite SQL queries to:\n(a) Find all books priced over £15, showing title and price, sorted by price descending [2]\n(b) Find the total number of books sold for each BookID [2]\n(c) List all book titles with their author\'s full name [2]',
+        markScheme: [
+            '(a) SELECT Title, Price FROM Books WHERE Price > 15 ORDER BY Price DESC (2)',
+            '(b) SELECT BookID, SUM(Quantity) FROM Sales GROUP BY BookID (2)',
+            '(c) Correct JOIN between Books and Authors (1)',
+            '(c) Concatenation of FirstName and LastName / both columns selected (1)'
+        ],
+        sampleAnswer: '(a) SELECT Title, Price\nFROM Books\nWHERE Price > 15\nORDER BY Price DESC;\n\n(b) SELECT BookID, SUM(Quantity) AS TotalSold\nFROM Sales\nGROUP BY BookID;\n\n(c) SELECT Books.Title, Authors.FirstName, Authors.LastName\nFROM Books\nJOIN Authors ON Books.AuthorID = Authors.AuthorID;\n\nOR (with concatenation):\n\nSELECT Books.Title, \n       Authors.FirstName || \' \' || Authors.LastName AS AuthorName\nFROM Books\nJOIN Authors ON Books.AuthorID = Authors.AuthorID;'
+    },
+    {
+        id: 20120,
+        topic: 'databases',
+        marks: 4,
+        year: '2022',
+        paper: 'Paper 1',
+        question: 'Explain the purpose of:\n(a) A primary key [2]\n(b) A foreign key [2]\n\nUse examples from a school database with Students and Classes tables.',
+        markScheme: [
+            '(a) Uniquely identifies each record in a table (1)',
+            '(a) Example: StudentID in Students table (1)',
+            '(b) Links to primary key in another table / creates relationship (1)',
+            '(b) Example: ClassID in Students table linking to Classes (1)'
+        ],
+        sampleAnswer: '(a) Primary Key:\nA primary key is a field (or combination of fields) that uniquely identifies each record in a database table. No two records can have the same primary key value, and it cannot be empty (NULL).\n\nExample: In a Students table, StudentID would be the primary key. Each student has a unique ID (e.g., S001, S002) that distinguishes them from all other students, even if they have the same name.\n\n(b) Foreign Key:\nA foreign key is a field in one table that references the primary key in another table, creating a relationship between the two tables. It enables data to be linked across tables.\n\nExample: In the Students table, ClassID could be a foreign key that references the primary key ClassID in the Classes table. This links each student to their class without storing all class details repeatedly for every student.'
+    },
+
+    // ========== MORE ALGORITHMS - Paper 2 Style ==========
+    {
+        id: 20121,
+        topic: 'problem-solving',
+        marks: 5,
+        year: '2023',
+        paper: 'Paper 2',
+        question: 'Describe the bubble sort algorithm. Show the state of the array [5, 2, 8, 1, 9] after each complete pass of bubble sort.',
+        markScheme: [
+            'Compares adjacent elements and swaps if in wrong order (1)',
+            'Pass 1: [2, 5, 1, 8, 9] (1)',
+            'Pass 2: [2, 1, 5, 8, 9] (1)',
+            'Pass 3: [1, 2, 5, 8, 9] (1)',
+            'Pass 4: no swaps needed, sorted (1)'
+        ],
+        sampleAnswer: 'Bubble sort works by repeatedly stepping through the list, comparing adjacent elements and swapping them if they are in the wrong order. After each pass, the largest unsorted element "bubbles" to its correct position at the end.\n\nOriginal: [5, 2, 8, 1, 9]\n\nPass 1:\n5,2 → swap → [2, 5, 8, 1, 9]\n5,8 → no swap\n8,1 → swap → [2, 5, 1, 8, 9]\n8,9 → no swap\nResult: [2, 5, 1, 8, 9]\n\nPass 2:\n2,5 → no swap\n5,1 → swap → [2, 1, 5, 8, 9]\n5,8 → no swap\nResult: [2, 1, 5, 8, 9]\n\nPass 3:\n2,1 → swap → [1, 2, 5, 8, 9]\n2,5 → no swap\nResult: [1, 2, 5, 8, 9]\n\nPass 4:\nNo swaps needed → Array is sorted\nFinal: [1, 2, 5, 8, 9]'
+    },
+    {
+        id: 20122,
+        topic: 'programming',
+        marks: 6,
+        year: '2022',
+        paper: 'Paper 2',
+        question: 'A temperature monitoring system records temperatures every hour. Write pseudocode for a program that:\n- Stores 24 temperature readings in an array\n- Finds and outputs the highest temperature and when it occurred\n- Finds and outputs the lowest temperature and when it occurred\n- Calculates and outputs the average temperature',
+        markScheme: [
+            'Array declaration for 24 elements (1)',
+            'Input loop for readings with hours (1)',
+            'Max finding with tracking hour (1)',
+            'Min finding with tracking hour (1)',
+            'Sum calculation within loop (1)',
+            'Average calculation and all outputs (1)'
+        ],
+        sampleAnswer: '// Declare array for 24 hourly readings\nDECLARE temps: ARRAY[0:23] OF REAL\n\n// Input temperatures\nFOR hour ← 0 TO 23\n    OUTPUT "Enter temperature for hour ", hour, ": "\n    INPUT temps[hour]\nENDFOR\n\n// Initialize tracking variables\nmaxTemp ← temps[0]\nmaxHour ← 0\nminTemp ← temps[0]\nminHour ← 0\ntotal ← 0\n\n// Find max, min, and sum\nFOR hour ← 0 TO 23\n    total ← total + temps[hour]\n    \n    IF temps[hour] > maxTemp THEN\n        maxTemp ← temps[hour]\n        maxHour ← hour\n    ENDIF\n    \n    IF temps[hour] < minTemp THEN\n        minTemp ← temps[hour]\n        minHour ← hour\n    ENDIF\nENDFOR\n\n// Calculate average\naverage ← total / 24\n\n// Output results\nOUTPUT "Highest temperature: ", maxTemp, " at hour ", maxHour\nOUTPUT "Lowest temperature: ", minTemp, " at hour ", minHour\nOUTPUT "Average temperature: ", average'
+    },
+    {
+        id: 20123,
+        topic: 'data',
+        marks: 4,
+        year: '2023',
+        paper: 'Paper 1',
+        question: 'An image has a resolution of 1920 × 1080 pixels with a colour depth of 24 bits.\n(a) Calculate the file size in megabytes. Show your working. [3]\n(b) Explain how reducing the colour depth would affect the image. [1]',
+        markScheme: [
+            '(a) Total pixels: 1920 × 1080 = 2,073,600 (1)',
+            '(a) Total bits: 2,073,600 × 24 = 49,766,400 (1)',
+            '(a) File size: 49,766,400 ÷ 8 ÷ 1,000,000 ≈ 6.22 MB (1)',
+            '(b) Fewer colors available / less smooth gradients / possible banding (1)'
+        ],
+        sampleAnswer: '(a) File size calculation:\nTotal pixels = 1920 × 1080 = 2,073,600 pixels\nBits per pixel = 24\nTotal bits = 2,073,600 × 24 = 49,766,400 bits\nTotal bytes = 49,766,400 ÷ 8 = 6,220,800 bytes\nMegabytes = 6,220,800 ÷ 1,000,000 = 6.22 MB\n\n(b) Reducing colour depth would reduce the number of available colours. This could cause visible banding in gradients (smooth colour transitions would appear as distinct steps), loss of subtle colour variations, and an overall less realistic or natural appearance in photographs.'
+    },
+
+    // ========== MORE PROGRAMMING CONCEPTS ==========
+    {
+        id: 20124,
+        topic: 'programming',
+        marks: 5,
+        year: '2022',
+        paper: 'Paper 1',
+        question: 'Describe the purpose of the following types of test data:\n(a) Normal data [2]\n(b) Boundary data [2]\n(c) Erroneous data [1]\n\nGive an example of each for a program that accepts ages between 18 and 65.',
+        markScheme: [
+            '(a) Normal: typical/expected valid input (1)',
+            '(a) Example: 25, 40, 50 (any valid age in range) (1)',
+            '(b) Boundary: values at edges of valid range (1)',
+            '(b) Example: 17, 18, 65, 66 (1)',
+            '(c) Erroneous: invalid/wrong type data that should be rejected (1)',
+            '(c) Example: -5, "abc", 150 (1)'
+        ],
+        sampleAnswer: '(a) Normal data: Typical, expected input values that the program should handle correctly. These test that the program works under everyday conditions.\nExample for age 18-65: 25, 40, 50 (typical ages within the valid range)\n\n(b) Boundary data: Values at the edges of acceptable ranges. These are crucial because errors often occur at boundaries.\nExample for age 18-65:\n- 17 (just below minimum - should be rejected)\n- 18 (minimum valid - should be accepted)\n- 65 (maximum valid - should be accepted)\n- 66 (just above maximum - should be rejected)\n\n(c) Erroneous data: Invalid input that the program should reject. Tests that validation and error handling work correctly.\nExample for age 18-65: -5 (negative age), "twenty" (wrong type - text instead of number), 200 (unrealistic value)'
+    },
+    {
+        id: 20125,
+        topic: 'programming',
+        marks: 4,
+        year: '2023',
+        paper: 'Paper 2',
+        question: 'Explain the difference between a syntax error and a logic error. Give one example of each in pseudocode.',
+        markScheme: [
+            'Syntax error: violates language rules / prevents compilation (1)',
+            'Example: missing ENDIF, misspelled keyword, wrong brackets (1)',
+            'Logic error: program runs but produces incorrect output (1)',
+            'Example: using + instead of -, wrong comparison operator (1)'
+        ],
+        sampleAnswer: 'Syntax Error:\nA syntax error occurs when code violates the grammatical rules of the programming language. The program cannot be compiled or run until the error is fixed. The error is usually identified by the compiler/interpreter.\n\nExample:\nIF age > 18 THEN\n    OUTPUT "Adult"\n// Missing ENDIF - syntax error\n\nLogic Error:\nA logic error occurs when the program runs without crashing but produces incorrect results. The code is syntactically correct but doesn\'t do what was intended. These errors are harder to find as no error message is shown.\n\nExample:\naverage ← (num1 + num2 + num3) / 2  // Should divide by 3, not 2\n\nThis calculates the wrong average but doesn\'t cause any error message.'
+    },
+
+    // ========== ETHICS & BIGGER PICTURE ==========
+    {
+        id: 20126,
+        topic: 'bigger-picture',
+        marks: 6,
+        year: '2023',
+        paper: 'Paper 1',
+        question: 'Discuss the ethical implications of using artificial intelligence (AI) for making decisions about job applications.\n\nConsider both advantages and disadvantages in your answer.',
+        markScheme: [
+            'Advantage: Faster processing of large volumes of applications (1)',
+            'Advantage: Potential consistency/reduced human bias (1)',
+            'Disadvantage: Algorithmic bias from training data (1)',
+            'Disadvantage: Lack of transparency in decisions (1)',
+            'Disadvantage: Privacy concerns with data collection (1)',
+            'Discussion of accountability/fairness issues (1)'
+        ],
+        sampleAnswer: 'Advantages of AI in recruitment:\n1. Efficiency: AI can process thousands of applications quickly, reducing time-to-hire and freeing HR staff for other tasks.\n2. Consistency: AI applies the same criteria to every application, potentially eliminating inconsistencies from human fatigue or mood variations.\n\nDisadvantages and ethical concerns:\n1. Algorithmic Bias: If the AI is trained on historical hiring data, it may perpetuate past discrimination. For example, if a company historically hired fewer women, the AI might learn to favour male candidates.\n\n2. Lack of Transparency: AI decision-making can be a "black box" - candidates may not understand why they were rejected, making it difficult to challenge unfair decisions.\n\n3. Privacy: AI systems may collect and analyse extensive personal data from social media and other sources without explicit consent.\n\n4. Accountability: When AI makes a discriminatory decision, it\'s unclear who is responsible - the company, the AI developers, or the training data providers.\n\nConclusion: While AI can improve efficiency, organisations must ensure systems are regularly audited for bias, decisions are explainable, and human oversight remains in place for final decisions.'
+    },
+    {
+        id: 20127,
+        topic: 'bigger-picture',
+        marks: 4,
+        year: '2022',
+        paper: 'Paper 1',
+        question: 'Explain what the digital divide is and describe two ways it can affect society.',
+        markScheme: [
+            'Digital divide: gap between those with/without access to technology (1)',
+            'Can be geographical, economic, or generational (1)',
+            'Effect 1: Educational disadvantage - limited access to online learning (1)',
+            'Effect 2: Economic/employment disadvantage - cannot apply for jobs online (1)'
+        ],
+        sampleAnswer: 'The digital divide refers to the gap between individuals, communities, or countries who have access to modern information and communication technology and those who do not. This divide can exist due to:\n- Economic factors (cannot afford devices/internet)\n- Geographic factors (rural areas with poor infrastructure)\n- Age factors (older generations less familiar with technology)\n- Educational factors (lacking digital skills)\n\nEffects on society:\n\n1. Educational Inequality: Students without home internet access struggle to complete online homework, access educational resources, or participate in remote learning. This widens the achievement gap between wealthy and disadvantaged students.\n\n2. Employment Barriers: Many jobs require online applications, digital skills, or remote working capability. Those on the wrong side of the digital divide may be unable to find employment or are limited to lower-paying jobs that don\'t require technology, perpetuating economic inequality.'
+    },
+
+    // ========== MORE DATA REPRESENTATION ==========
+    {
+        id: 20128,
+        topic: 'data',
+        marks: 4,
+        year: '2023',
+        paper: 'Paper 1',
+        question: 'Using the Caesar cipher with a shift of 5:\n(a) Encrypt the message "HELLO" [2]\n(b) Explain one weakness of the Caesar cipher [2]',
+        markScheme: [
+            '(a) H→M, E→J, L→Q, L→Q, O→T (1)',
+            '(a) Encrypted message: MJQQT (1)',
+            '(b) Only 25 possible shifts / easy to brute force (1)',
+            '(b) Letter frequency analysis can crack it (1)'
+        ],
+        sampleAnswer: '(a) Encrypting "HELLO" with shift 5:\nH (position 7) + 5 = M (position 12)\nE (position 4) + 5 = J (position 9)\nL (position 11) + 5 = Q (position 16)\nL (position 11) + 5 = Q (position 16)\nO (position 14) + 5 = T (position 19)\n\nEncrypted message: MJQQT\n\n(b) Weakness: The Caesar cipher has only 25 possible shift values, making it extremely vulnerable to brute force attack. An attacker can simply try all 25 shifts until readable text appears. Additionally, the cipher preserves letter frequency - "E" is the most common letter in English, so the most frequent letter in the ciphertext likely represents "E", making frequency analysis attacks straightforward.'
+    },
+    {
+        id: 20129,
+        topic: 'data',
+        marks: 5,
+        year: '2022',
+        paper: 'Paper 1',
+        question: 'Explain what Run Length Encoding (RLE) is and demonstrate how it would compress the following string:\n\n"AAABBBBCCCCCCDDDD"\n\nCalculate the compression ratio.',
+        markScheme: [
+            'RLE replaces runs of identical characters with count and character (1)',
+            'Compressed: 3A4B6C4D (1)',
+            'Original length: 17 characters (1)',
+            'Compressed length: 8 characters (1)',
+            'Ratio: 8/17 = 0.47 or ~47% or 2.1:1 compression (1)'
+        ],
+        sampleAnswer: 'Run Length Encoding (RLE) is a simple lossless compression technique that replaces consecutive sequences (runs) of identical characters with the character followed by the count of how many times it appears.\n\nOriginal string: "AAABBBBCCCCCCDDDD" (17 characters)\n\nCompressing:\n- AAA → 3A (3 copies of A)\n- BBBB → 4B (4 copies of B)\n- CCCCCC → 6C (6 copies of C)\n- DDDD → 4D (4 copies of D)\n\nCompressed string: "3A4B6C4D" (8 characters)\n\nCompression ratio calculation:\nOriginal size: 17 characters\nCompressed size: 8 characters\nRatio: 8 ÷ 17 = 0.47 (or 47% of original)\nCompression ratio: 17:8 ≈ 2.1:1\n\nThe data has been reduced to less than half its original size.'
+    },
+
+    // ========== ADDITIONAL PROGRAMMING ==========
+    {
+        id: 20130,
+        topic: 'programming',
+        marks: 5,
+        year: '2023',
+        paper: 'Paper 2',
+        question: 'Write pseudocode for a function that takes a string and returns it reversed. For example, "HELLO" would return "OLLEH".',
+        markScheme: [
+            'Function declaration with string parameter (1)',
+            'Initialize empty result string (1)',
+            'Loop from end to start of string (1)',
+            'Concatenate each character to result (1)',
+            'Return the reversed string (1)'
+        ],
+        sampleAnswer: 'FUNCTION reverseString(text)\n    reversed ← ""\n    \n    // Loop from end to start\n    FOR i ← LENGTH(text) - 1 TO 0 STEP -1\n        // Get character at position i\n        char ← SUBSTRING(text, i, 1)\n        // Add to result\n        reversed ← reversed & char\n    ENDFOR\n    \n    RETURN reversed\nENDFUNCTION\n\n// Alternative using array approach:\nFUNCTION reverseString(text)\n    reversed ← ""\n    length ← LENGTH(text)\n    \n    FOR i ← 0 TO length - 1\n        // Get character from end\n        char ← SUBSTRING(text, length - 1 - i, 1)\n        reversed ← reversed & char\n    ENDFOR\n    \n    RETURN reversed\nENDFUNCTION'
+    },
+    {
+        id: 20131,
+        topic: 'programming',
+        marks: 4,
+        year: '2022',
+        paper: 'Paper 2',
+        question: 'Explain the difference between:\n(a) Local and global variables [2]\n(b) Passing parameters by value and by reference [2]',
+        markScheme: [
+            '(a) Local: only accessible within function/procedure where declared (1)',
+            '(a) Global: accessible from anywhere in the program (1)',
+            '(b) By value: copy of data passed, original unchanged (1)',
+            '(b) By reference: address passed, original can be modified (1)'
+        ],
+        sampleAnswer: '(a) Local vs Global Variables:\n\nLocal variables are declared inside a function or procedure and can only be accessed within that function. They are created when the function runs and destroyed when it ends. This keeps data isolated and prevents unintended modifications.\n\nGlobal variables are declared outside all functions and can be accessed from anywhere in the program. While convenient, they can make code harder to debug and maintain because any part of the program can modify them.\n\n(b) Passing by Value vs Reference:\n\nBy Value: A copy of the data is passed to the function. Any changes made inside the function affect only the copy; the original variable remains unchanged. Used when you don\'t want the function to modify the original data.\n\nBy Reference: The memory address of the variable is passed. The function works directly with the original data, so any changes affect the original variable. Used when you need the function to modify the original data or when passing large data structures to avoid copying overhead.'
+    }
+];
+
+// Append additional past paper questions to the array
+PAST_PAPER_QUESTIONS.push(...ADDITIONAL_PAST_PAPER_QUESTIONS);
+
 // ==================== NEW FLASHCARDS ====================
 
 const NEW_FLASHCARDS = [
@@ -864,6 +1407,113 @@ const MORE_FLASHCARDS = [
 // Add more flashcards
 FLASHCARDS.push(...MORE_FLASHCARDS);
 
+// ==================== EXPANDED FLASHCARDS (CS Theory) ====================
+const EXPANDED_FLASHCARDS = [
+    // Binary/Hex conversions
+    { id: 500, topic: 'data', front: 'Convert binary 11001010 to denary', back: '128 + 64 + 8 + 2 = 202. Add place values where bit is 1: 128, 64, 32, 16, 8, 4, 2, 1' },
+    { id: 501, topic: 'data', front: 'Convert denary 175 to binary', back: '10101111. Subtract largest place values: 175-128=47, 47-32=15, 15-8=7, 7-4=3, 3-2=1, 1-1=0' },
+    { id: 502, topic: 'data', front: 'Convert hex A7 to denary', back: 'A7 = (10×16) + 7 = 160 + 7 = 167. A=10 in hex.' },
+    { id: 503, topic: 'data', front: 'Convert denary 255 to hex', back: 'FF. 255÷16=15 remainder 15. Both 15s = F. Maximum 8-bit value.' },
+    { id: 504, topic: 'data', front: 'Convert binary 11110000 to hex', back: 'F0. Split into nibbles: 1111=F, 0000=0. Each nibble = one hex digit.' },
+    { id: 505, topic: 'data', front: 'Convert hex 2B to binary', back: '00101011. 2=0010, B=1011. Expand each hex digit to 4 bits.' },
+    { id: 506, topic: 'data', front: 'Why use hexadecimal?', back: 'Shorter than binary (1 hex = 4 bits), easier for humans to read, used for colors (#FF0000), MAC addresses, memory addresses.' },
+    { id: 507, topic: 'data', front: 'Binary addition: 1011 + 0111', back: '10010. Carry 1 when sum exceeds 1. 1+1=10, 1+1+1=11. Result may need extra bit.' },
+    { id: 508, topic: 'data', front: 'What is binary overflow?', back: 'When result exceeds available bits. 8-bit max=255, so 200+100=300 overflows. Causes incorrect results.' },
+    { id: 509, topic: 'data', front: 'Convert hex FF to binary', back: '11111111. F=1111, so FF=11111111. This equals 255 in denary.' },
+    
+    // Logic gates
+    { id: 510, topic: 'computers', front: 'AND gate truth table', back: '0 AND 0 = 0, 0 AND 1 = 0, 1 AND 0 = 0, 1 AND 1 = 1. Output is 1 ONLY when ALL inputs are 1.' },
+    { id: 511, topic: 'computers', front: 'OR gate truth table', back: '0 OR 0 = 0, 0 OR 1 = 1, 1 OR 0 = 1, 1 OR 1 = 1. Output is 1 when ANY input is 1.' },
+    { id: 512, topic: 'computers', front: 'NOT gate function', back: 'Inverts input: NOT 0 = 1, NOT 1 = 0. Single input, single output. Also called inverter.' },
+    { id: 513, topic: 'computers', front: 'XOR gate truth table', back: '0 XOR 0 = 0, 0 XOR 1 = 1, 1 XOR 0 = 1, 1 XOR 1 = 0. Output is 1 when inputs DIFFER.' },
+    { id: 514, topic: 'computers', front: 'NAND gate truth table', back: '0 NAND 0 = 1, 0 NAND 1 = 1, 1 NAND 0 = 1, 1 NAND 1 = 0. Opposite of AND. Universal gate.' },
+    { id: 515, topic: 'computers', front: 'NOR gate truth table', back: '0 NOR 0 = 1, 0 NOR 1 = 0, 1 NOR 0 = 0, 1 NOR 1 = 0. Opposite of OR. Universal gate.' },
+    { id: 516, topic: 'computers', front: 'Why are NAND/NOR called universal gates?', back: 'Any logic circuit can be built using only NAND gates (or only NOR gates). Simplifies manufacturing.' },
+    { id: 517, topic: 'computers', front: 'Logic gate: A AND (NOT B)', back: 'Output 1 only when A=1 AND B=0. Used in circuits where you need A but not B.' },
+    { id: 518, topic: 'computers', front: 'Half adder circuit', back: 'Adds 2 bits. Sum = A XOR B, Carry = A AND B. Basic building block for arithmetic circuits.' },
+    { id: 519, topic: 'computers', front: 'Full adder circuit', back: 'Adds 3 bits (A, B, carry-in). Uses two half adders and an OR gate. Chains together for multi-bit addition.' },
+    
+    // Network protocols
+    { id: 520, topic: 'networks', front: 'TCP (Transmission Control Protocol)', back: 'Reliable, connection-based. Guarantees delivery, order, error checking. Three-way handshake. Used: web, email, file transfer.' },
+    { id: 521, topic: 'networks', front: 'UDP (User Datagram Protocol)', back: 'Fast, connectionless. No guarantee of delivery/order. Low overhead. Used: streaming, gaming, VoIP, DNS.' },
+    { id: 522, topic: 'networks', front: 'TCP vs UDP speed', back: 'UDP faster due to no handshake, no acknowledgments, no retransmission. TCP slower but reliable.' },
+    { id: 523, topic: 'networks', front: 'HTTP (HyperText Transfer Protocol)', back: 'Application layer protocol for web. Request-response model. Methods: GET (retrieve), POST (submit), PUT, DELETE. Port 80.' },
+    { id: 524, topic: 'networks', front: 'HTTPS', back: 'HTTP + SSL/TLS encryption. Secure web browsing. Port 443. Protects data in transit. Uses digital certificates.' },
+    { id: 525, topic: 'networks', front: 'FTP (File Transfer Protocol)', back: 'Transfers files between computers. Uses two connections: control (port 21) and data (port 20). Clear text, consider SFTP.' },
+    { id: 526, topic: 'networks', front: 'SMTP (Simple Mail Transfer Protocol)', back: 'Sends email. Port 25 (or 587 with auth). Push protocol. Works with POP3/IMAP for receiving.' },
+    { id: 527, topic: 'networks', front: 'POP3 vs IMAP', back: 'POP3: downloads and deletes from server. IMAP: keeps on server, syncs across devices. IMAP better for multiple devices.' },
+    { id: 528, topic: 'networks', front: 'IP (Internet Protocol)', back: 'Addresses and routes packets. IPv4: 32-bit (4 billion addresses). IPv6: 128-bit (practically unlimited). Network layer.' },
+    { id: 529, topic: 'networks', front: 'DHCP', back: 'Dynamic Host Configuration Protocol. Automatically assigns IP addresses to devices on a network. Simplifies network management.' },
+    
+    // CPU components
+    { id: 530, topic: 'computers', front: 'ALU (Arithmetic Logic Unit)', back: 'Performs all calculations (add, subtract, multiply) and logical operations (AND, OR, comparisons). Core of CPU processing.' },
+    { id: 531, topic: 'computers', front: 'Control Unit (CU)', back: 'Coordinates CPU operations. Fetches instructions, decodes them, controls data flow. Directs other components.' },
+    { id: 532, topic: 'computers', front: 'Program Counter (PC)', back: 'Register holding memory address of NEXT instruction to fetch. Increments after each fetch (unless jump).' },
+    { id: 533, topic: 'computers', front: 'Memory Address Register (MAR)', back: 'Holds address of memory location being accessed. Sends address to memory via address bus.' },
+    { id: 534, topic: 'computers', front: 'Memory Data Register (MDR)', back: 'Holds data being transferred to/from memory. Acts as buffer between CPU and RAM.' },
+    { id: 535, topic: 'computers', front: 'Current Instruction Register (CIR)', back: 'Holds the instruction currently being decoded/executed. Fed to decoder in control unit.' },
+    { id: 536, topic: 'computers', front: 'Accumulator (ACC)', back: 'Register storing results of ALU calculations. Used for intermediate results. Single general-purpose register in simple CPUs.' },
+    { id: 537, topic: 'computers', front: 'CPU Cache levels', back: 'L1: smallest, fastest, on CPU core. L2: larger, slightly slower. L3: shared between cores, largest. Reduces RAM access.' },
+    { id: 538, topic: 'computers', front: 'Address Bus', back: 'Carries memory addresses from CPU to RAM. Unidirectional. Width determines max addressable memory (32-bit = 4GB).' },
+    { id: 539, topic: 'computers', front: 'Data Bus', back: 'Carries actual data between CPU and memory/devices. Bidirectional. Width affects transfer speed (32-bit, 64-bit).' },
+    
+    // Data types and structures
+    { id: 540, topic: 'programming', front: 'Integer data type', back: 'Whole numbers only (no decimals). Positive or negative. Examples: -5, 0, 42. Used for counting, indexing.' },
+    { id: 541, topic: 'programming', front: 'Float/Real data type', back: 'Numbers with decimal points. Examples: 3.14, -0.5, 2.0. Used for measurements, calculations requiring precision.' },
+    { id: 542, topic: 'programming', front: 'Boolean data type', back: 'Only two values: True or False (1 or 0). Used for conditions, flags, logic. 1 bit of information.' },
+    { id: 543, topic: 'programming', front: 'Character data type', back: 'Single letter, digit, or symbol. Examples: \'A\', \'7\', \'@\'. Usually 1 byte (ASCII) or 2+ bytes (Unicode).' },
+    { id: 544, topic: 'programming', front: 'String data type', back: 'Sequence of characters. Text data. Examples: "Hello", "123". Operations: concatenation, substring, length.' },
+    { id: 545, topic: 'programming', front: 'Array data structure', back: 'Ordered collection of elements, same type. Fixed size. Access by index (0-based). O(1) access, O(n) search.' },
+    { id: 546, topic: 'programming', front: 'Stack data structure', back: 'LIFO (Last In First Out). Operations: push (add), pop (remove). Used for undo, function calls, backtracking.' },
+    { id: 547, topic: 'programming', front: 'Queue data structure', back: 'FIFO (First In First Out). Operations: enqueue (add), dequeue (remove). Used for print jobs, task scheduling.' },
+    { id: 548, topic: 'programming', front: 'Linked list vs array', back: 'Linked list: dynamic size, O(1) insert/delete, O(n) access. Array: fixed size, O(1) access, O(n) insert/delete.' },
+    { id: 549, topic: 'programming', front: 'Record/Struct', back: 'Collection of related fields, can be different types. Example: Student record with name(string), age(int), grade(char).' },
+    
+    // Algorithms (sorting, searching)
+    { id: 550, topic: 'problem-solving', front: 'Linear Search algorithm', back: 'Check each element sequentially until found. O(n) time. Works on unsorted data. Simple but slow for large lists.' },
+    { id: 551, topic: 'problem-solving', front: 'Binary Search algorithm', back: 'Divide sorted list in half each step. O(log n) time. REQUIRES sorted data. Very efficient for large lists.' },
+    { id: 552, topic: 'problem-solving', front: 'Binary search step-by-step', back: '1. Find middle element. 2. If target=middle, found. 3. If target<middle, search left half. 4. If target>middle, search right half. Repeat.' },
+    { id: 553, topic: 'problem-solving', front: 'Bubble Sort algorithm', back: 'Compare adjacent pairs, swap if wrong order. Repeat passes until no swaps. O(n²) time. Simple but inefficient.' },
+    { id: 554, topic: 'problem-solving', front: 'Bubble Sort optimization', back: 'Track if any swaps made in pass. If no swaps, list is sorted—stop early. Best case O(n) for sorted input.' },
+    { id: 555, topic: 'problem-solving', front: 'Merge Sort algorithm', back: 'Divide list into halves until single elements. Merge pairs in sorted order. O(n log n) time. Divide and conquer.' },
+    { id: 556, topic: 'problem-solving', front: 'Merge Sort merge step', back: 'Compare first elements of two sorted sublists. Take smaller one. Repeat until both empty. Combines into one sorted list.' },
+    { id: 557, topic: 'problem-solving', front: 'Quick Sort algorithm', back: 'Pick pivot, partition (smaller left, larger right), recurse on partitions. O(n log n) average, O(n²) worst case.' },
+    { id: 558, topic: 'problem-solving', front: 'Insertion Sort algorithm', back: 'Build sorted portion by inserting each element in correct position. O(n²) worst, O(n) best (nearly sorted). Good for small data.' },
+    { id: 559, topic: 'problem-solving', front: 'Time complexity comparison', back: 'O(1) < O(log n) < O(n) < O(n log n) < O(n²) < O(2ⁿ). Lower is better for large inputs.' },
+    
+    // Security concepts
+    { id: 560, topic: 'networks', front: 'Encryption', back: 'Converting plaintext to unreadable ciphertext using an algorithm and key. Protects data confidentiality. Decryption reverses it.' },
+    { id: 561, topic: 'networks', front: 'Symmetric encryption', back: 'Same key to encrypt and decrypt. Fast. Problem: secure key exchange. Examples: AES, DES. Used for bulk data.' },
+    { id: 562, topic: 'networks', front: 'Asymmetric encryption', back: 'Two keys: public (encrypt) and private (decrypt). Slower. Solves key exchange. Examples: RSA. Used for secure communication.' },
+    { id: 563, topic: 'networks', front: 'Hashing', back: 'One-way function producing fixed-size digest. Cannot reverse. Same input = same hash. Used for passwords, integrity checking.' },
+    { id: 564, topic: 'networks', front: 'Malware types', back: 'Virus (attaches to files), Worm (self-replicates via network), Trojan (disguised), Ransomware (encrypts for payment), Spyware (monitors user).' },
+    { id: 565, topic: 'networks', front: 'Firewall function', back: 'Monitors and filters network traffic based on security rules. Blocks unauthorized access. Can be hardware or software.' },
+    { id: 566, topic: 'networks', front: 'Packet filtering firewall', back: 'Examines packet headers (IP, port). Simple, fast. Doesn\'t inspect content. Stateless or stateful.' },
+    { id: 567, topic: 'networks', front: 'Phishing attack', back: 'Fake emails/websites trick users into revealing credentials. Social engineering. Prevention: verify URLs, don\'t click suspicious links.' },
+    { id: 568, topic: 'networks', front: 'SQL injection attack', back: 'Malicious SQL in input fields to manipulate database. Example: \' OR 1=1--. Prevention: parameterized queries, input validation.' },
+    { id: 569, topic: 'networks', front: 'DDoS attack', back: 'Distributed Denial of Service. Overwhelms server with traffic from many sources. Prevention: traffic filtering, rate limiting, CDN.' },
+    { id: 570, topic: 'networks', front: 'Man-in-the-middle attack', back: 'Attacker intercepts communication between two parties. Can eavesdrop or modify data. Prevention: HTTPS, certificate validation.' },
+    { id: 571, topic: 'networks', front: 'Brute force attack', back: 'Trying all possible password combinations. Time-consuming. Prevention: strong passwords, account lockout, rate limiting, 2FA.' },
+    { id: 572, topic: 'networks', front: 'Two-factor authentication (2FA)', back: 'Two different verification methods: something you know (password) + something you have (phone) or are (biometric). Much more secure.' },
+    { id: 573, topic: 'networks', front: 'Digital certificate', back: 'Electronic document proving identity. Contains public key. Issued by Certificate Authority (CA). Enables HTTPS trust.' },
+    { id: 574, topic: 'networks', front: 'VPN (Virtual Private Network)', back: 'Encrypts all traffic through secure tunnel. Hides IP address. Used for privacy, accessing restricted content, secure remote work.' },
+    
+    // Additional topics for comprehensive coverage
+    { id: 575, topic: 'data', front: 'Two\'s complement for -5 (8-bit)', back: 'Start with +5: 00000101. Invert: 11111010. Add 1: 11111011. MSB=1 indicates negative.' },
+    { id: 576, topic: 'computers', front: 'Fetch-Decode-Execute cycle', back: 'Fetch: PC→MAR, read instruction→MDR→CIR, PC+1. Decode: CU interprets instruction. Execute: ALU performs operation.' },
+    { id: 577, topic: 'computers', front: 'Control bus signals', back: 'Read/Write, Clock, Interrupt, Bus request. Coordinates operations between CPU and other components.' },
+    { id: 578, topic: 'programming', front: 'Recursion base case', back: 'Condition that stops recursion. Without it, infinite recursion causes stack overflow. Example: factorial(0) = 1.' },
+    { id: 579, topic: 'problem-solving', front: 'Space complexity', back: 'Memory used by algorithm. Bubble sort: O(1) in-place. Merge sort: O(n) needs extra arrays. Trade-off with time.' },
+    { id: 580, topic: 'networks', front: 'MAC address format', back: '48-bit hardware address. Written as 6 hex pairs: AA:BB:CC:DD:EE:FF. Unique to each network interface. Layer 2.' },
+    { id: 581, topic: 'networks', front: 'IPv4 vs IPv6', back: 'IPv4: 32-bit, 4 billion addresses, exhausted. IPv6: 128-bit, 340 undecillion addresses, built-in security.' },
+    { id: 582, topic: 'databases', front: 'SQL JOIN types', back: 'INNER: matching rows only. LEFT: all from left + matches. RIGHT: all from right + matches. FULL: all from both.' },
+    { id: 583, topic: 'programming', front: 'Pass by value vs reference', back: 'Value: copy passed, original unchanged. Reference: address passed, can modify original. Affects function behavior.' },
+    { id: 584, topic: 'computers', front: 'Interrupt handling', back: 'Signal to CPU requiring attention. CPU saves state, runs interrupt handler, restores state. Types: hardware, software, timer.' }
+];
+
+// Add expanded flashcards
+FLASHCARDS.push(...EXPANDED_FLASHCARDS);
+
 /**
  * Shuffle question options and update answer index accordingly.
  * 
@@ -905,5 +1555,68 @@ function shuffleQuestionOptions(question) {
         answer: newAnswerIndex
     };
 }
+
+// ==================== NEW QUESTIONS (ID 500+) ====================
+// Topics: Security, Databases, Ethics, Web Development
+// Answer distribution: ~25% each (A=0, B=1, C=2, D=3)
+
+const QUESTIONS_500 = [
+    // ==================== SECURITY: Encryption & Hashing (11 questions) ====================
+    { id: 500, topic: 'networks', question: 'What is the main difference between encryption and hashing?', options: ['Encryption is reversible, hashing is one-way', 'Hashing is reversible, encryption is one-way', 'Both are reversible', 'Both are one-way'], answer: 0, explanation: 'Encryption can be decrypted with a key; hashing is a one-way function that cannot be reversed.' },
+    { id: 501, topic: 'networks', question: 'Which algorithm is commonly used for hashing passwords?', options: ['AES', 'bcrypt', 'RSA', 'DES'], answer: 1, explanation: 'bcrypt is designed for password hashing with built-in salting and adaptive cost factor.' },
+    { id: 502, topic: 'networks', question: 'What is a salt in cryptography?', options: ['A type of firewall', 'An encryption key', 'Random data added before hashing to prevent rainbow table attacks', 'A password strength measure'], answer: 2, explanation: 'A salt is random data added to input before hashing, making precomputed attacks ineffective.' },
+    { id: 503, topic: 'networks', question: 'Which type of encryption uses the same key for encryption and decryption?', options: ['Asymmetric', 'Public key', 'Hash-based', 'Symmetric'], answer: 3, explanation: 'Symmetric encryption (like AES) uses one shared key for both encryption and decryption.' },
+    { id: 504, topic: 'networks', question: 'In asymmetric encryption, which key is used to encrypt data sent to you?', options: ['Your public key', 'Your private key', 'The sender\'s private key', 'A shared secret key'], answer: 0, explanation: 'Others encrypt with your public key; only your private key can decrypt it.' },
+    { id: 505, topic: 'networks', question: 'What is a rainbow table attack?', options: ['Flooding a network with colorful packets', 'Using precomputed hash values to crack passwords', 'A type of DDoS attack', 'Intercepting wireless signals'], answer: 1, explanation: 'Rainbow tables contain precomputed hashes to quickly look up passwords from their hashes.' },
+    { id: 506, topic: 'networks', question: 'What does SSL/TLS provide for web connections?', options: ['Faster speeds', 'Encrypted secure communication', 'Better graphics', 'More bandwidth'], answer: 1, explanation: 'SSL/TLS encrypts data between browser and server, providing secure HTTPS connections.' },
+    { id: 507, topic: 'networks', question: 'Which hash algorithm produces a 256-bit output?', options: ['MD5', 'SHA-1', 'CRC32', 'SHA-256'], answer: 3, explanation: 'SHA-256 produces a 256-bit (32-byte) hash output, commonly used for security.' },
+    { id: 508, topic: 'networks', question: 'Why should MD5 not be used for security purposes?', options: ['It has known collision vulnerabilities', 'It\'s too slow', 'It produces outputs that are too long', 'It requires too much memory'], answer: 0, explanation: 'MD5 has known collision attacks where different inputs produce the same hash.' },
+    { id: 509, topic: 'networks', question: 'What is end-to-end encryption?', options: ['Encryption at server only', 'Encryption of file names only', 'Encryption using end keys', 'Encryption where only sender and recipient can read messages'], answer: 3, explanation: 'End-to-end encryption means only communicating parties can decrypt messages, not even the service provider.' },
+    { id: 510, topic: 'networks', question: 'A digital signature is created using:', options: ['The sender\'s private key', 'The sender\'s public key', 'The recipient\'s public key', 'A shared password'], answer: 0, explanation: 'Digital signatures are created with the sender\'s private key and verified with their public key.' },
+    
+    // ==================== SECURITY: Malware & Firewalls (11 questions) ====================
+    { id: 511, topic: 'networks', question: 'What type of malware disguises itself as legitimate software?', options: ['Worm', 'Trojan horse', 'Adware', 'Rootkit'], answer: 1, explanation: 'Trojans appear to be useful software but contain hidden malicious code.' },
+    { id: 512, topic: 'networks', question: 'Which malware type can spread across networks without user interaction?', options: ['Virus', 'Trojan', 'Worm', 'Spyware'], answer: 2, explanation: 'Worms self-replicate and spread automatically across networks without needing user action.' },
+    { id: 513, topic: 'networks', question: 'What does a packet-filtering firewall examine?', options: ['File contents', 'Email attachments', 'User passwords', 'Packet headers (IP addresses, ports)'], answer: 3, explanation: 'Packet-filtering firewalls check packet headers for source/destination IPs and port numbers.' },
+    { id: 514, topic: 'networks', question: 'What is a keylogger?', options: ['Malware that records keystrokes', 'A password manager', 'A firewall type', 'An encryption tool'], answer: 0, explanation: 'Keyloggers secretly record everything typed, capturing passwords and sensitive data.' },
+    { id: 515, topic: 'networks', question: 'What is the purpose of a stateful firewall?', options: ['Only check incoming traffic', 'Track active connections and their states', 'Block all UDP traffic', 'Encrypt all packets'], answer: 1, explanation: 'Stateful firewalls track connection states and make decisions based on traffic context.' },
+    { id: 516, topic: 'networks', question: 'Which malware type typically demands payment in cryptocurrency?', options: ['Adware', 'Spyware', 'Worm', 'Ransomware'], answer: 3, explanation: 'Ransomware encrypts files and demands cryptocurrency payment for decryption keys.' },
+    { id: 517, topic: 'networks', question: 'What does a rootkit do?', options: ['Hides malware presence from detection', 'Speeds up computer', 'Manages user accounts', 'Compresses files'], answer: 0, explanation: 'Rootkits hide malware and malicious activities by modifying OS components.' },
+    { id: 518, topic: 'networks', question: 'An application-level firewall operates at which OSI layer?', options: ['Layer 1 - Physical', 'Layer 7 - Application', 'Layer 3 - Network', 'Layer 4 - Transport'], answer: 1, explanation: 'Application-level firewalls inspect traffic at Layer 7, understanding application protocols.' },
+    { id: 519, topic: 'networks', question: 'What is a botnet?', options: ['A network security tool', 'A network of infected computers controlled remotely', 'A type of firewall', 'An antivirus program'], answer: 1, explanation: 'Botnets are networks of compromised computers (bots/zombies) controlled by attackers.' },
+    { id: 520, topic: 'networks', question: 'What protection does a DMZ provide?', options: ['Isolates public-facing servers from internal network', 'Faster internet', 'Encrypts all traffic', 'Blocks all external access'], answer: 0, explanation: 'A DMZ (Demilitarized Zone) separates public servers from the internal network for security.' },
+    { id: 521, topic: 'networks', question: 'Which is NOT a function of antivirus software?', options: ['Scanning for known malware signatures', 'Quarantining infected files', 'Encrypting network traffic', 'Real-time protection'], answer: 2, explanation: 'Antivirus detects and removes malware. Encrypting traffic is done by VPNs/SSL.' },
+    
+    // ==================== DATABASES: SQL & Keys (11 questions) ====================
+    { id: 522, topic: 'databases', question: 'What SQL keyword removes duplicate rows from results?', options: ['UNIQUE', 'DISTINCT', 'SINGLE', 'NODUPE'], answer: 1, explanation: 'SELECT DISTINCT returns only unique rows, removing duplicates from results.' },
+    { id: 523, topic: 'databases', question: 'Which SQL clause is used with aggregate functions to filter groups?', options: ['WHERE', 'GROUP BY', 'HAVING', 'ORDER BY'], answer: 2, explanation: 'HAVING filters groups after GROUP BY; WHERE filters individual rows before grouping.' },
+    { id: 524, topic: 'databases', question: 'What does a composite key consist of?', options: ['One field only', 'A foreign key', 'An auto-increment field', 'Two or more fields combined'], answer: 3, explanation: 'A composite key uses multiple fields together to uniquely identify a record.' },
+    { id: 525, topic: 'databases', question: 'Which constraint ensures a field cannot be empty?', options: ['NOT NULL', 'UNIQUE', 'PRIMARY KEY', 'CHECK'], answer: 0, explanation: 'NOT NULL constraint ensures the field must contain a value, cannot be left empty.' },
+    { id: 526, topic: 'databases', question: 'What does CASCADE DELETE do?', options: ['Deletes the database', 'Cancels all deletions', 'Automatically deletes related records in child tables', 'Creates a backup before delete'], answer: 2, explanation: 'CASCADE DELETE automatically removes related records when parent record is deleted.' },
+    { id: 527, topic: 'databases', question: 'In 3NF (Third Normal Form), there should be no:', options: ['Primary keys', 'Foreign keys', 'Tables', 'Transitive dependencies'], answer: 3, explanation: '3NF eliminates transitive dependencies - non-key fields should depend only on the primary key.' },
+    { id: 528, topic: 'databases', question: 'What does the SQL JOIN operation do?', options: ['Combines rows from two or more tables', 'Splits tables apart', 'Deletes matching rows', 'Creates indexes'], answer: 0, explanation: 'JOIN combines rows from multiple tables based on related columns.' },
+    { id: 529, topic: 'databases', question: 'Which type of JOIN returns all rows from the left table?', options: ['INNER JOIN', 'CROSS JOIN', 'LEFT JOIN', 'NATURAL JOIN'], answer: 2, explanation: 'LEFT JOIN returns all rows from left table plus matching rows from right table.' },
+    { id: 530, topic: 'databases', question: 'What is a surrogate key?', options: ['A natural identifier like email', 'A foreign key', 'A composite key', 'An auto-generated artificial key (like ID number)'], answer: 3, explanation: 'Surrogate keys are system-generated (often auto-increment) with no business meaning.' },
+    { id: 531, topic: 'databases', question: 'The BETWEEN operator in SQL is:', options: ['Exclusive of endpoints', 'Only for dates', 'Inclusive of endpoints', 'Only for strings'], answer: 2, explanation: 'BETWEEN is inclusive - WHERE age BETWEEN 18 AND 65 includes both 18 and 65.' },
+    { id: 532, topic: 'databases', question: 'What does database indexing improve?', options: ['Storage capacity', 'Data security', 'Query search speed', 'Backup speed'], answer: 2, explanation: 'Indexes create data structures that speed up searching/querying, like a book index.' },
+    
+    // ==================== ETHICS & IMPACTS (5 questions) ====================
+    { id: 533, topic: 'bigger-picture', question: 'What is the main purpose of GDPR?', options: ['Speed up internet', 'Regulate software prices', 'Protect personal data and privacy', 'Control social media'], answer: 2, explanation: 'GDPR (General Data Protection Regulation) protects EU citizens\' personal data and privacy.' },
+    { id: 534, topic: 'bigger-picture', question: 'What ethical concern arises from facial recognition in public spaces?', options: ['Faster identification', 'Improved security only', 'Better photography', 'Mass surveillance and privacy invasion'], answer: 3, explanation: 'Facial recognition enables mass surveillance, tracking individuals without consent.' },
+    { id: 535, topic: 'bigger-picture', question: 'What is planned obsolescence?', options: ['Designing products to become outdated/fail intentionally', 'Planning software updates', 'Scheduling backups', 'Organizing files'], answer: 0, explanation: 'Planned obsolescence designs products to have limited lifespans, forcing replacements.' },
+    { id: 536, topic: 'bigger-picture', question: 'Which is an example of the digital divide?', options: ['Using different browsers', 'Preferring iOS over Android', 'Rural areas lacking broadband access', 'Using old software'], answer: 2, explanation: 'Digital divide refers to inequality in technology access between different groups or regions.' },
+    { id: 537, topic: 'bigger-picture', question: 'What is net neutrality?', options: ['Neutral website colors', 'Free antivirus software', 'ISPs treating all internet traffic equally', 'Anonymous browsing'], answer: 2, explanation: 'Net neutrality means ISPs must treat all data equally, not favoring certain services.' },
+    
+    // ==================== WEB DEVELOPMENT: HTML & CSS (6 questions) ====================
+    { id: 538, topic: 'programming', question: 'What does HTML stand for?', options: ['High Tech Modern Language', 'HyperText Markup Language', 'Home Tool Markup Language', 'Hyperlink Text Mode Language'], answer: 1, explanation: 'HTML = HyperText Markup Language, the standard language for creating web pages.' },
+    { id: 539, topic: 'programming', question: 'Which HTML tag creates a hyperlink?', options: ['<link>', '<href>', '<url>', '<a>'], answer: 3, explanation: 'The <a> (anchor) tag creates hyperlinks using the href attribute for the destination.' },
+    { id: 540, topic: 'programming', question: 'What does CSS stand for?', options: ['Cascading Style Sheets', 'Computer Style Sheets', 'Creative Style System', 'Coded Style Syntax'], answer: 0, explanation: 'CSS = Cascading Style Sheets, used to style and layout web pages.' },
+    { id: 541, topic: 'programming', question: 'Which CSS property changes text color?', options: ['text-color', 'color', 'font-color', 'foreground'], answer: 1, explanation: 'The color property sets the text color. background-color sets background.' },
+    { id: 542, topic: 'programming', question: 'What is the correct HTML for the largest heading?', options: ['<heading>', '<h6>', '<head>', '<h1>'], answer: 3, explanation: '<h1> is the largest heading, <h6> is smallest. <head> contains metadata, not visible content.' },
+    { id: 543, topic: 'programming', question: 'Which CSS selector targets elements with class="main"?', options: ['#main', 'main', '*main', '.main'], answer: 3, explanation: '.classname selects by class, #id selects by ID, tagname selects all of that tag.' }
+];
+
+// Append new questions to QUESTIONS array
+QUESTIONS.push(...QUESTIONS_500);
 
 console.log('📚 Content expanded: ' + QUESTIONS.length + ' questions, ' + FLASHCARDS.length + ' flashcards loaded.');

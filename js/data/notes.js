@@ -979,6 +979,580 @@ ENDFUNCTION</code></pre>
 </div>
             `
         },
+        'Trace Tables': {
+            content: `
+<h2>Trace Tables</h2>
+<div class="definition-box">
+    <strong>Trace Table:</strong> A technique used to trace the execution of an algorithm by recording the values of variables at each step. Essential for debugging and understanding program flow.
+</div>
+
+<h3>Why Use Trace Tables?</h3>
+<ul>
+    <li><strong>Debugging:</strong> Find logic errors by tracking variable changes</li>
+    <li><strong>Understanding:</strong> See exactly how an algorithm works step-by-step</li>
+    <li><strong>Verification:</strong> Check if algorithm produces correct output</li>
+    <li><strong>Exam skill:</strong> Common exam question type!</li>
+</ul>
+
+<h3>How to Create a Trace Table</h3>
+<ol>
+    <li>Create columns for each variable and any output</li>
+    <li>Add a row for each step/iteration</li>
+    <li>Track changes line by line</li>
+    <li>Only update values when they change</li>
+</ol>
+
+<h3>Example 1: Simple Loop</h3>
+<div class="example-box">
+    <h4>Code:</h4>
+<pre><code>total ← 0
+FOR i ← 1 TO 4
+    total ← total + i
+NEXT i
+OUTPUT total</code></pre>
+
+    <h4>Trace Table:</h4>
+    <table class="notes-table">
+        <tr><th>Step</th><th>i</th><th>total</th><th>Output</th></tr>
+        <tr><td>1</td><td>-</td><td>0</td><td>-</td></tr>
+        <tr><td>2</td><td>1</td><td>1</td><td>-</td></tr>
+        <tr><td>3</td><td>2</td><td>3</td><td>-</td></tr>
+        <tr><td>4</td><td>3</td><td>6</td><td>-</td></tr>
+        <tr><td>5</td><td>4</td><td>10</td><td>-</td></tr>
+        <tr><td>6</td><td>-</td><td>10</td><td>10</td></tr>
+    </table>
+    <p><strong>Result:</strong> Outputs 10 (sum of 1+2+3+4)</p>
+</div>
+
+<h3>Example 2: While Loop with Condition</h3>
+<div class="example-box">
+    <h4>Code:</h4>
+<pre><code>x ← 20
+count ← 0
+WHILE x > 1
+    x ← x DIV 2
+    count ← count + 1
+ENDWHILE
+OUTPUT count</code></pre>
+
+    <h4>Trace Table:</h4>
+    <table class="notes-table">
+        <tr><th>Iteration</th><th>x</th><th>x > 1?</th><th>count</th><th>Output</th></tr>
+        <tr><td>Start</td><td>20</td><td>-</td><td>0</td><td>-</td></tr>
+        <tr><td>1</td><td>10</td><td>TRUE</td><td>1</td><td>-</td></tr>
+        <tr><td>2</td><td>5</td><td>TRUE</td><td>2</td><td>-</td></tr>
+        <tr><td>3</td><td>2</td><td>TRUE</td><td>3</td><td>-</td></tr>
+        <tr><td>4</td><td>1</td><td>TRUE</td><td>4</td><td>-</td></tr>
+        <tr><td>End</td><td>1</td><td>FALSE</td><td>4</td><td>4</td></tr>
+    </table>
+    <p><strong>Result:</strong> Outputs 4</p>
+</div>
+
+<h3>Example 3: Array Processing</h3>
+<div class="example-box">
+    <h4>Code:</h4>
+<pre><code>nums ← [5, 2, 8, 1]
+max ← nums[0]
+FOR i ← 1 TO 3
+    IF nums[i] > max THEN
+        max ← nums[i]
+    ENDIF
+NEXT i
+OUTPUT max</code></pre>
+
+    <h4>Trace Table:</h4>
+    <table class="notes-table">
+        <tr><th>i</th><th>nums[i]</th><th>nums[i] > max?</th><th>max</th></tr>
+        <tr><td>-</td><td>-</td><td>-</td><td>5</td></tr>
+        <tr><td>1</td><td>2</td><td>FALSE</td><td>5</td></tr>
+        <tr><td>2</td><td>8</td><td>TRUE</td><td>8</td></tr>
+        <tr><td>3</td><td>1</td><td>FALSE</td><td>8</td></tr>
+    </table>
+    <p><strong>Result:</strong> Outputs 8 (the maximum value)</p>
+</div>
+
+<h3>Example 4: Nested Conditions</h3>
+<div class="example-box">
+    <h4>Code:</h4>
+<pre><code>age ← 17
+hasLicense ← TRUE
+IF age >= 18 THEN
+    IF hasLicense THEN
+        result ← "Can drive"
+    ELSE
+        result ← "Get license"
+    ENDIF
+ELSE
+    result ← "Too young"
+ENDIF
+OUTPUT result</code></pre>
+
+    <h4>Trace Table:</h4>
+    <table class="notes-table">
+        <tr><th>Step</th><th>age</th><th>hasLicense</th><th>age >= 18?</th><th>result</th><th>Output</th></tr>
+        <tr><td>1</td><td>17</td><td>TRUE</td><td>FALSE</td><td>"Too young"</td><td>"Too young"</td></tr>
+    </table>
+</div>
+
+<div class="tip-box">
+    <strong>Exam Tips for Trace Tables:</strong>
+    <ul>
+        <li>Include ALL variables mentioned in the code</li>
+        <li>Add an output column if the code outputs anything</li>
+        <li>Use "-" or leave blank for unchanged values</li>
+        <li>Show the condition check for loops</li>
+        <li>Number your steps/iterations clearly</li>
+    </ul>
+</div>
+
+<div class="warning">
+    <strong>⚠️ Common Mistakes:</strong>
+    <ul>
+        <li>Forgetting to initialize variables</li>
+        <li>Not showing the loop termination condition</li>
+        <li>Skipping steps or iterations</li>
+        <li>Array index errors (remember arrays start at 0!)</li>
+    </ul>
+</div>
+            `
+        },
+        'Flowchart Examples': {
+            content: `
+<h2>Flowchart Examples</h2>
+
+<h3>Flowchart Symbol Reference</h3>
+<table class="notes-table">
+    <tr><th>Symbol</th><th>Name</th><th>Use</th></tr>
+    <tr><td>⬭ Oval/Rounded Rectangle</td><td>Terminator</td><td>START and END</td></tr>
+    <tr><td>▭ Rectangle</td><td>Process</td><td>Calculations, assignments</td></tr>
+    <tr><td>▱ Parallelogram</td><td>Input/Output</td><td>INPUT, OUTPUT, PRINT</td></tr>
+    <tr><td>◇ Diamond</td><td>Decision</td><td>IF/ELSE, conditions</td></tr>
+    <tr><td>→ Arrow</td><td>Flow Line</td><td>Direction of flow</td></tr>
+</table>
+
+<h3>Example 1: Calculate Grade</h3>
+<div class="example-box">
+    <h4>Problem: Input a score and output the grade (A/B/C/F)</h4>
+<pre><code>          ┌─────────┐
+          │  START  │
+          └────┬────┘
+               ↓
+       ┌───────────────┐
+       │ INPUT score   │
+       └───────┬───────┘
+               ↓
+         ◇ score >= 70? ◇
+        ╱               ╲
+      YES               NO
+       ↓                 ↓
+  ◇ score >= 80? ◇    ◇ score >= 50? ◇
+  ╱           ╲       ╱           ╲
+YES           NO    YES           NO
+ ↓             ↓     ↓             ↓
+┌────┐     ┌────┐ ┌────┐      ┌────┐
+│A   │     │B   │ │C   │      │F   │
+└─┬──┘     └─┬──┘ └─┬──┘      └─┬──┘
+  └────┬─────┴──────┴───────────┘
+       ↓
+  ┌──────────────┐
+  │ OUTPUT grade │
+  └──────┬───────┘
+         ↓
+    ┌─────────┐
+    │   END   │
+    └─────────┘</code></pre>
+</div>
+
+<h3>Example 2: Find Maximum of Two Numbers</h3>
+<div class="example-box">
+<pre><code>       ┌─────────┐
+       │  START  │
+       └────┬────┘
+            ↓
+    ┌───────────────┐
+    │ INPUT num1    │
+    └───────┬───────┘
+            ↓
+    ┌───────────────┐
+    │ INPUT num2    │
+    └───────┬───────┘
+            ↓
+      ◇ num1 > num2? ◇
+     ╱               ╲
+   YES               NO
+    ↓                 ↓
+┌─────────────┐  ┌─────────────┐
+│ max ← num1  │  │ max ← num2  │
+└──────┬──────┘  └──────┬──────┘
+       └────────┬───────┘
+                ↓
+        ┌────────────┐
+        │ OUTPUT max │
+        └─────┬──────┘
+              ↓
+         ┌─────────┐
+         │   END   │
+         └─────────┘</code></pre>
+</div>
+
+<h3>Example 3: While Loop - Count Down</h3>
+<div class="example-box">
+<pre><code>       ┌─────────┐
+       │  START  │
+       └────┬────┘
+            ↓
+    ┌───────────────┐
+    │  count ← 5    │
+    └───────┬───────┘
+            ↓
+      ◇ count > 0? ◇ ←────────┐
+     ╱            ╲           │
+   YES            NO          │
+    ↓              ↓          │
+┌──────────┐  ┌─────────┐     │
+│ OUTPUT   │  │   END   │     │
+│  count   │  └─────────┘     │
+└────┬─────┘                  │
+     ↓                        │
+┌──────────────────┐          │
+│ count ← count - 1│──────────┘
+└──────────────────┘</code></pre>
+</div>
+
+<h3>Example 4: Password Validation Loop</h3>
+<div class="example-box">
+<pre><code>            ┌─────────┐
+            │  START  │
+            └────┬────┘
+                 ↓
+        ┌─────────────────┐
+        │ attempts ← 0    │
+        └────────┬────────┘
+                 ↓
+    ┌──→ ◇ attempts < 3? ◇
+    │   ╱               ╲
+    │ YES               NO
+    │  ↓                 ↓
+    │ ┌──────────────┐  ┌─────────────┐
+    │ │INPUT password│  │OUTPUT       │
+    │ └──────┬───────┘  │"Locked out" │
+    │        ↓          └──────┬──────┘
+    │  ◇ password =           ↓
+    │   "secret"? ◇      ┌─────────┐
+    │  ╱        ╲        │   END   │
+    │YES        NO       └─────────┘
+    │ ↓          ↓
+    │┌────────┐ ┌──────────────────┐
+    ││OUTPUT  │ │attempts ← attempts│
+    ││"Access"│ │    + 1           │
+    │└───┬────┘ └────────┬─────────┘
+    │    ↓               │
+    │┌─────────┐         │
+    ││  END    │         │
+    │└─────────┘         │
+    └────────────────────┘</code></pre>
+</div>
+
+<h3>Example 5: Linear Search</h3>
+<div class="example-box">
+<pre><code>             ┌─────────┐
+             │  START  │
+             └────┬────┘
+                  ↓
+          ┌──────────────┐
+          │INPUT target  │
+          └──────┬───────┘
+                 ↓
+          ┌──────────────┐
+          │found ← FALSE │
+          │i ← 0         │
+          └──────┬───────┘
+                 ↓
+    ┌──→ ◇ i < length AND   ◇
+    │      found = FALSE?
+    │   ╱                 ╲
+    │ YES                 NO
+    │  ↓                   ↓
+    │◇ list[i] = target? ◇ ◇ found = TRUE? ◇
+    │ ╱          ╲         ╱           ╲
+    │YES         NO      YES           NO
+    │ ↓           ↓       ↓             ↓
+    │┌──────────┐┌────┐ ┌─────────┐ ┌──────────┐
+    ││found ←   ││i←  │ │OUTPUT   │ │OUTPUT    │
+    ││TRUE      ││i+1 │ │"Found   │ │"Not      │
+    │└────┬─────┘└─┬──┘ │at ",i   │ │found"    │
+    │     └────────┤    └────┬────┘ └────┬─────┘
+    └──────────────┘         └─────┬─────┘
+                                   ↓
+                              ┌─────────┐
+                              │   END   │
+                              └─────────┘</code></pre>
+</div>
+
+<div class="tip-box">
+    <strong>Flowchart Drawing Tips:</strong>
+    <ul>
+        <li>Always start with START and end with END</li>
+        <li>Flow should generally go top to bottom, left to right</li>
+        <li>Decision diamonds must have exactly TWO exits (YES/NO or TRUE/FALSE)</li>
+        <li>All arrows should point to a symbol, not empty space</li>
+        <li>Avoid crossing flow lines where possible</li>
+        <li>Keep processes simple - one action per box</li>
+    </ul>
+</div>
+            `
+        },
+        'Pseudocode Examples': {
+            content: `
+<h2>Extended Pseudocode Examples</h2>
+
+<h3>Standard Pseudocode Structures</h3>
+<table class="notes-table">
+    <tr><th>Structure</th><th>Syntax</th></tr>
+    <tr><td><strong>Assignment</strong></td><td>variable ← value</td></tr>
+    <tr><td><strong>Input</strong></td><td>INPUT variable</td></tr>
+    <tr><td><strong>Output</strong></td><td>OUTPUT expression</td></tr>
+    <tr><td><strong>IF-THEN-ELSE</strong></td><td>IF condition THEN ... ELSE ... ENDIF</td></tr>
+    <tr><td><strong>FOR loop</strong></td><td>FOR i ← start TO end ... NEXT i</td></tr>
+    <tr><td><strong>WHILE loop</strong></td><td>WHILE condition ... ENDWHILE</td></tr>
+    <tr><td><strong>REPEAT loop</strong></td><td>REPEAT ... UNTIL condition</td></tr>
+    <tr><td><strong>Function</strong></td><td>FUNCTION name(params) ... RETURN value ENDFUNCTION</td></tr>
+    <tr><td><strong>Procedure</strong></td><td>PROCEDURE name(params) ... ENDPROCEDURE</td></tr>
+</table>
+
+<h3>Example 1: Calculate Factorial</h3>
+<div class="example-box">
+<pre><code class="language-plaintext">// Calculate factorial of n (n!)
+// e.g., 5! = 5 × 4 × 3 × 2 × 1 = 120
+
+FUNCTION factorial(n)
+    IF n <= 1 THEN
+        RETURN 1
+    ELSE
+        result ← 1
+        FOR i ← 2 TO n
+            result ← result * i
+        NEXT i
+        RETURN result
+    ENDIF
+ENDFUNCTION
+
+// Usage
+OUTPUT "Enter a number: "
+INPUT num
+answer ← factorial(num)
+OUTPUT num, "! = ", answer</code></pre>
+</div>
+
+<h3>Example 2: Validate Email (Basic)</h3>
+<div class="example-box">
+<pre><code class="language-plaintext">// Check if email contains @ and . in correct positions
+
+FUNCTION isValidEmail(email)
+    hasAt ← FALSE
+    hasDot ← FALSE
+    atPosition ← -1
+    
+    FOR i ← 0 TO LENGTH(email) - 1
+        IF email[i] = "@" THEN
+            hasAt ← TRUE
+            atPosition ← i
+        ENDIF
+        IF email[i] = "." AND i > atPosition AND atPosition > 0 THEN
+            hasDot ← TRUE
+        ENDIF
+    NEXT i
+    
+    IF hasAt AND hasDot AND atPosition > 0 THEN
+        RETURN TRUE
+    ELSE
+        RETURN FALSE
+    ENDIF
+ENDFUNCTION
+
+// Usage
+REPEAT
+    OUTPUT "Enter email: "
+    INPUT userEmail
+    IF NOT isValidEmail(userEmail) THEN
+        OUTPUT "Invalid email format. Try again."
+    ENDIF
+UNTIL isValidEmail(userEmail)
+OUTPUT "Email accepted!"</code></pre>
+</div>
+
+<h3>Example 3: Menu-Driven Program</h3>
+<div class="example-box">
+<pre><code class="language-plaintext">// Simple calculator menu
+
+PROCEDURE displayMenu()
+    OUTPUT "===== CALCULATOR ====="
+    OUTPUT "1. Add"
+    OUTPUT "2. Subtract"
+    OUTPUT "3. Multiply"
+    OUTPUT "4. Divide"
+    OUTPUT "5. Exit"
+    OUTPUT "======================"
+ENDPROCEDURE
+
+PROCEDURE getNumbers()
+    OUTPUT "Enter first number: "
+    INPUT num1
+    OUTPUT "Enter second number: "
+    INPUT num2
+ENDPROCEDURE
+
+// Main program
+choice ← 0
+REPEAT
+    CALL displayMenu()
+    OUTPUT "Enter choice (1-5): "
+    INPUT choice
+    
+    IF choice >= 1 AND choice <= 4 THEN
+        CALL getNumbers()
+    ENDIF
+    
+    CASE choice OF
+        1: OUTPUT "Result: ", num1 + num2
+        2: OUTPUT "Result: ", num1 - num2
+        3: OUTPUT "Result: ", num1 * num2
+        4: IF num2 = 0 THEN
+               OUTPUT "Error: Cannot divide by zero"
+           ELSE
+               OUTPUT "Result: ", num1 / num2
+           ENDIF
+        5: OUTPUT "Goodbye!"
+        DEFAULT: OUTPUT "Invalid choice!"
+    ENDCASE
+    
+    OUTPUT ""  // Blank line
+UNTIL choice = 5</code></pre>
+</div>
+
+<h3>Example 4: Bubble Sort with Optimization</h3>
+<div class="example-box">
+<pre><code class="language-plaintext">// Bubble sort with early exit optimization
+
+PROCEDURE bubbleSort(arr)
+    n ← LENGTH(arr)
+    
+    FOR i ← 0 TO n - 2
+        swapped ← FALSE
+        
+        FOR j ← 0 TO n - 2 - i
+            IF arr[j] > arr[j + 1] THEN
+                // Swap elements
+                temp ← arr[j]
+                arr[j] ← arr[j + 1]
+                arr[j + 1] ← temp
+                swapped ← TRUE
+            ENDIF
+        NEXT j
+        
+        // If no swaps occurred, array is sorted
+        IF swapped = FALSE THEN
+            RETURN
+        ENDIF
+    NEXT i
+ENDPROCEDURE
+
+// Usage
+numbers ← [64, 34, 25, 12, 22, 11, 90]
+OUTPUT "Before: ", numbers
+CALL bubbleSort(numbers)
+OUTPUT "After: ", numbers</code></pre>
+</div>
+
+<h3>Example 5: Binary Search</h3>
+<div class="example-box">
+<pre><code class="language-plaintext">// Binary search - array MUST be sorted!
+
+FUNCTION binarySearch(arr, target)
+    low ← 0
+    high ← LENGTH(arr) - 1
+    
+    WHILE low <= high
+        mid ← (low + high) DIV 2
+        
+        IF arr[mid] = target THEN
+            RETURN mid          // Found at index mid
+        ELSE IF arr[mid] < target THEN
+            low ← mid + 1       // Search right half
+        ELSE
+            high ← mid - 1      // Search left half
+        ENDIF
+    ENDWHILE
+    
+    RETURN -1                   // Not found
+ENDFUNCTION
+
+// Usage
+sortedList ← [2, 5, 8, 12, 16, 23, 38, 56, 72, 91]
+OUTPUT "Enter number to find: "
+INPUT searchFor
+
+position ← binarySearch(sortedList, searchFor)
+
+IF position = -1 THEN
+    OUTPUT searchFor, " was not found"
+ELSE
+    OUTPUT searchFor, " found at index ", position
+ENDIF</code></pre>
+</div>
+
+<h3>Example 6: Count Word Occurrences</h3>
+<div class="example-box">
+<pre><code class="language-plaintext">// Count how many times a word appears in a sentence
+
+FUNCTION countWord(sentence, word)
+    count ← 0
+    wordLength ← LENGTH(word)
+    sentenceLength ← LENGTH(sentence)
+    
+    // Convert both to uppercase for case-insensitive search
+    sentence ← UPPER(sentence)
+    word ← UPPER(word)
+    
+    FOR i ← 0 TO sentenceLength - wordLength
+        match ← TRUE
+        
+        // Check if word matches at position i
+        FOR j ← 0 TO wordLength - 1
+            IF sentence[i + j] ≠ word[j] THEN
+                match ← FALSE
+            ENDIF
+        NEXT j
+        
+        IF match = TRUE THEN
+            count ← count + 1
+        ENDIF
+    NEXT i
+    
+    RETURN count
+ENDFUNCTION
+
+// Usage
+text ← "The cat sat on the mat. The cat was happy."
+searchWord ← "the"
+occurrences ← countWord(text, searchWord)
+OUTPUT "'", searchWord, "' appears ", occurrences, " times"</code></pre>
+</div>
+
+<div class="tip-box">
+    <strong>Pseudocode Best Practices:</strong>
+    <ul>
+        <li>Use meaningful variable names (totalScore not ts)</li>
+        <li>Indent code inside loops and IF statements</li>
+        <li>Add comments to explain complex logic</li>
+        <li>Use UPPERCASE for keywords</li>
+        <li>Use ← for assignment (not =)</li>
+        <li>Always close structures (ENDIF, ENDWHILE, NEXT)</li>
+        <li>Keep lines reasonably short</li>
+    </ul>
+</div>
+            `
+        },
         'Decomposition': {
             content: `
 <h2>Decomposition</h2>
@@ -1646,6 +2220,350 @@ OUTPUT "Your grade: ", myGrade    // Outputs: Your grade: A</code></pre>
 </div>
             `
         },
+        'Validation Techniques': {
+            content: `
+<h2>Validation Techniques</h2>
+<div class="definition-box">
+    <strong>Validation:</strong> Automatic checking by a computer program that data entered is reasonable, sensible, and within acceptable boundaries BEFORE it is processed. Validation checks if data is <em>acceptable</em>, NOT if it is <em>correct</em>.
+</div>
+
+<h3>Validation vs Verification - KEY DIFFERENCE!</h3>
+<table class="notes-table">
+    <tr><th>Validation</th><th>Verification</th></tr>
+    <tr><td>Automatic computer check</td><td>Human check</td></tr>
+    <tr><td>Checks if data is REASONABLE</td><td>Checks if data is ACCURATE/CORRECT</td></tr>
+    <tr><td>Example: Age is a number between 0-120</td><td>Example: User checks their typed email is correct</td></tr>
+    <tr><td>Can be wrong but valid (age=25 when really 26)</td><td>Confirms data matches the truth</td></tr>
+</table>
+
+<h3>Complete Validation Examples</h3>
+
+<h4>1. Range Check with Retry Loop</h4>
+<div class="example-box">
+<pre><code class="language-plaintext">// Validate age between 0 and 120
+FUNCTION getValidAge()
+    valid ← FALSE
+    REPEAT
+        OUTPUT "Enter your age (0-120): "
+        INPUT age
+        
+        IF age < 0 THEN
+            OUTPUT "Error: Age cannot be negative"
+        ELSE IF age > 120 THEN
+            OUTPUT "Error: Age cannot exceed 120"
+        ELSE
+            valid ← TRUE
+        ENDIF
+    UNTIL valid = TRUE
+    
+    RETURN age
+ENDFUNCTION
+
+// Usage
+userAge ← getValidAge()
+OUTPUT "Age accepted: ", userAge</code></pre>
+</div>
+
+<h4>2. Type Check</h4>
+<div class="example-box">
+<pre><code class="language-plaintext">// Check if input is a valid integer
+FUNCTION isInteger(value)
+    FOR i ← 0 TO LENGTH(value) - 1
+        char ← value[i]
+        // Check if character is a digit (0-9)
+        IF char < "0" OR char > "9" THEN
+            // Allow negative sign at start
+            IF NOT (i = 0 AND char = "-") THEN
+                RETURN FALSE
+            ENDIF
+        ENDIF
+    NEXT i
+    RETURN TRUE
+ENDFUNCTION
+
+// Validate quantity input
+REPEAT
+    OUTPUT "Enter quantity: "
+    INPUT quantityStr
+    
+    IF NOT isInteger(quantityStr) THEN
+        OUTPUT "Error: Please enter a whole number"
+    ENDIF
+UNTIL isInteger(quantityStr)
+
+quantity ← INTEGER(quantityStr)</code></pre>
+</div>
+
+<h4>3. Length Check</h4>
+<div class="example-box">
+<pre><code class="language-plaintext">// Validate password length (8-20 characters)
+FUNCTION validatePasswordLength(password)
+    IF LENGTH(password) < 8 THEN
+        RETURN "Password must be at least 8 characters"
+    ELSE IF LENGTH(password) > 20 THEN
+        RETURN "Password cannot exceed 20 characters"
+    ELSE
+        RETURN "Valid"
+    ENDIF
+ENDFUNCTION
+
+// Validate UK postcode (6-8 characters)
+FUNCTION validatePostcodeLength(postcode)
+    length ← LENGTH(postcode)
+    IF length < 6 OR length > 8 THEN
+        RETURN FALSE
+    ENDIF
+    RETURN TRUE
+ENDFUNCTION</code></pre>
+</div>
+
+<h4>4. Presence Check</h4>
+<div class="example-box">
+<pre><code class="language-plaintext">// Ensure required fields are not empty
+FUNCTION checkPresence(fieldName, value)
+    // Remove whitespace
+    trimmed ← TRIM(value)
+    
+    IF trimmed = "" THEN
+        OUTPUT fieldName, " is required and cannot be empty"
+        RETURN FALSE
+    ENDIF
+    RETURN TRUE
+ENDFUNCTION
+
+// Usage in a form
+valid ← TRUE
+IF NOT checkPresence("Name", userName) THEN
+    valid ← FALSE
+ENDIF
+IF NOT checkPresence("Email", userEmail) THEN
+    valid ← FALSE
+ENDIF
+IF NOT checkPresence("Address", userAddress) THEN
+    valid ← FALSE
+ENDIF
+
+IF valid THEN
+    OUTPUT "Form submitted successfully"
+ENDIF</code></pre>
+</div>
+
+<h4>5. Format Check (Pattern Matching)</h4>
+<div class="example-box">
+<pre><code class="language-plaintext">// Validate email format
+FUNCTION isValidEmail(email)
+    // Must contain @ and at least one . after @
+    atPosition ← -1
+    dotAfterAt ← FALSE
+    
+    FOR i ← 0 TO LENGTH(email) - 1
+        IF email[i] = "@" THEN
+            IF atPosition = -1 THEN
+                atPosition ← i
+            ELSE
+                RETURN FALSE  // Multiple @ not allowed
+            ENDIF
+        ENDIF
+        IF email[i] = "." AND atPosition > 0 AND i > atPosition THEN
+            dotAfterAt ← TRUE
+        ENDIF
+    NEXT i
+    
+    // Must have @ not at start/end, and . after @
+    IF atPosition > 0 AND atPosition < LENGTH(email) - 1 AND dotAfterAt THEN
+        RETURN TRUE
+    ENDIF
+    RETURN FALSE
+ENDFUNCTION
+
+// Validate UK phone number (starts with 0, 11 digits)
+FUNCTION isValidUKPhone(phone)
+    // Remove spaces
+    cleaned ← REPLACE(phone, " ", "")
+    
+    IF LENGTH(cleaned) ≠ 11 THEN
+        RETURN FALSE
+    ENDIF
+    IF cleaned[0] ≠ "0" THEN
+        RETURN FALSE
+    ENDIF
+    // Check all characters are digits
+    FOR i ← 0 TO 10
+        IF cleaned[i] < "0" OR cleaned[i] > "9" THEN
+            RETURN FALSE
+        ENDIF
+    NEXT i
+    RETURN TRUE
+ENDFUNCTION
+
+// Validate date format DD/MM/YYYY
+FUNCTION isValidDateFormat(dateStr)
+    IF LENGTH(dateStr) ≠ 10 THEN
+        RETURN FALSE
+    ENDIF
+    IF dateStr[2] ≠ "/" OR dateStr[5] ≠ "/" THEN
+        RETURN FALSE
+    ENDIF
+    // Additional: Check day/month/year are valid numbers
+    RETURN TRUE
+ENDFUNCTION</code></pre>
+</div>
+
+<h4>6. Lookup Check (Table/List Lookup)</h4>
+<div class="example-box">
+<pre><code class="language-plaintext">// Validate against a list of allowed values
+FUNCTION isValidCountry(country)
+    validCountries ← ["UK", "USA", "Canada", "Australia", "France", "Germany"]
+    
+    FOR i ← 0 TO LENGTH(validCountries) - 1
+        IF UPPER(country) = UPPER(validCountries[i]) THEN
+            RETURN TRUE
+        ENDIF
+    NEXT i
+    RETURN FALSE
+ENDFUNCTION
+
+// Validate title
+FUNCTION isValidTitle(title)
+    validTitles ← ["Mr", "Mrs", "Ms", "Miss", "Dr", "Prof"]
+    RETURN title IN validTitles
+ENDFUNCTION
+
+// Validate product code exists in database
+FUNCTION productExists(productCode)
+    OPEN "products.txt" FOR READ AS file
+    found ← FALSE
+    WHILE NOT EOF(file) AND found = FALSE
+        line ← READLINE(file)
+        parts ← SPLIT(line, ",")
+        IF parts[0] = productCode THEN
+            found ← TRUE
+        ENDIF
+    ENDWHILE
+    CLOSE file
+    RETURN found
+ENDFUNCTION</code></pre>
+</div>
+
+<h4>7. Check Digit</h4>
+<div class="example-box">
+<pre><code class="language-plaintext">// Simple check digit calculation (modulo 10)
+FUNCTION calculateCheckDigit(number)
+    total ← 0
+    FOR i ← 0 TO LENGTH(number) - 1
+        digit ← INTEGER(number[i])
+        total ← total + digit
+    NEXT i
+    checkDigit ← total MOD 10
+    RETURN STRING(checkDigit)
+ENDFUNCTION
+
+// Validate a code with check digit
+FUNCTION validateWithCheckDigit(fullCode)
+    // Last character is the check digit
+    codeWithoutCheck ← SUBSTRING(fullCode, 0, LENGTH(fullCode) - 1)
+    providedCheck ← fullCode[LENGTH(fullCode) - 1]
+    
+    calculatedCheck ← calculateCheckDigit(codeWithoutCheck)
+    
+    RETURN providedCheck = calculatedCheck
+ENDFUNCTION
+
+// Example: Validate "12345" + check digit
+code ← "12345"
+checkDigit ← calculateCheckDigit(code)
+fullCode ← code + checkDigit  // "123455"
+OUTPUT "Full code with check digit: ", fullCode</code></pre>
+</div>
+
+<h3>Complete Validation System Example</h3>
+<div class="example-box">
+    <h4>User Registration Validation</h4>
+<pre><code class="language-plaintext">FUNCTION validateRegistration(username, email, password, age)
+    errors ← []
+    
+    // Username: presence + length
+    IF username = "" THEN
+        APPEND "Username is required" TO errors
+    ELSE IF LENGTH(username) < 3 THEN
+        APPEND "Username must be at least 3 characters" TO errors
+    ELSE IF LENGTH(username) > 20 THEN
+        APPEND "Username cannot exceed 20 characters" TO errors
+    ENDIF
+    
+    // Email: presence + format
+    IF email = "" THEN
+        APPEND "Email is required" TO errors
+    ELSE IF NOT isValidEmail(email) THEN
+        APPEND "Invalid email format" TO errors
+    ENDIF
+    
+    // Password: presence + length + complexity
+    IF password = "" THEN
+        APPEND "Password is required" TO errors
+    ELSE
+        IF LENGTH(password) < 8 THEN
+            APPEND "Password must be at least 8 characters" TO errors
+        ENDIF
+        IF NOT containsDigit(password) THEN
+            APPEND "Password must contain at least one number" TO errors
+        ENDIF
+        IF NOT containsUpper(password) THEN
+            APPEND "Password must contain at least one uppercase letter" TO errors
+        ENDIF
+    ENDIF
+    
+    // Age: type + range
+    IF NOT isInteger(age) THEN
+        APPEND "Age must be a number" TO errors
+    ELSE
+        ageNum ← INTEGER(age)
+        IF ageNum < 13 THEN
+            APPEND "You must be at least 13 to register" TO errors
+        ELSE IF ageNum > 120 THEN
+            APPEND "Please enter a valid age" TO errors
+        ENDIF
+    ENDIF
+    
+    RETURN errors
+ENDFUNCTION
+
+// Usage
+errors ← validateRegistration(username, email, password, age)
+
+IF LENGTH(errors) = 0 THEN
+    OUTPUT "Registration successful!"
+    // Save user to database
+ELSE
+    OUTPUT "Please fix the following errors:"
+    FOR EACH error IN errors
+        OUTPUT "• ", error
+    NEXT
+ENDIF</code></pre>
+</div>
+
+<div class="tip-box">
+    <strong>Validation Best Practices:</strong>
+    <ul>
+        <li>Validate on input - don't let bad data enter your system</li>
+        <li>Combine multiple validation types for thorough checking</li>
+        <li>Provide clear error messages telling users what's wrong</li>
+        <li>Use loops to retry until valid input is received</li>
+        <li>Remember: valid ≠ correct (25 is valid age, but might not be the user's real age)</li>
+    </ul>
+</div>
+
+<div class="warning">
+    <strong>⚠️ Common Exam Mistakes:</strong>
+    <ul>
+        <li>Confusing validation (automatic check) with verification (human check)</li>
+        <li>Not providing retry loops for invalid input</li>
+        <li>Missing edge cases (empty strings, boundary values)</li>
+        <li>Forgetting that validation can't check if data is true/correct</li>
+    </ul>
+</div>
+            `
+        },
         'Validation': {
             content: `
 <h2>Validation</h2>
@@ -1986,6 +2904,227 @@ OUTPUT firstName    // Outputs: "John"</code></pre>
 </div>
             `
         },
+        'Data Structures': {
+            content: `
+<h2>Data Structures</h2>
+<div class="definition-box">
+    <strong>Data Structure:</strong> A way of organizing and storing data so it can be accessed and modified efficiently. Different structures suit different tasks.
+</div>
+
+<h3>Common Data Structures</h3>
+<table class="notes-table">
+    <tr><th>Structure</th><th>Description</th><th>Use Cases</th></tr>
+    <tr><td><strong>Array</strong></td><td>Fixed-size, indexed collection</td><td>Lists of items, lookup tables</td></tr>
+    <tr><td><strong>List</strong></td><td>Dynamic-size, ordered collection</td><td>When size changes frequently</td></tr>
+    <tr><td><strong>Stack</strong></td><td>LIFO (Last In, First Out)</td><td>Undo operations, backtracking</td></tr>
+    <tr><td><strong>Queue</strong></td><td>FIFO (First In, First Out)</td><td>Print queues, task scheduling</td></tr>
+    <tr><td><strong>Dictionary/Map</strong></td><td>Key-value pairs</td><td>Lookups, configurations</td></tr>
+    <tr><td><strong>Record</strong></td><td>Collection of related fields</td><td>Database entries, objects</td></tr>
+</table>
+
+<h3>1. Arrays</h3>
+<div class="example-box">
+    <h4>Basic Array Operations</h4>
+<pre><code class="language-plaintext">// Declare and initialize
+scores ← [85, 92, 78, 95, 88]
+
+// Access by index (0-based)
+first ← scores[0]        // 85
+last ← scores[4]         // 88
+
+// Modify element
+scores[2] ← 80           // Change 78 to 80
+
+// Get length
+size ← LENGTH(scores)    // 5
+
+// Iterate through array
+FOR i ← 0 TO LENGTH(scores) - 1
+    OUTPUT scores[i]
+NEXT i</code></pre>
+</div>
+
+<h3>2. 2D Arrays (Tables/Grids)</h3>
+<div class="example-box">
+    <h4>Working with 2D Arrays</h4>
+<pre><code class="language-plaintext">// Create a 3x3 grid
+grid ← [[1, 2, 3],
+        [4, 5, 6],
+        [7, 8, 9]]
+
+// Access element at row 1, column 2
+value ← grid[1][2]       // 6
+
+// Iterate through 2D array
+FOR row ← 0 TO 2
+    FOR col ← 0 TO 2
+        OUTPUT grid[row][col], " "
+    NEXT col
+    OUTPUT ""            // New line
+NEXT row
+
+// Example: Tic-Tac-Toe board
+board ← [["X", "O", "X"],
+         [" ", "X", "O"],
+         ["O", " ", "X"]]</code></pre>
+</div>
+
+<h3>3. Stacks (LIFO)</h3>
+<div class="example-box">
+    <h4>Stack Operations</h4>
+<pre><code class="language-plaintext">// Initialize empty stack
+stack ← []
+top ← -1
+
+// PUSH - Add to top
+PROCEDURE push(item)
+    top ← top + 1
+    stack[top] ← item
+ENDPROCEDURE
+
+// POP - Remove from top
+FUNCTION pop()
+    IF top < 0 THEN
+        RETURN "Stack empty"
+    ENDIF
+    item ← stack[top]
+    top ← top - 1
+    RETURN item
+ENDFUNCTION
+
+// PEEK - View top without removing
+FUNCTION peek()
+    IF top < 0 THEN
+        RETURN "Stack empty"
+    ENDIF
+    RETURN stack[top]
+ENDFUNCTION
+
+// Example: Undo feature
+CALL push("Action 1")
+CALL push("Action 2")
+CALL push("Action 3")
+lastAction ← pop()       // Returns "Action 3"
+OUTPUT "Undoing: ", lastAction</code></pre>
+</div>
+
+<h3>4. Queues (FIFO)</h3>
+<div class="example-box">
+    <h4>Queue Operations</h4>
+<pre><code class="language-plaintext">// Initialize queue
+queue ← []
+front ← 0
+rear ← -1
+
+// ENQUEUE - Add to back
+PROCEDURE enqueue(item)
+    rear ← rear + 1
+    queue[rear] ← item
+ENDPROCEDURE
+
+// DEQUEUE - Remove from front
+FUNCTION dequeue()
+    IF front > rear THEN
+        RETURN "Queue empty"
+    ENDIF
+    item ← queue[front]
+    front ← front + 1
+    RETURN item
+ENDFUNCTION
+
+// Example: Print queue
+CALL enqueue("Document1.pdf")
+CALL enqueue("Document2.pdf")
+CALL enqueue("Document3.pdf")
+
+WHILE front <= rear
+    nextDoc ← dequeue()
+    OUTPUT "Printing: ", nextDoc
+ENDWHILE</code></pre>
+</div>
+
+<h3>5. Records (Structures)</h3>
+<div class="example-box">
+    <h4>Using Records</h4>
+<pre><code class="language-plaintext">// Define a record structure
+TYPE Student
+    studentID : STRING
+    firstName : STRING
+    lastName : STRING
+    age : INTEGER
+    grades : ARRAY OF INTEGER
+ENDTYPE
+
+// Create a record
+student1 : Student
+student1.studentID ← "S001"
+student1.firstName ← "John"
+student1.lastName ← "Smith"
+student1.age ← 16
+student1.grades ← [85, 92, 78]
+
+// Access record fields
+OUTPUT student1.firstName, " ", student1.lastName
+OUTPUT "Age: ", student1.age
+
+// Array of records
+students : ARRAY[0..29] OF Student
+students[0] ← student1</code></pre>
+</div>
+
+<h3>6. Dictionaries (Key-Value Pairs)</h3>
+<div class="example-box">
+    <h4>Dictionary Operations</h4>
+<pre><code class="language-plaintext">// Create dictionary
+phoneBook ← {}
+phoneBook["Alice"] ← "07123456789"
+phoneBook["Bob"] ← "07987654321"
+phoneBook["Charlie"] ← "07555123456"
+
+// Access by key
+alicePhone ← phoneBook["Alice"]
+OUTPUT "Alice's number: ", alicePhone
+
+// Check if key exists
+IF "Bob" IN phoneBook THEN
+    OUTPUT "Bob's number: ", phoneBook["Bob"]
+ENDIF
+
+// Update value
+phoneBook["Alice"] ← "07111222333"
+
+// Delete entry
+DELETE phoneBook["Charlie"]
+
+// Iterate through dictionary
+FOR EACH name IN phoneBook.keys()
+    OUTPUT name, ": ", phoneBook[name]
+NEXT</code></pre>
+</div>
+
+<h3>Choosing the Right Data Structure</h3>
+<table class="notes-table">
+    <tr><th>Task</th><th>Best Structure</th><th>Why?</th></tr>
+    <tr><td>Store fixed list of items</td><td>Array</td><td>Fast index access</td></tr>
+    <tr><td>Undo/Redo functionality</td><td>Stack</td><td>LIFO matches undo order</td></tr>
+    <tr><td>Process tasks in order</td><td>Queue</td><td>FIFO ensures fairness</td></tr>
+    <tr><td>Look up by name/key</td><td>Dictionary</td><td>Fast key-based access</td></tr>
+    <tr><td>Store related data together</td><td>Record</td><td>Groups fields logically</td></tr>
+    <tr><td>Game board/grid</td><td>2D Array</td><td>Row/column addressing</td></tr>
+</table>
+
+<div class="tip-box">
+    <strong>Exam Tips:</strong>
+    <ul>
+        <li>Arrays: Remember 0-based indexing!</li>
+        <li>Stack: LIFO - like a stack of plates</li>
+        <li>Queue: FIFO - like a queue at a shop</li>
+        <li>Know when to use each structure</li>
+        <li>Be able to implement push/pop, enqueue/dequeue</li>
+    </ul>
+</div>
+            `
+        },
         'File Handling': {
             content: `
 <h2>File Handling (Paper 2)</h2>
@@ -2013,74 +3152,189 @@ OUTPUT firstName    // Outputs: "John"</code></pre>
 
 <h3>File Modes</h3>
 <table class="notes-table">
-    <tr><th>Mode</th><th>Description</th></tr>
-    <tr><td><strong>Read ("r")</strong></td><td>Open for reading only</td></tr>
-    <tr><td><strong>Write ("w")</strong></td><td>Open for writing (overwrites existing)</td></tr>
-    <tr><td><strong>Append ("a")</strong></td><td>Open for writing (adds to end)</td></tr>
+    <tr><th>Mode</th><th>Description</th><th>Behavior</th></tr>
+    <tr><td><strong>Read ("r")</strong></td><td>Open for reading only</td><td>File must exist</td></tr>
+    <tr><td><strong>Write ("w")</strong></td><td>Open for writing</td><td>Creates new / overwrites existing</td></tr>
+    <tr><td><strong>Append ("a")</strong></td><td>Open for appending</td><td>Creates new / adds to end</td></tr>
 </table>
 
 <h3>Reading from a File</h3>
-<pre><code class="language-python"># Pseudocode
+<div class="example-box">
+    <h4>Read entire file line by line</h4>
+<pre><code class="language-plaintext">// Pseudocode
 OPEN "data.txt" FOR READ AS file
 WHILE NOT EOF(file)
-    line = READLINE(file)
+    line ← READLINE(file)
     OUTPUT line
 ENDWHILE
-CLOSE file
+CLOSE file</code></pre>
 
-# Python
+<pre><code class="language-python"># Python
 file = open("data.txt", "r")
 for line in file:
-    print(line)
-file.close()</code></pre>
+    print(line.strip())  # strip() removes newline
+file.close()
+
+# Using 'with' (automatically closes file)
+with open("data.txt", "r") as file:
+    for line in file:
+        print(line.strip())</code></pre>
+</div>
 
 <h3>Writing to a File</h3>
-<pre><code class="language-python"># Pseudocode
+<div class="example-box">
+    <h4>Write new content (overwrites existing)</h4>
+<pre><code class="language-plaintext">// Pseudocode
 OPEN "output.txt" FOR WRITE AS file
 WRITELINE(file, "Hello World")
 WRITELINE(file, "This is line 2")
-CLOSE file
+WRITELINE(file, "This is line 3")
+CLOSE file</code></pre>
 
-# Python
+<pre><code class="language-python"># Python
 file = open("output.txt", "w")
 file.write("Hello World\\n")
 file.write("This is line 2\\n")
+file.write("This is line 3\\n")
 file.close()</code></pre>
+</div>
 
 <h3>Appending to a File</h3>
-<pre><code class="language-python"># Add to existing file without overwriting
+<div class="example-box">
+    <h4>Add to existing file</h4>
+<pre><code class="language-plaintext">// Pseudocode - adds to end without deleting
 OPEN "log.txt" FOR APPEND AS file
-WRITELINE(file, "New entry added")
+WRITELINE(file, "New entry: " + timestamp)
 CLOSE file</code></pre>
+</div>
 
-<h3>Example: Read numbers and calculate average</h3>
-<pre><code class="language-python">OPEN "numbers.txt" FOR READ AS file
-total = 0
-count = 0
+<h3>Practical Example 1: High Score System</h3>
+<div class="example-box">
+<pre><code class="language-plaintext">// Save a new score
+PROCEDURE saveScore(playerName, score)
+    OPEN "highscores.txt" FOR APPEND AS file
+    WRITELINE(file, playerName + "," + STRING(score))
+    CLOSE file
+ENDPROCEDURE
+
+// Load and display all scores
+PROCEDURE displayScores()
+    OUTPUT "=== HIGH SCORES ==="
+    OPEN "highscores.txt" FOR READ AS file
+    WHILE NOT EOF(file)
+        line ← READLINE(file)
+        // Split by comma
+        parts ← SPLIT(line, ",")
+        name ← parts[0]
+        score ← parts[1]
+        OUTPUT name, ": ", score
+    ENDWHILE
+    CLOSE file
+ENDPROCEDURE
+
+// Usage
+CALL saveScore("Alice", 1500)
+CALL saveScore("Bob", 2300)
+CALL displayScores()</code></pre>
+</div>
+
+<h3>Practical Example 2: Process CSV Data</h3>
+<div class="example-box">
+    <h4>Read student grades from CSV file</h4>
+<pre><code class="language-plaintext">// students.csv contains:
+// Name,Maths,English,Science
+// Alice,85,92,78
+// Bob,76,88,91
+
+OPEN "students.csv" FOR READ AS file
+
+// Skip header line
+header ← READLINE(file)
+
+totalMaths ← 0
+count ← 0
+
 WHILE NOT EOF(file)
-    number = READLINE(file)
-    total = total + number
-    count = count + 1
+    line ← READLINE(file)
+    parts ← SPLIT(line, ",")
+    
+    name ← parts[0]
+    maths ← INTEGER(parts[1])
+    english ← INTEGER(parts[2])
+    science ← INTEGER(parts[3])
+    
+    average ← (maths + english + science) / 3
+    OUTPUT name, " average: ", average
+    
+    totalMaths ← totalMaths + maths
+    count ← count + 1
 ENDWHILE
+
 CLOSE file
 
-average = total / count
-OUTPUT "Average: ", average</code></pre>
+OUTPUT "Class maths average: ", totalMaths / count</code></pre>
+</div>
 
-<h3>Example: Save high scores</h3>
-<pre><code class="language-python">// Writing scores
-OPEN "scores.txt" FOR WRITE AS file
-WRITELINE(file, playerName + "," + score)
-CLOSE file
+<h3>Practical Example 3: Search and Update File</h3>
+<div class="example-box">
+    <h4>Find and update a record</h4>
+<pre><code class="language-plaintext">// Update a student's score
+PROCEDURE updateScore(targetName, newScore)
+    lines ← []
+    found ← FALSE
+    
+    // Read all lines
+    OPEN "scores.txt" FOR READ AS file
+    WHILE NOT EOF(file)
+        line ← READLINE(file)
+        parts ← SPLIT(line, ",")
+        
+        IF parts[0] = targetName THEN
+            // Update this line
+            line ← targetName + "," + STRING(newScore)
+            found ← TRUE
+        ENDIF
+        
+        APPEND line TO lines
+    ENDWHILE
+    CLOSE file
+    
+    // Write all lines back
+    IF found THEN
+        OPEN "scores.txt" FOR WRITE AS file
+        FOR EACH line IN lines
+            WRITELINE(file, line)
+        NEXT
+        CLOSE file
+        OUTPUT "Updated successfully"
+    ELSE
+        OUTPUT "Student not found"
+    ENDIF
+ENDPROCEDURE</code></pre>
+</div>
 
-// Reading scores
-OPEN "scores.txt" FOR READ AS file
-WHILE NOT EOF(file)
-    line = READLINE(file)
-    // Split line by comma to get name and score
-    OUTPUT line
-ENDWHILE
-CLOSE file</code></pre>
+<h3>Error Handling</h3>
+<div class="example-box">
+<pre><code class="language-plaintext">// Check if file exists before reading
+FUNCTION fileExists(filename)
+    TRY
+        OPEN filename FOR READ AS file
+        CLOSE file
+        RETURN TRUE
+    CATCH
+        RETURN FALSE
+    ENDTRY
+ENDFUNCTION
+
+// Safe file reading
+IF fileExists("data.txt") THEN
+    OPEN "data.txt" FOR READ AS file
+    // ... read file
+    CLOSE file
+ELSE
+    OUTPUT "Error: File not found"
+ENDIF</code></pre>
+</div>
 
 <div class="tip-box">
     <strong>Paper 2 Tips:</strong>
@@ -2090,6 +3344,18 @@ CLOSE file</code></pre>
         <li>APPEND adds to end, WRITE overwrites everything</li>
         <li>Check for EOF (End Of File) when reading</li>
         <li>Each WRITELINE creates a new line in the file</li>
+        <li>Use SPLIT() to parse CSV data</li>
+        <li>Convert strings to integers when needed</li>
+    </ul>
+</div>
+
+<div class="warning">
+    <strong>⚠️ Common Mistakes:</strong>
+    <ul>
+        <li>Forgetting to close the file</li>
+        <li>Using WRITE when you meant APPEND (data lost!)</li>
+        <li>Not handling missing files</li>
+        <li>Forgetting EOF check in while loop (infinite loop)</li>
     </ul>
 </div>
             `
@@ -2759,162 +4025,262 @@ After:  0 0 0 0 0 0 1 1  = 3
         },
         'Encryption': {
             content: `
-<h2>Encryption</h2>
+<h2>Encryption - Comprehensive Guide</h2>
 <div class="definition-box">
-    <strong>Encryption:</strong> The process of converting readable data (plaintext) into unreadable scrambled data (ciphertext) to protect it from unauthorized access.
+    <strong>Encryption:</strong> The process of converting readable data (plaintext) into unreadable scrambled data (ciphertext) using an algorithm and a key. Only someone with the correct key can decrypt and read the original data.
 </div>
 
-<h3>Key Terms</h3>
+<h3>Why Encryption Matters</h3>
+<ul>
+    <li><strong>Privacy:</strong> Protects personal communications and data</li>
+    <li><strong>Security:</strong> Prevents unauthorized access to sensitive information</li>
+    <li><strong>Integrity:</strong> Ensures data hasn't been tampered with</li>
+    <li><strong>Authentication:</strong> Verifies the sender's identity</li>
+    <li><strong>Compliance:</strong> Required by laws (GDPR, HIPAA) for certain data</li>
+</ul>
+
+<h3>Key Encryption Terms</h3>
 <table class="notes-table">
-    <tr><th>Term</th><th>Definition</th></tr>
-    <tr><td><strong>Plaintext</strong></td><td>Original readable message</td></tr>
-    <tr><td><strong>Ciphertext</strong></td><td>Encrypted (scrambled) message</td></tr>
-    <tr><td><strong>Key</strong></td><td>Secret value used to encrypt/decrypt</td></tr>
-    <tr><td><strong>Encryption</strong></td><td>Plaintext → Ciphertext</td></tr>
-    <tr><td><strong>Decryption</strong></td><td>Ciphertext → Plaintext</td></tr>
+    <tr><th>Term</th><th>Definition</th><th>Example</th></tr>
+    <tr><td><strong>Plaintext</strong></td><td>Original readable message</td><td>"HELLO"</td></tr>
+    <tr><td><strong>Ciphertext</strong></td><td>Encrypted (scrambled) message</td><td>"KHOOR"</td></tr>
+    <tr><td><strong>Key</strong></td><td>Secret value used to encrypt/decrypt</td><td>3 (shift of 3)</td></tr>
+    <tr><td><strong>Algorithm</strong></td><td>Method used for encryption</td><td>Caesar cipher, AES</td></tr>
+    <tr><td><strong>Encryption</strong></td><td>Plaintext → Ciphertext</td><td>HELLO → KHOOR</td></tr>
+    <tr><td><strong>Decryption</strong></td><td>Ciphertext → Plaintext</td><td>KHOOR → HELLO</td></tr>
 </table>
 
-<h3>Caesar Cipher</h3>
-<p>A simple substitution cipher that shifts each letter by a fixed number of positions.</p>
+<h2>Caesar Cipher - A Classic Example</h2>
+<div class="definition-box">
+    <strong>Caesar Cipher:</strong> A simple substitution cipher that shifts each letter by a fixed number of positions in the alphabet. Named after Julius Caesar who used it for military messages.
+</div>
 
 <div class="example-box">
-    <h4>Caesar Cipher with shift of 3</h4>
-<pre><code>Plaintext:   H E L L O
-Shift +3:    ↓ ↓ ↓ ↓ ↓
-Ciphertext:  K H O O R
+    <h4>Caesar Cipher with Shift of 3</h4>
+<pre><code>Alphabet:   A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+Shifted +3: D E F G H I J K L M N O P Q R S T U V W X Y Z A B C
 
-A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
-↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓ ↓
-D E F G H I J K L M N O P Q R S T U V W X Y Z A B C</code></pre>
+Encrypting "HELLO":
+H → K (H + 3)
+E → H (E + 3)
+L → O (L + 3)
+L → O (L + 3)
+O → R (O + 3)
+
+Plaintext:  HELLO
+Ciphertext: KHOOR
+
+To decrypt, shift backwards by 3:
+K → H, H → E, O → L, O → L, R → O = "HELLO"</code></pre>
+</div>
+
+<div class="example-box">
+    <h4>Handling Wrap-Around</h4>
+<pre><code>What happens when we encrypt 'X' with shift 3?
+
+X → Y → Z → A (wraps around!)
+
+So 'X' + 3 = 'A'
+'Y' + 3 = 'B'  
+'Z' + 3 = 'C'
+
+Using ASCII: 
+newChar = ((oldChar - 65 + shift) MOD 26) + 65
+
+For 'X' (ASCII 88) with shift 3:
+((88 - 65 + 3) MOD 26) + 65
+= (26 MOD 26) + 65
+= 0 + 65
+= 65 = 'A' ✓</code></pre>
 </div>
 
 <h3>Caesar Cipher Algorithm</h3>
-<pre><code class="language-python">FUNCTION encrypt(text, shift)
-    result = ""
-    FOR each character IN text
-        IF character is a letter THEN
-            code = ASC(character)
-            code = code + shift
-            // Wrap around if past Z
-            IF code > ASC('Z') THEN
-                code = code - 26
-            ENDIF
-            result = result + CHR(code)
+<pre><code class="language-python">FUNCTION caesarEncrypt(text, shift)
+    result ← ""
+    FOR EACH character IN text
+        IF character is uppercase letter THEN
+            // Get position (0-25), add shift, wrap around, convert back
+            newChar ← ((ASC(character) - 65 + shift) MOD 26) + 65
+            result ← result + CHR(newChar)
+        ELSE IF character is lowercase letter THEN
+            newChar ← ((ASC(character) - 97 + shift) MOD 26) + 97
+            result ← result + CHR(newChar)
         ELSE
-            result = result + character
+            result ← result + character  // Keep spaces, numbers unchanged
         ENDIF
     NEXT
     RETURN result
+ENDFUNCTION
+
+FUNCTION caesarDecrypt(text, shift)
+    // Decrypting is encrypting with negative shift
+    RETURN caesarEncrypt(text, 26 - shift)
+    // OR: RETURN caesarEncrypt(text, -shift)
 ENDFUNCTION</code></pre>
 
 <h3>Why Caesar Cipher is Weak</h3>
 <ul>
-    <li>Only 25 possible keys (shifts 1-25)</li>
-    <li>Easy to crack by trying all keys (brute force)</li>
-    <li>Letter frequency analysis can break it</li>
+    <li><strong>Only 25 possible keys:</strong> Can try all shifts 1-25 (brute force)</li>
+    <li><strong>Frequency analysis:</strong> 'E' is most common letter in English - find the most common letter in ciphertext</li>
+    <li><strong>Pattern preservation:</strong> Same letter always encrypts to same ciphertext</li>
+    <li><strong>No key exchange security:</strong> Both parties need to know the shift</li>
 </ul>
 
-<h3>Modern Encryption Concepts</h3>
+<h2>Modern Encryption - Symmetric vs Asymmetric</h2>
+
+<h3>Symmetric Encryption</h3>
+<div class="definition-box">
+    <strong>Symmetric Encryption:</strong> Uses the SAME key for both encryption and decryption. Fast but requires secure key exchange.
+</div>
+
+<div class="example-box">
+    <h4>How Symmetric Encryption Works</h4>
+<pre><code>Alice wants to send a secret message to Bob:
+
+1. Alice and Bob agree on a shared secret key (e.g., "MySecretKey123")
+   
+2. Alice encrypts: "Meet at noon" + Key → "X#9mK@pL2..."
+   
+3. Alice sends ciphertext to Bob
+   
+4. Bob decrypts: "X#9mK@pL2..." + Key → "Meet at noon"
+
+Problem: How do Alice and Bob securely share the key?
+If someone intercepts the key, they can read everything!</code></pre>
+</div>
+
 <table class="notes-table">
-    <tr><th>Type</th><th>Description</th><th>Example Use</th></tr>
-    <tr><td><strong>Symmetric</strong></td><td>Same key for encrypt & decrypt</td><td>AES - file encryption</td></tr>
-    <tr><td><strong>Asymmetric</strong></td><td>Public key + Private key pair</td><td>HTTPS websites</td></tr>
+    <tr><th>Algorithm</th><th>Key Size</th><th>Use Case</th><th>Notes</th></tr>
+    <tr><td><strong>AES</strong></td><td>128/192/256 bits</td><td>File encryption, VPNs, HTTPS</td><td>Current gold standard</td></tr>
+    <tr><td><strong>DES</strong></td><td>56 bits</td><td>Legacy systems</td><td>Obsolete - too weak</td></tr>
+    <tr><td><strong>3DES</strong></td><td>168 bits</td><td>Banking</td><td>Being phased out</td></tr>
 </table>
+
+<h3>Asymmetric Encryption (Public Key Cryptography)</h3>
+<div class="definition-box">
+    <strong>Asymmetric Encryption:</strong> Uses TWO different keys - a public key for encryption and a private key for decryption. Solves the key exchange problem.
+</div>
+
+<div class="example-box">
+    <h4>How Asymmetric Encryption Works</h4>
+<pre><code>1. Bob generates a KEY PAIR:
+   - Public key (shared openly): 🔓
+   - Private key (kept secret): 🔐
+   
+2. Bob publishes his public key 🔓 (anyone can see it)
+
+3. Alice encrypts message using Bob's PUBLIC key:
+   "Meet at noon" + 🔓 → "X#9mK@pL2..."
+   
+4. Alice sends ciphertext to Bob
+
+5. Bob decrypts using his PRIVATE key:
+   "X#9mK@pL2..." + 🔐 → "Meet at noon"
+
+Key insight: 
+- Public key can ONLY encrypt
+- Private key can ONLY decrypt
+- Even if attacker has the public key, they CANNOT decrypt!</code></pre>
+</div>
+
+<table class="notes-table">
+    <tr><th>Algorithm</th><th>Key Size</th><th>Use Case</th><th>Notes</th></tr>
+    <tr><td><strong>RSA</strong></td><td>2048-4096 bits</td><td>HTTPS, digital signatures, email</td><td>Most widely used</td></tr>
+    <tr><td><strong>ECC</strong></td><td>256-384 bits</td><td>Mobile devices, cryptocurrency</td><td>Same security, smaller keys</td></tr>
+</table>
+
+<h3>Symmetric vs Asymmetric Comparison</h3>
+<table class="notes-table">
+    <tr><th>Feature</th><th>Symmetric</th><th>Asymmetric</th></tr>
+    <tr><td><strong>Keys</strong></td><td>One shared key</td><td>Public + Private key pair</td></tr>
+    <tr><td><strong>Speed</strong></td><td>Very fast</td><td>Slow (100-1000x slower)</td></tr>
+    <tr><td><strong>Key exchange</strong></td><td>Difficult (must be secret)</td><td>Easy (public key is public)</td></tr>
+    <tr><td><strong>Key size</strong></td><td>128-256 bits</td><td>2048-4096 bits</td></tr>
+    <tr><td><strong>Best for</strong></td><td>Encrypting large data</td><td>Key exchange, digital signatures</td></tr>
+</table>
+
+<h3>How HTTPS Uses Both</h3>
+<div class="example-box">
+    <h4>HTTPS: The Best of Both Worlds</h4>
+<pre><code>When you visit https://bank.com:
+
+1. ASYMMETRIC: Your browser gets bank's public key (in certificate)
+   
+2. SYMMETRIC: Browser generates random session key (fast AES key)
+   
+3. ASYMMETRIC: Browser encrypts session key with bank's public key
+   → Sends to bank
+   
+4. Bank decrypts session key with its private key
+
+5. SYMMETRIC: All further communication uses fast AES encryption
+   with the shared session key
+
+Why? Asymmetric is too slow for bulk data.
+Use asymmetric to securely share a symmetric key,
+then use symmetric for speed!</code></pre>
+</div>
+
+<h2>Hashing (Not Encryption!)</h2>
+<div class="definition-box">
+    <strong>Hashing:</strong> A ONE-WAY function that converts input into a fixed-length string (hash). Unlike encryption, hashing CANNOT be reversed - you can't get the original from the hash.
+</div>
+
+<div class="example-box">
+    <h4>Hashing Examples</h4>
+<pre><code>Input: "password123"
+MD5 hash: 482c811da5d5b4bc6d497ffa98491e38
+SHA-256: ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f
+
+Input: "password124" (just one character different!)
+MD5 hash: 9e60f65c01e371a72fb006df60d1b7f8
+SHA-256: 5f78c33274e43fa9de5659265c1d917e25c03722dcb0b8d27db8d5feaa813953
+
+Notice: Completely different output for tiny input change!</code></pre>
+</div>
+
+<h3>Uses of Hashing</h3>
+<ul>
+    <li><strong>Password storage:</strong> Store hash, not actual password</li>
+    <li><strong>Data integrity:</strong> Verify files haven't been modified</li>
+    <li><strong>Digital signatures:</strong> Sign the hash, not the whole document</li>
+    <li><strong>Checksums:</strong> Verify download integrity</li>
+</ul>
+
+<h3>Practice Questions</h3>
+<div class="example-box">
+    <ol>
+        <li>Encrypt "ATTACK" using Caesar cipher with shift 5.</li>
+        <li>Decrypt "WKLV" using Caesar cipher (shift 3).</li>
+        <li>Why is asymmetric encryption used in HTTPS but not for the entire session?</li>
+        <li>What is the difference between encryption and hashing?</li>
+        <li>A company stores user passwords. Should they encrypt or hash them? Why?</li>
+    </ol>
+    <details>
+        <summary>Click for answers</summary>
+        <ol>
+            <li>A→F, T→Y, T→Y, A→F, C→H, K→P = "FYYFHP"</li>
+            <li>W→T, K→H, L→I, V→S = "THIS"</li>
+            <li>Asymmetric is too slow for bulk data. HTTPS uses asymmetric encryption only to securely exchange a symmetric key, then uses fast symmetric encryption for all data.</li>
+            <li>Encryption is reversible (can decrypt with key). Hashing is one-way (cannot recover original from hash).</li>
+            <li>HASH them. If the database is breached, attackers only get hashes, not actual passwords. With encryption, if the key is stolen, all passwords are exposed.</li>
+        </ol>
+    </details>
+</div>
 
 <div class="tip-box">
     <strong>Exam Tips:</strong>
     <ul>
-        <li>Know how Caesar cipher works with shifts</li>
-        <li>Be able to encrypt AND decrypt messages</li>
-        <li>Remember: decryption uses the OPPOSITE shift</li>
-        <li>Understand why simple ciphers are insecure</li>
+        <li>Know Caesar cipher encryption AND decryption</li>
+        <li>Remember: Symmetric = same key, Asymmetric = key pair</li>
+        <li>Asymmetric is slower but solves key exchange</li>
+        <li>Hashing is ONE-WAY - not encryption!</li>
+        <li>Passwords should be hashed, not encrypted</li>
     </ul>
 </div>
             `
         },
-        'ASCII & Unicode': {
-            content: `
-<h2>Character Encoding</h2>
-<div class="definition-box">
-    <strong>Character Encoding:</strong> A system that assigns unique numbers to characters so computers can store and process text. Without encoding, computers couldn't understand letters, symbols, or text.
-</div>
 
-<h2>ASCII</h2>
-<div class="definition-box">
-    <strong>ASCII</strong> (American Standard Code for Information Interchange): A 7-bit encoding system that represents 128 different characters including letters, digits, punctuation, and control codes.
-</div>
-
-<h3>ASCII Character Table (Key Values)</h3>
-<table class="notes-table">
-    <tr><th>Characters</th><th>Decimal Range</th><th>Example</th></tr>
-    <tr><td><strong>Control codes</strong></td><td>0 - 31</td><td>Tab (9), Newline (10)</td></tr>
-    <tr><td><strong>Space</strong></td><td>32</td><td>' '</td></tr>
-    <tr><td><strong>Digits 0-9</strong></td><td>48 - 57</td><td>'0'=48, '9'=57</td></tr>
-    <tr><td><strong>Uppercase A-Z</strong></td><td>65 - 90</td><td>'A'=65, 'Z'=90</td></tr>
-    <tr><td><strong>Lowercase a-z</strong></td><td>97 - 122</td><td>'a'=97, 'z'=122</td></tr>
-</table>
-
-<h3>Important ASCII Values to Remember</h3>
-<div class="example-box">
-<pre><code>'A' = 65    'a' = 97    (difference of 32!)
-'B' = 66    'b' = 98
-'Z' = 90    'z' = 122
-
-'0' = 48    (the CHARACTER zero, not the number!)
-'9' = 57
-
-Space = 32</code></pre>
-</div>
-
-<h3>ASCII Tricks</h3>
-<ul>
-    <li><strong>Uppercase to lowercase:</strong> Add 32 (A=65, a=97)</li>
-    <li><strong>Lowercase to uppercase:</strong> Subtract 32</li>
-    <li><strong>Character digit to number:</strong> Subtract 48 ('5' - 48 = 5)</li>
-</ul>
-
-<h2>Unicode</h2>
-<div class="definition-box">
-    <strong>Unicode:</strong> A universal character encoding standard that supports over 143,000 characters from all the world's writing systems, symbols, and emojis. It's the modern replacement for ASCII.
-</div>
-
-<h3>Why Unicode?</h3>
-<ul>
-    <li>ASCII only has 128 characters - not enough for global use</li>
-    <li>Can't represent Chinese, Arabic, Japanese, Russian, etc.</li>
-    <li>Unicode includes symbols, mathematical notation, and emojis</li>
-</ul>
-
-<h3>Unicode Formats</h3>
-<table class="notes-table">
-    <tr><th>Format</th><th>Bits per Character</th><th>Characters Supported</th></tr>
-    <tr><td><strong>UTF-8</strong></td><td>8-32 bits (variable)</td><td>All Unicode (most common)</td></tr>
-    <tr><td><strong>UTF-16</strong></td><td>16-32 bits</td><td>All Unicode</td></tr>
-    <tr><td><strong>UTF-32</strong></td><td>32 bits (fixed)</td><td>All Unicode</td></tr>
-</table>
-
-<h3>ASCII vs Unicode Comparison</h3>
-<table class="notes-table">
-    <tr><th>Feature</th><th>ASCII</th><th>Unicode</th></tr>
-    <tr><td><strong>Bits</strong></td><td>7 bits</td><td>8-32 bits</td></tr>
-    <tr><td><strong>Characters</strong></td><td>128</td><td>143,000+</td></tr>
-    <tr><td><strong>Languages</strong></td><td>English only</td><td>All languages</td></tr>
-    <tr><td><strong>Emojis</strong></td><td>No</td><td>Yes 😀</td></tr>
-    <tr><td><strong>File size</strong></td><td>Smaller</td><td>Larger</td></tr>
-    <tr><td><strong>Compatibility</strong></td><td>ASCII subset of Unicode</td><td>Includes ASCII</td></tr>
-</table>
-
-<div class="tip-box">
-    <strong>Key Points:</strong>
-    <ul>
-        <li>ASCII is a subset of Unicode - the first 128 Unicode characters are identical to ASCII</li>
-        <li>UTF-8 is backward compatible with ASCII</li>
-        <li>Unicode uses more storage but supports ALL languages</li>
-        <li>Modern systems and the internet primarily use UTF-8</li>
-    </ul>
-</div>
-            `
-        },
         'Images': {
             content: `
 <h2>Image Representation</h2>
@@ -3303,60 +4669,432 @@ An MP3 of this song would be around 3-5 MB.</code></pre>
         },
         'Compression': {
             content: `
-<h2>Compression</h2>
+<h2>Compression - Comprehensive Guide</h2>
 <div class="definition-box">
-    <strong>Compression:</strong> The process of reducing file size to save storage space and reduce transmission time. Compressed files take up less space and transfer faster over networks.
+    <strong>Compression:</strong> The process of reducing file size by encoding data more efficiently. Compressed files take up less storage space and transfer faster over networks.
 </div>
 
 <h3>Why Compress?</h3>
 <ul>
-    <li><strong>Save storage:</strong> Fit more files on a device</li>
+    <li><strong>Save storage:</strong> Fit more files on a device (a 4GB movie → 1.5GB)</li>
     <li><strong>Faster transfers:</strong> Quicker downloads and uploads</li>
     <li><strong>Reduce bandwidth:</strong> Use less internet data</li>
-    <li><strong>Faster streaming:</strong> Video/music streams smoothly</li>
+    <li><strong>Faster streaming:</strong> Video/music streams without buffering</li>
+    <li><strong>Email attachments:</strong> Stay within size limits</li>
 </ul>
 
 <h2>Two Types of Compression</h2>
 
 <h3>1. Lossy Compression</h3>
 <div class="definition-box">
-    <strong>Lossy:</strong> Permanently removes some data to achieve smaller file sizes. The original cannot be perfectly restored.
+    <strong>Lossy:</strong> Permanently removes some data that humans are less likely to notice. The original CANNOT be perfectly restored.
 </div>
 
-<p><strong>Common Lossy Formats:</strong> JPEG (photos), MP3 (music), MP4 (video)</p>
+<table class="notes-table">
+    <tr><th>Format</th><th>Type</th><th>How It Works</th><th>Typical Reduction</th></tr>
+    <tr><td><strong>JPEG</strong></td><td>Images</td><td>Removes fine color details, averages similar colors</td><td>80-95%</td></tr>
+    <tr><td><strong>MP3</strong></td><td>Audio</td><td>Removes frequencies humans can't easily hear</td><td>70-90%</td></tr>
+    <tr><td><strong>MP4/H.264</strong></td><td>Video</td><td>Stores only changes between frames</td><td>90-98%</td></tr>
+    <tr><td><strong>AAC</strong></td><td>Audio</td><td>More efficient than MP3, used in iTunes</td><td>75-90%</td></tr>
+</table>
+
+<div class="example-box">
+    <h4>JPEG Compression - Practical Example</h4>
+<pre><code>Original photo: 24MB (RAW from camera)
+      ↓
+JPEG Quality 100%: 8MB (minimal loss, hard to see)
+      ↓
+JPEG Quality 80%: 2MB (slight loss, acceptable for web)
+      ↓
+JPEG Quality 50%: 500KB (visible artifacts, small file)
+      ↓
+JPEG Quality 10%: 80KB (very blocky, unusable for printing)</code></pre>
+    <p>Lower quality = smaller file = more data permanently lost</p>
+</div>
+
+<div class="example-box">
+    <h4>MP3 Bit Rate Comparison</h4>
+    <table class="notes-table">
+        <tr><th>Bit Rate</th><th>File Size (3 min song)</th><th>Quality</th></tr>
+        <tr><td>320 kbps</td><td>~7 MB</td><td>Near CD quality</td></tr>
+        <tr><td>192 kbps</td><td>~4 MB</td><td>Good quality</td></tr>
+        <tr><td>128 kbps</td><td>~3 MB</td><td>Acceptable quality</td></tr>
+        <tr><td>64 kbps</td><td>~1.5 MB</td><td>Noticeable quality loss</td></tr>
+    </table>
+</div>
 
 <h3>2. Lossless Compression</h3>
 <div class="definition-box">
-    <strong>Lossless:</strong> Reduces file size WITHOUT losing any data. The original can be perfectly restored.
+    <strong>Lossless:</strong> Reduces file size WITHOUT losing any data. The original CAN be perfectly restored.
 </div>
 
-<p><strong>Common Lossless Formats:</strong> PNG (images), ZIP (archives), FLAC (audio)</p>
-
-<h3>Comparison Table</h3>
 <table class="notes-table">
-    <tr><th>Feature</th><th>Lossy</th><th>Lossless</th></tr>
-    <tr><td><strong>Quality</strong></td><td>Some loss</td><td>Perfect</td></tr>
-    <tr><td><strong>File size</strong></td><td>Much smaller</td><td>Moderately smaller</td></tr>
-    <tr><td><strong>Reversible?</strong></td><td>No</td><td>Yes</td></tr>
-    <tr><td><strong>Best for</strong></td><td>Photos, music, video</td><td>Documents, code, source files</td></tr>
+    <tr><th>Format</th><th>Type</th><th>How It Works</th><th>Typical Reduction</th></tr>
+    <tr><td><strong>PNG</strong></td><td>Images</td><td>Finds patterns, stores references</td><td>20-50%</td></tr>
+    <tr><td><strong>ZIP/RAR</strong></td><td>Any files</td><td>Dictionary-based compression</td><td>40-80%</td></tr>
+    <tr><td><strong>FLAC</strong></td><td>Audio</td><td>Lossless audio codec</td><td>40-60%</td></tr>
+    <tr><td><strong>GIF</strong></td><td>Images</td><td>Limited to 256 colors, patterns</td><td>50-70%</td></tr>
 </table>
 
-<h3>Run-Length Encoding (RLE)</h3>
-<p>A simple lossless compression technique that replaces repeated values with a count.</p>
+<h3>Lossless Compression Techniques</h3>
+
+<h4>1. Run-Length Encoding (RLE)</h4>
+<p>Replaces consecutive repeated values with a count and the value.</p>
 
 <div class="example-box">
     <h4>RLE Example</h4>
-<pre><code>Original: AAAABBBCCDDDDDD
-Encoded:  4A3B2C6D
+<pre><code>Original:    AAAABBBCCDDDDDD
+Encoded:     4A3B2C6D
 
-Saved: 15 characters → 8 characters (47% reduction!)</code></pre>
+Original:    15 characters
+Compressed:  8 characters
+Reduction:   47% smaller!
+
+How it works:
+AAAA → 4A (4 occurrences of A)
+BBB  → 3B (3 occurrences of B)
+CC   → 2C (2 occurrences of C)
+DDDDDD → 6D (6 occurrences of D)</code></pre>
+</div>
+
+<div class="example-box">
+    <h4>RLE for Images (Black & White)</h4>
+<pre><code>Image row (W=white, B=black):
+WWWWWWWBBBWWWWWBBBBBBBB
+
+RLE encoded:
+7W3B5W8B
+
+Perfect for simple graphics with large areas of same color.
+NOT effective for photos (too many color variations).</code></pre>
+</div>
+
+<h4>2. Dictionary-Based Compression (Used in ZIP)</h4>
+<p>Builds a dictionary of repeated patterns and replaces them with shorter codes.</p>
+
+<div class="example-box">
+    <h4>Dictionary Compression Example</h4>
+<pre><code>Original text:
+"the cat sat on the mat and the cat ate the rat"
+
+Dictionary built:
+1 = "the "
+2 = "cat "
+3 = "at "
+
+Compressed:
+"1 2s3on 1m3and 12ate 1r3"
+
+Repeated phrases replaced with short codes!</code></pre>
+</div>
+
+<h4>3. Huffman Coding</h4>
+<p>Uses shorter codes for more frequent characters, longer codes for rare ones.</p>
+
+<div class="example-box">
+    <h4>Huffman Coding Example</h4>
+<pre><code>Text: "AAAAAABBBCCCD"
+
+Character frequency:
+A: 6 times (most common)
+B: 3 times
+C: 3 times
+D: 1 time (least common)
+
+Standard ASCII: Each character = 8 bits
+Total: 13 × 8 = 104 bits
+
+Huffman codes:
+A = 0      (1 bit - most common)
+B = 10     (2 bits)
+C = 110    (3 bits)
+D = 111    (3 bits - least common)
+
+Encoded: 000000 101010 110110110 111
+Total: 6 + 6 + 9 + 3 = 24 bits
+
+Compression: 104 bits → 24 bits = 77% smaller!</code></pre>
+</div>
+
+<h3>Comparison: Lossy vs Lossless</h3>
+<table class="notes-table">
+    <tr><th>Feature</th><th>Lossy</th><th>Lossless</th></tr>
+    <tr><td><strong>Quality</strong></td><td>Some permanent loss</td><td>Perfect - no loss</td></tr>
+    <tr><td><strong>File size</strong></td><td>Much smaller (80-95%)</td><td>Moderately smaller (40-70%)</td></tr>
+    <tr><td><strong>Reversible?</strong></td><td>NO - original lost forever</td><td>YES - can restore original</td></tr>
+    <tr><td><strong>Best for</strong></td><td>Photos, music, video</td><td>Text, code, important originals</td></tr>
+    <tr><td><strong>Repeated compression</strong></td><td>Quality degrades further</td><td>No additional loss</td></tr>
+</table>
+
+<h3>When to Use Each Type</h3>
+<div class="info-box">
+    <h4>Use Lossy When:</h4>
+    <ul>
+        <li>Sharing photos on social media</li>
+        <li>Streaming music or video</li>
+        <li>Storage space is critical</li>
+        <li>Perfect quality isn't essential</li>
+    </ul>
+    
+    <h4>Use Lossless When:</h4>
+    <ul>
+        <li>Archiving important documents</li>
+        <li>Storing source code</li>
+        <li>Professional photo/audio editing (keep originals)</li>
+        <li>Medical images, legal documents</li>
+        <li>Any data where accuracy is critical</li>
+    </ul>
+</div>
+
+<h3>Practice Questions</h3>
+<div class="example-box">
+    <ol>
+        <li>Apply RLE to: WWWWBBBBBWWWBBBB</li>
+        <li>Why is lossy compression unsuitable for text documents?</li>
+        <li>A photographer wants to archive original photos. Should they use JPEG or PNG? Why?</li>
+        <li>Why can lossy compression achieve smaller file sizes than lossless?</li>
+    </ol>
+    <details>
+        <summary>Click for answers</summary>
+        <ol>
+            <li>4W5B3W4B (16 chars → 8 chars)</li>
+            <li>Lossy compression removes data permanently. In text, every character matters - removing any would make the document incorrect or unreadable.</li>
+            <li>PNG (lossless) - archives should preserve the original exactly. JPEG would permanently lose quality that cannot be recovered.</li>
+            <li>Lossy compression permanently discards data that algorithms determine humans won't notice (like inaudible frequencies), allowing much greater reduction than lossless which must keep everything.</li>
+        </ol>
+    </details>
 </div>
 
 <div class="tip-box">
-    <strong>When to Use Each:</strong>
+    <strong>Exam Tips:</strong>
     <ul>
-        <li><strong>Lossy:</strong> Media for sharing (photos, streaming)</li>
-        <li><strong>Lossless:</strong> Documents, source code, originals</li>
+        <li>Know RLE - be able to encode AND decode</li>
+        <li>Remember: Lossy = permanent loss, Lossless = reversible</li>
+        <li>JPEG = lossy images, PNG = lossless images</li>
+        <li>ZIP files use lossless compression</li>
+        <li>Know when to use each type and why</li>
+    </ul>
+</div>
+            `
+        },
+        'Character Encoding': {
+            content: `
+<h2>Character Encoding - Complete Guide</h2>
+<div class="definition-box">
+    <strong>Character Encoding:</strong> A system that assigns unique numeric codes to characters (letters, digits, symbols) so computers can store, process, and display text. Without encoding, computers couldn't understand or display text.
+</div>
+
+<h3>Why Do We Need Character Encoding?</h3>
+<p>Computers only understand binary (0s and 1s). Character encoding provides a standardized mapping:</p>
+<div class="example-box">
+<pre><code>Character → Numeric Code → Binary
+
+'A' → 65 → 01000001
+'B' → 66 → 01000010
+'a' → 97 → 01100001
+'1' → 49 → 00110001
+'@' → 64 → 01000000</code></pre>
+</div>
+
+<h2>ASCII - American Standard Code for Information Interchange</h2>
+
+<div class="definition-box">
+    <strong>ASCII:</strong> A 7-bit character encoding standard that represents 128 characters including English letters, digits, punctuation, and control codes. Developed in 1963, it became the foundation for text computing.
+</div>
+
+<h3>ASCII Character Ranges - MEMORIZE THESE!</h3>
+<table class="notes-table">
+    <tr><th>Range</th><th>Decimal</th><th>What It Contains</th><th>Examples</th></tr>
+    <tr><td>Control codes</td><td>0-31</td><td>Non-printable control characters</td><td>Tab (9), Newline (10), Carriage Return (13)</td></tr>
+    <tr><td>Space</td><td>32</td><td>Space character</td><td>' '</td></tr>
+    <tr><td>Symbols</td><td>33-47</td><td>Punctuation and symbols</td><td>! " # $ % & ' ( ) * + , - . /</td></tr>
+    <tr><td>Digits</td><td>48-57</td><td>Numbers 0-9</td><td>'0'=48, '9'=57</td></tr>
+    <tr><td>Symbols</td><td>58-64</td><td>More punctuation</td><td>: ; < = > ? @</td></tr>
+    <tr><td>Uppercase</td><td>65-90</td><td>A-Z</td><td>'A'=65, 'Z'=90</td></tr>
+    <tr><td>Symbols</td><td>91-96</td><td>Brackets, backslash</td><td>[ \\ ] ^ _ \`</td></tr>
+    <tr><td>Lowercase</td><td>97-122</td><td>a-z</td><td>'a'=97, 'z'=122</td></tr>
+    <tr><td>Symbols</td><td>123-126</td><td>Braces, tilde</td><td>{ | } ~</td></tr>
+    <tr><td>Delete</td><td>127</td><td>Delete control code</td><td>DEL</td></tr>
+</table>
+
+<h3>Key ASCII Values to Memorize</h3>
+<div class="example-box">
+<pre><code>UPPERCASE LETTERS:
+'A' = 65    'B' = 66    'C' = 67    ...    'Z' = 90
+
+LOWERCASE LETTERS:
+'a' = 97    'b' = 98    'c' = 99    ...    'z' = 122
+
+DIGITS (as characters!):
+'0' = 48    '1' = 49    '2' = 50    ...    '9' = 57
+
+IMPORTANT OTHERS:
+Space = 32
+'@' = 64
+'\n' (newline) = 10
+
+KEY RELATIONSHIP:
+Uppercase to lowercase: ADD 32
+'A' (65) + 32 = 'a' (97)
+'B' (66) + 32 = 'b' (98)</code></pre>
+</div>
+
+<h3>ASCII Conversion Examples</h3>
+<div class="example-box">
+    <h4>Text to ASCII</h4>
+<pre><code>"Hi!" in ASCII:
+'H' = 72
+'i' = 105
+'!' = 33
+
+Binary: 01001000 01101001 00100001</code></pre>
+
+    <h4>ASCII to Text</h4>
+<pre><code>72 101 108 108 111 = ?
+
+72 = 'H'
+101 = 'e'
+108 = 'l'
+108 = 'l'
+111 = 'o'
+
+Answer: "Hello"</code></pre>
+</div>
+
+<h3>ASCII Tricks for Programming</h3>
+<div class="example-box">
+    <h4>Useful Conversions</h4>
+<pre><code>// Convert uppercase to lowercase (add 32)
+char lower = 'A' + 32;  // = 'a'
+
+// Convert lowercase to uppercase (subtract 32)  
+char upper = 'a' - 32;  // = 'A'
+
+// Convert character digit to actual number (subtract 48)
+int num = '5' - 48;  // = 5 (the number)
+// OR: int num = '5' - '0';  // = 5
+
+// Check if character is uppercase
+if (char >= 65 AND char <= 90) then uppercase
+
+// Check if character is a digit
+if (char >= 48 AND char <= 57) then digit</code></pre>
+</div>
+
+<h3>ASCII Limitations</h3>
+<ul>
+    <li>Only 128 characters (7 bits)</li>
+    <li>English alphabet only - no accents (é, ü, ñ)</li>
+    <li>No support for other languages (Chinese, Arabic, Japanese)</li>
+    <li>No emojis or special symbols</li>
+</ul>
+
+<h2>Unicode - The Universal Solution</h2>
+
+<div class="definition-box">
+    <strong>Unicode:</strong> A universal character encoding standard that supports over 149,000 characters from virtually all world writing systems, plus symbols, emojis, and historical scripts.
+</div>
+
+<h3>Unicode Encodings</h3>
+<table class="notes-table">
+    <tr><th>Encoding</th><th>Bits per Character</th><th>Features</th><th>Use Case</th></tr>
+    <tr><td><strong>UTF-8</strong></td><td>8-32 (variable)</td><td>ASCII-compatible, efficient for English</td><td>Web pages, most files</td></tr>
+    <tr><td><strong>UTF-16</strong></td><td>16-32 (variable)</td><td>Good for Asian languages</td><td>Windows internal, Java</td></tr>
+    <tr><td><strong>UTF-32</strong></td><td>32 (fixed)</td><td>Simple but wasteful</td><td>Internal processing</td></tr>
+</table>
+
+<h3>UTF-8 - The Most Important Encoding</h3>
+<div class="example-box">
+    <h4>How UTF-8 Works</h4>
+<pre><code>UTF-8 uses variable-length encoding:
+
+ASCII characters (0-127): 1 byte
+  'A' = 01000001 (same as ASCII!)
+
+Latin extended (128-2047): 2 bytes
+  'é' = 11000011 10101001
+
+Asian characters (2048-65535): 3 bytes
+  '中' = 11100100 10111000 10101101
+
+Emojis and rare symbols: 4 bytes
+  '😀' = 11110000 10011111 10011000 10000000</code></pre>
+    <p><strong>Advantage:</strong> English text is exactly the same size as ASCII, but you can still include any character!</p>
+</div>
+
+<h3>ASCII vs Unicode Comparison</h3>
+<table class="notes-table">
+    <tr><th>Feature</th><th>ASCII</th><th>Unicode (UTF-8)</th></tr>
+    <tr><td><strong>Bits</strong></td><td>7 bits (usually stored as 8)</td><td>8-32 bits (variable)</td></tr>
+    <tr><td><strong>Characters</strong></td><td>128</td><td>149,000+</td></tr>
+    <tr><td><strong>Languages</strong></td><td>English only</td><td>All world languages</td></tr>
+    <tr><td><strong>Symbols</strong></td><td>Basic punctuation</td><td>Math, music, arrows, emojis</td></tr>
+    <tr><td><strong>Emojis</strong></td><td>❌ No</td><td>✓ Yes 😀 🎉 🚀</td></tr>
+    <tr><td><strong>File size (English)</strong></td><td>1 byte per character</td><td>1 byte per character (same)</td></tr>
+    <tr><td><strong>Compatibility</strong></td><td>Subset of Unicode</td><td>Includes all ASCII</td></tr>
+</table>
+
+<h3>Why Unicode is Essential</h3>
+<div class="example-box">
+    <h4>The Same Message in Different Languages</h4>
+<pre><code>English: Hello World
+Chinese: 你好世界
+Arabic: مرحبا بالعالم
+Japanese: こんにちは世界
+Russian: Привет мир
+Emoji: 👋🌍
+
+ASCII can only display the first line!
+Unicode (UTF-8) can display ALL of them.</code></pre>
+</div>
+
+<h3>Character Encoding in Practice</h3>
+<div class="example-box">
+    <h4>HTML Encoding Declaration</h4>
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;  &lt;!-- Tells browser to use UTF-8 --&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;p&gt;Hello! 你好! مرحبا! 😀&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+    <p>Without the charset declaration, non-ASCII characters might display as ??????? or garbage symbols!</p>
+</div>
+
+<h3>Practice Questions</h3>
+<div class="example-box">
+    <ol>
+        <li>What is the ASCII code for 'Z'?</li>
+        <li>Convert "CAT" to ASCII decimal values.</li>
+        <li>What character has ASCII code 97?</li>
+        <li>How would you convert 'b' to 'B' using ASCII codes?</li>
+        <li>Why is Unicode necessary when we already have ASCII?</li>
+        <li>What is the ASCII code for the digit character '7'? (Not the number 7)</li>
+    </ol>
+    <details>
+        <summary>Click for answers</summary>
+        <ol>
+            <li>'Z' = 90</li>
+            <li>'C' = 67, 'A' = 65, 'T' = 84 → "CAT" = 67, 65, 84</li>
+            <li>97 = 'a' (lowercase a)</li>
+            <li>Subtract 32: 'b' (98) - 32 = 66 = 'B'</li>
+            <li>ASCII only has 128 characters and only supports English. Unicode supports all world languages, symbols, and emojis - essential for international communication.</li>
+            <li>'7' = 55 (characters 0-9 are ASCII 48-57)</li>
+        </ol>
+    </details>
+</div>
+
+<div class="tip-box">
+    <strong>Exam Tips:</strong>
+    <ul>
+        <li>Memorize: 'A'=65, 'a'=97, '0'=48, Space=32</li>
+        <li>Uppercase + 32 = lowercase</li>
+        <li>Character digit - 48 = actual number</li>
+        <li>ASCII = 128 chars, English only</li>
+        <li>Unicode = 149,000+ chars, all languages</li>
+        <li>UTF-8 is ASCII-compatible for first 128 characters</li>
     </ul>
 </div>
             `
@@ -4405,6 +6143,194 @@ At the receiving end, this process is REVERSED.</code></pre>
         <li>HTTPS = HTTP + encryption (SSL/TLS)</li>
         <li>TCP = reliable but slow, UDP = fast but unreliable</li>
         <li>MAC addresses are permanent, IP addresses can change</li>
+    </ul>
+</div>
+            `
+        },
+        'TCP/IP Layers': {
+            content: `
+<h2>TCP/IP Model - Deep Dive</h2>
+<div class="definition-box">
+    <strong>TCP/IP Model:</strong> A four-layer conceptual framework that standardizes how data is packaged, addressed, transmitted, routed, and received across networks. It's the backbone of the Internet.
+</div>
+
+<h3>Layer 4: Application Layer</h3>
+<p>The topmost layer where users interact with network services. Protocols at this layer define how applications communicate.</p>
+
+<div class="example-box">
+    <h4>Practical Example: Loading a Webpage</h4>
+<pre><code>1. You type "www.google.com" in your browser
+2. DNS converts domain name → IP address (142.250.185.46)
+3. Browser sends HTTP/HTTPS request to that IP
+4. Server sends back HTML, CSS, JavaScript
+5. Browser renders the webpage
+
+Protocols used: DNS (port 53), HTTPS (port 443)</code></pre>
+</div>
+
+<h4>Key Application Layer Protocols</h4>
+<table class="notes-table">
+    <tr><th>Protocol</th><th>Port</th><th>What It Does</th><th>Real-World Example</th></tr>
+    <tr><td><strong>HTTP</strong></td><td>80</td><td>Transfers web pages (unencrypted)</td><td>Loading a basic website</td></tr>
+    <tr><td><strong>HTTPS</strong></td><td>443</td><td>Secure web transfer (encrypted)</td><td>Online banking, shopping</td></tr>
+    <tr><td><strong>FTP</strong></td><td>21</td><td>File upload/download</td><td>Uploading website files to server</td></tr>
+    <tr><td><strong>SMTP</strong></td><td>25/587</td><td>Send emails</td><td>Your email app sending a message</td></tr>
+    <tr><td><strong>DNS</strong></td><td>53</td><td>Domain name → IP address</td><td>google.com → 142.250.185.46</td></tr>
+    <tr><td><strong>DHCP</strong></td><td>67/68</td><td>Automatic IP address assignment</td><td>Your device getting an IP when joining Wi-Fi</td></tr>
+</table>
+
+<h3>Layer 3: Transport Layer</h3>
+<p>Manages end-to-end communication, ensuring data arrives complete and in order (or quickly if using UDP).</p>
+
+<h4>TCP vs UDP - Detailed Comparison</h4>
+<table class="notes-table">
+    <tr><th>Feature</th><th>TCP</th><th>UDP</th></tr>
+    <tr><td><strong>Connection</strong></td><td>Connection-oriented (3-way handshake)</td><td>Connectionless (fire and forget)</td></tr>
+    <tr><td><strong>Reliability</strong></td><td>Guaranteed delivery with acknowledgments</td><td>No guarantee - packets may be lost</td></tr>
+    <tr><td><strong>Speed</strong></td><td>Slower due to overhead</td><td>Faster - minimal overhead</td></tr>
+</table>
+
+<div class="example-box">
+    <h4>TCP Three-Way Handshake</h4>
+<pre><code>Client                    Server
+   |-------- SYN ----------->|   "Hello, can we connect?"
+   |<------ SYN-ACK ---------|   "Yes, I acknowledge"
+   |-------- ACK ----------->|   "Great, let's start!"
+   |====== DATA FLOW =======>|   Connection established</code></pre>
+</div>
+
+<div class="example-box">
+    <h4>When to Use TCP vs UDP</h4>
+    <table class="notes-table">
+        <tr><th>Use TCP For:</th><th>Use UDP For:</th></tr>
+        <tr><td>Web browsing, Email, File downloads</td><td>Live streaming, Gaming, Voice calls</td></tr>
+    </table>
+</div>
+
+<h3>Layer 2: Internet Layer</h3>
+<p>Handles logical addressing (IP addresses) and routing packets between different networks.</p>
+
+<h4>IP Addressing</h4>
+<table class="notes-table">
+    <tr><th>IPv4</th><th>IPv6</th></tr>
+    <tr><td>32-bit: 192.168.1.1</td><td>128-bit: 2001:0db8:85a3:...</td></tr>
+    <tr><td>~4.3 billion addresses</td><td>Virtually unlimited</td></tr>
+</table>
+
+<h3>Layer 1: Network Access Layer</h3>
+<p>Deals with physical transmission - electrical signals, light pulses, or radio waves.</p>
+
+<table class="notes-table">
+    <tr><th>Medium</th><th>Speed</th><th>Use Case</th></tr>
+    <tr><td><strong>Ethernet Cable</strong></td><td>1-10 Gbps</td><td>Office networks</td></tr>
+    <tr><td><strong>Fiber Optic</strong></td><td>100+ Gbps</td><td>Internet backbone</td></tr>
+    <tr><td><strong>Wi-Fi</strong></td><td>~1-10 Gbps</td><td>Wireless networks</td></tr>
+</table>
+
+<div class="tip-box">
+    <strong>Exam Tips:</strong>
+    <ul>
+        <li>Layer order: Application → Transport → Internet → Network Access</li>
+        <li>TCP = reliable, UDP = fast</li>
+        <li>IP addresses = logical (can change), MAC addresses = physical (permanent)</li>
+    </ul>
+</div>
+            `
+        },
+        'Network Security': {
+            content: `
+<h2>Network Security - Comprehensive Guide</h2>
+<div class="definition-box">
+    <strong>Network Security:</strong> The policies, practices, and technologies used to protect network infrastructure, data, and communications from unauthorized access and attacks.
+</div>
+
+<h3>The CIA Triad</h3>
+<table class="notes-table">
+    <tr><th>Principle</th><th>Meaning</th><th>Protection Methods</th></tr>
+    <tr><td><strong>Confidentiality</strong></td><td>Data only seen by authorized users</td><td>Encryption, access control</td></tr>
+    <tr><td><strong>Integrity</strong></td><td>Data hasn't been tampered with</td><td>Hashing, digital signatures</td></tr>
+    <tr><td><strong>Availability</strong></td><td>Systems accessible when needed</td><td>Redundancy, backups</td></tr>
+</table>
+
+<h3>Common Network Attacks</h3>
+
+<h4>DDoS Attack</h4>
+<div class="example-box">
+<pre><code>Normal: Server ← 1000 requests/sec = OK ✓
+DDoS:   Server ← 10,000,000 requests/sec = CRASH! ✗
+
+Protection: DDoS mitigation services, rate limiting</code></pre>
+</div>
+
+<h4>Man-in-the-Middle Attack</h4>
+<div class="example-box">
+<pre><code>Normal:  You ←→ Bank Website (encrypted)
+MITM:    You ←→ Attacker ←→ Bank Website
+
+Protection: HTTPS, certificate verification, VPNs</code></pre>
+</div>
+
+<h4>SQL Injection</h4>
+<div class="example-box">
+<pre><code>Normal login: username='john' AND password='secret'
+
+SQL Injection: username='' OR '1'='1'
+→ Always TRUE, bypasses authentication!
+
+Protection: Input validation, parameterized queries</code></pre>
+</div>
+
+<h3>Security Technologies</h3>
+
+<h4>Firewalls</h4>
+<div class="example-box">
+<pre><code>ALLOW: Port 443 (HTTPS)
+ALLOW: Port 80 (HTTP)
+DENY: Port 23 (Telnet - insecure)
+DENY: All other incoming traffic</code></pre>
+</div>
+
+<h4>Encryption Types</h4>
+<table class="notes-table">
+    <tr><th>Type</th><th>How It Works</th><th>Example</th></tr>
+    <tr><td><strong>Symmetric</strong></td><td>Same key encrypts and decrypts</td><td>AES - file encryption</td></tr>
+    <tr><td><strong>Asymmetric</strong></td><td>Public key encrypts, private key decrypts</td><td>HTTPS, digital signatures</td></tr>
+</table>
+
+<h4>VPN (Virtual Private Network)</h4>
+<ul>
+    <li>Creates encrypted tunnel between your device and VPN server</li>
+    <li>Hides your real IP address</li>
+    <li>Protects data on public Wi-Fi</li>
+</ul>
+
+<h4>Multi-Factor Authentication (MFA)</h4>
+<table class="notes-table">
+    <tr><th>Factor</th><th>Type</th><th>Examples</th></tr>
+    <tr><td><strong>Knowledge</strong></td><td>Something you KNOW</td><td>Password, PIN</td></tr>
+    <tr><td><strong>Possession</strong></td><td>Something you HAVE</td><td>Phone, hardware token</td></tr>
+    <tr><td><strong>Inherence</strong></td><td>Something you ARE</td><td>Fingerprint, face scan</td></tr>
+</table>
+
+<h3>Best Practices</h3>
+<div class="info-box">
+    <ul>
+        <li>Use strong, unique passwords</li>
+        <li>Enable MFA wherever possible</li>
+        <li>Keep software updated</li>
+        <li>Be suspicious of unexpected emails/links</li>
+        <li>Use HTTPS websites for sensitive data</li>
+        <li>Back up important data regularly</li>
+    </ul>
+</div>
+
+<div class="tip-box">
+    <strong>Exam Tips:</strong>
+    <ul>
+        <li>Know the CIA triad</li>
+        <li>Be able to explain DDoS, MITM, phishing, SQL injection</li>
+        <li>Understand symmetric vs asymmetric encryption</li>
+        <li>Know the three authentication factors</li>
     </ul>
 </div>
             `
