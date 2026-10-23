@@ -259,8 +259,10 @@ const SpeedRun = {
         
         SpeedRun.questionStartTime = Date.now();
         
-        // Shuffle options using Helpers.shuffleOptions
-        const shuffled = Helpers.shuffleOptions(question);
+        // Shuffle options using Helpers.shuffleOptions (with fallback)
+        const shuffled = (typeof Helpers !== 'undefined' && Helpers.shuffleOptions)
+            ? Helpers.shuffleOptions(question)
+            : { ...question }; // fallback: use original order
         SpeedRun.currentShuffled = shuffled;
         
         const questionArea = document.getElementById('sr-question-area');
