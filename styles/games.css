@@ -34,6 +34,10 @@
     overflow-y: auto;
     position: relative;
     animation: modalIn 0.3s ease;
+    /* Fix: Ensure proper centering with margin auto fallback */
+    margin: auto;
+    /* Fix: Add box-sizing for consistent sizing */
+    box-sizing: border-box;
 }
 
 @keyframes modalIn {
@@ -45,8 +49,10 @@
     position: absolute;
     top: var(--space-4);
     right: var(--space-4);
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
     border: none;
     background: var(--bg-elevated);
     border-radius: var(--radius-full);
@@ -55,6 +61,10 @@
     color: var(--text-muted);
     transition: all 0.2s;
     z-index: 10;
+    /* Fix: Ensure proper flex centering of icon */
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .game-close-btn:hover {
@@ -131,6 +141,11 @@
     font-size: 2rem;
     font-weight: 700;
     color: var(--primary);
+    /* Fix: Prevent text overflow */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
 }
 
 .sr-stat-label,
@@ -261,6 +276,10 @@
 .sr-score-display {
     display: flex;
     gap: var(--space-6);
+    /* Fix: Handle overflow and wrap on small screens */
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
 }
 
 .sr-score,
@@ -330,6 +349,11 @@
     cursor: pointer;
     transition: all 0.2s;
     text-align: left;
+    /* Fix: Ensure minimum width and proper text handling */
+    min-width: 0;
+    min-height: 56px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .sr-option:hover {
@@ -340,6 +364,8 @@
 .sr-option-key {
     width: 32px;
     height: 32px;
+    min-width: 32px;
+    min-height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -536,6 +562,8 @@
     cursor: pointer;
     transition: all 0.2s;
     text-align: center;
+    /* Fix: Ensure minimum touch target size */
+    min-height: 60px;
 }
 
 .difficulty-btn:hover,
@@ -751,6 +779,11 @@
     cursor: pointer;
     transition: all 0.2s;
     text-align: left;
+    /* Fix: Ensure minimum height and proper text handling */
+    min-height: 56px;
+    min-width: 0;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .bq-option:hover:not(:disabled) {
@@ -770,6 +803,8 @@
 .bq-option-key {
     width: 32px;
     height: 32px;
+    min-width: 32px;
+    min-height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -777,6 +812,7 @@
     color: white;
     border-radius: var(--radius-sm);
     font-weight: 700;
+    flex-shrink: 0;
 }
 
 .battle-powerups {
@@ -792,6 +828,12 @@
     border-radius: var(--radius-md);
     cursor: pointer;
     transition: all 0.2s;
+    /* Fix: Ensure minimum touch target size */
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .pu-btn:hover:not(.used) {
@@ -953,6 +995,8 @@
     border-radius: var(--radius-md);
     cursor: pointer;
     transition: all 0.2s;
+    /* Fix: Ensure minimum touch target size */
+    min-height: 44px;
 }
 
 .mm-diff-btn:hover,
@@ -1109,6 +1153,8 @@
     border-radius: var(--radius-md);
     cursor: pointer;
     transition: all 0.2s;
+    /* Fix: Ensure minimum touch target size */
+    min-height: 56px;
 }
 
 .tr-mode-btn:hover,
@@ -1416,6 +1462,11 @@
     cursor: pointer;
     transition: all 0.3s;
     text-align: left;
+    /* Fix: Ensure minimum height and proper text handling */
+    min-height: 56px;
+    min-width: 0;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .mill-answer:hover:not(:disabled) {
@@ -1471,6 +1522,12 @@
     cursor: pointer;
     font-weight: 600;
     transition: all 0.2s;
+    /* Fix: Ensure minimum touch target size */
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .mill-lifeline:hover:not(.used) {
@@ -1701,6 +1758,10 @@
     font-size: 1rem;
     color: var(--primary);
     text-align: center;
+    /* Fix: Ensure minimum height for touch */
+    min-height: 36px;
+    line-height: 1.5;
+    box-sizing: border-box;
 }
 
 .fc-blank:focus {
@@ -1752,6 +1813,11 @@
     cursor: pointer;
     font-family: 'Fira Code', monospace;
     transition: all 0.2s;
+    /* Fix: Ensure minimum touch target size */
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .fc-word:hover:not(.used) {
@@ -1809,6 +1875,8 @@
     transition: all 0.3s;
     text-align: center;
     position: relative;
+    /* Fix: Ensure minimum touch target size */
+    min-height: 120px;
 }
 
 .boss-card:hover:not(:disabled) {
@@ -2006,6 +2074,11 @@
     cursor: pointer;
     transition: all 0.2s;
     text-align: left;
+    /* Fix: Ensure minimum height and proper text handling */
+    min-height: 56px;
+    min-width: 0;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .boss-option:hover:not(:disabled) {
@@ -2018,6 +2091,8 @@
 .boss-opt-key {
     width: 32px;
     height: 32px;
+    min-width: 32px;
+    min-height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -2025,6 +2100,7 @@
     color: white;
     border-radius: var(--radius-sm);
     font-weight: 700;
+    flex-shrink: 0;
 }
 
 .boss-powerups {
@@ -2040,6 +2116,12 @@
     border-radius: var(--radius-md);
     cursor: pointer;
     transition: all 0.2s;
+    /* Fix: Ensure minimum touch target size */
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .boss-pu-btn:hover:not(.used) {
@@ -3464,5 +3546,184 @@
     .diff-card:active {
         transform: scale(0.98);
         opacity: 0.9;
+    }
+}
+
+
+/* =====================================================
+   ADDITIONAL GAME CSS FIXES - Added by automated review
+   ===================================================== */
+
+/* Fix: Game modal centering on all screen sizes */
+.game-modal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Ensure safe area insets on iOS */
+    padding: env(safe-area-inset-top, var(--space-4)) 
+             env(safe-area-inset-right, var(--space-4)) 
+             env(safe-area-inset-bottom, var(--space-4)) 
+             env(safe-area-inset-left, var(--space-4));
+}
+
+/* Fix: Ensure game container doesn't overflow viewport */
+.game-container {
+    max-width: min(900px, calc(100vw - 2rem));
+    max-height: min(90vh, calc(100vh - 2rem));
+}
+
+/* Fix: Results actions should wrap on small screens */
+.sr-results-actions,
+.mm-results-actions,
+.tr-results-actions,
+.fc-results-actions,
+.battle-results-actions,
+.mill-results-actions,
+.boss-results-actions {
+    flex-wrap: wrap;
+}
+
+/* Fix: Ensure results grid doesn't break on small screens */
+@media (max-width: 400px) {
+    .sr-results-grid,
+    .mm-results-grid,
+    .tr-results-grid,
+    .fc-results-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .sr-final-value,
+    .mm-fs-value,
+    .tr-fw-value,
+    .fc-fs-value,
+    .mill-fp-value {
+        font-size: 2.5rem;
+    }
+    
+    /* Fix: Timer text overflow */
+    .sr-timer-text {
+        font-size: 1.25rem;
+    }
+    
+    /* Fix: Battle arena spacing */
+    .battle-arena {
+        padding: var(--space-3);
+    }
+    
+    /* Fix: Combo counter sizing */
+    .sr-combo-value {
+        font-size: 1.25rem;
+    }
+    
+    /* Fix: Game header wrapping */
+    .sr-game-header,
+    .fc-game-header {
+        flex-wrap: wrap;
+        gap: var(--space-3);
+    }
+}
+
+/* Fix: Ensure proper text wrapping in option text */
+.sr-option-text,
+.bq-option-text,
+.boss-option-text,
+.mill-answer-text {
+    flex: 1;
+    min-width: 0;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+/* Fix: Memory match card content overflow */
+.mm-card-content {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Fix: Ensure HP bars have proper minimum width */
+.bp-hp-bar,
+.boss-hp-bar {
+    min-width: 100px;
+}
+
+/* Fix: Prize ladder scrolling on mobile */
+@media (max-width: 600px) {
+    .mill-prize-ladder {
+        max-height: 150px;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .mill-bottom-bar {
+        flex-direction: column-reverse;
+        gap: var(--space-3);
+    }
+}
+
+/* Fix: Ensure game play button is always accessible */
+.game-play-btn {
+    min-height: 48px;
+    font-size: 1rem;
+}
+
+/* Fix: Game card features list overflow */
+.game-card-features {
+    max-height: 120px;
+    overflow-y: auto;
+}
+
+/* Fix: Leaderboard table on small screens */
+@media (max-width: 480px) {
+    .mini-lb-table th,
+    .mini-lb-table td {
+        padding: var(--space-2);
+        font-size: 0.875rem;
+    }
+    
+    .sr-lb-entry {
+        padding: var(--space-2);
+        font-size: 0.875rem;
+    }
+}
+
+/* Fix: Type racer input should not zoom on iOS */
+.tr-input {
+    font-size: max(16px, 1rem);
+}
+
+/* Fix: Code block horizontal scroll on mobile */
+.fc-code-block {
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Fix: Ensure modals/dialogs are properly centered */
+.mill-confirm-box,
+.mill-audience-results,
+.mill-phone-dialog,
+.fc-hint-modal {
+    max-width: calc(100vw - 2rem);
+    max-height: calc(100vh - 4rem);
+    overflow-y: auto;
+}
+
+/* Fix: Battle player sections on narrow screens */
+@media (max-width: 380px) {
+    .battle-player {
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .bp-name {
+        font-size: 0.85rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .bp-score {
+        font-size: 1.25rem;
     }
 }
