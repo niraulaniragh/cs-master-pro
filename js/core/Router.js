@@ -74,6 +74,14 @@ const Router = (() => {
             route = 'home';
         }
         
+        // Check login status
+        const isLoggedIn = typeof Auth !== 'undefined' && Auth.isLoggedIn && Auth.isLoggedIn();
+        
+        // Redirect logged-in users away from landing page
+        if (route === 'landing' && isLoggedIn) {
+            route = 'home';
+        }
+        
         // Check guest access restrictions
         if (typeof GuestLimiter !== 'undefined') {
             const access = GuestLimiter.canAccessRoute(route);
@@ -84,7 +92,6 @@ const Router = (() => {
         }
         
         // Hide/show navigation based on route and login status
-        const isLoggedIn = typeof Auth !== 'undefined' && Auth.isLoggedIn && Auth.isLoggedIn();
         const nav = document.querySelector('.main-nav');
         const footer = document.querySelector('.main-footer');
         
@@ -262,17 +269,12 @@ const Router = (() => {
             const isLoggedIn = typeof Auth !== 'undefined' && Auth.isLoggedIn && Auth.isLoggedIn();
             let initialRoute;
             
-            if (hash && routes[hash]) {
-                // If user navigated to a specific hash, respect it (but landing for guests on protected routes)
-                if (!isLoggedIn && hash !== 'landing') {
-                    // Guest trying to access app - show landing
-                    initialRoute = 'landing';
-                } else {
-                    initialRoute = hash;
-                }
+            if (isLoggedIn) {
+                // Logged in users always go to home (or their requested route, but never landing)
+                initialRoute = (hash && routes[hash] && hash !== 'landing') ? hash : 'home';
             } else {
-                // No hash - show landing for guests, home for logged in users
-                initialRoute = isLoggedIn ? 'home' : 'landing';
+                // Guests go to landing (or landing if trying to access protected routes)
+                initialRoute = 'landing';
             }
             
             isInitialized = true;
