@@ -16670,535 +16670,173 @@ textarea:focus-visible,
 
 
 
+
 /* ==================== LANDING PAGE ==================== */
-
-/* Landing page container - ensure proper containment */
-.landing-guest {
-    width: 100%;
-    max-width: 100%;
-    overflow-x: hidden;
-    box-sizing: border-box;
-}
-
-.landing-guest * {
-    box-sizing: border-box;
-}
-
-/* Hero adjustments */
-.landing-guest .hero-landing {
-    padding: var(--space-10) var(--space-6);
-    width: 100%;
-    max-width: 1200px;
+.landing-page {
+    max-width: 1000px;
     margin: 0 auto;
+    padding: 40px 20px;
 }
 
-.landing-guest .hero-brand {
-    font-size: clamp(1.75rem, 5vw, 2.5rem);
-    background: linear-gradient(135deg, var(--primary), var(--accent));
+.landing-hero {
+    text-align: center;
+    padding: 60px 20px;
+    margin-bottom: 60px;
+}
+
+.landing-title {
+    font-size: clamp(2rem, 8vw, 3.5rem);
+    font-weight: 800;
+    background: linear-gradient(135deg, #10b981, #3b82f6);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-    hyphens: auto;
-    line-height: 1.2;
-    margin-bottom: var(--space-4);
+    margin-bottom: 16px;
 }
 
-.landing-guest .hero-subtitle {
-    font-size: clamp(1rem, 2.5vw, 1.25rem);
+.landing-subtitle {
+    font-size: clamp(1rem, 3vw, 1.25rem);
     color: var(--text-secondary);
-    line-height: 1.6;
     max-width: 600px;
-    margin: 0 auto var(--space-6);
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-}
-
-.landing-guest .hero-cta-buttons {
-    display: flex;
-    gap: var(--space-4);
-    margin-top: var(--space-6);
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-.landing-guest .hero-stats-preview {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-top: var(--space-8);
-    padding: 0 var(--space-4);
-    width: 100%;
-}
-
-.landing-guest .preview-card {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-6);
-    padding: var(--space-6) var(--space-8);
-    background: var(--bg-card);
-    border-radius: var(--radius-xl);
-    border: 1px solid var(--border);
-    justify-content: center;
-    max-width: 100%;
-    overflow: hidden;
-}
-
-.landing-guest .preview-stat {
-    text-align: center;
-    min-width: 100px;
-    padding: var(--space-2);
-}
-
-.landing-guest .preview-number {
-    display: block;
-    font-size: clamp(1.5rem, 4vw, 2rem);
-    font-weight: 700;
-    color: var(--primary);
-    line-height: 1.2;
-}
-
-.landing-guest .preview-label {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 150px;
-}
-
-/* Feature cards - Landing page cards with proper sizing */
-.landing-guest .feature-card {
-    cursor: default;
-    padding: var(--space-6);
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-xl);
-    min-height: 200px;
-    overflow: hidden;
-}
-
-.landing-guest .feature-card h3 {
-    font-size: 1.125rem;
-    margin-bottom: var(--space-3);
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-}
-
-.landing-guest .feature-card p {
-    color: var(--text-secondary);
+    margin: 0 auto 20px;
     line-height: 1.6;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
 }
 
-/* Topics list - properly sized cards */
-.topics-list-landing {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: var(--space-4);
-    width: 100%;
-    padding: var(--space-2);
-}
-
-.topic-preview-item {
-    display: flex;
-    align-items: center;
-    gap: var(--space-4);
-    padding: var(--space-4) var(--space-5);
+.landing-badge {
+    display: inline-block;
     background: var(--bg-elevated);
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--border);
-    min-height: 64px;
-    transition: all 0.2s ease;
-    overflow: hidden;
-}
-
-.topic-preview-item:hover {
-    border-color: var(--primary);
-    background: var(--bg-hover);
-}
-
-.topic-preview-item .topic-icon {
-    font-size: 1.75rem;
-    flex-shrink: 0;
-    width: 40px;
-    text-align: center;
-}
-
-.topic-preview-item .topic-name {
-    font-weight: 600;
-    font-size: 0.95rem;
-    color: var(--text-primary);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    flex: 1;
-    min-width: 0;
-}
-
-/* Games preview - larger cards with better spacing */
-.games-preview-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: var(--space-3);
-    width: 100%;
-}
-
-.game-preview-item {
-    display: flex;
-    align-items: center;
-    gap: var(--space-3);
-    padding: var(--space-4);
-    background: var(--bg-elevated);
-    border-radius: var(--radius-md);
-    border: 1px solid var(--border);
-    min-height: 56px;
-    transition: all 0.2s ease;
-    overflow: hidden;
-}
-
-.game-preview-item:hover {
-    border-color: var(--primary);
-    background: var(--bg-hover);
-}
-
-.game-preview-item .game-icon {
-    font-size: 1.5rem;
-    flex-shrink: 0;
-    width: 32px;
-    text-align: center;
-}
-
-.game-preview-item .game-name {
-    font-size: 0.95rem;
-    font-weight: 500;
-    color: var(--text-primary);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    flex: 1;
-    min-width: 0;
-}
-
-.games-more {
-    text-align: center;
-    color: var(--text-muted);
+    padding: 8px 20px;
+    border-radius: 20px;
     font-size: 0.9rem;
-    margin-top: var(--space-4);
-    padding: var(--space-2);
+    color: var(--text-muted);
+    margin-bottom: 32px;
 }
 
-/* Why list - proper spacing and containment */
-.why-list {
+.landing-buttons {
     display: flex;
-    flex-direction: column;
-    gap: var(--space-4);
-    padding: var(--space-2) 0;
-    margin: var(--space-4) 0;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
 }
 
-.why-item {
-    display: flex;
-    align-items: flex-start;
-    gap: var(--space-4);
-    color: var(--text-secondary);
-    padding: var(--space-3);
+.landing-btn {
+    padding: 14px 32px;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+}
+
+.landing-btn.primary {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+}
+
+.landing-btn.primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+}
+
+.landing-btn.secondary {
     background: var(--bg-elevated);
-    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+}
+
+.landing-btn.secondary:hover {
+    border-color: var(--primary);
+}
+
+.landing-btn.ghost {
+    background: none;
+    color: var(--text-muted);
+    padding: 10px 20px;
+}
+
+.landing-btn.ghost:hover {
+    color: var(--primary);
+}
+
+.landing-btn.large {
+    padding: 18px 40px;
+    font-size: 1.1rem;
+}
+
+/* Features Grid */
+.landing-features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin-bottom: 60px;
+}
+
+.landing-feature {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px 24px;
+    text-align: center;
+}
+
+.feature-icon {
+    font-size: 2.5rem;
+    display: block;
+    margin-bottom: 16px;
+}
+
+.landing-feature h3 {
+    font-size: 1.25rem;
+    margin-bottom: 8px;
+    color: var(--text-primary);
+}
+
+.landing-feature p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
     line-height: 1.5;
 }
 
-.why-item i {
-    color: var(--success);
-    flex-shrink: 0;
-    margin-top: 2px;
-    font-size: 1rem;
-}
-
-.why-item span {
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-}
-
-/* CTA Section - properly contained */
-.cta-section {
-    margin-top: var(--space-8);
-    padding: 0 var(--space-4);
-    width: 100%;
-    max-width: 1200px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.cta-card {
+/* CTA Section */
+.landing-cta {
     text-align: center;
-    padding: var(--space-10) var(--space-6) !important;
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(59, 130, 246, 0.1));
-    border: 1px solid rgba(16, 185, 129, 0.2);
-    border-radius: var(--radius-xl);
-    overflow: hidden;
-}
-
-.cta-card h2 {
-    font-size: clamp(1.5rem, 4vw, 1.75rem);
-    margin-bottom: var(--space-3);
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-}
-
-.cta-card p {
-    color: var(--text-muted);
-    margin-bottom: var(--space-6);
-    font-size: 1.05rem;
-    line-height: 1.6;
-    max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.cta-buttons {
-    display: flex;
-    gap: var(--space-4);
-    justify-content: center;
-    flex-wrap: wrap;
-}
-
-/* Button sizes - proper sizing */
-.btn-lg {
-    padding: var(--space-4) var(--space-6);
-    font-size: 1.05rem;
-    min-height: 48px;
-    min-width: 140px;
-}
-
-.btn-ghost {
-    background: transparent;
-    color: var(--text-primary);
-    border: 1px solid var(--border);
-}
-
-.btn-ghost:hover {
-    background: var(--bg-elevated);
-    border-color: var(--primary);
-}
-
-/* Landing sections grid layout */
-.landing-guest .landing-sections {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: var(--space-6);
-    padding: var(--space-6);
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.landing-guest .landing-section {
+    padding: 60px 20px;
     background: var(--bg-card);
+    border-radius: 20px;
     border: 1px solid var(--border);
-    border-radius: var(--radius-xl);
-    padding: var(--space-6);
-    overflow: hidden;
 }
 
-.landing-guest .landing-section h2 {
-    font-size: 1.25rem;
-    margin-bottom: var(--space-5);
-    word-wrap: break-word;
+.landing-cta h2 {
+    font-size: 1.75rem;
+    margin-bottom: 24px;
 }
 
-/* Tablet */
-@media (max-width: 1024px) {
-    .landing-guest .hero-landing {
-        padding: var(--space-8) var(--space-5);
-    }
-    
-    .landing-guest .preview-card {
-        padding: var(--space-5);
-        gap: var(--space-4);
-    }
-    
-    .topics-list-landing {
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: var(--space-3);
-    }
-    
-    .landing-guest .landing-sections {
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: var(--space-5);
-        padding: var(--space-5);
-    }
+.landing-cta .landing-btn {
+    display: block;
+    margin: 0 auto 12px;
 }
 
 /* Mobile */
-@media (max-width: 768px) {
-    .landing-guest .hero-landing {
-        padding: var(--space-6) var(--space-4);
+@media (max-width: 600px) {
+    .landing-hero {
+        padding: 40px 16px;
     }
     
-    .landing-guest .hero-brand {
-        font-size: 1.75rem;
-    }
-    
-    .landing-guest .hero-cta-buttons {
+    .landing-buttons {
         flex-direction: column;
-        align-items: center;
-        gap: var(--space-3);
     }
     
-    .landing-guest .hero-cta-buttons .btn {
+    .landing-btn {
         width: 100%;
-        max-width: 280px;
     }
     
-    .landing-guest .preview-card {
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: space-around;
-        gap: var(--space-4);
-        padding: var(--space-4);
-    }
-    
-    .landing-guest .preview-stat {
-        min-width: 80px;
-    }
-    
-    .landing-guest .preview-number {
-        font-size: 1.5rem;
-    }
-    
-    .landing-guest .preview-label {
-        font-size: 0.8rem;
-    }
-    
-    .topics-list-landing {
+    .landing-features {
         grid-template-columns: 1fr;
-        gap: var(--space-3);
     }
     
-    .topic-preview-item {
-        padding: var(--space-4);
-    }
-    
-    .games-preview-list {
-        grid-template-columns: 1fr;
-        gap: var(--space-3);
-    }
-    
-    .game-preview-item {
-        padding: var(--space-3) var(--space-4);
-    }
-    
-    .why-list {
-        gap: var(--space-3);
-    }
-    
-    .why-item {
-        padding: var(--space-3);
-    }
-    
-    .cta-section {
-        padding: 0 var(--space-3);
-    }
-    
-    .cta-card {
-        padding: var(--space-6) var(--space-4) !important;
-    }
-    
-    .cta-buttons {
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    .cta-buttons .btn-lg {
-        width: 100%;
-        max-width: 280px;
-    }
-    
-    .landing-guest .landing-sections {
-        grid-template-columns: 1fr;
-        padding: var(--space-4);
-        gap: var(--space-4);
-    }
-    
-    .landing-guest .landing-section {
-        padding: var(--space-5);
-    }
-    
-    .landing-guest .feature-card {
-        padding: var(--space-5);
-        min-height: auto;
-    }
-}
-
-/* Small mobile */
-@media (max-width: 480px) {
-    .landing-guest .hero-landing {
-        padding: var(--space-5) var(--space-3);
-    }
-    
-    .landing-guest .hero-brand {
-        font-size: 1.5rem;
-    }
-    
-    .landing-guest .preview-card {
-        padding: var(--space-3);
-        gap: var(--space-3);
-    }
-    
-    .landing-guest .preview-stat {
-        min-width: 70px;
-        padding: var(--space-1);
-    }
-    
-    .landing-guest .preview-number {
-        font-size: 1.25rem;
-    }
-    
-    .landing-guest .preview-label {
-        font-size: 0.75rem;
-        max-width: 100px;
-    }
-    
-    .topic-preview-item {
-        padding: var(--space-3);
-        gap: var(--space-3);
-    }
-    
-    .topic-preview-item .topic-icon {
-        font-size: 1.5rem;
-        width: 32px;
-    }
-    
-    .topic-preview-item .topic-name {
-        font-size: 0.9rem;
-    }
-    
-    .game-preview-item {
-        padding: var(--space-3);
-    }
-    
-    .game-preview-item .game-icon {
-        font-size: 1.25rem;
-    }
-    
-    .game-preview-item .game-name {
-        font-size: 0.9rem;
-    }
-    
-    .cta-card {
-        padding: var(--space-5) var(--space-3) !important;
-    }
-    
-    .btn-lg {
-        padding: var(--space-3) var(--space-4);
-        font-size: 1rem;
-        min-height: 44px;
-    }
-    
-    .landing-guest .landing-section {
-        padding: var(--space-4);
+    .landing-feature {
+        padding: 24px 20px;
     }
 }
 

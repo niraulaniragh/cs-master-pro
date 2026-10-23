@@ -609,9 +609,11 @@ const AuthModal = {
                         Toast.show(welcome, 'success');
                     }
                     
-                    // Reload app to show authenticated state
-                    if (typeof App !== 'undefined' && App.init) {
-                        App.init();
+                    // Navigate to home page
+                    if (typeof Router !== 'undefined' && Router.navigate) {
+                        Router.navigate('home');
+                    } else {
+                        window.location.reload();
                     }
                 } else {
                     AuthModal.showError(AuthModal.formatApiError(result?.error, 'Registration failed'));
@@ -638,9 +640,11 @@ const AuthModal = {
                         Toast.show(`Welcome back, ${displayName}! 👋`, 'success');
                     }
                     
-                    // Reload app with user's progress
-                    if (typeof App !== 'undefined' && App.init) {
-                        App.init();
+                    // Navigate to home page
+                    if (typeof Router !== 'undefined' && Router.navigate) {
+                        Router.navigate('home');
+                    } else {
+                        window.location.reload();
                     }
                 } else {
                     // Generic message for login failures (security: don't reveal if email exists)
