@@ -11633,27 +11633,31 @@ textarea:focus {
     gap: 15px;
 }
 
-.stat-card {
+.game-stats-section .stat-card,
+.crypto-hack-game .stat-card {
     background: rgba(255, 255, 255, 0.05);
     border-radius: 12px;
     padding: 20px;
     text-align: center;
 }
 
-.stat-card .stat-icon {
+.game-stats-section .stat-card .stat-icon,
+.crypto-hack-game .stat-card .stat-icon {
     font-size: 2rem;
     display: block;
     margin-bottom: 10px;
 }
 
-.stat-card .stat-value {
+.game-stats-section .stat-card .stat-value,
+.crypto-hack-game .stat-card .stat-value {
     font-size: 2rem;
     font-weight: 700;
     color: white;
     display: block;
 }
 
-.stat-card .stat-label {
+.game-stats-section .stat-card .stat-label,
+.crypto-hack-game .stat-card .stat-label {
     color: rgba(255, 255, 255, 0.6);
     font-size: 0.85rem;
 }
@@ -12067,7 +12071,7 @@ textarea:focus {
     margin-bottom: var(--space-6);
 }
 
-.stat-card {
+.stats-overview .stat-card {
     display: flex;
     align-items: center;
     gap: var(--space-4);
@@ -12076,26 +12080,28 @@ textarea:focus {
     border: 1px solid var(--border);
     border-radius: 16px;
     transition: transform 0.2s, box-shadow 0.2s;
+    text-align: left;
 }
 
-.stat-card:hover {
+.stats-overview .stat-card:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
 }
 
-.stat-card.primary {
+.stats-overview .stat-card.primary {
     background: linear-gradient(135deg, var(--primary), var(--accent));
     border: none;
 }
 
-.stat-card.primary .stat-value,
-.stat-card.primary .stat-desc {
+.stats-overview .stat-card.primary .stat-value,
+.stats-overview .stat-card.primary .stat-desc {
     color: white;
 }
 
-.stat-icon-wrap {
+.stats-overview .stat-icon-wrap {
     width: 52px;
     height: 52px;
+    min-width: 52px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -12106,22 +12112,23 @@ textarea:focus {
     font-weight: 800;
 }
 
-.stat-icon-wrap.blue { background: linear-gradient(135deg, #3b82f6, #60a5fa); }
-.stat-icon-wrap.green { background: linear-gradient(135deg, #10b981, #34d399); }
-.stat-icon-wrap.orange { background: linear-gradient(135deg, #f97316, #fb923c); }
-.stat-icon-wrap.purple { background: linear-gradient(135deg, #8b5cf6, #a78bfa); }
+.stats-overview .stat-icon-wrap.blue { background: linear-gradient(135deg, #3b82f6, #60a5fa); }
+.stats-overview .stat-icon-wrap.green { background: linear-gradient(135deg, #10b981, #34d399); }
+.stats-overview .stat-icon-wrap.orange { background: linear-gradient(135deg, #f97316, #fb923c); }
+.stats-overview .stat-icon-wrap.purple { background: linear-gradient(135deg, #8b5cf6, #a78bfa); }
 
-.stat-icon-inner {
+.stats-overview .stat-icon-inner {
     font-size: 1.25rem;
     font-weight: 800;
 }
 
-.stat-content {
+.stats-overview .stat-content {
     flex: 1;
     min-width: 0;
+    overflow: hidden;
 }
 
-.stat-content .stat-value {
+.stats-overview .stat-content .stat-value {
     display: block;
     font-size: 1.25rem;
     font-weight: 700;
@@ -12130,7 +12137,7 @@ textarea:focus {
     margin-bottom: 2px;
 }
 
-.stat-content .stat-desc {
+.stats-overview .stat-content .stat-desc {
     display: block;
     font-size: 0.8rem;
     color: var(--text-muted);
