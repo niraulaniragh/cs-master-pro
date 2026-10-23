@@ -1,7 +1,7 @@
 /**
  * BattleMode.js - 1v1 Head to Head
  * Compete against AI opponents or challenge friends
- * Features: Power-ups, sudden death, difficulty levels
+ * Features: Power-ups, sudden death, difficulty levels, AI personalities
  */
 
 const BattleMode = {
@@ -20,8 +20,50 @@ const BattleMode = {
     questionTimer: null,
     opponentTimeout: null,
     timeLeft: 15,
-    playerAnswered: false, // Track if player already answered this round
+    playerAnswered: false,
     timeFrozen: false,
+    currentPersonality: null,
+    lastDamageDealt: 0,
+
+    // AI Personalities
+    personalities: {
+        aggressive: {
+            name: 'Aggressive',
+            icon: '🔥',
+            speedMultiplier: 0.7,
+            accuracyModifier: -0.05,
+            damageMultiplier: 1.3,
+            taunt: ['Come on, is that all?', 'Too slow!', 'I eat noobs for breakfast!'],
+            color: '#ef4444'
+        },
+        defensive: {
+            name: 'Defensive',
+            icon: '🛡️',
+            speedMultiplier: 1.3,
+            accuracyModifier: 0.1,
+            damageMultiplier: 0.8,
+            taunt: ['Patience wins battles...', 'Steady and sure.', 'No rush here.'],
+            color: '#3b82f6'
+        },
+        balanced: {
+            name: 'Balanced',
+            icon: '⚖️',
+            speedMultiplier: 1.0,
+            accuracyModifier: 0,
+            damageMultiplier: 1.0,
+            taunt: ['Good game!', 'Well played!', 'Let\'s see what you\'ve got.'],
+            color: '#10b981'
+        }
+    },
+
+    // Battle commentary phrases
+    commentary: {
+        criticalHit: ['💥 CRITICAL HIT!', '⚡ DEVASTATING BLOW!', '🎯 PERFECT STRIKE!'],
+        closeBattle: ['😰 This is INTENSE!', '🔥 Neck and neck!', '⚔️ Anyone\'s game!'],
+        lowHP: ['💀 On the brink!', '😱 Hanging by a thread!', '🩸 Critical condition!'],
+        comeback: ['🔄 The comeback begins!', '💪 Fighting back!', '🌟 Never give up!'],
+        dominating: ['👑 DOMINATING!', '🏆 Unstoppable!', '💯 Flawless!']
+    },
 
     difficulties: {
         easy: { name: 'Rookie Bot 🤖', speed: [3, 6], accuracy: 0.5, color: '#10b981' },
@@ -127,7 +169,6 @@ const BattleMode = {
             btn.classList.remove('selected');
         });
         
-        // Use evt parameter or fallback to find button by diff
         const targetBtn = evt?.target?.closest('.difficulty-btn') || 
                          document.querySelector(`.difficulty-btn[onclick*="'${diff}'"]`);
         if (targetBtn) {
@@ -135,15 +176,21 @@ const BattleMode = {
         }
     },
 
+    // Assign random personality to AI
+    assignPersonality: () => {
+        const personalities = Object.keys(BattleMode.personalities);
+        const randomIndex = Math.floor(Math.random() * personalities.length);
+        BattleMode.currentPersonality = personalities[randomIndex];
+        return BattleMode.personalities[BattleMode.currentPersonality];
+    },
+
     startGame: () => {
         try {
-            // Validate QUESTIONS exists
             if (typeof QUESTIONS === 'undefined' || !Array.isArray(QUESTIONS) || QUESTIONS.length === 0) {
                 Toast?.show?.('No questions available', 'error');
                 return;
             }
             
-            // Validate shuffleArray function exists
             if (typeof shuffleArray !== 'function') {
                 console.error('shuffleArray function not found');
                 Toast?.show?.('Game initialization error', 'error');
@@ -168,6 +215,10 @@ const BattleMode = {
             BattleMode.activeDoublePoints = false;
             BattleMode.playerAnswered = false;
             BattleMode.timeFrozen = false;
+            BattleMode.lastDamageDealt = 0;
+            
+            // Assign AI personality
+            const personality = BattleMode.assignPersonality();
             
             SoundFX?.play?.('start');
             
@@ -178,18 +229,43 @@ const BattleMode = {
             }
             container.innerHTML = BattleMode.renderGame();
             
-            // Register keyboard handler
+            // Show AI personality announcement
+            BattleMode.showPersonalityIntro(personality);
+            
             document.addEventListener('keydown', BattleMode.keyHandler);
             
-            BattleMode.showQuestion();
+            setTimeout(() => BattleMode.showQuestion(), 2000);
         } catch (error) {
             console.error('BattleMode.startGame error:', error);
             Toast?.show?.('Failed to start game', 'error');
         }
     },
 
+    showPersonalityIntro: (personality) => {
+        const gameView = document.querySelector('.battle-game-view');
+        if (!gameView) return;
+        
+        const intro = document.createElement('div');
+        intro.className = 'personality-intro';
+        intro.innerHTML = `
+            <div class="personality-badge" style="--personality-color: ${personality.color}">
+                <span class="personality-icon">${personality.icon}</span>
+                <span class="personality-name">${personality.name}</span>
+            </div>
+            <div class="personality-taunt">"${personality.taunt[Math.floor(Math.random() * personality.taunt.length)]}"</div>
+        `;
+        gameView.appendChild(intro);
+        
+        setTimeout(() => intro.classList.add('show'), 100);
+        setTimeout(() => {
+            intro.classList.remove('show');
+            setTimeout(() => intro.remove(), 500);
+        }, 1800);
+    },
+
     renderGame: () => {
         const opponent = BattleMode.difficulties[BattleMode.difficulty] || BattleMode.difficulties.normal;
+        const personality = BattleMode.personalities[BattleMode.currentPersonality] || BattleMode.personalities.balanced;
         const currentUser = typeof Auth !== 'undefined' ? Auth.getCurrentUser?.() : null;
         const username = currentUser?.username || 'You';
         const escapedUsername = typeof Helpers !== 'undefined' && Helpers.escapeHtml 
@@ -198,6 +274,8 @@ const BattleMode = {
         
         return `
             <div class="battle-game-view">
+                <div class="battle-commentary" id="battle-commentary"></div>
+                
                 <div class="battle-arena">
                     <div class="battle-player player-left">
                         <div class="bp-avatar">👤</div>
@@ -217,11 +295,18 @@ const BattleMode = {
                     <div class="battle-player player-right">
                         <div class="bp-avatar" style="background: ${opponent.color}">🤖</div>
                         <div class="bp-name">${BattleMode.opponentName}</div>
+                        <div class="bp-personality" style="color: ${personality.color}">${personality.icon} ${personality.name}</div>
                         <div class="bp-hp-bar">
                             <div class="bp-hp-fill" id="opponent-hp" style="width: 100%"></div>
                             <span class="bp-hp-text" id="opponent-hp-text">100</span>
                         </div>
                         <div class="bp-score" id="opponent-score">0</div>
+                        <div class="ai-thinking-indicator" id="ai-thinking" style="display: none;">
+                            <span class="thinking-dots">
+                                <span>.</span><span>.</span><span>.</span>
+                            </span>
+                            <span class="thinking-text">Thinking</span>
+                        </div>
                     </div>
                 </div>
                 
@@ -262,7 +347,7 @@ const BattleMode = {
         }
         
         BattleMode.round++;
-        BattleMode.playerAnswered = false; // Reset for new round
+        BattleMode.playerAnswered = false;
         
         const roundEl = document.getElementById('battle-round');
         if (roundEl) roundEl.textContent = BattleMode.round;
@@ -278,6 +363,14 @@ const BattleMode = {
         BattleMode.timeLeft = 15;
         BattleMode.activeDoublePoints = false;
         
+        // Shuffle answer options
+        const shuffled = typeof Helpers !== 'undefined' && Helpers.shuffleOptions 
+            ? Helpers.shuffleOptions(question)
+            : { options: question.options, correctIndex: question.answer };
+        
+        // Store shuffled correct index for this round
+        BattleMode.currentCorrectIndex = shuffled.correctIndex;
+        
         const questionArea = document.getElementById('battle-question-area');
         if (!questionArea) {
             console.error('Question area not found');
@@ -288,7 +381,7 @@ const BattleMode = {
             <div class="battle-question animate-in">
                 <h3 class="bq-text">${question.question}</h3>
                 <div class="bq-options">
-                    ${question.options.map((opt, i) => `
+                    ${shuffled.options.map((opt, i) => `
                         <button class="bq-option" onclick="BattleMode.answer(${i})" data-index="${i}">
                             <span class="bq-option-key">${String.fromCharCode(65 + i)}</span>
                             <span class="bq-option-text">${opt}</span>
@@ -298,8 +391,42 @@ const BattleMode = {
             </div>
         `;
         
+        // Check for close battle commentary
+        BattleMode.checkBattleCommentary();
+        
         BattleMode.startQuestionTimer();
         BattleMode.simulateOpponent(question);
+    },
+
+    // Show dramatic battle commentary
+    showCommentary: (type) => {
+        const phrases = BattleMode.commentary[type];
+        if (!phrases) return;
+        
+        const phrase = phrases[Math.floor(Math.random() * phrases.length)];
+        const commentaryEl = document.getElementById('battle-commentary');
+        if (!commentaryEl) return;
+        
+        commentaryEl.textContent = phrase;
+        commentaryEl.className = 'battle-commentary show ' + type;
+        
+        setTimeout(() => {
+            commentaryEl.classList.remove('show');
+        }, 2000);
+    },
+
+    checkBattleCommentary: () => {
+        const hpDiff = Math.abs(BattleMode.playerHP - BattleMode.opponentHP);
+        
+        if (hpDiff <= 15 && BattleMode.round > 3) {
+            BattleMode.showCommentary('closeBattle');
+        } else if (BattleMode.playerHP <= 25) {
+            BattleMode.showCommentary('lowHP');
+        } else if (BattleMode.opponentHP <= 25 && BattleMode.playerHP > 50) {
+            BattleMode.showCommentary('dominating');
+        } else if (BattleMode.playerHP < BattleMode.opponentHP && BattleMode.lastDamageDealt > 15) {
+            BattleMode.showCommentary('comeback');
+        }
     },
 
     startQuestionTimer: () => {
@@ -315,13 +442,12 @@ const BattleMode = {
         timerFill.classList.remove('danger');
         timerText.textContent = BattleMode.timeLeft;
         
-        // Clear any existing timer
         if (BattleMode.questionTimer) {
             clearInterval(BattleMode.questionTimer);
         }
         
         BattleMode.questionTimer = setInterval(() => {
-            if (BattleMode.timeFrozen) return; // Skip countdown when frozen
+            if (BattleMode.timeFrozen) return;
             
             BattleMode.timeLeft -= 0.1;
             
@@ -342,25 +468,59 @@ const BattleMode = {
         }, 100);
     },
 
+    // Show AI thinking animation
+    showAIThinking: (show) => {
+        const thinkingEl = document.getElementById('ai-thinking');
+        if (thinkingEl) {
+            thinkingEl.style.display = show ? 'flex' : 'none';
+            if (show) {
+                thinkingEl.classList.add('active');
+            } else {
+                thinkingEl.classList.remove('active');
+            }
+        }
+    },
+
     simulateOpponent: (question) => {
         const settings = BattleMode.difficulties[BattleMode.difficulty] || BattleMode.difficulties.normal;
-        const willBeCorrect = Math.random() < settings.accuracy;
-        const [minTime, maxTime] = settings.speed;
-        const answerTime = minTime + Math.random() * (maxTime - minTime);
+        const personality = BattleMode.personalities[BattleMode.currentPersonality] || BattleMode.personalities.balanced;
         
-        // Clear any existing opponent timeout
+        // Apply personality modifiers
+        const accuracy = Math.min(0.98, settings.accuracy + personality.accuracyModifier);
+        const willBeCorrect = Math.random() < accuracy;
+        
+        const [minTime, maxTime] = settings.speed;
+        const adjustedMin = minTime * personality.speedMultiplier;
+        const adjustedMax = maxTime * personality.speedMultiplier;
+        const answerTime = adjustedMin + Math.random() * (adjustedMax - adjustedMin);
+        
         if (BattleMode.opponentTimeout) {
             clearTimeout(BattleMode.opponentTimeout);
         }
         
+        // Show thinking animation after a short delay
+        setTimeout(() => {
+            if (BattleMode.isPlaying && !BattleMode.playerAnswered) {
+                BattleMode.showAIThinking(true);
+            }
+        }, 500);
+        
         BattleMode.opponentTimeout = setTimeout(() => {
-            // Only process opponent answer if game is still playing AND player hasn't answered yet
+            BattleMode.showAIThinking(false);
+            
             if (!BattleMode.isPlaying || BattleMode.playerAnswered) return;
             
             if (willBeCorrect) {
-                BattleMode.opponentScore += 10;
-                BattleMode.playerHP -= 10;
-                BattleMode.showOpponentAction('correct');
+                const baseDamage = 10;
+                const damage = Math.round(baseDamage * personality.damageMultiplier);
+                BattleMode.opponentScore += damage;
+                BattleMode.playerHP -= damage;
+                BattleMode.showOpponentAction('correct', damage);
+                
+                // Screen shake on big AI hits
+                if (damage >= 12) {
+                    BattleMode.screenShake('medium');
+                }
             } else {
                 BattleMode.opponentHP -= 5;
                 BattleMode.showOpponentAction('wrong');
@@ -368,28 +528,47 @@ const BattleMode = {
             
             BattleMode.updateDisplays();
             
-            // Check for KO after opponent action
             if (BattleMode.playerHP <= 0 || BattleMode.opponentHP <= 0) {
                 setTimeout(() => BattleMode.endGame(), 1000);
             }
         }, answerTime * 1000);
     },
 
-    showOpponentAction: (result) => {
+    showOpponentAction: (result, damage = 0) => {
         const playerRight = document.querySelector('.player-right');
         if (!playerRight) return;
         
         const indicator = document.createElement('div');
         indicator.className = `opponent-indicator ${result}`;
-        indicator.textContent = result === 'correct' ? '✓ Bot answered!' : '✗ Bot missed!';
+        
+        if (result === 'correct' && damage >= 12) {
+            indicator.textContent = `💥 Bot SMASHED! -${damage}HP`;
+        } else {
+            indicator.textContent = result === 'correct' ? '✓ Bot answered!' : '✗ Bot missed!';
+        }
+        
         playerRight.appendChild(indicator);
         setTimeout(() => indicator.remove(), 1000);
+    },
+
+    // Screen shake effect
+    screenShake: (intensity = 'light') => {
+        const gameView = document.querySelector('.battle-game-view');
+        if (!gameView) return;
+        
+        const shakeClass = `shake-${intensity}`;
+        gameView.classList.add(shakeClass);
+        
+        setTimeout(() => {
+            gameView.classList.remove(shakeClass);
+        }, intensity === 'heavy' ? 500 : 300);
     },
 
     answer: (index) => {
         if (!BattleMode.isPlaying || BattleMode.playerAnswered) return;
         
-        BattleMode.playerAnswered = true; // Prevent double answers and stop opponent
+        BattleMode.playerAnswered = true;
+        BattleMode.showAIThinking(false);
         
         clearInterval(BattleMode.questionTimer);
         clearTimeout(BattleMode.opponentTimeout);
@@ -397,12 +576,16 @@ const BattleMode = {
         const question = BattleMode.questions[BattleMode.currentIndex];
         if (!question) return;
         
-        const isCorrect = index === question.answer;
+        // Use shuffled correct index
+        const correctIndex = BattleMode.currentCorrectIndex !== undefined 
+            ? BattleMode.currentCorrectIndex 
+            : question.answer;
+        const isCorrect = index === correctIndex;
         
         // Highlight answers
         document.querySelectorAll('.bq-option').forEach((btn, i) => {
             btn.disabled = true;
-            if (i === question.answer) {
+            if (i === correctIndex) {
                 btn.classList.add('correct');
             } else if (i === index && !isCorrect) {
                 btn.classList.add('wrong');
@@ -411,23 +594,34 @@ const BattleMode = {
         
         if (isCorrect) {
             let points = 10;
+            const isCritical = BattleMode.timeLeft > 10; // Fast answer = critical
+            
             if (BattleMode.activeDoublePoints) {
                 points = 20;
                 BattleMode.activeDoublePoints = false;
             }
+            
+            if (isCritical) {
+                points = Math.round(points * 1.5);
+                BattleMode.showCommentary('criticalHit');
+                BattleMode.screenShake('heavy');
+            }
+            
             BattleMode.playerScore += points;
-            BattleMode.opponentHP -= 15;
+            BattleMode.lastDamageDealt = points;
+            BattleMode.opponentHP -= points;
             SoundFX?.play?.('correct');
-            BattleMode.showFeedback(true, points);
+            BattleMode.showFeedback(true, points, isCritical);
         } else {
             BattleMode.playerHP -= 10;
+            BattleMode.lastDamageDealt = 0;
             SoundFX?.play?.('damage');
             BattleMode.showFeedback(false, 0);
+            BattleMode.screenShake('light');
         }
         
         BattleMode.updateDisplays();
         
-        // Check for KO
         if (BattleMode.playerHP <= 0 || BattleMode.opponentHP <= 0) {
             setTimeout(() => BattleMode.endGame(), 1000);
             return;
@@ -438,23 +632,29 @@ const BattleMode = {
     },
 
     timeout: () => {
-        if (BattleMode.playerAnswered) return; // Already handled
+        if (BattleMode.playerAnswered) return;
         
         BattleMode.playerAnswered = true;
+        BattleMode.showAIThinking(false);
         clearInterval(BattleMode.questionTimer);
         clearTimeout(BattleMode.opponentTimeout);
         
         BattleMode.playerHP -= 15;
+        BattleMode.lastDamageDealt = 0;
         SoundFX?.play?.('damage');
-        BattleMode.showFeedback(false, 0, 'Time up!');
+        BattleMode.showFeedback(false, 0, false, 'Time up!');
         BattleMode.updateDisplays();
+        BattleMode.screenShake('medium');
         
-        // Highlight correct answer
         const question = BattleMode.questions[BattleMode.currentIndex];
+        const correctIndex = BattleMode.currentCorrectIndex !== undefined 
+            ? BattleMode.currentCorrectIndex 
+            : question?.answer;
+        
         if (question) {
             document.querySelectorAll('.bq-option').forEach((btn, i) => {
                 btn.disabled = true;
-                if (i === question.answer) {
+                if (i === correctIndex) {
                     btn.classList.add('correct');
                 }
             });
@@ -469,11 +669,53 @@ const BattleMode = {
         setTimeout(() => BattleMode.showQuestion(), 1500);
     },
 
+    // Power-up visual effects
+    showPowerUpVisual: (type) => {
+        const gameView = document.querySelector('.battle-game-view');
+        if (!gameView) return;
+        
+        const visual = document.createElement('div');
+        visual.className = 'powerup-visual ' + type;
+        
+        const icons = {
+            doublePoints: '2️⃣',
+            skipQuestion: '⏭️',
+            timeFreeze: '❄️'
+        };
+        
+        const names = {
+            doublePoints: 'DOUBLE DAMAGE!',
+            skipQuestion: 'SKIP!',
+            timeFreeze: 'TIME FREEZE!'
+        };
+        
+        visual.innerHTML = `
+            <div class="powerup-burst">
+                <span class="powerup-icon-large">${icons[type]}</span>
+                <span class="powerup-name-large">${names[type]}</span>
+            </div>
+        `;
+        
+        gameView.appendChild(visual);
+        
+        // Add screen effect for time freeze
+        if (type === 'timeFreeze') {
+            gameView.classList.add('frozen-effect');
+            setTimeout(() => gameView.classList.remove('frozen-effect'), 5000);
+        }
+        
+        setTimeout(() => visual.remove(), 1000);
+    },
+
     usePowerUp: (type) => {
         if (!BattleMode.isPlaying || BattleMode.playerAnswered) return;
         if (!BattleMode.powerUps[type] || BattleMode.powerUps[type] <= 0) return;
         
         BattleMode.powerUps[type]--;
+        
+        // Show visual effect
+        BattleMode.showPowerUpVisual(type);
+        SoundFX?.play?.('powerup');
         
         switch (type) {
             case 'doublePoints':
@@ -483,6 +725,7 @@ const BattleMode = {
             case 'skipQuestion':
                 clearInterval(BattleMode.questionTimer);
                 clearTimeout(BattleMode.opponentTimeout);
+                BattleMode.showAIThinking(false);
                 BattleMode.currentIndex++;
                 Toast?.show?.('⏭️ Question skipped!', 'info');
                 BattleMode.showQuestion();
@@ -498,7 +741,6 @@ const BattleMode = {
                 break;
         }
         
-        // Update UI with null checks
         const puDouble = document.getElementById('pu-double');
         const puSkip = document.getElementById('pu-skip');
         const puFreeze = document.getElementById('pu-freeze');
@@ -515,15 +757,20 @@ const BattleMode = {
         });
     },
 
-    showFeedback: (correct, points, message = '') => {
+    showFeedback: (correct, points, isCritical = false, message = '') => {
         const gameView = document.querySelector('.battle-game-view');
         if (!gameView) return;
         
         const feedback = document.createElement('div');
-        feedback.className = `battle-feedback ${correct ? 'correct' : 'wrong'}`;
-        feedback.innerHTML = correct 
-            ? `<span>✓ +${points} points!</span>`
-            : `<span>✗ ${message || 'Wrong!'}</span>`;
+        feedback.className = `battle-feedback ${correct ? 'correct' : 'wrong'} ${isCritical ? 'critical' : ''}`;
+        
+        if (correct) {
+            feedback.innerHTML = isCritical 
+                ? `<span>💥 CRITICAL! +${points} points!</span>`
+                : `<span>✓ +${points} points!</span>`;
+        } else {
+            feedback.innerHTML = `<span>✗ ${message || 'Wrong!'}</span>`;
+        }
         
         gameView.appendChild(feedback);
         setTimeout(() => feedback.remove(), 1000);
@@ -576,17 +823,14 @@ const BattleMode = {
                           (BattleMode.playerHP === BattleMode.opponentHP && BattleMode.playerScore > BattleMode.opponentScore);
         const isDraw = BattleMode.playerHP === BattleMode.opponentHP && BattleMode.playerScore === BattleMode.opponentScore;
         
-        // Play sound
         if (playerWon) {
             SoundFX?.play?.('victory');
         } else if (!isDraw) {
             SoundFX?.play?.('defeat');
         }
         
-        // Save stats
         BattleMode.saveStats(playerWon, isDraw);
         
-        // Award XP
         let xpEarned = playerWon ? 100 : 25;
         if (playerWon && BattleMode.difficulty === 'expert') xpEarned = 200;
         AppState?.addXP?.(xpEarned);
@@ -599,6 +843,7 @@ const BattleMode = {
         
         const clampedPlayerHP = Math.max(0, BattleMode.playerHP);
         const clampedOpponentHP = Math.max(0, BattleMode.opponentHP);
+        const personality = BattleMode.personalities[BattleMode.currentPersonality] || BattleMode.personalities.balanced;
         
         container.innerHTML = `
             <button class="game-close-btn" onclick="BattleMode.close()">✕</button>
@@ -606,6 +851,14 @@ const BattleMode = {
             <div class="battle-results">
                 <div class="battle-result-banner ${playerWon ? 'victory' : isDraw ? 'draw' : 'defeat'}">
                     ${playerWon ? '🎉 VICTORY! 🎉' : isDraw ? '🤝 DRAW! 🤝' : '💀 DEFEAT 💀'}
+                </div>
+                
+                <div class="opponent-reaction">
+                    ${playerWon 
+                        ? `${personality.icon} "Well played, human..."` 
+                        : isDraw 
+                            ? `${personality.icon} "A worthy opponent!"` 
+                            : `${personality.icon} "${personality.taunt[0]}"`}
                 </div>
                 
                 <div class="battle-final-scores">
@@ -642,9 +895,7 @@ const BattleMode = {
         try {
             const container = document.querySelector('.battle-container');
             if (container) {
-                // Re-render the entire container with menu
                 const menuHtml = BattleMode.renderMenu();
-                // Extract just the inner content
                 const tempDiv = document.createElement('div');
                 tempDiv.innerHTML = menuHtml;
                 const newContainer = tempDiv.querySelector('.battle-container');
@@ -675,7 +926,6 @@ const BattleMode = {
             
             localStorage.setItem('csmaster_battle_stats', JSON.stringify(stats));
             
-            // Achievements with null checks
             if (stats.wins >= 10) AppState?.unlockAchievement?.('battle_veteran');
             if (stats.maxWinStreak >= 5) AppState?.unlockAchievement?.('undefeated');
         } catch (error) {
@@ -693,20 +943,18 @@ const BattleMode = {
     },
 
     cleanup: () => {
-        // Remove keyboard listener
         document.removeEventListener('keydown', BattleMode.keyHandler);
-        // Stop game and clear timers
         BattleMode.stopGame();
-        // Reset state
         BattleMode.questions = [];
         BattleMode.currentIndex = 0;
         BattleMode.playerAnswered = false;
         BattleMode.timeFrozen = false;
+        BattleMode.currentPersonality = null;
+        BattleMode.currentCorrectIndex = undefined;
         console.log('⚔️ BattleMode cleanup');
     }
 };
 
-// Keyboard shortcuts handler (defined but not auto-registered)
 BattleMode.keyHandler = (e) => {
     if (!BattleMode.isPlaying || BattleMode.playerAnswered) return;
     
@@ -718,4 +966,210 @@ BattleMode.keyHandler = (e) => {
         BattleMode.answer(keyMap[key]);
     }
 };
-// Note: Keyboard handler is now registered in startGame() and removed in cleanup()
+
+// CSS for new features (inject into page)
+const battleModeStyles = document.createElement('style');
+battleModeStyles.textContent = `
+/* AI Thinking Animation */
+.ai-thinking-indicator {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 15px;
+    font-size: 0.8em;
+    margin-top: 5px;
+}
+.ai-thinking-indicator.active {
+    animation: pulse 1s infinite;
+}
+.thinking-dots span {
+    animation: bounce 1.4s infinite ease-in-out;
+    display: inline-block;
+}
+.thinking-dots span:nth-child(1) { animation-delay: 0s; }
+.thinking-dots span:nth-child(2) { animation-delay: 0.2s; }
+.thinking-dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes bounce {
+    0%, 80%, 100% { transform: translateY(0); }
+    40% { transform: translateY(-5px); }
+}
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Battle Commentary */
+.battle-commentary {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.5em;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    opacity: 0;
+    transition: opacity 0.3s, transform 0.3s;
+    z-index: 100;
+    pointer-events: none;
+}
+.battle-commentary.show {
+    opacity: 1;
+    animation: commentaryPop 0.5s ease-out;
+}
+.battle-commentary.criticalHit { color: #fbbf24; }
+.battle-commentary.closeBattle { color: #f97316; }
+.battle-commentary.lowHP { color: #ef4444; }
+.battle-commentary.comeback { color: #10b981; }
+.battle-commentary.dominating { color: #a855f7; }
+@keyframes commentaryPop {
+    0% { transform: translate(-50%, -50%) scale(0.5); }
+    50% { transform: translate(-50%, -50%) scale(1.2); }
+    100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+/* Screen Shake */
+.shake-light {
+    animation: shakeLight 0.3s ease-in-out;
+}
+.shake-medium {
+    animation: shakeMedium 0.3s ease-in-out;
+}
+.shake-heavy {
+    animation: shakeHeavy 0.5s ease-in-out;
+}
+@keyframes shakeLight {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-2px); }
+    75% { transform: translateX(2px); }
+}
+@keyframes shakeMedium {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-5px); }
+    40% { transform: translateX(5px); }
+    60% { transform: translateX(-3px); }
+    80% { transform: translateX(3px); }
+}
+@keyframes shakeHeavy {
+    0%, 100% { transform: translate(0, 0); }
+    10% { transform: translate(-8px, -2px); }
+    20% { transform: translate(8px, 2px); }
+    30% { transform: translate(-6px, -4px); }
+    40% { transform: translate(6px, 4px); }
+    50% { transform: translate(-4px, -2px); }
+    60% { transform: translate(4px, 2px); }
+    70% { transform: translate(-2px, -1px); }
+    80% { transform: translate(2px, 1px); }
+}
+
+/* Personality Intro */
+.personality-intro {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    text-align: center;
+    z-index: 200;
+    transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.personality-intro.show {
+    transform: translate(-50%, -50%) scale(1);
+}
+.personality-badge {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 15px 30px;
+    background: linear-gradient(135deg, rgba(0,0,0,0.8), rgba(0,0,0,0.6));
+    border: 3px solid var(--personality-color);
+    border-radius: 50px;
+    box-shadow: 0 0 30px var(--personality-color);
+}
+.personality-icon {
+    font-size: 2em;
+}
+.personality-name {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: var(--personality-color);
+}
+.personality-taunt {
+    margin-top: 10px;
+    font-style: italic;
+    color: #ccc;
+}
+.bp-personality {
+    font-size: 0.75em;
+    margin-top: 2px;
+}
+
+/* Power-up Visuals */
+.powerup-visual {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 150;
+    animation: powerupFlash 1s ease-out forwards;
+}
+.powerup-burst {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 40px;
+    background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+    border-radius: 20px;
+}
+.powerup-icon-large {
+    font-size: 4em;
+    animation: powerupSpin 0.5s ease-out;
+}
+.powerup-name-large {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 0 0 20px currentColor;
+    margin-top: 10px;
+}
+.powerup-visual.doublePoints .powerup-name-large { color: #fbbf24; }
+.powerup-visual.skipQuestion .powerup-name-large { color: #a855f7; }
+.powerup-visual.timeFreeze .powerup-name-large { color: #38bdf8; }
+@keyframes powerupFlash {
+    0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+    20% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); }
+}
+@keyframes powerupSpin {
+    0% { transform: rotate(0deg) scale(0.5); }
+    100% { transform: rotate(360deg) scale(1); }
+}
+
+/* Time Freeze Effect */
+.frozen-effect {
+    position: relative;
+}
+.frozen-effect::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle, rgba(56, 189, 248, 0.1) 0%, transparent 70%);
+    pointer-events: none;
+    animation: frozenPulse 2s infinite;
+}
+@keyframes frozenPulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.6; }
+}
+
+/* Critical Feedback */
+.battle-feedback.critical {
+    font-size: 1.5em;
+    color: #fbbf24;
+    text-shadow: 0 0 20px #fbbf24;
+}
+`;
+document.head.appendChild(battleModeStyles);

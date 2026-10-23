@@ -2,6 +2,7 @@
  * Millionaire.js - Who Wants to Be a Millionaire Style Quiz
  * 15 questions of escalating difficulty
  * Features: Lifelines, dramatic reveals, XP milestones
+ * Enhanced with TV show atmosphere!
  */
 
 const Millionaire = {
@@ -12,7 +13,7 @@ const Millionaire = {
     lifelines: { fiftyFifty: true, askAudience: true, phoneFriend: true },
     isAnswerLocked: false,
     selectedAnswer: null,
-    eliminatedAnswers: [], // Track eliminated answers for 50:50
+    eliminatedAnswers: [],
 
     // Prize ladder (XP instead of money)
     prizes: [
@@ -23,6 +24,109 @@ const Millionaire = {
     
     // Safe havens
     safeHavens: [4, 9, 14], // Questions 5, 10, 15 (0-indexed: 4, 9, 14)
+
+    // Host commentary pool
+    hostCommentary: {
+        intro: [
+            "Welcome back! The tension is palpable...",
+            "Let's play Who Wants to Be a CS Master!",
+            "The stakes couldn't be higher!"
+        ],
+        newQuestion: [
+            "Here comes your next question...",
+            "Let's see what we've got for you...",
+            "This one's interesting..."
+        ],
+        thinking: [
+            "Take your time, there's no rush...",
+            "The audience is on the edge of their seats...",
+            "Think carefully now..."
+        ],
+        highStakes: [
+            "This is a big one! Are you sure?",
+            "A lot of XP riding on this answer...",
+            "The pressure is on!"
+        ],
+        correct: [
+            "Brilliant! You got it!",
+            "That's the right answer!",
+            "Well done! Moving on up!"
+        ],
+        wrong: [
+            "Oh no... I'm so sorry.",
+            "Unfortunately, that's not correct.",
+            "The correct answer was right there..."
+        ],
+        finalAnswer: [
+            "Is that your final answer?",
+            "You're locking that in?",
+            "No going back after this!"
+        ]
+    },
+
+    // Music/atmosphere cues
+    musicCues: {
+        intro: "🎵 Theme music plays...",
+        thinking: "🎵 Tension building...",
+        dramatic: "🎵 Dramatic suspense...",
+        reveal: "🎵 Heartbeat intensifies...",
+        correct: "🎵 Victory fanfare!",
+        wrong: "🎵 Somber melody...",
+        millionaire: "🎵 TRIUMPHANT CELEBRATION! 🎉"
+    },
+
+    getRandomComment: (type) => {
+        const comments = Millionaire.hostCommentary[type];
+        return comments[Math.floor(Math.random() * comments.length)];
+    },
+
+    showMusicCue: (cueType) => {
+        const cue = Millionaire.musicCues[cueType];
+        if (!cue) return;
+        
+        // Remove existing cue
+        document.querySelector('.mill-music-cue')?.remove();
+        
+        const cueEl = document.createElement('div');
+        cueEl.className = 'mill-music-cue';
+        cueEl.innerHTML = `<span>${cue}</span>`;
+        
+        const container = document.querySelector('.mill-game-view') || document.querySelector('.millionaire-container');
+        if (container) {
+            container.appendChild(cueEl);
+            setTimeout(() => cueEl.classList.add('visible'), 50);
+            setTimeout(() => {
+                cueEl.classList.remove('visible');
+                setTimeout(() => cueEl.remove(), 500);
+            }, 2500);
+        }
+    },
+
+    showHostCommentary: (text) => {
+        // Remove existing commentary
+        document.querySelector('.mill-host-commentary')?.remove();
+        
+        const commentEl = document.createElement('div');
+        commentEl.className = 'mill-host-commentary';
+        commentEl.innerHTML = `
+            <div class="host-avatar">🎤</div>
+            <div class="host-text">"${Millionaire.escapeHtml(text)}"</div>
+        `;
+        
+        const container = document.querySelector('.mill-main-area') || document.querySelector('.millionaire-container');
+        if (container) {
+            container.appendChild(commentEl);
+            setTimeout(() => commentEl.classList.add('visible'), 50);
+        }
+    },
+
+    clearHostCommentary: () => {
+        const el = document.querySelector('.mill-host-commentary');
+        if (el) {
+            el.classList.remove('visible');
+            setTimeout(() => el.remove(), 300);
+        }
+    },
 
     open: () => {
         const modal = document.createElement('div');
@@ -154,7 +258,13 @@ const Millionaire = {
             }
             container.innerHTML = Millionaire.renderGame();
             
-            Millionaire.showQuestion();
+            // Show intro atmosphere
+            Millionaire.showMusicCue('intro');
+            setTimeout(() => {
+                Millionaire.showHostCommentary(Millionaire.getRandomComment('intro'));
+            }, 500);
+            
+            setTimeout(() => Millionaire.showQuestion(), 2500);
         } catch (error) {
             console.error('Millionaire.startGame error:', error);
             if (typeof Toast !== 'undefined' && Toast?.show) {
@@ -243,6 +353,9 @@ const Millionaire = {
         Millionaire.isAnswerLocked = false;
         Millionaire.eliminatedAnswers = [];
         
+        // Clear previous commentary
+        Millionaire.clearHostCommentary();
+        
         // Update prize ladder
         document.querySelectorAll('.mill-prize-row').forEach((row, i) => {
             row.classList.remove('current');
@@ -250,6 +363,11 @@ const Millionaire = {
                 row.classList.add('current');
             }
         });
+        
+        // Show host commentary for new question
+        setTimeout(() => {
+            Millionaire.showHostCommentary(Millionaire.getRandomComment('newQuestion'));
+        }, 300);
         
         // Show question with animation
         const questionPanel = document.getElementById('mill-question-panel');
@@ -260,22 +378,37 @@ const Millionaire = {
             `;
         }
         
-        // Show answers
+        // Shuffle answer options using Helpers.shuffleOptions
+        let shuffledQuestion = question;
+        if (typeof Helpers !== 'undefined' && Helpers?.shuffleOptions) {
+            const shuffled = Helpers.shuffleOptions(question);
+            shuffledQuestion = shuffled;
+        }
+        
+        // Store shuffled question for answer checking
+        Millionaire.questions[Millionaire.currentQuestion] = shuffledQuestion;
+        
+        // Show answers with staggered animation
         const answersPanel = document.getElementById('mill-answers');
         if (answersPanel) {
             const letters = ['A', 'B', 'C', 'D'];
-            answersPanel.innerHTML = question.options.map((opt, i) => `
-                <button class="mill-answer animate-in" data-index="${i}" onclick="Millionaire.selectAnswer(${i})" style="animation-delay: ${i * 0.1}s">
+            answersPanel.innerHTML = shuffledQuestion.options.map((opt, i) => `
+                <button class="mill-answer animate-in" data-index="${i}" onclick="Millionaire.selectAnswer(${i})" style="animation-delay: ${i * 0.15}s">
                     <span class="mill-answer-letter">${letters[i]}:</span>
                     <span class="mill-answer-text">${Millionaire.escapeHtml(opt)}</span>
                 </button>
             `).join('');
         }
+        
+        // Start thinking music for higher stakes
+        if (Millionaire.currentQuestion >= 5) {
+            setTimeout(() => Millionaire.showMusicCue('thinking'), 1500);
+        }
     },
 
     selectAnswer: (index) => {
         if (Millionaire.isAnswerLocked) return;
-        if (Millionaire.eliminatedAnswers.includes(index)) return; // Can't select eliminated answers
+        if (Millionaire.eliminatedAnswers.includes(index)) return;
         
         Millionaire.selectedAnswer = index;
         
@@ -288,27 +421,65 @@ const Millionaire = {
             selectedBtn.classList.add('selected');
         }
         
-        // Show confirmation
+        // Clear previous commentary
+        Millionaire.clearHostCommentary();
+        
+        // Show confirmation (enhanced for high stakes)
         Millionaire.showConfirmation();
+    },
+
+    isHighStakes: () => {
+        // Questions 8+ are high stakes (16,000 XP and above)
+        return Millionaire.currentQuestion >= 7;
     },
 
     showConfirmation: () => {
         // Remove any existing confirm box
         document.querySelector('.mill-confirm-box')?.remove();
         
+        const isHigh = Millionaire.isHighStakes();
+        const question = Millionaire.questions[Millionaire.currentQuestion];
+        const letters = ['A', 'B', 'C', 'D'];
+        const selectedLetter = letters[Millionaire.selectedAnswer];
+        const selectedText = question.options[Millionaire.selectedAnswer];
+        
+        // Show dramatic music cue for high stakes
+        if (isHigh) {
+            Millionaire.showMusicCue('dramatic');
+        }
+        
         const confirmBox = document.createElement('div');
-        confirmBox.className = 'mill-confirm-box';
+        confirmBox.className = `mill-confirm-box ${isHigh ? 'high-stakes' : ''}`;
         confirmBox.innerHTML = `
-            <p>Final answer?</p>
+            ${isHigh ? `
+                <div class="stakes-warning">
+                    ⚠️ HIGH STAKES! ${Millionaire.prizes[Millionaire.currentQuestion].toLocaleString()} XP on the line!
+                </div>
+            ` : ''}
+            <p class="final-answer-prompt">${Millionaire.getRandomComment('finalAnswer')}</p>
+            <p class="selected-answer-preview">
+                <strong>${selectedLetter}:</strong> ${Millionaire.escapeHtml(selectedText)}
+            </p>
             <div class="mill-confirm-buttons">
-                <button class="btn btn-primary" onclick="Millionaire.lockAnswer()">Yes, Final Answer</button>
-                <button class="btn btn-secondary" onclick="this.parentElement.parentElement.remove()">Change Answer</button>
+                <button class="btn btn-primary ${isHigh ? 'pulse-attention' : ''}" onclick="Millionaire.lockAnswer()">
+                    ✅ Final Answer!
+                </button>
+                <button class="btn btn-secondary" onclick="this.parentElement.parentElement.remove()">
+                    🔄 Change Answer
+                </button>
             </div>
         `;
         
         const mainArea = document.querySelector('.mill-main-area');
         if (mainArea) {
             mainArea.appendChild(confirmBox);
+            
+            // Host commentary for high stakes
+            if (isHigh) {
+                setTimeout(() => {
+                    Millionaire.showHostCommentary(Millionaire.getRandomComment('highStakes'));
+                }, 500);
+            }
         }
     },
 
@@ -318,31 +489,79 @@ const Millionaire = {
         if (Millionaire.selectedAnswer === null) return;
         
         Millionaire.isAnswerLocked = true;
+        Millionaire.clearHostCommentary();
         
         const question = Millionaire.questions[Millionaire.currentQuestion];
         if (!question) return;
         
         const isCorrect = Millionaire.selectedAnswer === question.answer;
         
-        // Dramatic pause and reveal
+        // Start suspenseful reveal sequence
+        Millionaire.suspensefulReveal(isCorrect, question);
+    },
+
+    suspensefulReveal: (isCorrect, question) => {
         const selectedBtn = document.querySelector(`.mill-answer[data-index="${Millionaire.selectedAnswer}"]`);
         if (!selectedBtn) {
             console.error('Selected button not found');
             return;
         }
-        selectedBtn.classList.add('thinking');
+        
+        // Phase 1: Lock in animation
+        selectedBtn.classList.add('locked-in');
+        Millionaire.showMusicCue('reveal');
+        
+        // Phase 2: Dramatic pause with pulsing
+        setTimeout(() => {
+            selectedBtn.classList.add('thinking');
+            
+            // Add suspense dots
+            const answersPanel = document.getElementById('mill-answers');
+            if (answersPanel) {
+                const suspenseEl = document.createElement('div');
+                suspenseEl.className = 'mill-suspense-indicator';
+                suspenseEl.innerHTML = '<span>.</span><span>.</span><span>.</span>';
+                answersPanel.appendChild(suspenseEl);
+            }
+        }, 500);
+        
+        // Phase 3: Build tension (longer for high stakes)
+        const revealDelay = Millionaire.isHighStakes() ? 4000 : 2500;
         
         setTimeout(() => {
+            // Remove suspense indicator
+            document.querySelector('.mill-suspense-indicator')?.remove();
             selectedBtn.classList.remove('thinking');
             
-            // Show correct answer
+            // Phase 4: Reveal with animation
+            Millionaire.revealAnswer(isCorrect, question, selectedBtn);
+        }, revealDelay);
+    },
+
+    revealAnswer: (isCorrect, question, selectedBtn) => {
+        // Highlight all answers briefly
+        document.querySelectorAll('.mill-answer').forEach(btn => {
+            btn.classList.add('reveal-pulse');
+        });
+        
+        setTimeout(() => {
+            document.querySelectorAll('.mill-answer').forEach(btn => {
+                btn.classList.remove('reveal-pulse');
+            });
+            
+            // Show correct answer with glow
             const correctBtn = document.querySelector(`.mill-answer[data-index="${question.answer}"]`);
             if (correctBtn) {
-                correctBtn.classList.add('correct');
+                correctBtn.classList.add('correct', 'glow-correct');
             }
             
             if (!isCorrect) {
-                selectedBtn.classList.add('wrong');
+                selectedBtn.classList.add('wrong', 'shake-wrong');
+                Millionaire.showMusicCue('wrong');
+                Millionaire.showHostCommentary(Millionaire.getRandomComment('wrong'));
+            } else {
+                Millionaire.showMusicCue('correct');
+                Millionaire.showHostCommentary(Millionaire.getRandomComment('correct'));
             }
             
             setTimeout(() => {
@@ -351,8 +570,8 @@ const Millionaire = {
                 } else {
                     Millionaire.wrongAnswer();
                 }
-            }, 1500);
-        }, 2000);
+            }, 2000);
+        }, 500);
     },
 
     correctAnswer: () => {
@@ -360,6 +579,8 @@ const Millionaire = {
         const prizeEl = document.getElementById('mill-current-prize');
         if (prizeEl) {
             prizeEl.textContent = Millionaire.currentPrize.toLocaleString() + ' XP';
+            prizeEl.classList.add('prize-bump');
+            setTimeout(() => prizeEl.classList.remove('prize-bump'), 500);
         }
         
         // Update ladder
@@ -373,8 +594,9 @@ const Millionaire = {
         }
         
         Millionaire.currentQuestion++;
+        Millionaire.clearHostCommentary();
         
-        setTimeout(() => Millionaire.showQuestion(), 2000);
+        setTimeout(() => Millionaire.showQuestion(), 2500);
     },
 
     wrongAnswer: () => {
@@ -404,6 +626,7 @@ const Millionaire = {
     winGame: () => {
         Millionaire.isPlaying = false;
         Millionaire.currentPrize = Millionaire.prizes[14]; // 1,000,000
+        Millionaire.showMusicCue('millionaire');
         Millionaire.endGame(true, Millionaire.currentPrize, true);
     },
 
@@ -442,6 +665,8 @@ const Millionaire = {
             document.querySelector('.mill-confirm-box')?.remove();
         }
         
+        Millionaire.showHostCommentary("Two wrong answers have been removed!");
+        
         if (typeof Toast !== 'undefined' && Toast?.show) {
             Toast.show('50:50 used! Two wrong answers removed.', 'info');
         }
@@ -457,33 +682,41 @@ const Millionaire = {
         const audienceBtn = document.getElementById('ll-audience');
         if (audienceBtn) audienceBtn.classList.add('used');
         
-        // Generate audience percentages (correct answer gets highest)
-        const correctPercent = 40 + Math.floor(Math.random() * 30); // 40-70%
-        let remaining = 100 - correctPercent;
+        // Generate realistic audience poll distribution
+        // Correct answer gets most votes, but with variance based on question difficulty
+        const difficulty = Millionaire.currentQuestion / 14; // 0 to 1
+        const baseCorrectPercent = 75 - (difficulty * 35); // 75% for easy, 40% for hard
+        const variance = Math.floor(Math.random() * 15) - 7; // -7 to +7
+        const correctPercent = Math.max(25, Math.min(85, Math.floor(baseCorrectPercent + variance)));
         
-        // Distribute remaining among other answers
+        let remaining = 100 - correctPercent;
         const percentages = [0, 0, 0, 0];
         percentages[question.answer] = correctPercent;
         
+        // Distribute remaining with realistic clustering
+        // Second-best answer often gets more votes
         const otherIndices = [0, 1, 2, 3].filter(i => i !== question.answer);
-        otherIndices.forEach((idx, i) => {
-            if (i === otherIndices.length - 1) {
-                percentages[idx] = remaining; // Last one gets remainder
-            } else {
-                const share = Math.floor(Math.random() * (remaining / 2));
-                percentages[idx] = share;
-                remaining -= share;
-            }
-        });
+        shuffleArray(otherIndices);
         
-        // Show results
+        // First "distractor" gets more
+        const secondBest = Math.floor(remaining * (0.4 + Math.random() * 0.3));
+        percentages[otherIndices[0]] = secondBest;
+        remaining -= secondBest;
+        
+        // Split rest between remaining two
+        const thirdBest = Math.floor(remaining * (0.4 + Math.random() * 0.4));
+        percentages[otherIndices[1]] = thirdBest;
+        percentages[otherIndices[2]] = remaining - thirdBest;
+        
+        // Show results with animation
         const resultsHtml = `
             <div class="mill-audience-results">
-                <h4>👥 Audience Results</h4>
+                <h4>👥 Audience Poll Results</h4>
+                <div class="audience-poll-intro">The audience has voted...</div>
                 <div class="audience-bars">
                     ${['A', 'B', 'C', 'D'].map((letter, i) => `
                         <div class="audience-bar">
-                            <div class="ab-fill" style="height: ${percentages[i]}%"></div>
+                            <div class="ab-fill" style="height: 0%" data-target="${percentages[i]}"></div>
                             <span class="ab-percent">${percentages[i]}%</span>
                             <span class="ab-letter">${letter}</span>
                         </div>
@@ -501,7 +734,17 @@ const Millionaire = {
         const mainArea = document.querySelector('.mill-main-area');
         if (mainArea && resultsDiv.firstElementChild) {
             mainArea.appendChild(resultsDiv.firstElementChild);
+            
+            // Animate bars filling up
+            setTimeout(() => {
+                document.querySelectorAll('.ab-fill').forEach(bar => {
+                    const target = bar.getAttribute('data-target');
+                    bar.style.height = target + '%';
+                });
+            }, 100);
         }
+        
+        Millionaire.showHostCommentary("Let's see what the audience thinks!");
     },
 
     usePhoneFriend: () => {
@@ -516,8 +759,11 @@ const Millionaire = {
         
         const letters = ['A', 'B', 'C', 'D'];
         
-        // Friend is 80% likely to give correct answer
-        const isCorrect = Math.random() < 0.8;
+        // Friend reliability decreases with difficulty
+        const difficulty = Millionaire.currentQuestion / 14;
+        const correctChance = 0.9 - (difficulty * 0.3); // 90% easy, 60% hard
+        const isCorrect = Math.random() < correctChance;
+        
         const correctIndex = question.answer;
         const wrongIndices = [0, 1, 2, 3].filter(i => i !== correctIndex && i < question.options.length);
         
@@ -528,12 +774,13 @@ const Millionaire = {
             suggestedIndex = shuffleArray(wrongIndices)[0];
         }
         
-        const confidence = isCorrect ? (70 + Math.floor(Math.random() * 25)) : (30 + Math.floor(Math.random() * 40));
+        const confidence = isCorrect 
+            ? (70 + Math.floor(Math.random() * 25)) 
+            : (30 + Math.floor(Math.random() * 40));
         
-        const friendNames = ['Alex', 'Sam', 'Jordan', 'Casey', 'Morgan'];
+        const friendNames = ['Professor Alex', 'Dr. Sam', 'Tech Guru Jordan', 'Casey from MIT', 'Morgan the Developer'];
         const friendName = shuffleArray(friendNames)[0];
         
-        // Get the actual answer text with bounds checking
         const suggestedLetter = letters[suggestedIndex] || 'A';
         const suggestedText = question.options[suggestedIndex] || 'that option';
         
@@ -542,12 +789,16 @@ const Millionaire = {
         
         const dialogHtml = `
             <div class="mill-phone-dialog">
-                <h4>📞 Calling ${Millionaire.escapeHtml(friendName)}...</h4>
-                <p class="phone-message">
-                    "Hmm, I think it's <strong>${suggestedLetter}: ${Millionaire.escapeHtml(suggestedText)}</strong>. 
-                    I'm about ${confidence}% sure about that."
-                </p>
-                <button class="btn btn-secondary" onclick="this.parentElement.remove()">Thanks!</button>
+                <div class="phone-ringing">📞 Calling ${Millionaire.escapeHtml(friendName)}...</div>
+                <div class="phone-connected" style="display:none">
+                    <h4>📞 ${Millionaire.escapeHtml(friendName)}</h4>
+                    <p class="phone-message">
+                        "Hmm, let me think... I'm pretty sure it's 
+                        <strong>${suggestedLetter}: ${Millionaire.escapeHtml(suggestedText)}</strong>. 
+                        I'd say I'm about ${confidence}% confident on that one."
+                    </p>
+                    <button class="btn btn-secondary" onclick="this.parentElement.parentElement.remove()">Thanks!</button>
+                </div>
             </div>
         `;
         
@@ -556,7 +807,17 @@ const Millionaire = {
         const mainArea = document.querySelector('.mill-main-area');
         if (mainArea && dialogDiv.firstElementChild) {
             mainArea.appendChild(dialogDiv.firstElementChild);
+            
+            // Simulate ringing then connecting
+            setTimeout(() => {
+                const ringing = document.querySelector('.phone-ringing');
+                const connected = document.querySelector('.phone-connected');
+                if (ringing) ringing.style.display = 'none';
+                if (connected) connected.style.display = 'block';
+            }, 1500);
         }
+        
+        Millionaire.showHostCommentary("Let's phone a friend!");
     },
 
     endGame: (walkedAway, prize, isMillionaire = false) => {
@@ -565,8 +826,8 @@ const Millionaire = {
         // Save stats
         Millionaire.saveStats(Millionaire.currentQuestion, safePrize, isMillionaire);
         
-        // Award XP (prize is already XP, so use directly or scale as needed)
-        const xpEarned = Math.floor(safePrize / 10); // 10% of prize as actual XP reward
+        // Award XP
+        const xpEarned = Math.floor(safePrize / 10);
         if (xpEarned > 0 && typeof AppState !== 'undefined' && AppState?.addXP) {
             AppState.addXP(xpEarned);
         }
@@ -596,7 +857,9 @@ const Millionaire = {
                     ${isMillionaire ? '🎉 YOU\'RE A CS MILLIONAIRE! 🎉' : walkedAway ? '🚶 You walked away!' : '💔 Game Over'}
                 </div>
                 
-                <div class="mill-final-prize">
+                ${isMillionaire ? '<div class="mill-confetti">🎊✨🎉✨🎊</div>' : ''}
+                
+                <div class="mill-final-prize ${isMillionaire ? 'millionaire-glow' : ''}">
                     <span class="mill-fp-value">${safePrize.toLocaleString()}</span>
                     <span class="mill-fp-label">XP Won</span>
                 </div>
@@ -644,7 +907,6 @@ const Millionaire = {
     },
 
     cleanup: () => {
-        // Stop game
         Millionaire.isPlaying = false;
         Millionaire.isAnswerLocked = false;
         Millionaire.selectedAnswer = null;

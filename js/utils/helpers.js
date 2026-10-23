@@ -105,6 +105,33 @@ const Helpers = {
     shuffle: shuffleArray,
     shuffleArray: shuffleArray,
 
+    /**
+     * Shuffle question options while tracking the correct answer
+     * @param {Object} question - Question object with options and answer properties
+     * @returns {Object} New question with shuffled options and updated answer index
+     */
+    shuffleOptions: (question) => {
+        if (!question || !question.options) return question;
+        
+        // Create array of {option, originalIndex}
+        const indexed = question.options.map((opt, i) => ({ opt, i }));
+        
+        // Fisher-Yates shuffle
+        for (let i = indexed.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [indexed[i], indexed[j]] = [indexed[j], indexed[i]];
+        }
+        
+        // Find where correct answer ended up
+        const newAnswer = indexed.findIndex(item => item.i === question.answer);
+        
+        return {
+            ...question,
+            options: indexed.map(item => item.opt),
+            answer: newAnswer
+        };
+    },
+
     // XP and Level utilities (expose as properties and reference functions)
     XP_THRESHOLDS,
     RANKS,

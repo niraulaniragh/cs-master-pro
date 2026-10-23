@@ -864,4 +864,46 @@ const MORE_FLASHCARDS = [
 // Add more flashcards
 FLASHCARDS.push(...MORE_FLASHCARDS);
 
+/**
+ * Shuffle question options and update answer index accordingly.
+ * 
+ * This function solves the problem where 'answer' field values cluster around
+ * 1 or 2 (B or C), creating predictable patterns. It randomizes option order
+ * while tracking where the correct answer moves to.
+ * 
+ * USAGE IN GAMES:
+ * Before displaying a question, call this function to randomize options:
+ * 
+ *   const shuffledQuestion = shuffleQuestionOptions(question);
+ *   // Now display shuffledQuestion.options and use shuffledQuestion.answer
+ *   // to check the user's selection
+ * 
+ * For batch processing:
+ *   const shuffledQuestions = questions.map(q => shuffleQuestionOptions(q));
+ * 
+ * @param {Object} question - Question object with 'options' array and 'answer' index
+ * @returns {Object} New question object with shuffled options and updated answer index
+ */
+function shuffleQuestionOptions(question) {
+    // Create array of [originalIndex, option] pairs
+    const indexedOptions = question.options.map((opt, idx) => ({ originalIndex: idx, option: opt }));
+    
+    // Fisher-Yates shuffle
+    for (let i = indexedOptions.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [indexedOptions[i], indexedOptions[j]] = [indexedOptions[j], indexedOptions[i]];
+    }
+    
+    // Extract shuffled options and find new position of correct answer
+    const shuffledOptions = indexedOptions.map(item => item.option);
+    const newAnswerIndex = indexedOptions.findIndex(item => item.originalIndex === question.answer);
+    
+    // Return new question object (original unchanged)
+    return {
+        ...question,
+        options: shuffledOptions,
+        answer: newAnswerIndex
+    };
+}
+
 console.log('📚 Content expanded: ' + QUESTIONS.length + ' questions, ' + FLASHCARDS.length + ' flashcards loaded.');

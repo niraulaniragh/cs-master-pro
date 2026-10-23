@@ -1,7 +1,7 @@
 /**
  * SpeedRun.js - Timed Theory Challenge
  * Beat the clock! Answer questions as fast as possible.
- * Features: Combo multiplier, speed bonuses, global leaderboard
+ * Features: Combo multiplier, speed bonuses, global leaderboard, streak effects
  */
 
 const SpeedRun = {
@@ -19,6 +19,18 @@ const SpeedRun = {
     wrongAnswers: 0,
     fastestAnswer: Infinity,
     selectedTopic: 'all',
+    currentShuffled: null, // Store current shuffled question
+    closeCallCount: 0, // Track close call bonuses
+    
+    // Encouraging messages for streaks
+    streakMessages: {
+        3: { text: 'Nice!', icon: '👍' },
+        5: { text: 'On Fire!', icon: '🔥' },
+        7: { text: 'Unstoppable!', icon: '💪' },
+        10: { text: 'LEGENDARY!', icon: '⚡' },
+        15: { text: 'GODLIKE!', icon: '👑' },
+        20: { text: 'BEYOND LIMITS!', icon: '🌟' }
+    },
 
     open: () => {
         try {
@@ -142,6 +154,8 @@ const SpeedRun = {
             SpeedRun.isPlaying = true;
             SpeedRun.startTime = Date.now();
             SpeedRun.questionStartTime = null;
+            SpeedRun.currentShuffled = null;
+            SpeedRun.closeCallCount = 0;
             
             SoundFX?.play?.('start');
             
@@ -209,11 +223,14 @@ const SpeedRun = {
                             <span class="sr-score-label">Score</span>
                         </div>
                         <div class="sr-combo ${SpeedRun.combo > 0 ? 'active' : ''}" id="sr-combo-display">
+                            <span class="sr-combo-flames" id="sr-combo-flames"></span>
                             <span class="sr-combo-value" id="sr-combo">${SpeedRun.combo}x</span>
                             <span class="sr-combo-label">Combo</span>
                         </div>
                     </div>
                 </div>
+                
+                <div class="sr-streak-message" id="sr-streak-message"></div>
                 
                 <div class="sr-question-area" id="sr-question-area">
                     <!-- Question loads here -->
@@ -242,6 +259,10 @@ const SpeedRun = {
         
         SpeedRun.questionStartTime = Date.now();
         
+        // Shuffle options using Helpers.shuffleOptions
+        const shuffled = Helpers.shuffleOptions(question);
+        SpeedRun.currentShuffled = shuffled;
+        
         const questionArea = document.getElementById('sr-question-area');
         if (!questionArea) {
             console.error('Question area not found');
@@ -254,7 +275,7 @@ const SpeedRun = {
                 <div class="sr-question-number">Question ${SpeedRun.currentIndex + 1}</div>
                 <h3 class="sr-question-text">${question.question}</h3>
                 <div class="sr-options">
-                    ${question.options.map((opt, i) => `
+                    ${shuffled.options.map((opt, i) => `
                         <button class="sr-option" onclick="SpeedRun.answer(${i})">
                             <span class="sr-option-key">${String.fromCharCode(65 + i)}</span>
                             <span class="sr-option-text">${opt}</span>
@@ -275,16 +296,20 @@ const SpeedRun = {
     answer: (index) => {
         if (!SpeedRun.isPlaying) return;
         
-        const question = SpeedRun.questions[SpeedRun.currentIndex];
-        if (!question) {
+        const shuffled = SpeedRun.currentShuffled;
+        if (!shuffled) {
             SpeedRun.endGame();
             return;
         }
         
-        const isCorrect = index === question.answer;
+        // Use shuffled.answer for checking correct answer
+        const isCorrect = index === shuffled.answer;
         const answerTime = SpeedRun.questionStartTime 
             ? (Date.now() - SpeedRun.questionStartTime) / 1000 
             : 0;
+        
+        // Check for close call (answered in last 2 seconds of question display)
+        const isCloseCall = answerTime >= (SpeedRun.timeLeft > 2 ? 3 : SpeedRun.timeLeft) - 2 && answerTime > 0;
         
         // Calculate points
         let points = 0;
@@ -316,6 +341,15 @@ const SpeedRun = {
                 bonusText += ` +${speedBonus} speed`;
             }
             
+            // Close call bonus (answered in last 2 seconds before timer would run out)
+            if (SpeedRun.timeLeft <= 2 && isCorrect) {
+                const closeCallBonus = 75;
+                points += closeCallBonus;
+                bonusText += ` +${closeCallBonus} close call!`;
+                SpeedRun.closeCallCount++;
+                SpeedRun.showCloseCallEffect();
+            }
+            
             // Combo multiplier
             if (SpeedRun.combo > 1) {
                 const comboMultiplier = Math.min(SpeedRun.combo, 10);
@@ -326,34 +360,127 @@ const SpeedRun = {
             
             SpeedRun.score += points;
             SpeedRun.showFeedback(true, points, bonusText, answerTime);
+            
+            // Show streak message if applicable
+            SpeedRun.showStreakMessage();
         } else {
             SpeedRun.wrongAnswers++;
             SpeedRun.combo = 0;
             SoundFX?.play?.('wrong');
             SpeedRun.showFeedback(false, 0, '', answerTime);
+            SpeedRun.hideStreakMessage();
         }
         
         // Update displays with null checks
         const scoreEl = document.getElementById('sr-score');
         if (scoreEl) scoreEl.textContent = SpeedRun.score;
         
-        const comboEl = document.getElementById('sr-combo');
-        if (comboEl) comboEl.textContent = SpeedRun.combo + 'x';
-        
-        const comboDisplay = document.getElementById('sr-combo-display');
-        if (comboDisplay) {
-            if (SpeedRun.combo > 0) {
-                comboDisplay.classList.add('active');
-                if (SpeedRun.combo >= 5) comboDisplay.classList.add('fire');
-                if (SpeedRun.combo >= 10) comboDisplay.classList.add('legendary');
-            } else {
-                comboDisplay.classList.remove('active', 'fire', 'legendary');
-            }
-        }
+        SpeedRun.updateComboDisplay();
         
         // Next question after brief delay
         SpeedRun.currentIndex++;
         setTimeout(() => SpeedRun.showQuestion(), 400);
+    },
+    
+    updateComboDisplay: () => {
+        const comboEl = document.getElementById('sr-combo');
+        if (comboEl) comboEl.textContent = SpeedRun.combo + 'x';
+        
+        const comboDisplay = document.getElementById('sr-combo-display');
+        const flamesEl = document.getElementById('sr-combo-flames');
+        
+        if (comboDisplay) {
+            // Remove all classes first
+            comboDisplay.classList.remove('active', 'fire', 'legendary', 'godlike');
+            
+            if (SpeedRun.combo > 0) {
+                comboDisplay.classList.add('active');
+                
+                // Add visual combo indicator with x2, x3, x4...
+                if (SpeedRun.combo >= 2) {
+                    comboDisplay.classList.add('combo-active');
+                }
+                if (SpeedRun.combo >= 5) {
+                    comboDisplay.classList.add('fire');
+                }
+                if (SpeedRun.combo >= 10) {
+                    comboDisplay.classList.add('legendary');
+                }
+                if (SpeedRun.combo >= 15) {
+                    comboDisplay.classList.add('godlike');
+                }
+                
+                // Update flames based on combo
+                if (flamesEl) {
+                    let flames = '';
+                    if (SpeedRun.combo >= 3) flames = '🔥';
+                    if (SpeedRun.combo >= 5) flames = '🔥🔥';
+                    if (SpeedRun.combo >= 7) flames = '🔥🔥🔥';
+                    if (SpeedRun.combo >= 10) flames = '⚡🔥🔥🔥⚡';
+                    if (SpeedRun.combo >= 15) flames = '👑⚡🔥⚡👑';
+                    flamesEl.textContent = flames;
+                    flamesEl.className = 'sr-combo-flames' + (flames ? ' active' : '');
+                }
+            } else {
+                if (flamesEl) {
+                    flamesEl.textContent = '';
+                    flamesEl.className = 'sr-combo-flames';
+                }
+            }
+        }
+    },
+    
+    showStreakMessage: () => {
+        const messageEl = document.getElementById('sr-streak-message');
+        if (!messageEl) return;
+        
+        // Find the appropriate message for current combo
+        let streakData = null;
+        const thresholds = Object.keys(SpeedRun.streakMessages).map(Number).sort((a, b) => b - a);
+        
+        for (const threshold of thresholds) {
+            if (SpeedRun.combo >= threshold) {
+                streakData = SpeedRun.streakMessages[threshold];
+                break;
+            }
+        }
+        
+        if (streakData && SpeedRun.combo >= 3) {
+            messageEl.innerHTML = `<span class="sr-streak-icon">${streakData.icon}</span> <span class="sr-streak-text">${streakData.text}</span> <span class="sr-streak-combo">x${SpeedRun.combo}</span>`;
+            messageEl.className = 'sr-streak-message active';
+            
+            // Add shake effect for high combos
+            if (SpeedRun.combo >= 10) {
+                messageEl.classList.add('legendary');
+            }
+            if (SpeedRun.combo >= 15) {
+                messageEl.classList.add('godlike');
+            }
+        }
+    },
+    
+    hideStreakMessage: () => {
+        const messageEl = document.getElementById('sr-streak-message');
+        if (messageEl) {
+            messageEl.className = 'sr-streak-message';
+            messageEl.innerHTML = '';
+        }
+    },
+    
+    showCloseCallEffect: () => {
+        const gameView = document.querySelector('.sr-game-view');
+        if (!gameView) return;
+        
+        const closeCallEl = document.createElement('div');
+        closeCallEl.className = 'sr-close-call-effect';
+        closeCallEl.innerHTML = '⏱️ CLOSE CALL! ⏱️';
+        gameView.appendChild(closeCallEl);
+        
+        setTimeout(() => {
+            if (closeCallEl.parentNode) {
+                closeCallEl.remove();
+            }
+        }, 1000);
     },
 
     showFeedback: (correct, points, bonus, time) => {
@@ -511,6 +638,11 @@ const SpeedRun = {
                         <span class="sr-ri-label">Fastest</span>
                     </div>
                     <div class="sr-result-item">
+                        <span class="sr-ri-icon">⏱️</span>
+                        <span class="sr-ri-value">${SpeedRun.closeCallCount}</span>
+                        <span class="sr-ri-label">Close Calls</span>
+                    </div>
+                    <div class="sr-result-item">
                         <span class="sr-ri-icon">⭐</span>
                         <span class="sr-ri-value">+${xpEarned}</span>
                         <span class="sr-ri-label">XP Earned</span>
@@ -606,6 +738,8 @@ const SpeedRun = {
         SpeedRun.questions = [];
         SpeedRun.currentIndex = 0;
         SpeedRun.questionStartTime = null;
+        SpeedRun.currentShuffled = null;
+        SpeedRun.closeCallCount = 0;
         console.log('⚡ SpeedRun cleanup');
     }
 };

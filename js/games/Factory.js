@@ -1,6 +1,6 @@
 /**
- * Factory.js - Code Factory Production Game
- * Build products by answering questions to power your factory
+ * Factory.js - Code Factory Tycoon Game
+ * Build products by answering questions to power your factory empire!
  */
 
 const Factory = {
@@ -14,7 +14,22 @@ const Factory = {
     currentQuestionIndex: 0,
     productionRate: 1,
     qualityBonus: 0,
-    isAnswering: false, // Prevent double-clicks
+    isAnswering: false,
+    correctStreak: 0,
+    animationInterval: null,
+    
+    // Milestone achievements
+    milestones: {
+        firstProduct: { id: 'firstProduct', name: 'First Product!', icon: '📦', desc: 'Produce your first item', threshold: 1, type: 'products' },
+        producer: { id: 'producer', name: 'Producer', icon: '🏭', desc: 'Produce 50 items in one shift', threshold: 50, type: 'products' },
+        massProducer: { id: 'massProducer', name: 'Mass Producer', icon: '🚀', desc: 'Produce 200 items in one shift', threshold: 200, type: 'products' },
+        moneyMaker: { id: 'moneyMaker', name: 'Money Maker', icon: '💰', desc: 'Earn 1,000 in one shift', threshold: 1000, type: 'money' },
+        tycoon: { id: 'tycoon', name: 'Tycoon', icon: '👑', desc: 'Earn 5,000 in one shift', threshold: 5000, type: 'money' },
+        perfectShift: { id: 'perfectShift', name: 'Perfect Shift', icon: '⭐', desc: 'Answer 10 questions correctly in a row', threshold: 10, type: 'streak' },
+        factoryBoss: { id: 'factoryBoss', name: 'Factory Boss', icon: '🎩', desc: 'Max out all upgrades', threshold: 1, type: 'maxUpgrades' },
+        nightOwl: { id: 'nightOwl', name: 'Night Owl', icon: '🌙', desc: 'Complete 5 night shifts', threshold: 5, type: 'nightShifts' },
+        veteran: { id: 'veteran', name: 'Veteran', icon: '🏅', desc: 'Complete 25 shifts', threshold: 25, type: 'totalShifts' }
+    },
     
     upgradeCosts: {
         worker: [50, 100, 200, 400, 800],
@@ -23,7 +38,6 @@ const Factory = {
     },
 
     open: () => {
-        // Prevent duplicate modals
         if (document.getElementById('factory-modal')) {
             Factory.close();
         }
@@ -32,6 +46,7 @@ const Factory = {
         modal.className = 'game-modal active';
         modal.innerHTML = `<div class="game-container factory-container">${Factory.renderMenu()}</div>`;
         document.body.appendChild(modal);
+        Factory.injectTycoonStyles();
     },
     
     startAsHost: (game) => { Factory.open(); },
@@ -45,25 +60,321 @@ const Factory = {
             setTimeout(() => modal.remove(), 300);
         }
     },
+    
+    injectTycoonStyles: () => {
+        if (document.getElementById('factory-tycoon-styles')) return;
+        const style = document.createElement('style');
+        style.id = 'factory-tycoon-styles';
+        style.textContent = `
+            /* Conveyor Belt Animation */
+            .conveyor-belt {
+                position: relative;
+                background: linear-gradient(90deg, #374151 0%, #4b5563 50%, #374151 100%);
+                height: 80px;
+                border-radius: 8px;
+                overflow: hidden;
+                margin: 1rem 0;
+                border: 3px solid #6b7280;
+            }
+            .belt-track {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                height: 20px;
+                background: repeating-linear-gradient(90deg, #1f2937 0px, #1f2937 20px, #374151 20px, #374151 40px);
+                animation: beltMove 1s linear infinite;
+            }
+            @keyframes beltMove {
+                0% { background-position: 0 0; }
+                100% { background-position: 40px 0; }
+            }
+            .belt-paused .belt-track { animation-play-state: paused; }
+            
+            /* Machine Animation */
+            .machine-area {
+                display: flex;
+                justify-content: space-around;
+                padding: 0.5rem;
+                gap: 0.5rem;
+            }
+            .machine {
+                font-size: 2rem;
+                animation: machineWork 0.5s ease-in-out infinite;
+                filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+            }
+            .machine:nth-child(2) { animation-delay: 0.1s; }
+            .machine:nth-child(3) { animation-delay: 0.2s; }
+            .machine:nth-child(4) { animation-delay: 0.3s; }
+            .machine:nth-child(5) { animation-delay: 0.4s; }
+            @keyframes machineWork {
+                0%, 100% { transform: translateY(0) rotate(0deg); }
+                25% { transform: translateY(-3px) rotate(-2deg); }
+                75% { transform: translateY(-3px) rotate(2deg); }
+            }
+            .belt-paused .machine { animation-play-state: paused; }
+            
+            /* Worker Animation */
+            .workers-area {
+                display: flex;
+                justify-content: center;
+                gap: 0.75rem;
+                margin: 0.75rem 0;
+                flex-wrap: wrap;
+            }
+            .worker {
+                font-size: 1.8rem;
+                animation: workerBusy 1.2s ease-in-out infinite;
+                position: relative;
+            }
+            .worker::after {
+                content: '💭';
+                position: absolute;
+                top: -10px;
+                right: -5px;
+                font-size: 0.7rem;
+                opacity: 0;
+                animation: workerThink 2s ease-in-out infinite;
+            }
+            .worker:nth-child(odd)::after { animation-delay: 0.5s; }
+            @keyframes workerBusy {
+                0%, 100% { transform: translateX(0); }
+                25% { transform: translateX(-4px); }
+                75% { transform: translateX(4px); }
+            }
+            @keyframes workerThink {
+                0%, 60%, 100% { opacity: 0; transform: translateY(0); }
+                30% { opacity: 1; transform: translateY(-5px); }
+            }
+            .belt-paused .worker { animation-play-state: paused; }
+            .belt-paused .worker::after { animation-play-state: paused; }
+            
+            /* Product Animation */
+            .product-area {
+                position: absolute;
+                top: 10px;
+                left: 0;
+                right: 0;
+                display: flex;
+                justify-content: center;
+                gap: 0.5rem;
+                pointer-events: none;
+            }
+            .produced-item {
+                font-size: 1.5rem;
+                animation: productSlide 1s ease-out forwards;
+                opacity: 0;
+            }
+            @keyframes productSlide {
+                0% { transform: translateX(-100px) scale(0.5); opacity: 0; }
+                30% { opacity: 1; }
+                100% { transform: translateX(100px) scale(1); opacity: 0; }
+            }
+            
+            /* Earning Popup */
+            .earning-popup {
+                position: absolute;
+                top: -20px;
+                left: 50%;
+                transform: translateX(-50%);
+                font-size: 1.2rem;
+                font-weight: bold;
+                color: #22c55e;
+                text-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+                animation: earningFloat 1.2s ease-out forwards;
+                z-index: 10;
+            }
+            @keyframes earningFloat {
+                0% { opacity: 1; transform: translateX(-50%) translateY(0); }
+                100% { opacity: 0; transform: translateX(-50%) translateY(-40px); }
+            }
+            
+            /* Production Fail */
+            .production-fail {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                font-size: 1rem;
+                font-weight: bold;
+                color: #ef4444;
+                background: rgba(0,0,0,0.8);
+                padding: 0.5rem 1rem;
+                border-radius: 8px;
+                animation: failShake 0.5s ease-out;
+            }
+            @keyframes failShake {
+                0%, 100% { transform: translate(-50%, -50%) rotate(0); }
+                25% { transform: translate(-50%, -50%) rotate(-3deg); }
+                75% { transform: translate(-50%, -50%) rotate(3deg); }
+            }
+            
+            /* Upgrade Celebration */
+            .upgrade-celebration {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                pointer-events: none;
+                z-index: 9999;
+            }
+            .celebration-particle {
+                position: absolute;
+                font-size: 2rem;
+                animation: celebrationFall 2s ease-out forwards;
+            }
+            @keyframes celebrationFall {
+                0% { transform: translateY(-50px) rotate(0deg); opacity: 1; }
+                100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+            }
+            
+            /* Stats Dashboard */
+            .stats-dashboard {
+                background: linear-gradient(135deg, #1f2937, #374151);
+                border-radius: 12px;
+                padding: 1rem;
+                margin: 1rem 0;
+                border: 2px solid #4b5563;
+            }
+            .stats-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+                gap: 0.75rem;
+            }
+            .stat-card {
+                background: rgba(0,0,0,0.3);
+                border-radius: 8px;
+                padding: 0.75rem;
+                text-align: center;
+                transition: transform 0.2s, box-shadow 0.2s;
+            }
+            .stat-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            }
+            .stat-card .stat-icon { font-size: 1.5rem; display: block; }
+            .stat-card .stat-value { font-size: 1.25rem; font-weight: bold; color: #22d3ee; display: block; }
+            .stat-card .stat-label { font-size: 0.7rem; color: #9ca3af; display: block; }
+            
+            /* Achievements */
+            .achievements-section {
+                margin-top: 1rem;
+            }
+            .achievements-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+                gap: 0.5rem;
+            }
+            .achievement {
+                background: rgba(0,0,0,0.3);
+                border-radius: 8px;
+                padding: 0.5rem;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                opacity: 0.4;
+                filter: grayscale(1);
+                transition: all 0.3s;
+            }
+            .achievement.unlocked {
+                opacity: 1;
+                filter: grayscale(0);
+                border: 1px solid #22c55e;
+                box-shadow: 0 0 10px rgba(34, 197, 94, 0.2);
+            }
+            .achievement .ach-icon { font-size: 1.5rem; }
+            .achievement .ach-info { flex: 1; }
+            .achievement .ach-name { font-size: 0.75rem; font-weight: bold; display: block; }
+            .achievement .ach-desc { font-size: 0.6rem; color: #9ca3af; display: block; }
+            
+            /* Achievement Unlock Popup */
+            .achievement-unlock {
+                position: fixed;
+                top: 20%;
+                left: 50%;
+                transform: translateX(-50%) scale(0);
+                background: linear-gradient(135deg, #1f2937, #374151);
+                border: 3px solid #fbbf24;
+                border-radius: 16px;
+                padding: 1.5rem 2rem;
+                z-index: 10000;
+                text-align: center;
+                animation: achievementPop 0.5s ease-out forwards, achievementFade 0.5s ease-in 2.5s forwards;
+                box-shadow: 0 0 30px rgba(251, 191, 36, 0.5);
+            }
+            @keyframes achievementPop {
+                0% { transform: translateX(-50%) scale(0) rotate(-10deg); }
+                50% { transform: translateX(-50%) scale(1.1) rotate(5deg); }
+                100% { transform: translateX(-50%) scale(1) rotate(0deg); }
+            }
+            @keyframes achievementFade {
+                to { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+            }
+            .achievement-unlock .unlock-icon { font-size: 3rem; display: block; }
+            .achievement-unlock .unlock-title { color: #fbbf24; font-size: 0.9rem; margin-top: 0.5rem; }
+            .achievement-unlock .unlock-name { font-size: 1.2rem; font-weight: bold; margin-top: 0.25rem; }
+            
+            /* Streak Indicator */
+            .streak-indicator {
+                position: absolute;
+                top: -30px;
+                right: 10px;
+                background: linear-gradient(135deg, #f59e0b, #ef4444);
+                padding: 0.25rem 0.75rem;
+                border-radius: 20px;
+                font-size: 0.8rem;
+                font-weight: bold;
+                animation: streakPulse 1s ease-in-out infinite;
+            }
+            @keyframes streakPulse {
+                0%, 100% { transform: scale(1); }
+                50% { transform: scale(1.05); }
+            }
+            
+            /* HUD Enhancement */
+            .factory-hud {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.5rem;
+                justify-content: center;
+                padding: 0.75rem;
+                background: rgba(0,0,0,0.3);
+                border-radius: 8px;
+                margin-bottom: 1rem;
+            }
+            .hud-stat {
+                display: flex;
+                align-items: center;
+                gap: 0.3rem;
+                background: rgba(0,0,0,0.3);
+                padding: 0.4rem 0.75rem;
+                border-radius: 6px;
+                font-size: 0.9rem;
+            }
+            .hud-stat span:first-child { font-size: 1.1rem; }
+        `;
+        document.head.appendChild(style);
+    },
 
     renderMenu: () => {
         const stats = Factory.getStats();
+        const unlockedAchievements = stats.achievements || [];
+        
         return `
             <div class="game-header">
-                <h2>🏭 Code Factory</h2>
+                <h2>🏭 Code Factory Tycoon</h2>
                 <button class="close-btn" onclick="Factory.close()">✕</button>
             </div>
             <div class="factory-menu">
                 <div class="factory-hero">
-                    <div class="factory-graphic">🏭</div>
+                    <div class="factory-graphic" style="font-size: 4rem;">🏭</div>
                     <h3>Build Your Code Empire!</h3>
-                    <p>Answer questions to produce code products, hire workers, and upgrade machines!</p>
+                    <p>Answer questions to produce products, hire workers, and become a tycoon!</p>
                 </div>
-                <div class="factory-stats">
-                    <div class="f-stat"><span>💰</span><span>${stats.totalMoney || 0}</span><span>Total Earned</span></div>
-                    <div class="f-stat"><span>📦</span><span>${stats.totalProducts || 0}</span><span>Products Made</span></div>
-                    <div class="f-stat"><span>⭐</span><span>${stats.bestShift || 0}</span><span>Best Shift</span></div>
-                </div>
+                
+                ${Factory.renderStatsDashboard(stats)}
+                
                 <div class="factory-start">
                     <h4>Start a Shift</h4>
                     <div class="shift-options">
@@ -84,6 +395,70 @@ const Factory = {
                         </button>
                     </div>
                 </div>
+                
+                ${Factory.renderAchievements(unlockedAchievements)}
+            </div>
+        `;
+    },
+    
+    renderStatsDashboard: (stats) => {
+        return `
+            <div class="stats-dashboard">
+                <h4 style="margin: 0 0 0.75rem 0; color: #fbbf24;">📊 Factory Stats</h4>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-icon">💰</span>
+                        <span class="stat-value">${(stats.totalMoney || 0).toLocaleString()}</span>
+                        <span class="stat-label">Total Earnings</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-icon">📦</span>
+                        <span class="stat-value">${(stats.totalProducts || 0).toLocaleString()}</span>
+                        <span class="stat-label">Products Made</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-icon">⭐</span>
+                        <span class="stat-value">${stats.bestShift || 0}</span>
+                        <span class="stat-label">Best Shift</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-icon">📋</span>
+                        <span class="stat-value">${stats.shiftsCompleted || 0}</span>
+                        <span class="stat-label">Shifts Done</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-icon">👷</span>
+                        <span class="stat-value">${stats.workers || 1}/6</span>
+                        <span class="stat-label">Workers</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-icon">⚙️</span>
+                        <span class="stat-value">${stats.machines || 1}/6</span>
+                        <span class="stat-label">Machines</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+    
+    renderAchievements: (unlockedAchievements) => {
+        const achievementsList = Object.values(Factory.milestones).map(m => {
+            const isUnlocked = unlockedAchievements.includes(m.id);
+            return `
+                <div class="achievement ${isUnlocked ? 'unlocked' : ''}">
+                    <span class="ach-icon">${m.icon}</span>
+                    <div class="ach-info">
+                        <span class="ach-name">${m.name}</span>
+                        <span class="ach-desc">${m.desc}</span>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        return `
+            <div class="achievements-section">
+                <h4 style="margin: 0 0 0.75rem 0; color: #fbbf24;">🏆 Achievements</h4>
+                <div class="achievements-grid">${achievementsList}</div>
             </div>
         `;
     },
@@ -94,6 +469,8 @@ const Factory = {
         Factory.products = 0;
         Factory.money = 0;
         Factory.currentQuestionIndex = 0;
+        Factory.correctStreak = 0;
+        Factory.shiftType = shiftType;
         
         const stats = Factory.getStats();
         Factory.workers = Math.max(1, stats.workers || 1);
@@ -115,7 +492,6 @@ const Factory = {
             ];
         }
         
-        // Validate questions have required fields
         Factory.questions = Factory.questions.filter(q => 
             q && q.question && Array.isArray(q.options) && q.options.length > 0 && typeof q.answer === 'number'
         );
@@ -140,20 +516,35 @@ const Factory = {
         const container = document.querySelector('.factory-container');
         if (!container) return;
         
+        const workerEmojis = ['👷', '👷‍♀️', '🧑‍🔧', '👨‍🔧', '👩‍🔧', '🧑‍💼'];
+        const machineEmojis = ['⚙️', '🔧', '🔩', '🏭', '🔨', '⛏️'];
+        
+        const workersHtml = Array(Factory.workers).fill(0).map((_, i) => 
+            `<span class="worker">${workerEmojis[i % workerEmojis.length]}</span>`
+        ).join('');
+        
+        const machinesHtml = Array(Factory.machines).fill(0).map((_, i) => 
+            `<span class="machine">${machineEmojis[i % machineEmojis.length]}</span>`
+        ).join('');
+        
         container.innerHTML = `
             <div class="game-header"><h2>🏭 Factory Floor</h2><button class="close-btn" onclick="Factory.close()">✕</button></div>
             <div class="factory-floor">
                 <div class="factory-hud">
                     <div class="hud-stat" title="Money earned"><span>💰</span><span id="f-money">${Factory.money}</span></div>
                     <div class="hud-stat" title="Products made"><span>📦</span><span id="f-products">${Factory.products}</span></div>
-                    <div class="hud-stat" title="Workers (production base)"><span>👷</span><span id="f-workers">${Factory.workers}</span></div>
-                    <div class="hud-stat" title="Machines (multiplier)"><span>⚙️</span><span id="f-machines">${Factory.machines}</span></div>
+                    <div class="hud-stat" title="Workers"><span>👷</span><span id="f-workers">${Factory.workers}</span></div>
+                    <div class="hud-stat" title="Machines"><span>⚙️</span><span id="f-machines">${Factory.machines}</span></div>
                     <div class="hud-stat" title="Progress"><span>📊</span><span id="f-progress">${Factory.currentQuestionIndex}/${Factory.questions.length}</span></div>
                 </div>
                 
-                <div class="conveyor-belt">
-                    <div class="belt-animation"></div>
+                <div class="workers-area" id="workers-area">${workersHtml}</div>
+                
+                <div class="conveyor-belt" id="conveyor-belt">
+                    <div class="machine-area">${machinesHtml}</div>
+                    <div class="belt-track"></div>
                     <div class="product-area" id="product-area"></div>
+                    <div id="streak-display"></div>
                 </div>
                 
                 <div class="factory-question" id="factory-question">${Factory.renderQuestion()}</div>
@@ -180,14 +571,32 @@ const Factory = {
         
         Factory.currentQuestion = q;
         
+        // Shuffle answer options using Helpers.shuffleOptions
+        const shuffled = (typeof Helpers !== 'undefined' && Helpers.shuffleOptions) 
+            ? Helpers.shuffleOptions(q)
+            : Factory.shuffleOptionsInternal(q);
+        
         return `
             <div class="f-question">
                 <p class="question-text">${Factory.escapeHtml(q.question)}</p>
                 <div class="f-options">
-                    ${q.options.map((opt, i) => `<button class="f-option" onclick="Factory.answer(${i})">${Factory.escapeHtml(opt)}</button>`).join('')}
+                    ${shuffled.options.map((opt, i) => `<button class="f-option" data-original="${shuffled.originalIndices[i]}" onclick="Factory.answer(${shuffled.originalIndices[i]}, this)">${Factory.escapeHtml(opt)}</button>`).join('')}
                 </div>
             </div>
         `;
+    },
+    
+    // Internal shuffle if Helpers.shuffleOptions not available
+    shuffleOptionsInternal: (question) => {
+        const indices = question.options.map((_, i) => i);
+        for (let i = indices.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [indices[i], indices[j]] = [indices[j], indices[i]];
+        }
+        return {
+            options: indices.map(i => question.options[i]),
+            originalIndices: indices
+        };
     },
     
     escapeHtml: (text) => {
@@ -197,8 +606,7 @@ const Factory = {
         return div.innerHTML;
     },
     
-    answer: (index) => {
-        // Prevent double-clicks and answering when game not active
+    answer: (originalIndex, buttonEl) => {
         if (Factory.isAnswering || !Factory.isPlaying) return;
         Factory.isAnswering = true;
         
@@ -208,35 +616,58 @@ const Factory = {
             return;
         }
         
-        const isCorrect = index === q.answer;
+        const isCorrect = originalIndex === q.answer;
         const buttons = document.querySelectorAll('.f-option');
+        const conveyor = document.getElementById('conveyor-belt');
         
-        buttons.forEach((btn, i) => {
+        buttons.forEach((btn) => {
             btn.disabled = true;
             btn.classList.add('disabled');
-            if (i === q.answer) btn.classList.add('correct');
-            else if (i === index && !isCorrect) btn.classList.add('incorrect');
+            const origIdx = parseInt(btn.getAttribute('data-original'));
+            if (origIdx === q.answer) btn.classList.add('correct');
+            else if (btn === buttonEl && !isCorrect) btn.classList.add('incorrect');
         });
         
         if (isCorrect) {
-            // Calculate production with safe bounds
+            Factory.correctStreak++;
+            
+            // Check for streak achievement
+            if (Factory.correctStreak >= 10) {
+                Factory.checkMilestone('perfectShift', Factory.correctStreak);
+            }
+            
             const baseProducts = Math.max(1, Factory.workers) * Math.max(1, Factory.machines);
             const qualityMultiplier = 1 + (Math.max(0, Factory.qualityBonus) * 0.1);
-            const productsProduced = Math.max(1, Math.round(baseProducts * qualityMultiplier * Factory.productionRate));
+            const streakBonus = 1 + (Math.min(Factory.correctStreak, 10) * 0.05);
+            const productsProduced = Math.max(1, Math.round(baseProducts * qualityMultiplier * Factory.productionRate * streakBonus));
             
             Factory.products += productsProduced;
             
-            // Calculate money (10 per product base, capped at reasonable max)
             const moneyEarned = Math.min(productsProduced * 10, 10000);
             Factory.money += moneyEarned;
             
             Factory.updateHUD();
             Factory.showProduction(productsProduced, moneyEarned);
+            Factory.updateStreakDisplay();
+            
+            // Check milestones
+            Factory.checkMilestone('firstProduct', Factory.products);
+            Factory.checkMilestone('producer', Factory.products);
+            Factory.checkMilestone('massProducer', Factory.products);
+            Factory.checkMilestone('moneyMaker', Factory.money);
+            Factory.checkMilestone('tycoon', Factory.money);
+            
+            if (conveyor) conveyor.classList.remove('belt-paused');
             
             if (typeof SRSSystem !== 'undefined' && SRSSystem.recordAnswer) SRSSystem.recordAnswer(q.id, true);
             if (typeof SoundFX !== 'undefined' && SoundFX.play) SoundFX.play('success');
         } else {
+            Factory.correctStreak = 0;
             Factory.showProductionFail();
+            Factory.updateStreakDisplay();
+            
+            if (conveyor) conveyor.classList.add('belt-paused');
+            
             if (typeof SRSSystem !== 'undefined' && SRSSystem.recordAnswer) SRSSystem.recordAnswer(q.id, false);
             if (typeof SoundFX !== 'undefined' && SoundFX.play) SoundFX.play('error');
         }
@@ -253,6 +684,17 @@ const Factory = {
             const questionArea = document.getElementById('factory-question');
             if (questionArea) questionArea.innerHTML = Factory.renderQuestion();
         }, 1500);
+    },
+    
+    updateStreakDisplay: () => {
+        const display = document.getElementById('streak-display');
+        if (!display) return;
+        
+        if (Factory.correctStreak >= 3) {
+            display.innerHTML = `<div class="streak-indicator">🔥 ${Factory.correctStreak}x Streak!</div>`;
+        } else {
+            display.innerHTML = '';
+        }
     },
     
     updateHUD: () => {
@@ -273,7 +715,6 @@ const Factory = {
         const area = document.getElementById('product-area');
         if (!area) return;
         
-        // Show earnings notification
         const earning = document.createElement('span');
         earning.className = 'earning-popup';
         earning.textContent = `+${money} 💰`;
@@ -303,8 +744,64 @@ const Factory = {
         setTimeout(() => fail.remove(), 1200);
     },
     
+    checkMilestone: (milestoneId, value) => {
+        const milestone = Factory.milestones[milestoneId];
+        if (!milestone) return;
+        
+        const stats = Factory.getStats();
+        const achievements = stats.achievements || [];
+        
+        if (achievements.includes(milestoneId)) return;
+        
+        if (value >= milestone.threshold) {
+            achievements.push(milestoneId);
+            stats.achievements = achievements;
+            Factory.saveStats(stats);
+            Factory.showAchievementUnlock(milestone);
+        }
+    },
+    
+    showAchievementUnlock: (milestone) => {
+        // Remove any existing unlock popup
+        const existing = document.querySelector('.achievement-unlock');
+        if (existing) existing.remove();
+        
+        const popup = document.createElement('div');
+        popup.className = 'achievement-unlock';
+        popup.innerHTML = `
+            <span class="unlock-icon">${milestone.icon}</span>
+            <div class="unlock-title">🏆 Achievement Unlocked!</div>
+            <div class="unlock-name">${milestone.name}</div>
+        `;
+        document.body.appendChild(popup);
+        
+        if (typeof SoundFX !== 'undefined' && SoundFX.play) {
+            SoundFX.play('levelUp');
+        }
+        
+        setTimeout(() => popup.remove(), 3000);
+    },
+    
+    showUpgradeCelebration: () => {
+        const celebration = document.createElement('div');
+        celebration.className = 'upgrade-celebration';
+        
+        const particles = ['🎉', '✨', '⭐', '💫', '🌟', '🎊'];
+        for (let i = 0; i < 20; i++) {
+            const particle = document.createElement('span');
+            particle.className = 'celebration-particle';
+            particle.textContent = particles[Math.floor(Math.random() * particles.length)];
+            particle.style.left = `${Math.random() * 100}%`;
+            particle.style.animationDelay = `${Math.random() * 0.5}s`;
+            particle.style.animationDuration = `${1.5 + Math.random()}s`;
+            celebration.appendChild(particle);
+        }
+        
+        document.body.appendChild(celebration);
+        setTimeout(() => celebration.remove(), 2500);
+    },
+    
     openUpgrades: () => {
-        // Check if Modal is available
         if (typeof Modal === 'undefined' || !Modal.show) {
             Factory.showError('Upgrade menu not available');
             return;
@@ -355,7 +852,7 @@ const Factory = {
                             ${quality < 5 ? `<button class="btn btn-small btn-primary" onclick="Factory.upgrade('quality')" ${canUpgrade('quality', quality) ? '' : 'disabled'}>${getCost('quality', quality)} 💰</button>` : '<span class="upgrade-max">MAX</span>'}
                         </div>
                     </div>
-                    <p class="upgrade-formula"><small>Formula: Workers × Machines × (1 + Quality×10%)</small></p>
+                    <p class="upgrade-formula"><small>Formula: Workers × Machines × (1 + Quality×10%) × Streak Bonus</small></p>
                 </div>
             `,
             footer: '<button class="btn btn-secondary" onclick="Modal.close()">Close</button>'
@@ -411,6 +908,15 @@ const Factory = {
         
         Factory.saveStats(stats);
         Factory.updateHUD();
+        Factory.showUpgradeCelebration();
+        
+        // Check for factory boss achievement (all maxed)
+        if (stats.workers >= 6 && stats.machines >= 6 && stats.qualityLevel >= 5) {
+            Factory.checkMilestone('factoryBoss', 1);
+        }
+        
+        // Update workers/machines display on factory floor
+        Factory.updateFactoryFloor();
         
         if (typeof Toast !== 'undefined' && Toast.show) {
             Toast.show(`⬆️ ${type.charAt(0).toUpperCase() + type.slice(1)} upgraded!`, 'success');
@@ -419,8 +925,18 @@ const Factory = {
         if (typeof Modal !== 'undefined' && Modal.close) {
             Modal.close();
         }
-        // Refresh upgrades modal
         setTimeout(() => Factory.openUpgrades(), 100);
+    },
+    
+    updateFactoryFloor: () => {
+        const workersArea = document.getElementById('workers-area');
+        const workerEmojis = ['👷', '👷‍♀️', '🧑‍🔧', '👨‍🔧', '👩‍🔧', '🧑‍💼'];
+        
+        if (workersArea) {
+            workersArea.innerHTML = Array(Factory.workers).fill(0).map((_, i) => 
+                `<span class="worker">${workerEmojis[i % workerEmojis.length]}</span>`
+            ).join('');
+        }
     },
     
     confirmEndShift: () => {
@@ -441,7 +957,7 @@ const Factory = {
     },
     
     endShift: () => {
-        if (!Factory.isPlaying) return; // Prevent double-ending
+        if (!Factory.isPlaying) return;
         Factory.isPlaying = false;
         
         const stats = Factory.getStats();
@@ -452,6 +968,16 @@ const Factory = {
         stats.totalProducts = previousProducts + Factory.products;
         stats.bestShift = Math.max(stats.bestShift || 0, Factory.products);
         stats.shiftsCompleted = (stats.shiftsCompleted || 0) + 1;
+        
+        // Track night shifts
+        if (Factory.shiftType === 'long') {
+            stats.nightShiftsCompleted = (stats.nightShiftsCompleted || 0) + 1;
+            Factory.checkMilestone('nightOwl', stats.nightShiftsCompleted);
+        }
+        
+        // Check veteran milestone
+        Factory.checkMilestone('veteran', stats.shiftsCompleted);
+        
         Factory.saveStats(stats);
         
         const xpEarned = Math.round(Factory.products * 2);
@@ -461,21 +987,18 @@ const Factory = {
             AppState.setState('user', user);
         }
         
-        const accuracy = Factory.currentQuestionIndex > 0 
-            ? Math.round((Factory.products / (Factory.currentQuestionIndex * Factory.workers * Factory.machines)) * 100)
-            : 0;
-        
         const container = document.querySelector('.factory-container');
         if (container) {
             container.innerHTML = `
                 <div class="game-header"><h2>🏭 Shift Complete!</h2><button class="close-btn" onclick="Factory.close()">✕</button></div>
                 <div class="factory-results">
-                    <div class="results-graphic"><span class="big-icon">🏭</span></div>
+                    <div class="results-graphic"><span class="big-icon" style="font-size: 4rem;">🏭</span></div>
                     <h3>Great Work!</h3>
                     <div class="results-stats">
                         <div class="result-item"><span>📦 Products Made</span><span class="result-value">${Factory.products}</span></div>
                         <div class="result-item"><span>💰 Money Earned</span><span class="result-value">${Factory.money}</span></div>
                         <div class="result-item"><span>✨ XP Earned</span><span class="result-value">+${xpEarned}</span></div>
+                        <div class="result-item"><span>🔥 Best Streak</span><span class="result-value">${Factory.correctStreak}x</span></div>
                         <div class="result-item"><span>📊 Questions</span><span class="result-value">${Factory.currentQuestionIndex}/${Factory.questions.length}</span></div>
                     </div>
                     ${Factory.products === stats.bestShift && Factory.products > 0 ? '<div class="new-record">🏆 New Best Shift!</div>' : ''}
@@ -517,6 +1040,11 @@ const Factory = {
         Factory.currentQuestionIndex = 0;
         Factory.products = 0;
         Factory.money = 0;
+        Factory.correctStreak = 0;
+        if (Factory.animationInterval) {
+            clearInterval(Factory.animationInterval);
+            Factory.animationInterval = null;
+        }
         console.log('🏭 Factory cleanup');
     }
 };

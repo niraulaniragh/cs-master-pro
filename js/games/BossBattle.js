@@ -19,6 +19,42 @@ const BossBattle = {
     powerUps: { heal: 2, shield: 1, critical: 2 },
     hasShield: false,
     criticalActive: false,
+    bossPhase: 1, // For special moves at HP thresholds
+    specialMoveUsed: { phase2: false, phase3: false },
+
+    // Boss taunts
+    bossTaunts: {
+        entrance: [
+            "You dare challenge me?!",
+            "Another fool seeking defeat!",
+            "Your knowledge ends here!",
+            "Prepare to be schooled!"
+        ],
+        attack: [
+            "Take THIS!",
+            "Feel my power!",
+            "You cannot escape!",
+            "Pathetic attempt!"
+        ],
+        damaged: [
+            "Lucky shot!",
+            "You'll pay for that!",
+            "Impossible!",
+            "Is that all you've got?"
+        ],
+        lowHP: [
+            "I won't lose to YOU!",
+            "This isn't over!",
+            "I'm just getting started!",
+            "ENOUGH!"
+        ],
+        special: [
+            "WITNESS TRUE POWER!",
+            "BEHOLD MY ULTIMATE ATTACK!",
+            "YOU CANNOT SURVIVE THIS!",
+            "FEEL THE WRATH!"
+        ]
+    },
 
     // Boss characters for each topic
     bosses: [
@@ -32,7 +68,8 @@ const BossBattle = {
             attack: 15,
             color: '#3b82f6',
             reward: 500,
-            attacks: ['Binary Blast', 'Hex Hammer', 'Bit Barrage']
+            attacks: ['Binary Blast', 'Hex Hammer', 'Bit Barrage'],
+            specialMove: { name: 'OVERFLOW APOCALYPSE', damage: 35, effect: 'screen-glitch' }
         },
         {
             id: 'algorithm-dragon',
@@ -44,7 +81,8 @@ const BossBattle = {
             attack: 18,
             color: '#10b981',
             reward: 600,
-            attacks: ['Sorting Storm', 'Search Strike', 'Loop Lightning']
+            attacks: ['Sorting Storm', 'Search Strike', 'Loop Lightning'],
+            specialMove: { name: 'INFINITE RECURSION', damage: 40, effect: 'fire-breath' }
         },
         {
             id: 'network-ninja',
@@ -56,7 +94,8 @@ const BossBattle = {
             attack: 20,
             color: '#10b981',
             reward: 550,
-            attacks: ['Packet Punch', 'Protocol Slash', 'Firewall Fury']
+            attacks: ['Packet Punch', 'Protocol Slash', 'Firewall Fury'],
+            specialMove: { name: 'DDOS DEVASTATION', damage: 38, effect: 'shadow-clone' }
         },
         {
             id: 'hardware-golem',
@@ -68,7 +107,8 @@ const BossBattle = {
             attack: 12,
             color: '#f59e0b',
             reward: 700,
-            attacks: ['CPU Crush', 'RAM Rush', 'Cache Crash']
+            attacks: ['CPU Crush', 'RAM Rush', 'Cache Crash'],
+            specialMove: { name: 'THERMAL MELTDOWN', damage: 30, effect: 'earthquake' }
         },
         {
             id: 'security-specter',
@@ -80,7 +120,8 @@ const BossBattle = {
             attack: 25,
             color: '#10b981',
             reward: 650,
-            attacks: ['Malware Maelstrom', 'Phishing Phantasm', 'Encryption Eclipse']
+            attacks: ['Malware Maelstrom', 'Phishing Phantasm', 'Encryption Eclipse'],
+            specialMove: { name: 'ZERO DAY STRIKE', damage: 45, effect: 'phase-shift' }
         },
         {
             id: 'code-kraken',
@@ -92,7 +133,8 @@ const BossBattle = {
             attack: 17,
             color: '#06b6d4',
             reward: 600,
-            attacks: ['Function Flood', 'Variable Vortex', 'Loop Leviathan']
+            attacks: ['Function Flood', 'Variable Vortex', 'Loop Leviathan'],
+            specialMove: { name: 'SPAGHETTI CODE TSUNAMI', damage: 35, effect: 'tentacle-grab' }
         },
         {
             id: 'database-demon',
@@ -104,7 +146,8 @@ const BossBattle = {
             attack: 19,
             color: '#f97316',
             reward: 580,
-            attacks: ['Query Quake', 'SQL Slash', 'Table Tornado']
+            attacks: ['Query Quake', 'SQL Slash', 'Table Tornado'],
+            specialMove: { name: 'DROP TABLE DOOM', damage: 42, effect: 'hellfire' }
         },
         {
             id: 'final-boss',
@@ -116,7 +159,8 @@ const BossBattle = {
             attack: 22,
             color: '#fbbf24',
             reward: 1500,
-            attacks: ['Exam Explosion', 'Mark Massacre', 'Grade Guillotine']
+            attacks: ['Exam Explosion', 'Mark Massacre', 'Grade Guillotine'],
+            specialMove: { name: 'FINAL EXAMINATION', damage: 50, effect: 'ultimate-doom' }
         }
     ],
 
@@ -226,7 +270,7 @@ const BossBattle = {
             // Calculate difficulty based on boss defeats
             const stats = BossBattle.getStats();
             const defeatedCount = stats.defeated?.length || 0;
-            BossBattle.difficulty = 1 + (defeatedCount * 0.15); // 15% harder per boss defeated
+            BossBattle.difficulty = 1 + (defeatedCount * 0.15);
             
             // Scale boss HP and attack with difficulty
             const scaledHP = Math.floor(boss.hp * BossBattle.difficulty);
@@ -247,6 +291,8 @@ const BossBattle = {
             BossBattle.criticalActive = false;
             BossBattle.isPlaying = true;
             BossBattle.scaledBossAttack = scaledAttack;
+            BossBattle.bossPhase = 1;
+            BossBattle.specialMoveUsed = { phase2: false, phase3: false };
             
             const container = document.querySelector('.boss-container');
             if (!container) {
@@ -256,7 +302,7 @@ const BossBattle = {
             container.innerHTML = BossBattle.renderBattle();
             
             // Register keyboard handler
-            document.removeEventListener('keydown', BossBattle.keyHandler); // Prevent duplicates
+            document.removeEventListener('keydown', BossBattle.keyHandler);
             document.addEventListener('keydown', BossBattle.keyHandler);
             
             // Dramatic entrance
@@ -280,15 +326,16 @@ const BossBattle = {
             <div class="boss-battle-view" style="--boss-color: ${boss.color}">
                 <div class="boss-arena">
                     <div class="boss-player player-side">
-                        <div class="boss-avatar player-avatar">👤</div>
+                        <div class="boss-avatar player-avatar" id="player-avatar">👤</div>
                         <div class="boss-name">${typeof Helpers !== 'undefined' ? Helpers.escapeHtml(username) : username}</div>
-                        <div class="boss-hp-container">
+                        <div class="boss-hp-container" id="player-hp-container">
                             <div class="boss-hp-bar">
                                 <div class="boss-hp-fill player-hp" id="player-hp"></div>
                             </div>
                             <span class="boss-hp-text" id="player-hp-text">100/100</span>
                         </div>
                         <div class="shield-indicator ${BossBattle.hasShield ? 'active' : ''}" id="shield-indicator">🛡️</div>
+                        <div class="powerup-effect" id="player-powerup-effect"></div>
                     </div>
                     
                     <div class="boss-vs-indicator">
@@ -299,12 +346,13 @@ const BossBattle = {
                     <div class="boss-player boss-side">
                         <div class="boss-avatar" id="boss-avatar" style="background: ${boss.color}">${boss.icon}</div>
                         <div class="boss-name">${boss.name}</div>
-                        <div class="boss-hp-container">
+                        <div class="boss-hp-container" id="boss-hp-container">
                             <div class="boss-hp-bar">
                                 <div class="boss-hp-fill boss-hp" id="boss-hp"></div>
                             </div>
                             <span class="boss-hp-text" id="boss-hp-text">${BossBattle.maxBossHP}/${BossBattle.maxBossHP}</span>
                         </div>
+                        <div class="boss-taunt" id="boss-taunt"></div>
                     </div>
                 </div>
                 
@@ -331,18 +379,192 @@ const BossBattle = {
         `;
     },
 
+    // Get random taunt from category
+    getTaunt: (category) => {
+        const taunts = BossBattle.bossTaunts[category];
+        return taunts[Math.floor(Math.random() * taunts.length)];
+    },
+
+    // Show boss taunt with animation
+    showBossTaunt: (text) => {
+        const tauntEl = document.getElementById('boss-taunt');
+        if (!tauntEl) return;
+        
+        tauntEl.textContent = `"${text}"`;
+        tauntEl.classList.add('show');
+        
+        setTimeout(() => {
+            tauntEl.classList.remove('show');
+        }, 2500);
+    },
+
+    // Boss attack animation
+    playBossAttackAnimation: (attackName) => {
+        const bossAvatar = document.getElementById('boss-avatar');
+        const playerAvatar = document.getElementById('player-avatar');
+        const arena = document.querySelector('.boss-arena');
+        
+        if (!bossAvatar || !arena) return;
+        
+        // Boss lunges forward
+        bossAvatar.classList.add('attack-lunge');
+        
+        // Create attack effect
+        const attackEffect = document.createElement('div');
+        attackEffect.className = 'boss-attack-effect';
+        attackEffect.innerHTML = `<span class="attack-name">${attackName}</span>`;
+        arena.appendChild(attackEffect);
+        
+        setTimeout(() => {
+            bossAvatar.classList.remove('attack-lunge');
+            attackEffect.remove();
+        }, 800);
+        
+        // Screen shake for impact
+        setTimeout(() => {
+            arena.classList.add('screen-shake');
+            setTimeout(() => arena.classList.remove('screen-shake'), 300);
+        }, 400);
+    },
+
+    // Player power-up visual effect
+    showPowerUpEffect: (type) => {
+        const effectEl = document.getElementById('player-powerup-effect');
+        const playerAvatar = document.getElementById('player-avatar');
+        if (!effectEl || !playerAvatar) return;
+        
+        const effects = {
+            heal: { icon: '💚', color: '#22c55e', particles: '✨' },
+            shield: { icon: '🛡️', color: '#3b82f6', particles: '⚡' },
+            critical: { icon: '⚡', color: '#f59e0b', particles: '🔥' }
+        };
+        
+        const effect = effects[type];
+        
+        // Glow effect on player
+        playerAvatar.style.boxShadow = `0 0 30px ${effect.color}`;
+        playerAvatar.classList.add('powerup-active');
+        
+        // Particle burst
+        for (let i = 0; i < 6; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'powerup-particle';
+            particle.textContent = effect.particles;
+            particle.style.setProperty('--angle', `${i * 60}deg`);
+            effectEl.appendChild(particle);
+        }
+        
+        setTimeout(() => {
+            playerAvatar.style.boxShadow = '';
+            playerAvatar.classList.remove('powerup-active');
+            effectEl.innerHTML = '';
+        }, 1000);
+    },
+
+    // Health bar shake animation for low HP
+    shakeHealthBar: (target) => {
+        const containerId = target === 'player' ? 'player-hp-container' : 'boss-hp-container';
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        
+        container.classList.add('hp-shake');
+        setTimeout(() => container.classList.remove('hp-shake'), 500);
+    },
+
+    // Check and trigger boss special moves at HP thresholds
+    checkBossPhase: () => {
+        const boss = BossBattle.currentBoss;
+        if (!boss || !boss.specialMove) return false;
+        
+        const hpPercent = (BossBattle.bossHP / BossBattle.maxBossHP) * 100;
+        
+        // Phase 2: Below 60% HP
+        if (hpPercent <= 60 && hpPercent > 30 && !BossBattle.specialMoveUsed.phase2) {
+            BossBattle.specialMoveUsed.phase2 = true;
+            BossBattle.bossPhase = 2;
+            return true;
+        }
+        
+        // Phase 3: Below 30% HP
+        if (hpPercent <= 30 && !BossBattle.specialMoveUsed.phase3) {
+            BossBattle.specialMoveUsed.phase3 = true;
+            BossBattle.bossPhase = 3;
+            return true;
+        }
+        
+        return false;
+    },
+
+    // Execute boss special move
+    executeBossSpecialMove: (callback) => {
+        const boss = BossBattle.currentBoss;
+        if (!boss || !boss.specialMove) {
+            callback?.();
+            return;
+        }
+        
+        const special = boss.specialMove;
+        const arena = document.querySelector('.boss-arena');
+        const bossAvatar = document.getElementById('boss-avatar');
+        
+        // Show warning
+        BossBattle.showBossTaunt(BossBattle.getTaunt('special'));
+        BossBattle.addBattleLog(`⚠️ ${boss.name} is charging a special attack!`, 'warning');
+        
+        // Charging animation
+        bossAvatar?.classList.add('charging');
+        
+        setTimeout(() => {
+            bossAvatar?.classList.remove('charging');
+            
+            // Execute special move
+            BossBattle.addBattleLog(`💀 ${boss.icon} uses ${special.name}!!!`, 'special-attack');
+            
+            // Special effect based on type
+            arena?.classList.add(`special-${special.effect}`);
+            
+            // Calculate damage (reduced if shield)
+            let damage = special.damage;
+            if (BossBattle.hasShield) {
+                damage = Math.floor(damage / 2);
+                BossBattle.hasShield = false;
+                BossBattle.addBattleLog(`🛡️ Shield absorbed half the special attack!`, 'shield');
+                const shieldIndicator = document.getElementById('shield-indicator');
+                if (shieldIndicator) shieldIndicator.classList.remove('active');
+            }
+            
+            BossBattle.playerHP = Math.max(0, BossBattle.playerHP - damage);
+            BossBattle.showDamageEffect('player', damage);
+            BossBattle.updateHP();
+            
+            setTimeout(() => {
+                arena?.classList.remove(`special-${special.effect}`);
+                callback?.();
+            }, 1500);
+            
+        }, 1500);
+    },
+
     showBossEntrance: () => {
         const boss = BossBattle.currentBoss;
         if (!boss) return;
         
+        const bossAvatar = document.getElementById('boss-avatar');
+        bossAvatar?.classList.add('dramatic-entrance');
+        
         BossBattle.addBattleLog(`${boss.icon} ${boss.name} appears!`, 'entrance');
-        BossBattle.addBattleLog(`"${boss.description}"`, 'boss-speak');
+        
+        setTimeout(() => {
+            BossBattle.showBossTaunt(BossBattle.getTaunt('entrance'));
+            BossBattle.addBattleLog(`"${boss.description}"`, 'boss-speak');
+        }, 800);
         
         setTimeout(() => {
             if (!BossBattle.isPlaying) return;
+            bossAvatar?.classList.remove('dramatic-entrance');
             BossBattle.addBattleLog('Battle Start! Answer questions to attack!', 'system');
             BossBattle.showQuestion();
-        }, 2000);
+        }, 2500);
     },
 
     showQuestion: () => {
@@ -369,12 +591,17 @@ const BossBattle = {
         const questionArea = document.getElementById('boss-question-area');
         if (!questionArea) return;
         
+        // Shuffle answer options using Helpers if available
+        const shuffled = typeof Helpers !== 'undefined' && Helpers.shuffleOptions 
+            ? Helpers.shuffleOptions(question)
+            : { options: question.options, correctIndex: question.answer };
+        
         questionArea.innerHTML = `
             <div class="boss-question animate-in">
                 <h3>${question.question}</h3>
                 <div class="boss-options">
-                    ${question.options.map((opt, i) => `
-                        <button class="boss-option" onclick="BossBattle.answer(${i})" data-index="${i}">
+                    ${shuffled.options.map((opt, i) => `
+                        <button class="boss-option" onclick="BossBattle.answer(${i}, ${shuffled.correctIndex})" data-index="${i}">
                             <span class="boss-opt-key">${String.fromCharCode(65 + i)}</span>
                             ${opt}
                         </button>
@@ -384,20 +611,22 @@ const BossBattle = {
         `;
     },
 
-    answer: (index) => {
+    answer: (index, correctIndex) => {
         if (!BossBattle.isPlaying) return;
         
         const question = BossBattle.questions[BossBattle.currentIndex];
         if (!question) return;
         
-        const isCorrect = index === question.answer;
+        // Use correctIndex if provided (from shuffled), otherwise use original
+        const correctAnswer = correctIndex !== undefined ? correctIndex : question.answer;
+        const isCorrect = index === correctAnswer;
         const boss = BossBattle.currentBoss;
         if (!boss) return;
         
         // Disable all options
         document.querySelectorAll('.boss-option').forEach((btn, i) => {
             btn.disabled = true;
-            if (i === question.answer) btn.classList.add('correct');
+            if (i === correctAnswer) btn.classList.add('correct');
             else if (i === index) btn.classList.add('wrong');
         });
         
@@ -406,18 +635,29 @@ const BossBattle = {
             BossBattle.maxCombo = Math.max(BossBattle.maxCombo, BossBattle.combo);
             
             // Calculate damage with combo bonus
-            let damage = 15 + (BossBattle.combo * 3); // Increased combo multiplier
+            let damage = 15 + (BossBattle.combo * 3);
             if (BossBattle.criticalActive) {
                 damage *= 2;
                 BossBattle.criticalActive = false;
                 BossBattle.addBattleLog('⚡ CRITICAL HIT!', 'critical');
+                
+                // Critical hit visual
+                const playerAvatar = document.getElementById('player-avatar');
+                playerAvatar?.classList.add('critical-strike');
+                setTimeout(() => playerAvatar?.classList.remove('critical-strike'), 500);
             }
             
+            const prevHP = BossBattle.bossHP;
             BossBattle.bossHP = Math.max(0, BossBattle.bossHP - damage);
             BossBattle.totalDamage += damage;
             
             BossBattle.addBattleLog(`You deal ${damage} damage! 💥`, 'player-attack');
             BossBattle.showDamageEffect('boss', damage);
+            
+            // Boss damaged taunt
+            if (damage >= 25) {
+                BossBattle.showBossTaunt(BossBattle.getTaunt('damaged'));
+            }
             
             const comboCounter = document.getElementById('combo-counter');
             if (comboCounter) {
@@ -426,20 +666,54 @@ const BossBattle = {
                 setTimeout(() => comboCounter.classList.remove('pulse'), 300);
             }
             
+            // Check for phase transition (special move)
+            const triggerSpecial = BossBattle.checkBossPhase();
+            
+            BossBattle.updateHP();
+            BossBattle.currentIndex++;
+            
+            if (triggerSpecial && BossBattle.bossHP > 0) {
+                // Boss uses special move before next question
+                setTimeout(() => {
+                    if (!BossBattle.isPlaying) return;
+                    BossBattle.executeBossSpecialMove(() => {
+                        if (BossBattle.playerHP <= 0) {
+                            BossBattle.endBattle(false);
+                        } else if (BossBattle.bossHP <= 0) {
+                            BossBattle.endBattle(true);
+                        } else {
+                            BossBattle.showQuestion();
+                        }
+                    });
+                }, 1000);
+            } else {
+                setTimeout(() => {
+                    if (!BossBattle.isPlaying) return;
+                    if (BossBattle.bossHP <= 0) {
+                        BossBattle.endBattle(true);
+                    } else {
+                        BossBattle.showQuestion();
+                    }
+                }, 1500);
+            }
+            
         } else {
             BossBattle.combo = 0;
             const comboCounter = document.getElementById('combo-counter');
             if (comboCounter) comboCounter.textContent = 'Combo: 0x';
             
-            // Boss attacks with scaled damage
+            // Boss attacks with animation
             const attack = boss.attacks[Math.floor(Math.random() * boss.attacks.length)];
             let damage = BossBattle.scaledBossAttack || boss.attack;
+            
+            // Show boss attack animation
+            BossBattle.playBossAttackAnimation(attack);
+            BossBattle.showBossTaunt(BossBattle.getTaunt('attack'));
             
             if (BossBattle.hasShield) {
                 damage = Math.floor(damage / 2);
                 BossBattle.hasShield = false;
                 BossBattle.addBattleLog(`🛡️ Shield absorbed half the damage!`, 'shield');
-                // Update shield indicator
                 const shieldIndicator = document.getElementById('shield-indicator');
                 if (shieldIndicator) shieldIndicator.classList.remove('active');
             }
@@ -448,28 +722,33 @@ const BossBattle = {
             
             BossBattle.addBattleLog(`${boss.icon} uses ${attack}! -${damage} HP`, 'boss-attack');
             BossBattle.showDamageEffect('player', damage);
-        }
-        
-        BossBattle.updateHP();
-        BossBattle.currentIndex++;
-        
-        // Check for battle end
-        setTimeout(() => {
-            if (!BossBattle.isPlaying) return;
-            if (BossBattle.bossHP <= 0) {
-                BossBattle.endBattle(true);
-            } else if (BossBattle.playerHP <= 0) {
-                BossBattle.endBattle(false);
-            } else {
-                BossBattle.showQuestion();
+            
+            BossBattle.updateHP();
+            BossBattle.currentIndex++;
+            
+            // Check for low HP taunt
+            if (BossBattle.playerHP <= 30 && BossBattle.playerHP > 0) {
+                setTimeout(() => {
+                    BossBattle.showBossTaunt(BossBattle.getTaunt('lowHP'));
+                }, 500);
             }
-        }, 1500);
+            
+            setTimeout(() => {
+                if (!BossBattle.isPlaying) return;
+                if (BossBattle.playerHP <= 0) {
+                    BossBattle.endBattle(false);
+                } else {
+                    BossBattle.showQuestion();
+                }
+            }, 1500);
+        }
     },
 
     usePowerUp: (type) => {
         if (BossBattle.powerUps[type] <= 0) return;
         
         BossBattle.powerUps[type]--;
+        BossBattle.showPowerUpEffect(type);
         
         switch (type) {
             case 'heal':
@@ -480,6 +759,8 @@ const BossBattle = {
             case 'shield':
                 BossBattle.hasShield = true;
                 BossBattle.addBattleLog(`🛡️ Shield activated! Next attack halved.`, 'shield');
+                const shieldIndicator = document.getElementById('shield-indicator');
+                if (shieldIndicator) shieldIndicator.classList.add('active');
                 break;
             case 'critical':
                 BossBattle.criticalActive = true;
@@ -500,7 +781,8 @@ const BossBattle = {
     },
 
     showDamageEffect: (target, damage) => {
-        const element = target === 'boss' ? document.getElementById('boss-avatar') : document.querySelector('.player-avatar');
+        const element = target === 'boss' ? document.getElementById('boss-avatar') : document.getElementById('player-avatar');
+        if (!element) return;
         
         element.classList.add('shake');
         setTimeout(() => element.classList.remove('shake'), 300);
@@ -515,27 +797,38 @@ const BossBattle = {
 
     updateHP: () => {
         const boss = BossBattle.currentBoss;
+        if (!boss) return;
         
         const playerPercent = Math.max(0, BossBattle.playerHP);
-        const bossPercent = Math.max(0, (BossBattle.bossHP / boss.hp) * 100);
+        const bossPercent = Math.max(0, (BossBattle.bossHP / BossBattle.maxBossHP) * 100);
         
-        document.getElementById('player-hp').style.width = playerPercent + '%';
-        document.getElementById('boss-hp').style.width = bossPercent + '%';
+        const playerHPBar = document.getElementById('player-hp');
+        const bossHPBar = document.getElementById('boss-hp');
         
-        document.getElementById('player-hp-text').textContent = `${Math.max(0, BossBattle.playerHP)}/100`;
-        document.getElementById('boss-hp-text').textContent = `${Math.max(0, BossBattle.bossHP)}/${boss.hp}`;
+        if (playerHPBar) playerHPBar.style.width = playerPercent + '%';
+        if (bossHPBar) bossHPBar.style.width = bossPercent + '%';
         
-        // Color changes for low HP
+        const playerHPText = document.getElementById('player-hp-text');
+        const bossHPText = document.getElementById('boss-hp-text');
+        
+        if (playerHPText) playerHPText.textContent = `${Math.max(0, BossBattle.playerHP)}/100`;
+        if (bossHPText) bossHPText.textContent = `${Math.max(0, BossBattle.bossHP)}/${BossBattle.maxBossHP}`;
+        
+        // Low HP effects - shake and critical styling
         if (BossBattle.playerHP <= 30) {
-            document.getElementById('player-hp').classList.add('critical');
+            if (playerHPBar) playerHPBar.classList.add('critical');
+            BossBattle.shakeHealthBar('player');
         }
         if (bossPercent <= 30) {
-            document.getElementById('boss-hp').classList.add('critical');
+            if (bossHPBar) bossHPBar.classList.add('critical');
+            BossBattle.shakeHealthBar('boss');
         }
     },
 
     addBattleLog: (message, type) => {
         const log = document.getElementById('boss-battle-log');
+        if (!log) return;
+        
         const entry = document.createElement('div');
         entry.className = `battle-log-entry ${type}`;
         entry.textContent = message;
@@ -546,6 +839,85 @@ const BossBattle = {
         while (log.children.length > 5) {
             log.removeChild(log.firstChild);
         }
+    },
+
+    // Victory cutscene
+    showVictoryCutscene: (callback) => {
+        const boss = BossBattle.currentBoss;
+        const container = document.querySelector('.boss-battle-view');
+        if (!container || !boss) {
+            callback?.();
+            return;
+        }
+        
+        // Dim the arena
+        container.classList.add('cutscene-active');
+        
+        // Create cutscene overlay
+        const cutscene = document.createElement('div');
+        cutscene.className = 'cutscene victory-cutscene';
+        cutscene.innerHTML = `
+            <div class="cutscene-content">
+                <div class="cutscene-boss defeated-boss">${boss.icon}</div>
+                <div class="cutscene-explosion">💥</div>
+                <div class="cutscene-text">
+                    <div class="victory-text">VICTORY!</div>
+                    <div class="boss-defeated-text">${boss.name} has been defeated!</div>
+                </div>
+                <div class="cutscene-particles"></div>
+            </div>
+        `;
+        container.appendChild(cutscene);
+        
+        // Add particles
+        const particleContainer = cutscene.querySelector('.cutscene-particles');
+        for (let i = 0; i < 20; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'victory-particle';
+            particle.textContent = ['⭐', '✨', '🎉', '🏆'][Math.floor(Math.random() * 4)];
+            particle.style.setProperty('--x', `${Math.random() * 100}%`);
+            particle.style.setProperty('--delay', `${Math.random() * 0.5}s`);
+            particleContainer.appendChild(particle);
+        }
+        
+        setTimeout(() => {
+            cutscene.remove();
+            container.classList.remove('cutscene-active');
+            callback?.();
+        }, 3000);
+    },
+
+    // Defeat cutscene
+    showDefeatCutscene: (callback) => {
+        const boss = BossBattle.currentBoss;
+        const container = document.querySelector('.boss-battle-view');
+        if (!container || !boss) {
+            callback?.();
+            return;
+        }
+        
+        container.classList.add('cutscene-active');
+        
+        const cutscene = document.createElement('div');
+        cutscene.className = 'cutscene defeat-cutscene';
+        cutscene.innerHTML = `
+            <div class="cutscene-content">
+                <div class="cutscene-boss triumphant-boss">${boss.icon}</div>
+                <div class="defeat-overlay"></div>
+                <div class="cutscene-text">
+                    <div class="defeat-text">DEFEATED</div>
+                    <div class="boss-wins-text">${boss.name} was too powerful...</div>
+                    <div class="try-again-text">Study more and try again!</div>
+                </div>
+            </div>
+        `;
+        container.appendChild(cutscene);
+        
+        setTimeout(() => {
+            cutscene.remove();
+            container.classList.remove('cutscene-active');
+            callback?.();
+        }, 3000);
     },
 
     endBattle: (victory) => {
@@ -574,63 +946,72 @@ const BossBattle = {
         }
         if (isPerfect && victory) AppState?.unlockAchievement?.('flawless');
         
-        const container = document.querySelector('.boss-container');
-        if (!container) {
-            console.error('Boss container not found');
-            return;
-        }
-        
-        container.innerHTML = `
-            <button class="game-close-btn" onclick="BossBattle.close()">✕</button>
+        // Show cutscene then results
+        const showResults = () => {
+            const container = document.querySelector('.boss-container');
+            if (!container) {
+                console.error('Boss container not found');
+                return;
+            }
             
-            <div class="boss-results ${victory ? 'victory' : 'defeat'}">
-                <div class="boss-result-banner">
-                    ${victory ? '🎉 VICTORY! 🎉' : '💀 DEFEATED 💀'}
-                </div>
+            container.innerHTML = `
+                <button class="game-close-btn" onclick="BossBattle.close()">✕</button>
                 
-                <div class="boss-defeated-display">
-                    <span class="boss-icon-large" style="background: ${boss.color}">${boss.icon}</span>
-                    <span class="boss-name-large">${boss.name}</span>
-                    ${victory ? '<span class="defeated-text">has been defeated!</span>' : '<span class="defeated-text">has won this time...</span>'}
-                </div>
-                
-                ${isPerfect && victory ? '<div class="perfect-badge">⭐ PERFECT - No damage taken!</div>' : ''}
-                
-                <div class="boss-results-stats">
-                    <div class="boss-result-stat">
-                        <span class="brs-icon">💥</span>
-                        <span class="brs-value">${BossBattle.totalDamage}</span>
-                        <span class="brs-label">Damage Dealt</span>
+                <div class="boss-results ${victory ? 'victory' : 'defeat'}">
+                    <div class="boss-result-banner">
+                        ${victory ? '🎉 VICTORY! 🎉' : '💀 DEFEATED 💀'}
                     </div>
-                    <div class="boss-result-stat">
-                        <span class="brs-icon">🔥</span>
-                        <span class="brs-value">${BossBattle.combo}x</span>
-                        <span class="brs-label">Best Combo</span>
+                    
+                    <div class="boss-defeated-display">
+                        <span class="boss-icon-large" style="background: ${boss.color}">${boss.icon}</span>
+                        <span class="boss-name-large">${boss.name}</span>
+                        ${victory ? '<span class="defeated-text">has been defeated!</span>' : '<span class="defeated-text">has won this time...</span>'}
                     </div>
-                    <div class="boss-result-stat">
-                        <span class="brs-icon">⭐</span>
-                        <span class="brs-value">+${Math.floor(xpEarned)}</span>
-                        <span class="brs-label">XP Earned</span>
+                    
+                    ${isPerfect && victory ? '<div class="perfect-badge">⭐ PERFECT - No damage taken!</div>' : ''}
+                    
+                    <div class="boss-results-stats">
+                        <div class="boss-result-stat">
+                            <span class="brs-icon">💥</span>
+                            <span class="brs-value">${BossBattle.totalDamage}</span>
+                            <span class="brs-label">Damage Dealt</span>
+                        </div>
+                        <div class="boss-result-stat">
+                            <span class="brs-icon">🔥</span>
+                            <span class="brs-value">${BossBattle.maxCombo}x</span>
+                            <span class="brs-label">Best Combo</span>
+                        </div>
+                        <div class="boss-result-stat">
+                            <span class="brs-icon">⭐</span>
+                            <span class="brs-value">+${Math.floor(xpEarned)}</span>
+                            <span class="brs-label">XP Earned</span>
+                        </div>
+                    </div>
+                    
+                    <div class="boss-results-actions">
+                        <button class="btn btn-primary" onclick="BossBattle.startBattle()">
+                            🔄 ${victory ? 'Fight Again' : 'Try Again'}
+                        </button>
+                        <button class="btn btn-secondary" onclick="BossBattle.showMenu()">
+                            Choose Boss
+                        </button>
                     </div>
                 </div>
-                
-                <div class="boss-results-actions">
-                    <button class="btn btn-primary" onclick="BossBattle.startBattle()">
-                        🔄 ${victory ? 'Fight Again' : 'Try Again'}
-                    </button>
-                    <button class="btn btn-secondary" onclick="BossBattle.showMenu()">
-                        Choose Boss
-                    </button>
-                </div>
-            </div>
-        `;
+            `;
+        };
+        
+        // Play appropriate cutscene
+        if (victory) {
+            BossBattle.showVictoryCutscene(showResults);
+        } else {
+            BossBattle.showDefeatCutscene(showResults);
+        }
     },
 
     showMenu: () => {
         try {
             const container = document.querySelector('.boss-container');
             if (container) {
-                // Re-render the menu content
                 const menuHtml = BossBattle.renderMenu();
                 const tempDiv = document.createElement('div');
                 tempDiv.innerHTML = menuHtml;
@@ -669,18 +1050,15 @@ const BossBattle = {
     },
 
     cleanup: () => {
-        // Remove keydown listener
         document.removeEventListener('keydown', BossBattle.keyHandler);
-        // Stop game
         BossBattle.isPlaying = false;
-        // Reset state
         BossBattle.questions = [];
         BossBattle.currentBoss = null;
         console.log('🐉 BossBattle cleanup');
     }
 };
 
-// Keyboard shortcuts handler (defined but not auto-registered)
+// Keyboard shortcuts handler
 BossBattle.keyHandler = (e) => {
     if (!BossBattle.isPlaying) return;
     
@@ -689,7 +1067,370 @@ BossBattle.keyHandler = (e) => {
     
     if (keyMap.hasOwnProperty(key)) {
         e.preventDefault();
-        BossBattle.answer(keyMap[key]);
+        // Get correct index from the currently displayed button
+        const btn = document.querySelector(`.boss-option[data-index="${keyMap[key]}"]`);
+        if (btn && !btn.disabled) {
+            btn.click();
+        }
     }
 };
-// Note: Keyboard handler is now registered in startBattle() and removed in cleanup()
+
+// Inject epic CSS animations
+const epicBossStyles = document.createElement('style');
+epicBossStyles.textContent = `
+    /* Boss Attack Animation */
+    .attack-lunge {
+        animation: attackLunge 0.8s ease-out;
+    }
+    @keyframes attackLunge {
+        0% { transform: translateX(0) scale(1); }
+        30% { transform: translateX(-50px) scale(1.2); }
+        60% { transform: translateX(-100px) scale(1.3); }
+        100% { transform: translateX(0) scale(1); }
+    }
+    
+    .boss-attack-effect {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 100;
+        animation: attackEffect 0.8s ease-out forwards;
+    }
+    .attack-name {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #ef4444;
+        text-shadow: 0 0 20px #ef4444, 0 0 40px #ef4444;
+        animation: flashText 0.2s ease infinite;
+    }
+    @keyframes attackEffect {
+        0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+        50% { opacity: 1; transform: translate(-50%, -50%) scale(1.5); }
+        100% { opacity: 0; transform: translate(-50%, -50%) scale(2); }
+    }
+    @keyframes flashText {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+    }
+    
+    /* Screen Shake */
+    .screen-shake {
+        animation: screenShake 0.3s ease;
+    }
+    @keyframes screenShake {
+        0%, 100% { transform: translateX(0); }
+        20% { transform: translateX(-10px); }
+        40% { transform: translateX(10px); }
+        60% { transform: translateX(-5px); }
+        80% { transform: translateX(5px); }
+    }
+    
+    /* Boss Taunt */
+    .boss-taunt {
+        position: absolute;
+        bottom: -40px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0,0,0,0.8);
+        color: #fff;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-style: italic;
+        opacity: 0;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+        z-index: 10;
+    }
+    .boss-taunt.show {
+        opacity: 1;
+        animation: tauntBounce 0.3s ease;
+    }
+    @keyframes tauntBounce {
+        0% { transform: translateX(-50%) scale(0.8); }
+        50% { transform: translateX(-50%) scale(1.1); }
+        100% { transform: translateX(-50%) scale(1); }
+    }
+    
+    /* Power-up Effects */
+    .powerup-effect {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+    }
+    .powerup-particle {
+        position: absolute;
+        font-size: 1.5rem;
+        animation: particleBurst 1s ease-out forwards;
+    }
+    @keyframes particleBurst {
+        0% { 
+            transform: translate(-50%, -50%) rotate(var(--angle)) translateY(0);
+            opacity: 1;
+        }
+        100% { 
+            transform: translate(-50%, -50%) rotate(var(--angle)) translateY(-80px);
+            opacity: 0;
+        }
+    }
+    .powerup-active {
+        animation: powerupGlow 0.5s ease infinite;
+    }
+    @keyframes powerupGlow {
+        0%, 100% { filter: brightness(1); }
+        50% { filter: brightness(1.3); }
+    }
+    
+    /* HP Bar Shake */
+    .hp-shake {
+        animation: hpShake 0.5s ease;
+    }
+    @keyframes hpShake {
+        0%, 100% { transform: translateX(0); }
+        10% { transform: translateX(-3px); }
+        20% { transform: translateX(3px); }
+        30% { transform: translateX(-3px); }
+        40% { transform: translateX(3px); }
+        50% { transform: translateX(-2px); }
+        60% { transform: translateX(2px); }
+        70% { transform: translateX(-1px); }
+        80% { transform: translateX(1px); }
+    }
+    
+    /* Critical Strike */
+    .critical-strike {
+        animation: criticalStrike 0.5s ease;
+    }
+    @keyframes criticalStrike {
+        0% { transform: scale(1); filter: brightness(1); }
+        25% { transform: scale(1.3); filter: brightness(2) hue-rotate(30deg); }
+        50% { transform: scale(1.1); filter: brightness(1.5); }
+        100% { transform: scale(1); filter: brightness(1); }
+    }
+    
+    /* Boss Charging */
+    .charging {
+        animation: bossCharging 1.5s ease infinite;
+    }
+    @keyframes bossCharging {
+        0% { transform: scale(1); filter: brightness(1); }
+        50% { transform: scale(1.2); filter: brightness(1.5) saturate(2); box-shadow: 0 0 50px var(--boss-color); }
+        100% { transform: scale(1); filter: brightness(1); }
+    }
+    
+    /* Dramatic Entrance */
+    .dramatic-entrance {
+        animation: dramaticEntrance 1.5s ease;
+    }
+    @keyframes dramaticEntrance {
+        0% { transform: scale(0) rotate(-180deg); opacity: 0; }
+        50% { transform: scale(1.5) rotate(0deg); opacity: 1; }
+        75% { transform: scale(0.9); }
+        100% { transform: scale(1); }
+    }
+    
+    /* Special Move Effects */
+    .special-screen-glitch {
+        animation: screenGlitch 1.5s ease;
+    }
+    @keyframes screenGlitch {
+        0%, 100% { filter: none; }
+        10% { filter: hue-rotate(90deg); transform: skewX(5deg); }
+        20% { filter: hue-rotate(180deg); transform: skewX(-5deg); }
+        30% { filter: invert(1); }
+        40% { filter: hue-rotate(270deg); transform: skewX(3deg); }
+        50% { filter: saturate(3); }
+    }
+    
+    .special-fire-breath {
+        animation: fireBreath 1.5s ease;
+        background: linear-gradient(transparent, rgba(255,100,0,0.3));
+    }
+    @keyframes fireBreath {
+        0%, 100% { background: transparent; }
+        50% { background: linear-gradient(transparent, rgba(255,100,0,0.5)); }
+    }
+    
+    .special-earthquake {
+        animation: earthquake 1.5s ease;
+    }
+    @keyframes earthquake {
+        0%, 100% { transform: translateY(0); }
+        10% { transform: translateY(-5px) translateX(-3px); }
+        20% { transform: translateY(5px) translateX(3px); }
+        30% { transform: translateY(-5px) translateX(3px); }
+        40% { transform: translateY(5px) translateX(-3px); }
+        50% { transform: translateY(-3px); }
+    }
+    
+    .special-phase-shift {
+        animation: phaseShift 1.5s ease;
+    }
+    @keyframes phaseShift {
+        0%, 100% { opacity: 1; }
+        25% { opacity: 0.3; filter: blur(5px); }
+        50% { opacity: 0.8; filter: blur(0); }
+        75% { opacity: 0.3; filter: blur(5px); }
+    }
+    
+    .special-shadow-clone, .special-tentacle-grab, .special-hellfire, .special-ultimate-doom {
+        animation: ultimateAttack 1.5s ease;
+    }
+    @keyframes ultimateAttack {
+        0% { filter: brightness(1); }
+        25% { filter: brightness(0.3); }
+        50% { filter: brightness(2) saturate(2); }
+        75% { filter: brightness(0.5); }
+        100% { filter: brightness(1); }
+    }
+    
+    /* Cutscene Styles */
+    .cutscene-active {
+        filter: brightness(0.5);
+    }
+    .cutscene {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        pointer-events: none;
+    }
+    .cutscene-content {
+        text-align: center;
+        position: relative;
+    }
+    
+    /* Victory Cutscene */
+    .victory-cutscene .cutscene-boss {
+        font-size: 5rem;
+        animation: bossDefeat 1s ease forwards;
+    }
+    @keyframes bossDefeat {
+        0% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.5) rotate(10deg); opacity: 1; }
+        100% { transform: scale(0) rotate(180deg); opacity: 0; }
+    }
+    .cutscene-explosion {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 8rem;
+        animation: explosion 1s ease forwards;
+        animation-delay: 0.5s;
+        opacity: 0;
+    }
+    @keyframes explosion {
+        0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+        50% { transform: translate(-50%, -50%) scale(2); opacity: 1; }
+        100% { transform: translate(-50%, -50%) scale(3); opacity: 0; }
+    }
+    .victory-text {
+        font-size: 3rem;
+        font-weight: bold;
+        color: #fbbf24;
+        text-shadow: 0 0 30px #fbbf24;
+        animation: victoryText 0.5s ease forwards;
+        animation-delay: 1s;
+        opacity: 0;
+    }
+    @keyframes victoryText {
+        0% { transform: scale(0); opacity: 0; }
+        50% { transform: scale(1.2); }
+        100% { transform: scale(1); opacity: 1; }
+    }
+    .boss-defeated-text {
+        font-size: 1.2rem;
+        color: #fff;
+        animation: fadeIn 0.5s ease forwards;
+        animation-delay: 1.5s;
+        opacity: 0;
+    }
+    .victory-particle {
+        position: absolute;
+        font-size: 1.5rem;
+        left: var(--x);
+        animation: confetti 2s ease forwards;
+        animation-delay: var(--delay);
+    }
+    @keyframes confetti {
+        0% { transform: translateY(0); opacity: 1; }
+        100% { transform: translateY(-200px) rotate(360deg); opacity: 0; }
+    }
+    
+    /* Defeat Cutscene */
+    .defeat-cutscene .cutscene-boss {
+        font-size: 5rem;
+        animation: bossTriumph 2s ease infinite;
+    }
+    @keyframes bossTriumph {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+    }
+    .defeat-overlay {
+        position: absolute;
+        top: -100px;
+        left: -100px;
+        right: -100px;
+        bottom: -100px;
+        background: radial-gradient(transparent, rgba(0,0,0,0.8));
+        animation: defeatDarken 1s ease forwards;
+    }
+    @keyframes defeatDarken {
+        0% { opacity: 0; }
+        100% { opacity: 1; }
+    }
+    .defeat-text {
+        font-size: 3rem;
+        font-weight: bold;
+        color: #ef4444;
+        text-shadow: 0 0 30px #ef4444;
+        animation: defeatText 0.5s ease forwards;
+        animation-delay: 0.5s;
+        opacity: 0;
+    }
+    @keyframes defeatText {
+        0% { transform: translateY(-20px); opacity: 0; }
+        100% { transform: translateY(0); opacity: 1; }
+    }
+    .boss-wins-text, .try-again-text {
+        color: #fff;
+        animation: fadeIn 0.5s ease forwards;
+        opacity: 0;
+    }
+    .boss-wins-text { animation-delay: 1s; }
+    .try-again-text { animation-delay: 1.5s; font-size: 0.9rem; color: #9ca3af; margin-top: 10px; }
+    
+    @keyframes fadeIn {
+        0% { opacity: 0; }
+        100% { opacity: 1; }
+    }
+    
+    /* Battle Log Entry Animations */
+    .battle-log-entry.special-attack {
+        color: #ef4444;
+        font-weight: bold;
+        animation: specialLogEntry 0.5s ease;
+    }
+    .battle-log-entry.warning {
+        color: #f59e0b;
+        font-weight: bold;
+        animation: warningPulse 0.5s ease infinite;
+    }
+    @keyframes specialLogEntry {
+        0% { transform: scale(1.2); }
+        100% { transform: scale(1); }
+    }
+    @keyframes warningPulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+    }
+`;
+document.head.appendChild(epicBossStyles);
