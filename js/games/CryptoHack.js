@@ -210,9 +210,26 @@ const CryptoHack = {
             return '<div class="error-message">Error loading question. Skipping...</div>';
         }
         
-        // Create shuffled options with their original indices
-        const optionsWithIndices = q.options.map((opt, idx) => ({ text: opt || '', originalIndex: idx }));
-        const shuffledOptions = [...optionsWithIndices].sort(() => Math.random() - 0.5);
+        // Shuffle options using Helpers or fallback to Fisher-Yates
+        let shuffledOptions;
+        if (typeof Helpers !== 'undefined' && Helpers.shuffleOptions) {
+            const shuffled = Helpers.shuffleOptions(q);
+            shuffledOptions = shuffled.options.map((opt, i) => ({
+                text: opt || '',
+                originalIndex: q.options.indexOf(opt)
+            }));
+            // Fix: track where original correct answer is now
+            CryptoHack.currentCorrectIndex = shuffled.answer;
+        } else {
+            // Fallback: Fisher-Yates shuffle
+            const optionsWithIndices = q.options.map((opt, idx) => ({ text: opt || '', originalIndex: idx }));
+            for (let i = optionsWithIndices.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [optionsWithIndices[i], optionsWithIndices[j]] = [optionsWithIndices[j], optionsWithIndices[i]];
+            }
+            shuffledOptions = optionsWithIndices;
+            CryptoHack.currentCorrectIndex = shuffledOptions.findIndex(opt => opt.originalIndex === q.answer);
+        }
         
         return `
             <div class="crypto-question-card">

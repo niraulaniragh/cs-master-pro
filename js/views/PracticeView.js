@@ -612,9 +612,9 @@ const PracticeView = {
 
             const topic = typeof getTopicById === 'function' ? getTopicById(q.topic) : null;
             const options = Array.isArray(q.options) ? q.options : [];
-            const shuffledOptions = options.map((opt, i) => ({ text: opt, originalIndex: i }));
+            let shuffledOptions = options.map((opt, i) => ({ text: opt, originalIndex: i }));
             if (typeof Helpers !== 'undefined' && Helpers.shuffle) {
-                Helpers.shuffle(shuffledOptions);
+                shuffledOptions = Helpers.shuffle(shuffledOptions);
             }
 
             const questionCard = document.getElementById('question-card');
