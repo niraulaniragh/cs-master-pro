@@ -39,44 +39,55 @@ const App = (() => {
             
             console.log('🚀 CS Master Pro - Starting...');
             
-            // Initialize modules in order with error handling
+            // Phase 1: Core infrastructure (order matters: Storage -> Auth -> AppState -> Router)
             safeInit('Storage', () => typeof Storage !== 'undefined' && Storage.init && Storage.init());
             safeInit('Auth', () => typeof Auth !== 'undefined' && Auth.init && Auth.init());
+            safeInit('AppState', () => typeof AppState !== 'undefined' && AppState.init && AppState.init());
+            safeInit('Router', () => typeof Router !== 'undefined' && Router.init && Router.init());
+            
+            // Phase 2: Feature modules (can fail independently)
             safeInit('Classroom', () => typeof Classroom !== 'undefined' && Classroom.init && Classroom.init());
             
-            // Check authentication
+            // Phase 3: Session-dependent initialization with error boundary
             const session = typeof Auth !== 'undefined' ? Auth.getSession() : null;
             const isLoggedIn = session !== null;
             
             console.log('🔑 Session check:', isLoggedIn ? 'Found session' : 'No session');
             
-            if (isLoggedIn) {
-                handleLoggedInUser();
-            } else {
-                handleGuestUser();
-            }
-            
-            // Update nav stats safely
-            if (typeof AppState !== 'undefined' && typeof AppState.updateNavStats === 'function') {
-                AppState.updateNavStats();
-            }
-            
-            // Initialize router
-            safeInit('Router', () => typeof Router !== 'undefined' && Router.init && Router.init());
-            
-            // Apply syntax highlighting to any existing code blocks
-            if (typeof hljs !== 'undefined' && typeof hljs.highlightAll === 'function') {
+            try {
+                if (isLoggedIn) {
+                    handleLoggedInUser();
+                } else {
+                    handleGuestUser();
+                }
+            } catch (sessionError) {
+                console.error('❌ Session handling failed:', sessionError);
+                // Fallback to guest mode on any session error
                 try {
-                    hljs.highlightAll();
-                } catch (e) {
-                    console.warn('Syntax highlighting failed:', e);
+                    handleGuestUser();
+                } catch (guestError) {
+                    console.error('❌ Guest fallback failed:', guestError);
                 }
             }
             
-            // Cleanup old games
-            if (typeof Classroom !== 'undefined' && typeof Classroom.cleanupGames === 'function') {
-                Classroom.cleanupGames();
-            }
+            // Phase 4: Post-init tasks (non-critical)
+            safeInit('NavStats', () => {
+                if (typeof AppState !== 'undefined' && typeof AppState.updateNavStats === 'function') {
+                    AppState.updateNavStats();
+                }
+            });
+            
+            safeInit('SyntaxHighlight', () => {
+                if (typeof hljs !== 'undefined' && typeof hljs.highlightAll === 'function') {
+                    hljs.highlightAll();
+                }
+            });
+            
+            safeInit('GameCleanup', () => {
+                if (typeof Classroom !== 'undefined' && typeof Classroom.cleanupGames === 'function') {
+                    Classroom.cleanupGames();
+                }
+            });
             
             isInitialized = true;
             console.log('✅ Application initialized successfully');
@@ -100,14 +111,9 @@ const App = (() => {
             
             if (user) {
                 const profile = user.profile;
-                if (profile && typeof AppState !== 'undefined') {
-                    if (typeof AppState.initWithProfile === 'function') {
-                        AppState.initWithProfile(profile);
-                    } else if (typeof AppState.init === 'function') {
-                        AppState.init();
-                    }
-                } else if (typeof AppState !== 'undefined' && typeof AppState.init === 'function') {
-                    AppState.init();
+                // AppState already initialized in init(), just load profile if available
+                if (profile && typeof AppState !== 'undefined' && typeof AppState.initWithProfile === 'function') {
+                    AppState.initWithProfile(profile);
                 }
                 
                 // Update last active
@@ -127,9 +133,6 @@ const App = (() => {
                 if (typeof Auth.logout === 'function') {
                     Auth.logout();
                 }
-                if (typeof AppState !== 'undefined' && typeof AppState.init === 'function') {
-                    AppState.init();
-                }
                 setTimeout(() => {
                     if (typeof AuthModal !== 'undefined' && typeof AuthModal.show === 'function') {
                         AuthModal.show('login');
@@ -138,7 +141,8 @@ const App = (() => {
             }
         } catch (error) {
             console.error('Error handling logged in user:', error);
-            handleGuestUser();
+            // Re-throw to let the error boundary in init() handle it
+            throw error;
         }
     };
 
@@ -146,9 +150,7 @@ const App = (() => {
      * Handle guest user initialization
      */
     const handleGuestUser = () => {
-        if (typeof AppState !== 'undefined' && typeof AppState.init === 'function') {
-            AppState.init();
-        }
+        // AppState already initialized in init()
         // Show landing page for guests instead of login modal
         // The landing page has login/register buttons
         
@@ -251,23 +253,57 @@ const App = (() => {
     };
 
     /**
-     * Handle logout
+     * Handle logout with proper cleanup
      */
     const logout = () => {
         if (confirm('Are you sure you want to log out?')) {
             try {
+                // Phase 1: Clean up UI elements
+                hideGuestModeBadge();
+                
+                // Remove teacher nav link
+                const teacherLink = document.querySelector('.nav-link[data-route="teacher"]');
+                if (teacherLink && teacherLink.parentNode) {
+                    teacherLink.remove();
+                }
+                
+                // Phase 2: Clean up module state
+                if (typeof AppState !== 'undefined' && typeof AppState.reset === 'function') {
+                    AppState.reset();
+                }
+                
+                if (typeof Classroom !== 'undefined' && typeof Classroom.cleanup === 'function') {
+                    Classroom.cleanup();
+                }
+                
+                if (typeof Router !== 'undefined' && typeof Router.cleanup === 'function') {
+                    Router.cleanup();
+                }
+                
+                // Phase 3: Clear any active modals
+                if (typeof Modal !== 'undefined' && typeof Modal.close === 'function') {
+                    Modal.close();
+                }
+                
+                // Phase 4: Call Auth logout (clears session storage)
                 if (typeof Auth !== 'undefined' && typeof Auth.logout === 'function') {
                     Auth.logout();
                 }
+                
+                // Reset initialization flag to allow re-init after reload
+                isInitialized = false;
+                
                 if (typeof Toast !== 'undefined' && typeof Toast.show === 'function') {
                     Toast.show('You have been logged out', 'info');
                 }
-                // Reload to show login
+                
+                // Reload to reset application state
                 setTimeout(() => {
                     window.location.reload();
                 }, 500);
             } catch (error) {
                 console.error('Error during logout:', error);
+                // Force reload even on error to ensure clean state
                 window.location.reload();
             }
         }

@@ -65,13 +65,22 @@ const Classroom = {
     
     /**
      * Generate unique classroom code (6 characters)
+     * @param {Object} existingCodes - Optional object of existing codes to check against
      */
-    generateCode: () => {
+    generateCode: (existingCodes = null) => {
         const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Removed confusing chars (0, O, 1, I)
-        let code = '';
-        for (let i = 0; i < Classroom.CODE_LENGTH; i++) {
-            code += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
+        const maxAttempts = 20;
+        let attempts = 0;
+        let code;
+        
+        do {
+            code = '';
+            for (let i = 0; i < Classroom.CODE_LENGTH; i++) {
+                code += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            attempts++;
+        } while (existingCodes && existingCodes[code] && attempts < maxAttempts);
+        
         return code;
     },
     
@@ -108,16 +117,11 @@ const Classroom = {
             
             const classrooms = Classroom.getClassrooms();
             
-            // Generate unique code (with retry limit)
-            let code;
-            let attempts = 0;
-            const maxAttempts = 10;
-            do {
-                code = Classroom.generateCode();
-                attempts++;
-            } while (classrooms[code] && attempts < maxAttempts);
+            // Generate unique code with collision checking
+            const code = Classroom.generateCode(classrooms);
             
-            if (attempts >= maxAttempts) {
+            // Verify code is unique
+            if (classrooms[code]) {
                 return { success: false, error: 'Failed to generate unique code. Please try again.' };
             }
             
@@ -250,7 +254,11 @@ const Classroom = {
      */
     leave: (code) => {
         try {
-            const user = typeof Auth !== 'undefined' && typeof Auth.getCurrentUser === 'function' 
+            if (typeof Auth === 'undefined' || !Auth.isStudent || !Auth.isStudent()) {
+                return { success: false, error: 'Only students can leave classrooms' };
+            }
+            
+            const user = typeof Auth.getCurrentUser === 'function' 
                 ? Auth.getCurrentUser() : null;
             if (!user) {
                 return { success: false, error: 'Not logged in' };
@@ -261,16 +269,20 @@ const Classroom = {
             }
             
             const classrooms = Classroom.getClassrooms();
-            const classroom = classrooms[code];
+            const normalizedCode = code.toUpperCase().trim();
+            const classroom = classrooms[normalizedCode];
             
             if (!classroom) {
                 return { success: false, error: 'Classroom not found' };
             }
             
-            // Remove student from classroom
-            if (Array.isArray(classroom.students)) {
-                classroom.students = classroom.students.filter(s => s && s.id !== user.id);
+            // Verify user is in this classroom
+            if (!Array.isArray(classroom.students) || !classroom.students.some(s => s && s.id === user.id)) {
+                return { success: false, error: 'You are not in this classroom' };
             }
+            
+            // Remove student from classroom
+            classroom.students = classroom.students.filter(s => s && s.id !== user.id);
             
             if (!Classroom.saveClassrooms(classrooms)) {
                 return { success: false, error: 'Failed to leave classroom' };
@@ -280,7 +292,7 @@ const Classroom = {
             if (typeof Auth.getUsers === 'function' && typeof Auth.saveUsers === 'function') {
                 const users = Auth.getUsers();
                 if (users[user.email] && Array.isArray(users[user.email].joinedClassrooms)) {
-                    users[user.email].joinedClassrooms = users[user.email].joinedClassrooms.filter(c => c !== code);
+                    users[user.email].joinedClassrooms = users[user.email].joinedClassrooms.filter(c => c !== normalizedCode);
                     Auth.saveUsers(users);
                 }
             }
@@ -434,31 +446,53 @@ const Classroom = {
      */
     removeStudent: (code, studentId) => {
         try {
-            const user = typeof Auth !== 'undefined' && typeof Auth.getCurrentUser === 'function' 
+            if (typeof Auth === 'undefined' || !Auth.isTeacher || !Auth.isTeacher()) {
+                return { success: false, error: 'Only teachers can remove students' };
+            }
+            
+            const user = typeof Auth.getCurrentUser === 'function' 
                 ? Auth.getCurrentUser() : null;
             if (!user) {
                 return { success: false, error: 'Not logged in' };
             }
             
+            if (!code || typeof code !== 'string' || !studentId) {
+                return { success: false, error: 'Invalid classroom code or student ID' };
+            }
+            
             const classrooms = Classroom.getClassrooms();
-            const classroom = classrooms[code];
+            const normalizedCode = code.toUpperCase().trim();
+            const classroom = classrooms[normalizedCode];
             
-            if (!classroom || classroom.teacherId !== user.id) {
-                return { success: false, error: 'Classroom not found or unauthorized' };
+            if (!classroom) {
+                return { success: false, error: 'Classroom not found' };
             }
             
-            if (Array.isArray(classroom.students)) {
-                classroom.students = classroom.students.filter(s => s && s.id !== studentId);
+            if (classroom.teacherId !== user.id) {
+                return { success: false, error: 'Only the classroom teacher can remove students' };
             }
             
-            Classroom.saveClassrooms(classrooms);
+            // Check if student is in classroom
+            if (!Array.isArray(classroom.students) || !classroom.students.some(s => s && s.id === studentId)) {
+                return { success: false, error: 'Student not found in this classroom' };
+            }
+            
+            // Remove student from classroom
+            classroom.students = classroom.students.filter(s => s && s.id !== studentId);
+            
+            if (!Classroom.saveClassrooms(classrooms)) {
+                return { success: false, error: 'Failed to remove student' };
+            }
             
             // Remove from student's joined list
             if (typeof Auth.getUsers === 'function' && typeof Auth.saveUsers === 'function') {
                 const users = Auth.getUsers();
-                const studentUser = Object.values(users).find(u => u && u.id === studentId);
-                if (studentUser && Array.isArray(studentUser.joinedClassrooms)) {
-                    studentUser.joinedClassrooms = studentUser.joinedClassrooms.filter(c => c !== code);
+                // Find student by their ID in the users object (keyed by email)
+                const studentEmail = Object.keys(users).find(email => 
+                    users[email] && users[email].id === studentId
+                );
+                if (studentEmail && Array.isArray(users[studentEmail].joinedClassrooms)) {
+                    users[studentEmail].joinedClassrooms = users[studentEmail].joinedClassrooms.filter(c => c !== normalizedCode);
                     Auth.saveUsers(users);
                 }
             }
@@ -466,7 +500,7 @@ const Classroom = {
             return { success: true };
         } catch (error) {
             console.error('Error removing student:', error);
-            return { success: false, error: 'An error occurred' };
+            return { success: false, error: 'An error occurred while removing the student' };
         }
     },
     
@@ -518,7 +552,14 @@ const Classroom = {
             }
             
             const gameId = Date.now().toString(36) + Math.random().toString(36).substring(2);
-            const joinCode = Classroom.generateCode();
+            const games = Classroom.getActiveGames();
+            
+            // Generate unique join code with collision checking against existing games
+            const existingJoinCodes = {};
+            Object.values(games).forEach(g => {
+                if (g && g.joinCode) existingJoinCodes[g.joinCode] = true;
+            });
+            const joinCode = Classroom.generateCode(existingJoinCodes);
             
             const game = {
                 id: gameId,
@@ -540,7 +581,6 @@ const Classroom = {
                 results: []
             };
             
-            const games = Classroom.getActiveGames();
             games[gameId] = game;
             Classroom.saveActiveGames(games);
             

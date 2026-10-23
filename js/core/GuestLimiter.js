@@ -17,14 +17,36 @@ const GuestLimiter = (function() {
         pastPapers: 0        // Past papers (premium only)
     };
     
-    // Track guest usage in session
-    const sessionUsage = {
-        questionsAnswered: 0,
-        flashcardsViewed: 0,
-        gamesPlayed: [],     // Array of game IDs played
-        topicsViewed: [],    // Array of topic IDs viewed
-        toolsUsed: []        // Array of tool IDs used
-    };
+    // Track guest usage in session (persisted to sessionStorage)
+    const SESSION_KEY = 'guestLimiterUsage';
+    
+    function loadSessionUsage() {
+        try {
+            const stored = sessionStorage.getItem(SESSION_KEY);
+            if (stored) {
+                return JSON.parse(stored);
+            }
+        } catch (e) {
+            console.warn('Failed to load guest usage from session:', e);
+        }
+        return {
+            questionsAnswered: 0,
+            flashcardsViewed: 0,
+            gamesPlayed: [],
+            topicsViewed: [],
+            toolsUsed: []
+        };
+    }
+    
+    function saveSessionUsage() {
+        try {
+            sessionStorage.setItem(SESSION_KEY, JSON.stringify(sessionUsage));
+        } catch (e) {
+            console.warn('Failed to save guest usage to session:', e);
+        }
+    }
+    
+    let sessionUsage = loadSessionUsage();
     
     /**
      * Check if user is a guest (not logged in)
@@ -82,11 +104,17 @@ const GuestLimiter = (function() {
     
     /**
      * Record a question answered
+     * Returns false if limit reached (caller should check canAnswerQuestion first)
      */
     function recordQuestion() {
         if (isGuest()) {
+            if (sessionUsage.questionsAnswered >= LIMITS.questions) {
+                return false;
+            }
             sessionUsage.questionsAnswered++;
+            saveSessionUsage();
         }
+        return true;
     }
     
     /**
@@ -107,11 +135,17 @@ const GuestLimiter = (function() {
     
     /**
      * Record a flashcard viewed
+     * Returns false if limit reached
      */
     function recordFlashcard() {
         if (isGuest()) {
+            if (sessionUsage.flashcardsViewed >= LIMITS.flashcards) {
+                return false;
+            }
             sessionUsage.flashcardsViewed++;
+            saveSessionUsage();
         }
+        return true;
     }
     
     /**
@@ -137,11 +171,20 @@ const GuestLimiter = (function() {
     
     /**
      * Record a game played
+     * Returns false if limit reached and game not already played
      */
     function recordGame(gameId) {
-        if (isGuest() && !sessionUsage.gamesPlayed.includes(gameId)) {
+        if (isGuest()) {
+            if (sessionUsage.gamesPlayed.includes(gameId)) {
+                return true; // Already played, allow replay
+            }
+            if (sessionUsage.gamesPlayed.length >= LIMITS.games) {
+                return false;
+            }
             sessionUsage.gamesPlayed.push(gameId);
+            saveSessionUsage();
         }
+        return true;
     }
     
     /**
@@ -167,11 +210,20 @@ const GuestLimiter = (function() {
     
     /**
      * Record a topic viewed
+     * Returns false if limit reached and topic not already viewed
      */
     function recordTopic(topicId) {
-        if (isGuest() && !sessionUsage.topicsViewed.includes(topicId)) {
+        if (isGuest()) {
+            if (sessionUsage.topicsViewed.includes(topicId)) {
+                return true;
+            }
+            if (sessionUsage.topicsViewed.length >= LIMITS.topics) {
+                return false;
+            }
             sessionUsage.topicsViewed.push(topicId);
+            saveSessionUsage();
         }
+        return true;
     }
     
     /**
@@ -196,11 +248,20 @@ const GuestLimiter = (function() {
     
     /**
      * Record a tool used
+     * Returns false if limit reached and tool not already used
      */
     function recordTool(toolId) {
-        if (isGuest() && !sessionUsage.toolsUsed.includes(toolId)) {
+        if (isGuest()) {
+            if (sessionUsage.toolsUsed.includes(toolId)) {
+                return true;
+            }
+            if (sessionUsage.toolsUsed.length >= LIMITS.tools) {
+                return false;
+            }
             sessionUsage.toolsUsed.push(toolId);
+            saveSessionUsage();
         }
+        return true;
     }
     
     /**
@@ -284,7 +345,16 @@ const GuestLimiter = (function() {
             if (e.target === overlay) closeOverlay();
         });
         
+        // Keyboard handler for Escape key
+        function handleKeydown(e) {
+            if (e.key === 'Escape') {
+                closeOverlay();
+            }
+        }
+        document.addEventListener('keydown', handleKeydown);
+        
         function closeOverlay() {
+            document.removeEventListener('keydown', handleKeydown);
             overlay.classList.remove('visible');
             setTimeout(() => overlay.remove(), 300);
         }
@@ -304,23 +374,65 @@ const GuestLimiter = (function() {
     
     /**
      * Show inline limit message (for embedding in views)
+     * Returns an object with HTML and a setup function to attach event listener
      */
     function getLimitBanner(message) {
+        const bannerId = 'guest-banner-' + Date.now();
+        const html = `
+            <div class="guest-limit-banner" id="${bannerId}">
+                <div class="guest-limit-banner-content">
+                    <span class="guest-limit-banner-icon">🔒</span>
+                    <span class="guest-limit-banner-text">${escapeHtml(message)}</span>
+                </div>
+                <button class="btn btn-primary btn-small guest-signup-inline" data-guest-signup>
+                    Sign Up Free
+                </button>
+            </div>
+        `;
+        
+        // Setup function to attach event listener after DOM insertion
+        const setup = () => {
+            const banner = document.getElementById(bannerId);
+            if (banner) {
+                const btn = banner.querySelector('[data-guest-signup]');
+                if (btn) {
+                    btn.addEventListener('click', () => showSignupPrompt(message));
+                }
+            }
+        };
+        
+        return { html, setup, bannerId };
+    }
+    
+    /**
+     * Legacy getLimitBanner that returns just HTML (for backward compatibility)
+     * Uses event delegation on document
+     */
+    function getLimitBannerHtml(message) {
         return `
             <div class="guest-limit-banner">
                 <div class="guest-limit-banner-content">
                     <span class="guest-limit-banner-icon">🔒</span>
                     <span class="guest-limit-banner-text">${escapeHtml(message)}</span>
                 </div>
-                <button class="btn btn-primary btn-small guest-signup-inline" onclick="GuestLimiter.showSignupPrompt('${escapeHtml(message)}')">
+                <button class="btn btn-primary btn-small guest-signup-inline" data-guest-message="${escapeHtml(message)}">
                     Sign Up Free
                 </button>
             </div>
         `;
     }
     
+    // Event delegation for inline signup buttons (handles XSS-safe approach)
+    document.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-guest-message]');
+        if (btn) {
+            const message = btn.getAttribute('data-guest-message');
+            showSignupPrompt(message);
+        }
+    });
+    
     /**
-     * Reset session usage (for testing)
+     * Reset session usage (for testing or on logout)
      */
     function resetUsage() {
         sessionUsage.questionsAnswered = 0;
@@ -328,6 +440,11 @@ const GuestLimiter = (function() {
         sessionUsage.gamesPlayed = [];
         sessionUsage.topicsViewed = [];
         sessionUsage.toolsUsed = [];
+        try {
+            sessionStorage.removeItem(SESSION_KEY);
+        } catch (e) {
+            console.warn('Failed to clear guest usage from session:', e);
+        }
     }
     
     // Public API
@@ -348,6 +465,7 @@ const GuestLimiter = (function() {
         getUsageStats,
         showSignupPrompt,
         getLimitBanner,
+        getLimitBannerHtml,
         resetUsage,
         LIMITS
     };
