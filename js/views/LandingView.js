@@ -14,15 +14,15 @@ const LandingView = {
                     <p class="landing-subtitle">Master Computer Science the smart way. Interactive quizzes, engaging games, and comprehensive notes designed for Edexcel IGCSE success.</p>
                     <div class="landing-stats-row">
                         <div class="landing-stat">
-                            <span class="stat-num">11</span>
+                            <span class="stat-num">9</span>
                             <span class="stat-label">Topics</span>
                         </div>
                         <div class="landing-stat">
-                            <span class="stat-num">200+</span>
+                            <span class="stat-num">500+</span>
                             <span class="stat-label">Questions</span>
                         </div>
                         <div class="landing-stat">
-                            <span class="stat-num">12</span>
+                            <span class="stat-num">11</span>
                             <span class="stat-label">Games</span>
                         </div>
                         <div class="landing-stat">
