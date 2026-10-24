@@ -259,10 +259,10 @@ const AuthModal = {
                             ` : ''}
                             
                             <div class="auth-field">
-                                <label for="auth-email">Email</label>
-                                <input type="email" id="auth-email" name="email" 
-                                       placeholder="Enter your email" required maxlength="254"
-                                       autocomplete="email">
+                                <label for="auth-email">${isLogin ? 'Email or Username' : 'Email'}</label>
+                                <input type="${isLogin ? 'text' : 'email'}" id="auth-email" name="email" 
+                                       placeholder="${isLogin ? 'Enter email or username' : 'Enter your email'}" required maxlength="254"
+                                       autocomplete="${isLogin ? 'username' : 'email'}">
                             </div>
                             
                             <div class="auth-field">
@@ -549,16 +549,26 @@ const AuthModal = {
             const email = (form.email?.value || '').trim();
             const password = form.password?.value || '';
 
-            // Validate email with descriptive message
-            const emailValidation = AuthModal.validateEmail(email);
-            if (!emailValidation.isValid) {
-                AuthModal.showError(emailValidation.message);
-                form.email?.focus();
-                return;
+            // Validate email/username
+            const isSignup = AuthModal.mode === 'signup';
+            if (isSignup) {
+                // Strict email validation for signup
+                const emailValidation = AuthModal.validateEmail(email);
+                if (!emailValidation.isValid) {
+                    AuthModal.showError(emailValidation.message);
+                    form.email?.focus();
+                    return;
+                }
+            } else {
+                // For login, just check it's not empty
+                if (!email) {
+                    AuthModal.showError('Please enter your email or username');
+                    form.email?.focus();
+                    return;
+                }
             }
 
             // Validate password (stricter for signup)
-            const isSignup = AuthModal.mode === 'signup';
             const passwordValidation = AuthModal.validatePassword(password, isSignup);
             if (!passwordValidation.isValid) {
                 AuthModal.showError(passwordValidation.message);

@@ -402,28 +402,41 @@ const Auth = {
     },
 
     /**
-     * Login user
+     * Login user (accepts email or username)
      */
-    login: async (email, password) => {
+    login: async (emailOrUsername, password) => {
         try {
-            if (!email || !password) {
-                return { success: false, error: 'Please enter email and password' };
+            if (!emailOrUsername || !password) {
+                return { success: false, error: 'Please enter email/username and password' };
             }
 
-            const normalizedEmail = (email + '').toLowerCase().trim();
+            const input = (emailOrUsername + '').toLowerCase().trim();
+            const users = Auth.getUsers();
+            
+            // Find user by email or username
+            let user = users[input]; // Try as email first
+            let userEmail = input;
+            
+            if (!user) {
+                // Try to find by username
+                for (const [email, u] of Object.entries(users)) {
+                    if (u.username && u.username.toLowerCase() === input) {
+                        user = u;
+                        userEmail = email;
+                        break;
+                    }
+                }
+            }
 
             // Check rate limiting
-            if (Auth.isAccountLocked(normalizedEmail)) {
-                const remaining = Auth.getRemainingLockoutTime(normalizedEmail);
+            if (Auth.isAccountLocked(userEmail)) {
+                const remaining = Auth.getRemainingLockoutTime(userEmail);
                 return { success: false, error: `Account temporarily locked. Try again in ${remaining} minute(s).` };
             }
 
-            const users = Auth.getUsers();
-            const user = users[normalizedEmail];
-
             if (!user) {
-                Auth.recordFailedAttempt(normalizedEmail);
-                return { success: false, error: 'No account found with this email' };
+                Auth.recordFailedAttempt(input);
+                return { success: false, error: 'No account found with this email or username' };
             }
 
             // Verify password - support both old and new hash formats
