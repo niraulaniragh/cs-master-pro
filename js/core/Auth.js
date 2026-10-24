@@ -465,7 +465,7 @@ const Auth = {
             }
             
             if (!isValid) {
-                const attempts = Auth.recordFailedAttempt(normalizedEmail);
+                const attempts = Auth.recordFailedAttempt(userEmail);
                 const remaining = Auth.MAX_FAILED_ATTEMPTS - attempts;
                 if (remaining > 0) {
                     return { success: false, error: `Incorrect password. ${remaining} attempt(s) remaining.` };
@@ -476,7 +476,7 @@ const Auth = {
             }
 
             // Clear failed attempts on successful login
-            Auth.clearFailedAttempts(normalizedEmail);
+            Auth.clearFailedAttempts(userEmail);
 
             // Update last active
             if (!user.profile) {
