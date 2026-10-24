@@ -15,7 +15,7 @@ const Auth = {
     LOCKOUT_DURATION: 15 * 60 * 1000, // 15 minutes in milliseconds
     
     // Session config
-    SESSION_DURATION: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
+    SESSION_DURATION: 12 * 60 * 60 * 1000, // 12 hours in milliseconds
     SESSION_REFRESH_THRESHOLD: 30 * 60 * 1000, // Refresh if less than 30 min remaining
     
     /**
