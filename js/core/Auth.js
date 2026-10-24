@@ -542,6 +542,16 @@ const Auth = {
             if (session.expiresAt && now > session.expiresAt) {
                 console.log('🔐 Session expired');
                 Auth.clearSessionData();
+                // Show user-friendly message
+                if (typeof Toast !== 'undefined' && Toast.show) {
+                    Toast.show('Your session has expired. Please log in again.', 'warning');
+                }
+                // Show login modal after a brief delay
+                setTimeout(() => {
+                    if (typeof AuthModal !== 'undefined' && AuthModal.show) {
+                        AuthModal.show('login');
+                    }
+                }, 500);
                 return null;
             }
             
@@ -552,6 +562,15 @@ const Auth = {
                 if (!user || user.activeSessionToken !== session.sessionToken) {
                     console.log('🔐 Session token invalid (possibly logged in elsewhere)');
                     Auth.clearSessionData();
+                    // Show user-friendly message
+                    if (typeof Toast !== 'undefined' && Toast.show) {
+                        Toast.show('You have been logged out. Please log in again.', 'warning');
+                    }
+                    setTimeout(() => {
+                        if (typeof AuthModal !== 'undefined' && AuthModal.show) {
+                            AuthModal.show('login');
+                        }
+                    }, 500);
                     return null;
                 }
             }
